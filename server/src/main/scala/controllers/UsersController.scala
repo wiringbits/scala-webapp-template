@@ -10,7 +10,7 @@ import play.api.mvc.{AbstractController, ControllerComponents}
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class UsersController @Inject()(
+class UsersController @Inject() (
     usersService: UsersService,
     loggerService: UserLogsService
 )(implicit cc: ControllerComponents, ec: ExecutionContext, jwtConfig: JwtConfig)

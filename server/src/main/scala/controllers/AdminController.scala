@@ -10,7 +10,7 @@ import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class AdminController @Inject()(
+class AdminController @Inject() (
     adminService: AdminService
 )(implicit cc: ControllerComponents, ec: ExecutionContext)
     extends AbstractController(cc) {

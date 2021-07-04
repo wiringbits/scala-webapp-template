@@ -7,6 +7,7 @@ import scala.concurrent.ExecutionContext
 case class API(client: ApiClient)
 
 object API {
+
   // allows overriding the server url
   private val apiUrl = {
     net.wiringbits.BuildInfo.apiUrl.filter(_.nonEmpty).getOrElse {

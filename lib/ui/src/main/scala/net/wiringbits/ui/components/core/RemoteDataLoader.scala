@@ -17,6 +17,7 @@ import scala.util.{Failure, Success}
  *   retry button so that the user is able to try again.
  */
 object RemoteDataLoader {
+
   sealed trait DataState[T] extends Product with Serializable {
     def loaded(data: T): DataState.Loaded[T] = DataState.Loaded(data)
     def failed(msg: String): DataState.Failed[T] = DataState.Failed(msg)
@@ -51,7 +52,6 @@ object RemoteDataLoader {
   )
 
   /**
-   *
    * @tparam D The data to fetch and render
    * @return the component
    */
