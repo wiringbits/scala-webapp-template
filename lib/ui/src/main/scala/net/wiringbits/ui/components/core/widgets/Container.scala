@@ -19,6 +19,7 @@ import slinky.web.html._
 import scala.scalajs.js
 
 @react object Container {
+
   case class Props(
       child: ReactElement,
       margin: EdgeInsets = EdgeInsets.all(0),

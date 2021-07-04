@@ -51,8 +51,7 @@ object ApiClient {
 
   // TODO: X-Authorization header is being used to keep the nginx basic-authentication
   // once that's removed, Authorization header can be used instead.
-  class DefaultImpl(config: Config)(
-      implicit
+  class DefaultImpl(config: Config)(implicit
       backend: SttpBackend[Future, Nothing, Nothing],
       ec: ExecutionContext
   ) extends ApiClient {

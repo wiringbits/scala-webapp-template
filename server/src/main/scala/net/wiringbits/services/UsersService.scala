@@ -21,12 +21,12 @@ import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class UsersService @Inject()(
+class UsersService @Inject() (
     jwtConfig: JwtConfig,
     repository: UsersRepository,
     userLogsRepository: UserLogsRepository
-)(
-    implicit ec: ExecutionContext
+)(implicit
+    ec: ExecutionContext
 ) {
   private implicit val clock: Clock = Clock.systemUTC
 

@@ -9,7 +9,7 @@ import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class UsersRepository @Inject()(database: Database)(implicit ec: DatabaseExecutionContext) {
+class UsersRepository @Inject() (database: Database)(implicit ec: DatabaseExecutionContext) {
 
   def create(request: User.CreateUser): Future[Unit] = Future {
     database.withConnection { implicit conn =>

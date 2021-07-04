@@ -7,8 +7,8 @@ import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class AdminService @Inject()(userLogsRepository: UserLogsRepository, usersRepository: UsersRepository)(
-    implicit ec: ExecutionContext
+class AdminService @Inject() (userLogsRepository: UserLogsRepository, usersRepository: UsersRepository)(implicit
+    ec: ExecutionContext
 ) {
 
   def userLogs(userId: UUID): Future[AdminGetUserLogsResponse] = {

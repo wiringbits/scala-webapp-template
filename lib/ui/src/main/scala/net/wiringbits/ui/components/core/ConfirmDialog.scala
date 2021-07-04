@@ -7,6 +7,7 @@ import slinky.core.annotations.react
 import slinky.web.html._
 
 @react object ConfirmDialog {
+
   case class Props(
       visible: Boolean,
       title: String,

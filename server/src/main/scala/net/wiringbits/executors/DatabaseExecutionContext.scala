@@ -11,7 +11,7 @@ trait DatabaseExecutionContext extends ExecutionContext
 object DatabaseExecutionContext {
 
   @Singleton
-  class AkkaBased @Inject()(system: ActorSystem)
+  class AkkaBased @Inject() (system: ActorSystem)
       extends CustomExecutionContext(system, "database.dispatcher")
       with DatabaseExecutionContext
 }
