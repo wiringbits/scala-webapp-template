@@ -32,7 +32,7 @@ trait PlayAPISpec extends PlaySpec with ScalaFutures {
     )
   }
 
-  /** Syntactic sugar for calling APIs **/
+  /** Syntactic sugar for calling APIs * */
   def GET(url: String, extraHeaders: (String, String)*)(implicit application: Application): Future[Result] = {
     val headers = JsonHeader :: extraHeaders.toList
     val request = FakeRequest("GET", url)
@@ -47,8 +47,8 @@ trait PlayAPISpec extends PlaySpec with ScalaFutures {
     POST(url, EmptyJson, extraHeaders: _*)
   }
 
-  def POST(url: String, jsonBody: String, extraHeaders: (String, String)*)(
-      implicit application: Application
+  def POST(url: String, jsonBody: String, extraHeaders: (String, String)*)(implicit
+      application: Application
   ): Future[Result] = {
     val headers = JsonHeader :: extraHeaders.toList
     val request = FakeRequest("POST", url)
@@ -64,8 +64,8 @@ trait PlayAPISpec extends PlaySpec with ScalaFutures {
     PUT(url, EmptyJson, extraHeaders: _*)
   }
 
-  def PUT(url: String, jsonBody: String, extraHeaders: (String, String)*)(
-      implicit application: Application
+  def PUT(url: String, jsonBody: String, extraHeaders: (String, String)*)(implicit
+      application: Application
   ): Future[Result] = {
     val headers = JsonHeader :: extraHeaders.toList
     val request = FakeRequest("PUT", url)
@@ -97,11 +97,10 @@ object PlayAPISpec {
 
       def toQueryString: String = {
         params
-          .map {
-            case (key, value) =>
-              val encodedKey = URLEncoder.encode(key, "UTF-8")
-              val encodedValue = URLEncoder.encode(value, "UTF-8")
-              List(encodedKey, encodedValue).mkString("=")
+          .map { case (key, value) =>
+            val encodedKey = URLEncoder.encode(key, "UTF-8")
+            val encodedValue = URLEncoder.encode(value, "UTF-8")
+            List(encodedKey, encodedValue).mkString("=")
           }
           .mkString("&")
       }

@@ -5,11 +5,12 @@ ThisBuild / scalaVersion := "2.13.6"
 ThisBuild / organization := "net.wiringbits"
 
 val playJson = "2.9.2"
-val sttp = "2.1.2"
+val sttp = "2.1.5"
 
 val consoleDisabledOptions = Seq("-Xfatal-warnings", "-Ywarn-unused", "-Ywarn-unused-import")
 
-/** Say just `build` or `sbt build` to make a production bundle in `build`
+/**
+ * Say just `build` or `sbt build` to make a production bundle in `build`
  */
 lazy val build = TaskKey[File]("build")
 
@@ -80,11 +81,12 @@ lazy val baseLibSettings: Project => Project =
         "-unchecked" // Enable additional warnings where generated code depends on assumptions.
       ),
       libraryDependencies ++= Seq(
-        "org.scalatest" %%% "scalatest" % "3.1.1" % Test
+        "org.scalatest" %%% "scalatest" % "3.1.4" % Test
       )
     )
 
-/** Implement the  `build` task define above.
+/**
+ * Implement the  `build` task define above.
  * Most of this is really just to copy the index.html file around.
  */
 lazy val browserProject: Project => Project =
@@ -189,13 +191,13 @@ lazy val playSettings: Project => Project = {
         evolutions,
         jdbc,
         ws,
-        "com.google.inject" % "guice" % "4.1.0"
+        "com.google.inject" % "guice" % "4.2.3"
       ),
       // test
       libraryDependencies ++= Seq(
         "org.scalatestplus.play" %% "scalatestplus-play" % "5.1.0" % Test,
-        "org.mockito" %% "mockito-scala" % "1.14.4" % Test,
-        "org.mockito" %% "mockito-scala-scalatest" % "1.14.4" % Test
+        "org.mockito" %% "mockito-scala" % "1.14.8" % Test,
+        "org.mockito" %% "mockito-scala-scalatest" % "1.14.8" % Test
       )
     )
 }
@@ -265,7 +267,7 @@ lazy val ui = (project in file("lib/ui"))
     Compile / stMinimize := Selection.All,
     libraryDependencies ++= Seq(
       "io.github.cquiroz" %%% "scala-java-time" % "2.0.0",
-      "com.alexitc" %%% "sjs-material-ui-facade" % "0.1.2"
+      "com.alexitc" %%% "sjs-material-ui-facade" % "0.1.4"
     )
   )
 
@@ -279,9 +281,9 @@ lazy val server = (project in file("server"))
     libraryDependencies ++= Seq(
       "org.playframework.anorm" %% "anorm" % "2.6.10",
       "com.typesafe.play" %% "play-json" % "2.9.2",
-      "org.postgresql" % "postgresql" % "42.2.6",
+      "org.postgresql" % "postgresql" % "42.2.22",
       "com.github.jwt-scala" %% "jwt-core" % "7.1.5",
-      "de.svenkubiak" % "jBCrypt" % "0.4.1",
+      "de.svenkubiak" % "jBCrypt" % "0.4.3",
       "commons-validator" % "commons-validator" % "1.7",
       "com.dimafeng" %% "testcontainers-scala-scalatest" % "0.39.5" % "test",
       "com.dimafeng" %% "testcontainers-scala-postgresql" % "0.39.5" % "test"
@@ -332,10 +334,10 @@ lazy val web = (project in file("web"))
     libraryDependencies ++= Seq(
       "com.typesafe.play" %%% "play-json" % playJson,
       "com.softwaremill.sttp.client" %%% "core" % sttp,
-      "com.alexitc" %%% "sjs-material-ui-facade" % "0.1.2"
+      "com.alexitc" %%% "sjs-material-ui-facade" % "0.1.4"
     ),
     libraryDependencies ++= Seq(
-      "org.scalatest" %%% "scalatest" % "3.1.1" % Test
+      "org.scalatest" %%% "scalatest" % "3.1.4" % Test
     )
   )
 
@@ -355,6 +357,7 @@ lazy val adminBuildInfoSettings: Project => Project = _.enablePlugins(BuildInfoP
     buildInfoPackage := "net.wiringbits",
     buildInfoUsePackageAsPath := true
   )
+
 lazy val admin = (project in file("admin"))
   .dependsOn(common.js, api.js, ui)
   .enablePlugins(ScalablyTypedConverterPlugin)
@@ -382,10 +385,10 @@ lazy val admin = (project in file("admin"))
     libraryDependencies ++= Seq(
       "com.typesafe.play" %%% "play-json" % playJson,
       "com.softwaremill.sttp.client" %%% "core" % sttp,
-      "com.alexitc" %%% "sjs-material-ui-facade" % "0.1.2"
+      "com.alexitc" %%% "sjs-material-ui-facade" % "0.1.4"
     ),
     libraryDependencies ++= Seq(
-      "org.scalatest" %%% "scalatest" % "3.1.1" % Test
+      "org.scalatest" %%% "scalatest" % "3.1.4" % Test
     )
   )
 

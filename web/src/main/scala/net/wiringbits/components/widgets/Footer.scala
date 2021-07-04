@@ -35,6 +35,7 @@ import slinky.core.facade.Fragment
   }
 
   private val margin = 16
+
   private val description =
     "While wiringbits is a company based in Culiacan, Mexico, there is no office, everyone works remotely. We strive for great quality on the software we built, and try to open source everything we can."
 
