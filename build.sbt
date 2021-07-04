@@ -281,7 +281,7 @@ lazy val server = (project in file("server"))
     libraryDependencies ++= Seq(
       "org.playframework.anorm" %% "anorm" % "2.6.10",
       "com.typesafe.play" %% "play-json" % "2.9.2",
-      "org.postgresql" % "postgresql" % "42.2.6",
+      "org.postgresql" % "postgresql" % "42.2.22",
       "com.github.jwt-scala" %% "jwt-core" % "7.1.2",
       "de.svenkubiak" % "jBCrypt" % "0.4.1",
       "commons-validator" % "commons-validator" % "1.7",
