@@ -283,7 +283,7 @@ lazy val server = (project in file("server"))
       "com.typesafe.play" %% "play-json" % "2.9.2",
       "org.postgresql" % "postgresql" % "42.2.22",
       "com.github.jwt-scala" %% "jwt-core" % "7.1.2",
-      "de.svenkubiak" % "jBCrypt" % "0.4.1",
+      "de.svenkubiak" % "jBCrypt" % "0.4.3",
       "commons-validator" % "commons-validator" % "1.7",
       "com.dimafeng" %% "testcontainers-scala-scalatest" % "0.39.5" % "test",
       "com.dimafeng" %% "testcontainers-scala-postgresql" % "0.39.5" % "test"
