@@ -40,7 +40,7 @@ jobs:
       # run tests!
       # tests in the jvm are faster
       - run: sbt apiJVM/test
-      - run: sbt server/test
+      - run: TESTCONTAINERS_RYUK_DISABLED=true sbt server/test
 
       # package the apps
       - run: sbt server/dist
