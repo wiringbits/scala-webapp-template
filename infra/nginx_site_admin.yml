@@ -1,0 +1,59 @@
+---
+- hosts: frontend
+  gather_facts: no
+  vars:
+    - nginx_site_file: "config/nginx/admin_app_site.j2"
+    - nginx_admin_settings_directory: "/etc/nginx/admin-config"
+    - nginx_admin_settings_file: "/etc/nginx/admin-config/htpasswd"
+    - webapp_assets_directory: "/var/www/admin"
+
+  tasks:
+    - name: Create the custom config directory
+      become: yes
+      file:
+        path: "{{ nginx_admin_settings_directory }}"
+        state: directory
+
+    # file generated with `htpasswd -n demo`, user = demo, pass = wiringbits
+    - name: Copy the site password
+      become: yes
+      copy:
+        src: "{{ nginx_admin_password_file }}"
+        dest: "{{ nginx_admin_settings_file }}"
+
+    - name: Create the sites-available directory
+      become: yes
+      file:
+        path: /etc/nginx/sites-available
+        state: directory
+
+    - name: Copy the site config
+      become: yes
+      template:
+        src: "{{ nginx_site_file }}"
+        dest: /etc/nginx/sites-available/{{ admin_app_domain }}
+
+    - name: Create the sites-enabled directory
+      become: yes
+      file:
+        path: /etc/nginx/sites-enabled
+        state: directory
+
+    - name: Enable the site
+      become: yes
+      file:
+        src: /etc/nginx/sites-available/{{ admin_app_domain }}
+        dest: /etc/nginx/sites-enabled/{{ admin_app_domain }}
+        state: link
+
+    # Get SSL certificate
+    # Source: https://certbot.eff.org/lets-encrypt/ubuntufocal-nginx
+    - name: Install certbot
+      become: yes
+      snap:
+        name: certbot
+        classic: yes
+
+    - name: Get SSL certificate
+      become: yes
+      shell: certbot -n --agree-tos --nginx -m "{{ letsencrypt_notifications_email }}" --domains "{{ admin_app_domain }}"

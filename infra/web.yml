@@ -1,0 +1,53 @@
+---
+- hosts: frontend
+  gather_facts: no
+  vars:
+    - webapp_source_zip: "apps/web.zip"
+    - webapp_remote_file: "web.zip"
+    - webapp_assets_directory: "/var/www/html"
+
+  tasks:
+    - name: Build the application
+      shell: ./scripts/build-web.sh {{ web_api_url }}
+      delegate_to: 127.0.0.1
+
+    - name: Install unzip
+      become: yes
+      apt:
+        name: unzip
+        state: latest
+        update_cache: yes
+
+    - name: Upload the application
+      synchronize:
+        src: "{{ webapp_source_zip }}"
+        dest: "{{ webapp_remote_file }}"
+
+    - name: Create the web data directory
+      become: yes
+      file:
+        path: "{{ webapp_assets_directory }}"
+        state: directory
+        owner: www-data
+        group: www-data
+
+    - name: Unpack the application
+      become: yes
+      unarchive:
+        remote_src: yes
+        src: "{{ webapp_remote_file }}"
+        dest: "{{ webapp_assets_directory }}"
+
+    - name: Set the permissions
+      become: yes
+      file:
+        dest: "{{ webapp_assets_directory }}"
+        owner: www-data
+        group: www-data
+        recurse: yes
+
+    - name: Reload nginx config
+      become: yes
+      service:
+        name: nginx
+        state: reloaded

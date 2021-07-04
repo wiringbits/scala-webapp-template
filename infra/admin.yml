@@ -1,0 +1,53 @@
+---
+- hosts: frontend
+  gather_facts: no
+  vars:
+    - webapp_source_zip: "apps/admin.zip"
+    - webapp_remote_file: "admin.zip"
+    - webapp_assets_directory: "/var/www/admin"
+
+  tasks:
+    - name: Build the application
+      shell: ./scripts/build-admin.sh {{ admin_api_url }}
+      delegate_to: 127.0.0.1
+
+    - name: Install unzip
+      become: yes
+      apt:
+        name: unzip
+        state: latest
+        update_cache: yes
+
+    - name: Upload the application
+      synchronize:
+        src: "{{ webapp_source_zip }}"
+        dest: "{{ webapp_remote_file }}"
+
+    - name: Create the admin data directory
+      become: yes
+      file:
+        path: /var/www/admin
+        state: directory
+        owner: www-data
+        group: www-data
+
+    - name: Unpack the application
+      become: yes
+      unarchive:
+        remote_src: yes
+        src: admin.zip
+        dest: /var/www/admin
+
+    - name: Set the permissions
+      become: yes
+      file:
+        dest: /var/www/admin
+        owner: www-data
+        group: www-data
+        recurse: yes
+
+    - name: Reload nginx config
+      become: yes
+      service:
+        name: nginx
+        state: reloaded

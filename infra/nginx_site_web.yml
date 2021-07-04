@@ -1,0 +1,44 @@
+---
+- hosts: frontend
+  gather_facts: no
+  vars:
+    - nginx_site_file: "config/nginx/web_app_site.j2"
+    - webapp_assets_directory: "/var/www/html"
+
+  tasks:
+    - name: Create the sites-available directory
+      become: yes
+      file:
+        path: /etc/nginx/sites-available
+        state: directory
+
+    - name: Copy the site config
+      become: yes
+      template:
+        src: "{{ nginx_site_file }}"
+        dest: /etc/nginx/sites-available/{{ web_app_domain }}
+
+    - name: Create the sites-enabled directory
+      become: yes
+      file:
+        path: /etc/nginx/sites-enabled
+        state: directory
+
+    - name: Enable the site
+      become: yes
+      file:
+        src: /etc/nginx/sites-available/{{ web_app_domain }}
+        dest: /etc/nginx/sites-enabled/{{ web_app_domain }}
+        state: link
+
+    # Get SSL certificate
+    # Source: https://certbot.eff.org/lets-encrypt/ubuntufocal-nginx
+    - name: Install certbot
+      become: yes
+      snap:
+        name: certbot
+        classic: yes
+
+    - name: Get SSL certificate
+      become: yes
+      shell: certbot -n --agree-tos --nginx -m "{{ letsencrypt_notifications_email }}" --domains "{{ web_app_domain }}"

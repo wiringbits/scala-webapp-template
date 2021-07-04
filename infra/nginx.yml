@@ -1,0 +1,44 @@
+---
+- hosts: frontend
+  gather_facts: no
+  vars:
+    - nginx_config_file: "config/nginx/nginx.conf"
+    - nginx_mime_types_file: "config/nginx/mime.types"
+
+  tasks:
+    - name: Install nginx
+      become: yes
+      apt:
+        name: nginx
+        state: latest
+        update_cache: yes
+
+    - name: Disable nginx default site
+      become: yes
+      file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+
+    - name: Copy the nginx config
+      become: yes
+      copy:
+        src: "{{ nginx_config_file }}"
+        dest: /etc/nginx/nginx.conf
+
+    - name: Copy mime.types
+      become: yes
+      copy:
+        src: "{{ nginx_mime_types_file }}"
+        dest: /etc/nginx/mime.types
+
+    - name: Restart nginx
+      become: yes
+      service:
+        name: nginx
+        state: restarted
+
+    - name: Enable nginx to run on system startup
+      become: yes
+      systemd:
+        name: nginx
+        enabled: yes

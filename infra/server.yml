@@ -1,0 +1,115 @@
+---
+- hosts: backend
+  gather_facts: no
+  vars:
+    - app_source_zip: "apps/server.zip"
+    - app_source_zip_remote: "server.zip"
+    - app_user: "play"
+    - app_group: "play"
+    - app_home: "/home/play/app"
+    - app_env_config_file: "/home/play/app/.env"
+
+  tasks:
+    - name: Install java8
+      become: yes
+      apt:
+        name: default-jre
+        state: latest
+
+    - name: Build the application
+      retries: 10
+      delay: 5
+      shell: "./scripts/build-server.sh {{ app_source_name }}"
+      delegate_to: 127.0.0.1
+
+    - name: Upload the application
+      synchronize:
+        src: "{{ app_source_zip }}"
+        dest: "{{ app_source_zip_remote }}"
+
+    # Registering the service before unpacking the app allows to make sure the app is stopped
+    # on the first deployment.
+    - name: Add the systemd service
+      become: yes
+      template:
+        src: "{{ app_systemd_service_source }}"
+        dest: "/etc/systemd/system/{{ app_systemd_service_name }}.service"
+
+    - name: Pick up systemd changes
+      become: yes
+      systemd:
+        daemon_reload: yes
+
+    - name: Make sure the application is stopped
+      become: yes
+      systemd:
+        name: "{{ app_systemd_service_name }}"
+        state: stopped
+
+    # This is crucial to avoid polluting the classpath with old jars after upgrading dependencies
+    - name: Delete old application (important!)
+      become: yes
+      file:
+        path: "{{ app_home }}/{{ app_directory_name }}"
+        state: absent
+
+    - name: Create the app group
+      become: yes
+      group:
+        name: "{{ app_group }}"
+        state: present
+
+    - name: Create the app user
+      become: yes
+      user:
+        name: "{{ app_user }}"
+        group: "{{ app_group }}"
+        state: present
+        system: yes
+
+    - name: Create the app directory
+      become: yes
+      file:
+        path: "{{ app_home }}"
+        state: directory
+        owner: "{{ app_user }}"
+        group: "{{ app_group }}"
+
+    - name: Unpack the application
+      become: yes
+      unarchive:
+        remote_src: yes
+        src: "{{ app_source_zip_remote }}"
+        dest: "{{ app_home }}"
+        owner: "{{ app_user }}"
+        group: "{{ app_group }}"
+
+    - name: Set the application config
+      become: yes
+      template:
+        src: "{{ app_env_config_source }}"
+        dest: "{{ app_env_config_file }}"
+        owner: "{{ app_user }}"
+        group: "{{ app_group }}"
+
+    - name: Set the application files permissions
+      become: yes
+      file:
+        dest: "{{ app_home }}"
+        owner: "{{ app_user }}"
+        group: "{{ app_group }}"
+        recurse: yes
+
+    - name: Make sure the application is started
+      become: yes
+      systemd:
+        name: "{{ app_systemd_service_name }}"
+        state: started
+
+    - name: Enable the application to run on system startup
+      become: yes
+      systemd:
+        name: "{{ app_systemd_service_name }}"
+        enabled: yes
+
+# TODO: Check service is healthy by querying localhost:9000/health

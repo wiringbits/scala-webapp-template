@@ -1,0 +1,6 @@
+target/
+.idea/
+.bsp/
+logs/
+admin/build/
+web/build/

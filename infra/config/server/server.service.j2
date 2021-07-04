@@ -1,0 +1,16 @@
+[Unit]
+Description={{ app_systemd_service_name }}
+
+[Service]
+Type=simple
+WorkingDirectory={{ app_home }}/{{ app_directory_name }}
+StandardOutput=tty
+StandardError=tty
+EnvironmentFile={{ app_env_config_file }}
+LimitNOFILE=65535
+User=play
+ExecStart={{ app_home }}/{{ app_directory_name }}/bin/{{ app_startup_script }} -Dpidfile.path=/dev/null
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,22 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# https://www.playframework.com/documentation/latest/ScalaRouting
+# ~~~~
+
+GET /health controllers.HealthController.check()
+
+# create new user (public)
+POST /users controllers.UsersController.create()
+# login user (public)
+POST /users/login controllers.UsersController.login()
+
+# get the current user details
+GET /users/me controllers.UsersController.getCurrentUser()
+# update the current user details
+PUT /users/me controllers.UsersController.update()
+
+# get the current user logs
+GET /users/me/logs controllers.UsersController.getLogs()
+
+# get users
+GET /admin/users controllers.AdminController.getUsers()
