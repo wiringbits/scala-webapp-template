@@ -10,8 +10,8 @@ Check the [infra](./infra) docs to deploy your application.
 
 ## Demo
 To get an idea on what the template provides, play with the live demos, what you see there is what you will get by cloning the template:
-- [Web App](https://template.wiringbits.net)
-- [Admin App](https://admin-template.wiringbits.net) (username = `test`, password = `wiringbits`)
+- [Web App](https://template-demo.wiringbits.net)
+- [Admin App](https://template-demo-admin.wiringbits.net) (username = `demo`, password = `wiringbits`)
 
 ## Goal
 The goal for this project is to include more functionality that is common for web projects, like:
