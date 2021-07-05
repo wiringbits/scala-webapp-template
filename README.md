@@ -1,5 +1,7 @@
 # Wiringbits Web Application Template
 
+[![wiringbits](https://circleci.com/gh/wiringbits/scala-webapp-template.svg?style=svg)](https://circleci.com/gh/wiringbits/scala-webapp-template)
+
 This is the Wiringbits Web Application Template.
 
 The template provides a reusable skeleton to build web applications in Scala/Scala.js, it was created by extracting common functionality from web applications built by the [Wiringbits](https://wiringbits.net) team.
