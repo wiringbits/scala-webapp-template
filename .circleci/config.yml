@@ -40,7 +40,6 @@ jobs:
       # run tests!
       # tests in the jvm are faster
       - run: sbt apiJVM/test
-      - run: sbt server/test
 
       # package the apps
       - run: sbt server/dist
