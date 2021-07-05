@@ -5,8 +5,8 @@
 version: 2
 jobs:
   build-all:
-    docker:
-      - image: circleci/openjdk:8-jdk-node
+    machine:
+      image: ubuntu-1604:201903-01
 
     working_directory: ~/repo
 
@@ -17,7 +17,6 @@ jobs:
 
     steps:
       - checkout
-      - setup_remote_docker
 
       # Download and cache dependencies
       - restore_cache:
@@ -40,7 +39,7 @@ jobs:
       # run tests!
       # tests in the jvm are faster
       - run: sbt apiJVM/test
-      - run: TESTCONTAINERS_RYUK_DISABLED=true sbt server/test
+      - run: sbt server/test
 
       # package the apps
       - run: sbt server/dist
