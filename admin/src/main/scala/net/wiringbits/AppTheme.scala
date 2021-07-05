@@ -1,7 +1,6 @@
 package net.wiringbits
 
 import com.alexitc.materialui.facade.csstype.mod.{BoxSizingProperty, FlexDirectionProperty, PositionProperty}
-import com.alexitc.materialui.facade.materialUiCore.anon.PartialStyleRulesPaperCla.PartialStyleRulesPaperClaOps
 import com.alexitc.materialui.facade.materialUiCore.anon.{PartialPaperProps, PartialStyleRulesPaperCla}
 import com.alexitc.materialui.facade.materialUiCore.createMuiThemeMod.{Theme, ThemeOptions}
 import com.alexitc.materialui.facade.materialUiCore.createPaletteMod.{PaletteColorOptions, PaletteOptions}

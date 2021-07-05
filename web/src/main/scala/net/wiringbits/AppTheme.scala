@@ -6,13 +6,11 @@ import com.alexitc.materialui.facade.materialUiCore.createMuiThemeMod.{Theme, Th
 import com.alexitc.materialui.facade.materialUiCore.createPaletteMod.{PaletteColorOptions, PaletteOptions}
 import com.alexitc.materialui.facade.materialUiCore.createTypographyMod.TypographyOptions
 import com.alexitc.materialui.facade.materialUiCore.overridesMod.Overrides
-import com.alexitc.materialui.facade.materialUiCore.stylesMod.createMuiTheme
-import com.alexitc.materialui.facade.materialUiCore.{colorsMod => Colors}
-import com.alexitc.materialui.facade.materialUiCore.anon.PartialStyleRulesPaperCla.PartialStyleRulesPaperClaOps
-import com.alexitc.materialui.facade.materialUiCore.createBreakpointsMod.BreakpointsOptions
 import com.alexitc.materialui.facade.materialUiCore.propsMod.ComponentsProps
 import com.alexitc.materialui.facade.materialUiCore.shapeMod.ShapeOptions
+import com.alexitc.materialui.facade.materialUiCore.stylesMod.createMuiTheme
 import com.alexitc.materialui.facade.materialUiCore.withStylesMod.CSSProperties
+import com.alexitc.materialui.facade.materialUiCore.{colorsMod => Colors}
 
 object AppTheme {
   val primaryColor = Colors.teal.`500`
