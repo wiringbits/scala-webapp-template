@@ -1,6 +1,6 @@
 # Wiringbits Web Application Template
 
-[![wiringbits](https://circleci.com/gh/wiringbits/scala-webapp-template.svg?style=svg)](https://circleci.com/gh/wiringbits/scala-webapp-template)
+[![wiringbits](https://circleci.com/gh/wiringbits/scala-webapp-template.svg?style=svg)](https://circleci.com/gh/wiringbits/scala-webapp-template) [![Scala.js](https://www.scala-js.org/assets/badges/scalajs-1.6.0.svg)](https://www.scala-js.org)
 
 This is the Wiringbits Web Application Template.
 
