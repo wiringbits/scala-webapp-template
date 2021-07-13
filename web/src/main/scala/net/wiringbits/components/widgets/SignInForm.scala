@@ -14,6 +14,11 @@ import slinky.core.FunctionalComponent
 import slinky.core.annotations.react
 import slinky.core.facade.{Fragment, Hooks}
 import typings.reactRouterDom.{mod => reactRouterDom}
+import slinky.core.facade.ReactElement
+import slinky.core.facade.Hooks
+import org.scalajs.dom
+import slinky.core.{FunctionalComponent, SyntheticEvent}
+import slinky.web.html._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{Failure, Success}
@@ -43,7 +48,8 @@ import scala.util.{Failure, Success}
       }
     }
 
-    def doLogin(): Unit = {
+    def doLogin(e: SyntheticEvent[_, dom.Event]): Unit = {
+      e.preventDefault()
       setState(
         state.copy(
           error = None,
@@ -129,27 +135,31 @@ import scala.util.{Failure, Success}
         .disabled(loading)
         .variant(muiStrings.contained)
         .color(Color.primary)
-        .onClick(_ => doLogin())
+        .`type`(muiStrings.submit)
     }
 
     // TODO: Use a form to get the enter key submitting the form
-    mui
+    form(
+      onSubmit := (doLogin(_))
+    )(
+      mui
       .Paper()
       .elevation(1)(
-        Container(
-          minWidth = Some("300px"),
-          alignItems = Alignment.center,
-          padding = EdgeInsets.all(16),
-          child = Fragment(
-            Title(AppStrings.signIn),
-            emailInput,
-            passwordInput,
-            error,
-            Container(
-              minWidth = Some("100%"),
-              margin = EdgeInsets.top(16),
-              alignItems = Alignment.center,
-              child = loginButton
+          Container(
+            minWidth = Some("300px"),
+            alignItems = Alignment.center,
+            padding = EdgeInsets.all(16),
+            child = Fragment(
+              Title(AppStrings.signIn),
+              emailInput,
+              passwordInput,
+              error,
+              Container(
+                minWidth = Some("100%"),
+                margin = EdgeInsets.top(16),
+                alignItems = Alignment.center,
+                child = loginButton
+              )
             )
           )
         )
