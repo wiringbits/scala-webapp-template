@@ -1,6 +1,7 @@
 target/
 .idea/
 .bsp/
+.metals/
 logs/
 admin/build/
 web/build/
