@@ -37,6 +37,9 @@ jobs:
             - ~/.m2
           key: cache-v1-{{ checksum "build.sbt" }}-{{ checksum "project/plugins.sbt" }}
 
+      # check code format
+      - run: sbt scalafmtCheck
+
       # run tests!
       # tests in the jvm are faster
       - run: sbt apiJVM/test

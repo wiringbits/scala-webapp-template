@@ -63,6 +63,9 @@ By cloning this template you will gain a skeleton with:
 - REST API integration tests, so that you are confident that your changes aren't breaking the API compatibility unintentionally.
 - A user log displaying the interactions with the app.
 
+## Code format
+The code format is checked by [scalafmt](https://scalameta.org/scalafmt) when the CI complains about the format, running `sbt scalafmtAll` should fix it.
+
 
 ## server
 This is the server side for the project.
