@@ -139,8 +139,10 @@ import scala.util.{Failure, Success}
     }
 
     // TODO: Use a form to get the enter key submitting the form
-    form(onSubmit := (doLogin(_)))(
-    mui
+    form(
+      onSubmit := (doLogin(_))
+    )(
+      mui
       .Paper()
       .elevation(1)(
           Container(
