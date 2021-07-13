@@ -136,7 +136,6 @@ import scala.util.{Failure, Success}
         .variant(muiStrings.contained)
         .color(Color.primary)
         .`type`(muiStrings.submit)
-        //.onClick(_ => doLogin())
     }
 
     // TODO: Use a form to get the enter key submitting the form
