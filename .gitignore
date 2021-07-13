@@ -1,6 +1,7 @@
 target/
 .idea/
 .bsp/
+.vscode/
 .metals/
 logs/
 admin/build/
