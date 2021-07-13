@@ -2,7 +2,7 @@ target/
 .idea/
 .bsp/
 .vscode/
-.metals/
+.metals/**
 logs/
 admin/build/
 web/build/
