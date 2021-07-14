@@ -1,6 +1,6 @@
 # Wiringbits Web Application Template
 
-[![wiringbits](https://circleci.com/gh/wiringbits/scala-webapp-template.svg?style=svg)](https://circleci.com/gh/wiringbits/scala-webapp-template)
+[![wiringbits](https://circleci.com/gh/wiringbits/scala-webapp-template.svg?style=svg)](https://circleci.com/gh/wiringbits/scala-webapp-template) [![Scala.js](https://www.scala-js.org/assets/badges/scalajs-1.6.0.svg)](https://www.scala-js.org)
 
 This is the Wiringbits Web Application Template.
 
@@ -62,6 +62,9 @@ By cloning this template you will gain a skeleton with:
 - Database integration tests powered by [testcontainers](https://www.testcontainers.org/), launching a docker container with a clean database to run the tests, so that you are confident that the database layer is in sync with the actual database schema.
 - REST API integration tests, so that you are confident that your changes aren't breaking the API compatibility unintentionally.
 - A user log displaying the interactions with the app.
+
+## Code format
+The code format is checked by [scalafmt](https://scalameta.org/scalafmt) when the CI complains about the format, running `sbt scalafmtAll` should fix it.
 
 
 ## server
