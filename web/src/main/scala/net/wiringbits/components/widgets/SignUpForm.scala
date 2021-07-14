@@ -17,6 +17,12 @@ import typings.reactRouterDom.{mod => reactRouterDom}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{Failure, Success}
+import org.scalajs.dom
+import slinky.core.{FunctionalComponent, SyntheticEvent}
+import slinky.web.html._
+
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.{Failure, Success}
 
 @react object SignUpForm {
   case class Props(api: API, loggedIn: User => Unit)
@@ -46,7 +52,8 @@ import scala.util.{Failure, Success}
       }
     }
 
-    def doSignUp(): Unit = {
+    def doSignUp(e: SyntheticEvent[_, dom.Event]): Unit = {
+      e.preventDefault()
       setState(
         state.copy(
           error = None,
@@ -146,28 +153,32 @@ import scala.util.{Failure, Success}
         .disabled(loading)
         .variant(muiStrings.contained)
         .color(Color.primary)
-        .onClick(_ => doSignUp())
+        .`type`(muiStrings.submit)
     }
 
     // TODO: Use a form to get the enter key submitting the form
-    mui
-      .Paper()
-      .elevation(1)(
-        Container(
-          minWidth = Some("300px"),
-          alignItems = Alignment.center,
-          padding = EdgeInsets.all(16),
-          child = Fragment(
-            Title(AppStrings.signUp),
-            nameInput,
-            emailInput,
-            passwordInput,
-            error,
-            Container(
-              minWidth = Some("100%"),
-              margin = EdgeInsets.top(16),
-              alignItems = Alignment.center,
-              child = signUpButton
+    form(
+      onSubmit := (doSignUp(_))
+    )(
+      mui
+        .Paper()
+        .elevation(1)(
+          Container(
+            minWidth = Some("300px"),
+            alignItems = Alignment.center,
+            padding = EdgeInsets.all(16),
+            child = Fragment(
+              Title(AppStrings.signUp),
+              nameInput,
+              emailInput,
+              passwordInput,
+              error,
+              Container(
+                minWidth = Some("100%"),
+                margin = EdgeInsets.top(16),
+                alignItems = Alignment.center,
+                child = signUpButton
+              )
             )
           )
         )
