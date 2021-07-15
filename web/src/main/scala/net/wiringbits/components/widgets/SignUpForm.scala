@@ -21,9 +21,6 @@ import org.scalajs.dom
 import slinky.core.{FunctionalComponent, SyntheticEvent}
 import slinky.web.html._
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.util.{Failure, Success}
-
 @react object SignUpForm {
   case class Props(api: API, loggedIn: User => Unit)
 
@@ -157,9 +154,7 @@ import scala.util.{Failure, Success}
     }
 
     // TODO: Use a form to get the enter key submitting the form
-    form(
-      onSubmit := (doSignUp(_))
-    )(
+    form(onSubmit := (doSignUp(_)))(
       mui
         .Paper()
         .elevation(1)(
@@ -182,6 +177,6 @@ import scala.util.{Failure, Success}
             )
           )
         )
-      )
+    )
   }
 }
