@@ -143,8 +143,8 @@ import scala.util.{Failure, Success}
       onSubmit := (doLogin(_))
     )(
       mui
-      .Paper()
-      .elevation(1)(
+        .Paper()
+        .elevation(1)(
           Container(
             minWidth = Some("300px"),
             alignItems = Alignment.center,
@@ -163,6 +163,6 @@ import scala.util.{Failure, Success}
             )
           )
         )
-      )
+    )
   }
 }
