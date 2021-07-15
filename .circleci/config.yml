@@ -88,4 +88,6 @@ workflows:
   build:
     jobs:
       - build-all
-      - run-server-tests
+      - run-server-tests:
+          requires:
+            - build-all
