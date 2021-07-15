@@ -267,7 +267,7 @@ lazy val ui = (project in file("lib/ui"))
     Compile / stMinimize := Selection.All,
     libraryDependencies ++= Seq(
       "io.github.cquiroz" %%% "scala-java-time" % "2.0.0",
-      "com.alexitc" %%% "sjs-material-ui-facade" % "0.1.4"
+      "com.alexitc" %%% "sjs-material-ui-facade" % "0.1.5"
     )
   )
 
@@ -334,7 +334,7 @@ lazy val web = (project in file("web"))
     libraryDependencies ++= Seq(
       "com.typesafe.play" %%% "play-json" % playJson,
       "com.softwaremill.sttp.client" %%% "core" % sttp,
-      "com.alexitc" %%% "sjs-material-ui-facade" % "0.1.4"
+      "com.alexitc" %%% "sjs-material-ui-facade" % "0.1.5"
     ),
     libraryDependencies ++= Seq(
       "org.scalatest" %%% "scalatest" % "3.2.9" % Test
@@ -385,7 +385,7 @@ lazy val admin = (project in file("admin"))
     libraryDependencies ++= Seq(
       "com.typesafe.play" %%% "play-json" % playJson,
       "com.softwaremill.sttp.client" %%% "core" % sttp,
-      "com.alexitc" %%% "sjs-material-ui-facade" % "0.1.4"
+      "com.alexitc" %%% "sjs-material-ui-facade" % "0.1.5"
     ),
     libraryDependencies ++= Seq(
       "org.scalatest" %%% "scalatest" % "3.2.9" % Test
