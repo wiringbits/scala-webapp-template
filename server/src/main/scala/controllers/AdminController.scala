@@ -16,12 +16,14 @@ class AdminController @Inject() (
     extends AbstractController(cc) {
   private val logger = LoggerFactory.getLogger(this.getClass)
 
-  def getUserLogs(userIdStr: String) = handleGET { request =>
+  def getUserLogs(userIdStr: String, scrollId: String, limit: String) = handleGET { request =>
     for {
       _ <- adminUser(request)
       _ = logger.info(s"Get user logs: $userIdStr")
       userId = UUID.fromString(userIdStr)
-      response <- adminService.userLogs(userId)
+      userLogId = UUID.fromString(scrollId)
+      limitInt = limit.toInt
+      response <- adminService.userLogs(userId,limitInt,userLogId)
     } yield Ok(Json.toJson(response))
   }
 

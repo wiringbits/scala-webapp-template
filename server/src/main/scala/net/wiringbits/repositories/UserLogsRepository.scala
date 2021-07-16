@@ -24,9 +24,9 @@ class UserLogsRepository @Inject() (database: Database)(implicit ec: DatabaseExe
     }
   }
 
-  def logs(userId: UUID): Future[List[UserLog]] = Future {
+  def logs(userId: UUID, limit: Int, scrollId: UUID): Future[List[UserLog]] = Future {
     database.withConnection { implicit conn =>
-      UserLogsDAO.logs(userId)
+      UserLogsDAO.logs(userId,limit,scrollId)
     }
   }
 }

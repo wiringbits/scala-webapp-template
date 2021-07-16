@@ -11,9 +11,9 @@ class UserLogsService @Inject() (userLogsRepository: UserLogsRepository)(implici
     ec: ExecutionContext
 ) {
 
-  def logs(userId: UUID): Future[GetUserLogsResponse] = {
+  def logs(userId: UUID, limit: Int, scrollId: UUID): Future[GetUserLogsResponse] = {
     for {
-      logs <- userLogsRepository.logs(userId)
+      logs <- userLogsRepository.logs(userId,limit,scrollId)
       items = logs.map { x =>
         GetUserLogsResponse.UserLog(
           id = x.userLogId,

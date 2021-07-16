@@ -23,12 +23,12 @@ object UserLogsDAO {
       .execute()
   }
 
-  def logs(userId: UUID)(implicit conn: Connection): List[UserLog] = {
+  def logs(userId: UUID,limit: Int, scrollId: UUID)(implicit conn: Connection): List[UserLog] = {
     SQL"""
       SELECT user_log_id, user_id, message, created_at
       FROM user_logs
-      WHERE user_id = ${userId.toString}::UUID
-      ORDER BY created_at DESC, user_log_id
+      WHERE user_id = ${userId.toString}::UUID AND user_log_id > ${scrollId.toString}::UUID
+      ORDER BY created_at DESC, user_log_id LIMIT ${limit}
   """.as(userLogParser.*)
   }
 }

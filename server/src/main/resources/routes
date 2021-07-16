@@ -16,7 +16,7 @@ GET /users/me controllers.UsersController.getCurrentUser()
 PUT /users/me controllers.UsersController.update()
 
 # get the current user logs
-GET /users/me/logs controllers.UsersController.getLogs()
+GET /users/me/logs/scrollId/:scrollId/limit/:limit controllers.UsersController.getLogs(scrollId,limit)
 
 # get users
 GET /admin/users controllers.AdminController.getUsers()

@@ -11,9 +11,9 @@ class AdminService @Inject() (userLogsRepository: UserLogsRepository, usersRepos
     ec: ExecutionContext
 ) {
 
-  def userLogs(userId: UUID): Future[AdminGetUserLogsResponse] = {
+  def userLogs(userId: UUID, limit: Int, scrollId: UUID): Future[AdminGetUserLogsResponse] = {
     for {
-      logs <- userLogsRepository.logs(userId)
+      logs <- userLogsRepository.logs(userId,limit,scrollId)
       items = logs.map { x =>
         AdminGetUserLogsResponse.UserLog(
           id = x.userLogId,

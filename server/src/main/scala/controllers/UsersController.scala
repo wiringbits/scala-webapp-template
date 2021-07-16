@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory
 import play.api.libs.json.Json
 import play.api.mvc.{AbstractController, ControllerComponents}
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
@@ -51,11 +52,14 @@ class UsersController @Inject() (
     } yield Ok(Json.toJson(response))
   }
 
-  def getLogs() = handleGET { request =>
+  def getLogs(scrollId: String,limit: String) = handleGET { request =>
+      logger.info(s"limit: $limit")
     for {
       userId <- authenticate(request)
       _ = logger.info(s"Get user logs: $userId")
-      response <- loggerService.logs(userId)
+      userLogId = UUID.fromString(scrollId)
+      limitInt = limit.toInt
+      response <- loggerService.logs(userId,limitInt,userLogId)
     } yield Ok(Json.toJson(response))
   }
 }
