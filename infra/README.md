@@ -8,6 +8,8 @@ There [test-hosts.ini](./test-hosts.ini) inventory file is an example configurat
 
 A postgres database is required, you can use either a managed database or set up a local one by following these [instructions](./setup-postgres.md).
 
+Modify the [server](./config/server/dev.env.j2) configuration that are required while deploying it.
+
 The scripts are tested in Ubuntu 20.04 with paswordless sudo (meaning that `sudo ls` works without a password), they likely works in other Ubuntu based operating systems.
 
 
@@ -23,7 +25,8 @@ There are many playbooks involved to let you deploy the necessary pieces only:
 **NOTE** You will likely run the nginx stuff only once.
 
 After setting up everything:
-1. Deploy the apps with: `ansible-playbook -i test-hosts.ini server.yml web.yml admin.yml`
-2. Expose the apps to the internet with: `ansible-playbook -i test-hosts.ini nginx.yml nginx_site_admin.yml nginx_site_web.yml`
+1. Deploy nginx: `ansible-playbook -i test-hosts.ini nginx.yml`
+2. Deploy the apps with: `ansible-playbook -i test-hosts.ini server.yml web.yml admin.yml`
+3. Expose the apps to the internet with: `ansible-playbook -i test-hosts.ini nginx_site_admin.yml nginx_site_web.yml`
 
 Once everything is ready, run the first step to deploy the apps again (or use a single playbook to deploy a single app instead).

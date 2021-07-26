@@ -6,4 +6,4 @@ echo "API_URL=$API_URL" \
   && API_URL=$API_URL sbt admin/build \
   && cd -
 cd ../admin/build && zip -r admin.zip * && cd -
-mv ../admin/build/admin.zip apps/admin.zip
+mkdir -p apps && mv ../admin/build/admin.zip apps/admin.zip

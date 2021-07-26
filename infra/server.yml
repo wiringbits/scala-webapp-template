@@ -16,6 +16,12 @@
         name: default-jre
         state: latest
 
+    - name: Install unzip
+      become: yes
+      apt:
+        name: unzip
+        state: latest
+
     - name: Build the application
       retries: 10
       delay: 5
