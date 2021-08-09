@@ -63,7 +63,7 @@ lazy val baseWebSettings: Project => Project =
         "io.github.cquiroz" %%% "scala-java-time-tzdb" % "2.3.0"
       ),
       scalacOptions += "-Ymacro-annotations",
-      Test / fork := true,
+      Test / fork := false, // sjs needs this to run tests
       Test / requireJsDomEnv := true
     )
 
@@ -156,7 +156,8 @@ lazy val reactNpmDeps: Project => Project =
 lazy val withCssLoading: Project => Project =
   _.settings(
     /* custom webpack file to include css */
-    webpackConfigFile := Some((ThisBuild / baseDirectory).value / "custom.webpack.config.js"),
+    Compile / webpackConfigFile := Some((ThisBuild / baseDirectory).value / "custom.webpack.config.js"),
+    Test / webpackConfigFile := None, // it is important to avoid the custom webpack config in tests to get them passing
     Compile / npmDevDependencies ++= Seq(
       "webpack-merge" -> "4.2.2",
       "css-loader" -> "3.4.2",
@@ -209,7 +210,6 @@ lazy val common = (crossProject(JSPlatform, JVMPlatform) in file("lib/common"))
     libraryDependencies ++= Seq()
   )
   .jvmSettings(
-    Test / fork := true,
     libraryDependencies ++= Seq()
   )
   .jsSettings(

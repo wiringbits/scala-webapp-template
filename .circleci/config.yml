@@ -40,9 +40,14 @@ jobs:
       # check code format
       - run: sbt scalafmtCheck
 
-      # run tests!
-      # tests in the jvm are faster
+      # run tests! server test are executed by a different job
+      - run: sbt commonJVM/test
+      - run: sbt commonJS/test
       - run: sbt apiJVM/test
+      - run: sbt apiJS/test
+      - run: sbt ui/test
+      - run: sbt web/test
+      - run: sbt admin/test
 
       # package the apps
       - run: sbt server/dist
