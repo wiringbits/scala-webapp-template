@@ -1,10 +1,11 @@
 import net.wiringbits.api.models.ErrorResponse
 import net.wiringbits.config.JwtConfig
 import net.wiringbits.util.JwtUtils
+import org.slf4j.LoggerFactory
 import play.api.http.HeaderNames
 import play.api.libs.json.{JsValue, Json, Reads}
 import play.api.mvc.Results.InternalServerError
-import play.api.mvc._
+import play.api.mvc.*
 
 import java.time.Clock
 import java.util.UUID
@@ -14,6 +15,7 @@ import scala.util.{Failure, Try}
 
 package object controllers {
   private implicit val clock: Clock = Clock.systemUTC
+  private val logger = LoggerFactory.getLogger(this.getClass)
 
   def adminUser(request: Request[_]): Future[String] = {
     // nginx forwards the user while using basic-authentication, which is unknown in the local environment
@@ -69,6 +71,9 @@ package object controllers {
 
   def errorHandler: PartialFunction[Throwable, Result] = {
     // rendering any error this way should be enough for a while
-    case NonFatal(ex) => InternalServerError(renderError(ex.getMessage))
+    case NonFatal(ex) =>
+      // debug level used because this includes any validation error as well as server errors
+      logger.debug(s"Error response while handling a request: ${ex.getMessage}", ex)
+      InternalServerError(renderError(ex.getMessage))
   }
 }
