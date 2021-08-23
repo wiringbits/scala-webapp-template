@@ -34,7 +34,16 @@ object ApiClient {
         case Left(response) =>
           // handles non 2xx responses
           Try {
-            Json.parse(response).as[ErrorResponse]
+            val json = Json.parse(response)
+            // TODO: Unify responses to match the play error format
+            json
+              .asOpt[ErrorResponse]
+              .orElse {
+                json
+                  .asOpt[PlayErrorResponse]
+                  .map(model => ErrorResponse(model.error.message))
+              }
+              .getOrElse(throw new RuntimeException(s"Unexpected JSON response: $response"))
           } match {
             case Failure(exception) =>
               println(s"Unexpected response: ${exception.getMessage}")
