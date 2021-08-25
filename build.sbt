@@ -210,12 +210,18 @@ lazy val common = (crossProject(JSPlatform, JVMPlatform) in file("lib/common"))
     libraryDependencies ++= Seq()
   )
   .jvmSettings(
-    libraryDependencies ++= Seq()
+    libraryDependencies ++= Seq(
+      "com.typesafe.play" %% "play-json" % playJson,
+      "com.typesafe.play" %%% "play-json" % playJson // for a weird reason, jvm tests fail without this
+    )
   )
   .jsSettings(
     stUseScalaJsDom := true,
     Compile / stMinimize := Selection.All,
-    libraryDependencies ++= Seq("io.github.cquiroz" %%% "scala-java-time" % "2.3.0")
+    libraryDependencies ++= Seq(
+      "io.github.cquiroz" %%% "scala-java-time" % "2.3.0",
+      "com.typesafe.play" %%% "play-json" % playJson
+    )
   )
 
 // shared apis
