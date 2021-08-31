@@ -291,8 +291,8 @@ lazy val server = (project in file("server"))
       "com.github.jwt-scala" %% "jwt-core" % "9.0.1",
       "de.svenkubiak" % "jBCrypt" % "0.4.3",
       "commons-validator" % "commons-validator" % "1.7",
-      "com.dimafeng" %% "testcontainers-scala-scalatest" % "0.39.6" % "test",
-      "com.dimafeng" %% "testcontainers-scala-postgresql" % "0.39.6" % "test",
+      "com.dimafeng" %% "testcontainers-scala-scalatest" % "0.39.7" % "test",
+      "com.dimafeng" %% "testcontainers-scala-postgresql" % "0.39.7" % "test",
       "com.softwaremill.sttp.client" %% "core" % sttp % "test",
       "com.softwaremill.sttp.client" %% "async-http-client-backend-future" % sttp % "test"
     )
