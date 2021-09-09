@@ -5,7 +5,7 @@ ThisBuild / scalaVersion := "2.13.6"
 ThisBuild / organization := "net.wiringbits"
 
 val playJson = "2.9.2"
-val sttp = "2.2.9"
+val sttp = "2.2.10"
 
 val consoleDisabledOptions = Seq("-Xfatal-warnings", "-Ywarn-unused", "-Ywarn-unused-import")
 
