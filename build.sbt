@@ -81,7 +81,7 @@ lazy val baseLibSettings: Project => Project =
         "-unchecked" // Enable additional warnings where generated code depends on assumptions.
       ),
       libraryDependencies ++= Seq(
-        "org.scalatest" %%% "scalatest" % "3.2.9" % Test
+        "org.scalatest" %%% "scalatest" % "3.2.10" % Test
       )
     )
 
@@ -345,7 +345,7 @@ lazy val web = (project in file("web"))
       "com.alexitc" %%% "sjs-material-ui-facade" % "0.1.5"
     ),
     libraryDependencies ++= Seq(
-      "org.scalatest" %%% "scalatest" % "3.2.9" % Test
+      "org.scalatest" %%% "scalatest" % "3.2.10" % Test
     )
   )
 
@@ -396,7 +396,7 @@ lazy val admin = (project in file("admin"))
       "com.alexitc" %%% "sjs-material-ui-facade" % "0.1.5"
     ),
     libraryDependencies ++= Seq(
-      "org.scalatest" %%% "scalatest" % "3.2.9" % Test
+      "org.scalatest" %%% "scalatest" % "3.2.10" % Test
     )
   )
 
