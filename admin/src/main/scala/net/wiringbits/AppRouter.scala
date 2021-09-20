@@ -1,6 +1,6 @@
 package net.wiringbits
 
-import net.wiringbits.components.pages.{HomePage, UsersPage}
+import net.wiringbits.components.pages.{HomePage, TablePage, UsersPage}
 import net.wiringbits.components.widgets.{AppBar, Footer}
 import net.wiringbits.ui.components.core.widgets.Scaffold
 import slinky.core.FunctionalComponent
@@ -25,14 +25,15 @@ import typings.reactRouterDom.{components => router}
       )
     }
 
-    val home = generateRoute("/", HomePage())
+    val home = generateRoute("/", HomePage(props.api))
     val dashboard = generateRoute("/users", UsersPage(props.api))
+    val tablePage = generateRoute("/tables/:table_name", TablePage())
     val catchAllRoute = router.Route(
       RouteProps().setRender { _ =>
         router.Redirect("/")
       }
     )
 
-    router.Switch(home, dashboard, catchAllRoute)
+    router.Switch(home, dashboard, tablePage, catchAllRoute)
   }
 }

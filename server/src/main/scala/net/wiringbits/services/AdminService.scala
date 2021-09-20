@@ -1,13 +1,17 @@
 package net.wiringbits.services
 
 import net.wiringbits.api.models._
-import net.wiringbits.repositories.{UserLogsRepository, UsersRepository}
+import net.wiringbits.repositories.{TablesRepository, UserLogsRepository, UsersRepository}
 
 import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class AdminService @Inject() (userLogsRepository: UserLogsRepository, usersRepository: UsersRepository)(implicit
+class AdminService @Inject() (
+    userLogsRepository: UserLogsRepository,
+    usersRepository: UsersRepository,
+    tablesRepository: TablesRepository
+)(implicit
     ec: ExecutionContext
 ) {
 
@@ -36,5 +40,16 @@ class AdminService @Inject() (userLogsRepository: UserLogsRepository, usersRepos
         )
       }
     } yield AdminGetUsersResponse(items)
+  }
+
+  def tables(): Future[AdminGetTablesResponse] = {
+    for {
+      tables <- tablesRepository.all()
+      items = tables.map { x =>
+        AdminGetTablesResponse.Table(
+          table_name = x.table_name
+        )
+      }
+    } yield AdminGetTablesResponse(items)
   }
 }

@@ -67,4 +67,13 @@ package object models {
     case class User(id: UUID, name: String, email: String, createdAt: Instant)
     implicit val adminGetUsersResponseUserFormat: Format[User] = Json.format[User]
   }
+
+  case class AdminGetTablesResponse(data: List[AdminGetTablesResponse.Table])
+  implicit val adminGetTablesResponseFormat: Format[AdminGetTablesResponse] = Json.format[AdminGetTablesResponse]
+
+  object AdminGetTablesResponse {
+    case class Table(table_name: String)
+    implicit val adminGetTablesResponseUserFormat: Format[Table] = Json.format[Table]
+  }
+
 }

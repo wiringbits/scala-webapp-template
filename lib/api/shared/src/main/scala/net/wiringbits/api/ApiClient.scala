@@ -20,6 +20,7 @@ trait ApiClient {
 
   def adminGetUserLogs(userId: UUID): Future[AdminGetUserLogsResponse]
   def adminGetUsers(): Future[AdminGetUsersResponse]
+  def adminGetTables(): Future[AdminGetTablesResponse]
 }
 
 object ApiClient {
@@ -152,6 +153,17 @@ object ApiClient {
       val uri = ServerAPI.path(path)
 
       prepareRequest[AdminGetUsersResponse]
+        .get(uri)
+        .send()
+        .map(_.body)
+        .flatMap(Future.fromTry)
+    }
+
+    override def adminGetTables(): Future[AdminGetTablesResponse] = {
+      val path = ServerAPI.path :+ "admin" :+ "tables"
+      val uri = ServerAPI.path(path)
+
+      prepareRequest[AdminGetTablesResponse]
         .get(uri)
         .send()
         .map(_.body)

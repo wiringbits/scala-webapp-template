@@ -34,4 +34,12 @@ class AdminController @Inject() (
       maskedResponse = response.copy(data = response.data.map(_.copy(email = "masked_email")))
     } yield Ok(Json.toJson(maskedResponse))
   }
+
+  def getTables() = handleGET { request =>
+    for {
+      _ <- adminUser(request)
+      _ = logger.info(s"Get tables from database")
+      response <- adminService.tables()
+    } yield Ok(Json.toJson(response))
+  }
 }
