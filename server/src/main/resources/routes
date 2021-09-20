@@ -23,3 +23,6 @@ GET /admin/users controllers.AdminController.getUsers()
 
 # get user logs
 GET /admin/users/:userId/logs controllers.AdminController.getUserLogs(userId)
+
+# get database tables
+GET /admin/tables controllers.AdminController.getTables()
