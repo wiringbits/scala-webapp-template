@@ -14,15 +14,12 @@ import slinky.core.facade.Fragment
   case class Props(api: API)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
-    val (timesRefreshingData, forceRefresh) = GenericHooks.useForceRefresh
-
     RemoteDataLoader.component[AdminGetTablesResponse](
       RemoteDataLoader
         .Props(
           fetch = () => props.api.client.adminGetTables(),
-          render = response => TableList.component(TableList.Props(response, forceRefresh)),
-          progressIndicator = () => loader,
-          watchedObjects = List(timesRefreshingData)
+          render = response => TableList.component(TableList.Props(response)),
+          progressIndicator = () => loader
         )
     )
   }
