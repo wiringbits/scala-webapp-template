@@ -1,21 +1,24 @@
 package net.wiringbits.components.pages
 
-import net.wiringbits.ui.components.core.widgets.{Subtitle, Title}
-import org.scalajs.dom
+import net.wiringbits.components.widgets.Table
+import net.wiringbits.ui.components.core.widgets.Title
 import slinky.core.FunctionalComponent
 import slinky.core.annotations.react
-import slinky.core.facade.{Fragment, Hooks}
+import slinky.core.facade.Fragment
+import typings.reactRouter.mod.useParams
+
+import scala.scalajs.js
 
 @react object TablePage {
   type Props = Unit
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
-    val pathname = dom.window.location.pathname
-    val (routeValue, _) = Hooks.useState(pathname)
+    val params = useParams()
+    val table_name = params.asInstanceOf[js.Dynamic].table_name.toString
 
     Fragment(
-      Title(routeValue),
-      Subtitle("User list")
+      Title(table_name),
+      Table()
     )
   }
 
