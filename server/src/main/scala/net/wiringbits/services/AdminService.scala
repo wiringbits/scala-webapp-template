@@ -1,6 +1,6 @@
 package net.wiringbits.services
 
-import net.wiringbits.api.models.*
+import net.wiringbits.api.models._
 import net.wiringbits.repositories.{TablesRepository, UserLogsRepository, UsersRepository}
 
 import java.util.UUID
