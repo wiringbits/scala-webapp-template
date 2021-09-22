@@ -18,7 +18,7 @@ import slinky.core.facade.Fragment
       RemoteDataLoader
         .Props(
           fetch = () => props.api.client.adminGetTables(),
-          render = response => TableList.component(TableList.Props(response)),
+          render = response => ExperimentalTableListWidget.component(ExperimentalTableListWidget.Props(response)),
           progressIndicator = () => loader
         )
     )

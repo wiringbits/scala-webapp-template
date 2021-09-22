@@ -1,7 +1,7 @@
 package net.wiringbits.repositories
 
 import anorm._
-import net.wiringbits.repositories.models.{Table, User, UserLog}
+import net.wiringbits.repositories.models.{DatabaseTable, User, UserLog}
 
 package object daos {
   import anorm.{Column, MetaDataItem, TypeDoesNotMatch}
@@ -35,8 +35,8 @@ package object daos {
     Macro.parser[UserLog]("user_log_id", "user_id", "message", "created_at")
   }
 
-  val tableParser: RowParser[Table] = {
-    Macro.parser[Table](
+  val tableParser: RowParser[DatabaseTable] = {
+    Macro.parser[DatabaseTable](
       "table_name"
     )
   }

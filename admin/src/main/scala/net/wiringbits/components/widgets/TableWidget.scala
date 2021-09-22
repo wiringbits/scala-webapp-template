@@ -14,8 +14,8 @@ import org.scalablytyped.runtime.StringDictionary
 import slinky.core.FunctionalComponent
 import slinky.core.annotations.react
 
-@react object Table {
-  type Props = Unit
+@react object ExperimentalTableWidget {
+  case class Props(tableName: String)
 
   private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {
     val stylesCallback: StyleRulesCallback[Theme, Unit, String] = theme =>
@@ -43,7 +43,7 @@ import slinky.core.annotations.react
           )
           .className(classes("checkBox")),
         mui
-          .TableCell("users")
+          .TableCell(props.tableName)
           .className(classes("registry"))
       )
       .className(classes("tableRow"))
@@ -62,7 +62,7 @@ import slinky.core.annotations.react
                 )
                 .className(classes("checkBox")),
               mui
-                .TableCell("A")
+                .TableCell("Yeahyeahyeah")
                 .className(classes("registry"))
             )
             .className(classes("tableRow"))
