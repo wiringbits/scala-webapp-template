@@ -52,4 +52,14 @@ class AdminService @Inject() (
       }
     } yield AdminGetTablesResponse(items)
   }
+
+  def tableMetadata(tableName: String): Future[AdminGetTableMetadata] = {
+    for {
+      tableMetadata <- databaseTablesRepository.getTableMetadata(tableName)
+    } yield AdminGetTableMetadata(
+      name = tableMetadata.name,
+      columns = tableMetadata.columns
+    )
+
+  }
 }

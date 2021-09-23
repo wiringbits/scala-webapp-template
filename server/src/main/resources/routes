@@ -26,3 +26,6 @@ GET /admin/users/:userId/logs controllers.AdminController.getUserLogs(userId)
 
 # get database tables
 GET /admin/tables controllers.AdminController.getTables()
+
+# get database table fields
+GET /admin/tables/:tableName controllers.AdminController.getTableMetadata(tableName)

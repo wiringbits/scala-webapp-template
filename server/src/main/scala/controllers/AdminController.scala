@@ -42,4 +42,12 @@ class AdminController @Inject() (
       response <- adminService.tables()
     } yield Ok(Json.toJson(response))
   }
+
+  def getTableMetadata(tableName: String) = handleGET { request =>
+    for {
+      _ <- adminUser(request)
+      _ = logger.info(s"Get table metadata from $tableName")
+      response <- adminService.tableMetadata(tableName)
+    } yield Ok(Json.toJson(response))
+  }
 }
