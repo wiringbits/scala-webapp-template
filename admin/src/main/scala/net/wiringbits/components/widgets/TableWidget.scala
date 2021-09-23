@@ -2,72 +2,39 @@ package net.wiringbits.components.widgets
 
 import com.alexitc.materialui.facade.materialUiCore.createMuiThemeMod.Theme
 import com.alexitc.materialui.facade.materialUiStyles.makeStylesMod.StylesHook
-import com.alexitc.materialui.facade.materialUiCore.{components => mui}
 import com.alexitc.materialui.facade.materialUiStyles.mod.makeStyles
-import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
-  CSSProperties,
-  StyleRulesCallback,
-  Styles,
-  WithStylesOptions
-}
+import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{StyleRulesCallback, Styles, WithStylesOptions}
+import net.wiringbits.API
+import net.wiringbits.api.models.AdminGetTableMetadataResponse
+import net.wiringbits.ui.components.core.RemoteDataLoader
 import org.scalablytyped.runtime.StringDictionary
 import slinky.core.FunctionalComponent
 import slinky.core.annotations.react
+import typings.reactRouter.mod.useParams
 
-@react object ExperimentalTableWidget {
-  case class Props(tableName: String)
+import scala.scalajs.js
+
+@react object TableWidget {
+  case class Props(api: API)
 
   private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {
-    val stylesCallback: StyleRulesCallback[Theme, Unit, String] = theme =>
-      StringDictionary(
-        "tableRow" -> CSSProperties().setDisplay("flex"),
-        "tableCell" -> CSSProperties()
-          .setBorder("1px solid black")
-          .setPadding(0),
-        "registry" -> CSSProperties()
-          .setFlex(1),
-        "checkBox" -> CSSProperties().setPadding("1px")
-      )
+    val stylesCallback: StyleRulesCallback[Theme, Unit, String] = theme => StringDictionary()
     makeStyles(stylesCallback, WithStylesOptions())
   }
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val classes = useStyles(())
+    val params = useParams()
+    val tableName = params.asInstanceOf[js.Dynamic].tableName.toString
 
-    // This is bad code cause I'm currently working on creating the table
-    val tableHead = mui
-      .TableRow(
-        mui
-          .TableCell(
-            mui.Checkbox()
-          )
-          .className(classes("checkBox")),
-        mui
-          .TableCell(props.tableName)
-          .className(classes("registry"))
-      )
-      .className(classes("tableRow"))
-
-    mui
-      .Table(
-        mui.TableHead(
-          tableHead
-        ),
-        mui.TableBody(
-          mui
-            .TableRow(
-              mui
-                .TableCell(
-                  mui.Checkbox()
-                )
-                .className(classes("checkBox")),
-              mui
-                .TableCell("Yeahyeahyeah")
-                .className(classes("registry"))
-            )
-            .className(classes("tableRow"))
+    RemoteDataLoader.component[AdminGetTableMetadataResponse](
+      RemoteDataLoader
+        .Props(
+          fetch = () => props.api.client.adminGetTableMetadata(tableName),
+          render = response => Table.component(Table.Props(response)),
+          progressIndicator = () => Loader()
         )
-      )
+    )
   }
 
 }
