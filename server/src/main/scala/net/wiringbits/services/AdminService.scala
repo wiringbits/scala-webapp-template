@@ -1,6 +1,6 @@
 package net.wiringbits.services
 
-import net.wiringbits.api.models.*
+import net.wiringbits.api.models._
 import net.wiringbits.repositories.{DatabaseTablesRepository, UserLogsRepository, UsersRepository}
 
 import java.util.UUID
@@ -53,12 +53,13 @@ class AdminService @Inject() (
     } yield AdminGetTablesResponse(items)
   }
 
-  def tableMetadata(tableName: String): Future[AdminGetTableMetadata] = {
+  def tableMetadata(tableName: String): Future[AdminGetTableMetadataResponse] = {
     for {
       tableMetadata <- databaseTablesRepository.getTableMetadata(tableName)
-    } yield AdminGetTableMetadata(
+    } yield AdminGetTableMetadataResponse(
       name = tableMetadata.name,
-      columns = tableMetadata.columns
+      columns = tableMetadata.columns,
+      rows = tableMetadata.rows
     )
 
   }
