@@ -20,8 +20,9 @@ trait ApiClient {
 
   def adminGetUserLogs(userId: UUID): Future[AdminGetUserLogsResponse]
   def adminGetUsers(): Future[AdminGetUsersResponse]
+
   def adminGetTables(): Future[AdminGetTablesResponse]
-  def adminGetFields(tableName: String): Future[AdminGetTableMetadataResponse]
+  def adminGetTableMetadata(tableName: String): Future[AdminGetTableMetadataResponse]
 }
 
 object ApiClient {
@@ -171,7 +172,7 @@ object ApiClient {
         .flatMap(Future.fromTry)
     }
 
-    override def adminGetFields(tableName: String): Future[AdminGetTableMetadataResponse] = {
+    override def adminGetTableMetadata(tableName: String): Future[AdminGetTableMetadataResponse] = {
       val path = ServerAPI.path :+ "admin" :+ "tables" :+ tableName
       val uri = ServerAPI.path(path)
 
