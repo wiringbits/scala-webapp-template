@@ -73,7 +73,12 @@ package object models {
 
   object AdminGetTablesResponse {
     case class DatabaseTable(name: String)
-    implicit val adminGetTablesResponseUserFormat: Format[DatabaseTable] = Json.format[DatabaseTable]
+    implicit val adminGetTablesResponseFormat: Format[DatabaseTable] = Json.format[DatabaseTable]
   }
+
+  case class AdminGetTableMetadataResponse(name: String, columns: List[ColumnMetadata])
+
+  implicit val adminGetTableMetadataResponseFormat: Format[AdminGetTableMetadataResponse] =
+    Json.format[AdminGetTableMetadataResponse]
 
 }
