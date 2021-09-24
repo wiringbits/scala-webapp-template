@@ -4,15 +4,17 @@ import com.alexitc.materialui.facade.materialUiCore.createMuiThemeMod.Theme
 import com.alexitc.materialui.facade.materialUiStyles.makeStylesMod.StylesHook
 import com.alexitc.materialui.facade.materialUiStyles.mod.makeStyles
 import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{StyleRulesCallback, Styles, WithStylesOptions}
-import net.wiringbits.api.models.AdminGetUsersResponse
-import net.wiringbits.ui.components.core.RemoteDataLoader
-import net.wiringbits.ui.core.GenericHooks
 import net.wiringbits.API
+import net.wiringbits.api.models.AdminGetTableMetadataResponse
+import net.wiringbits.ui.components.core.RemoteDataLoader
 import org.scalablytyped.runtime.StringDictionary
 import slinky.core.FunctionalComponent
 import slinky.core.annotations.react
+import typings.reactRouter.mod.useParams
 
-@react object Users {
+import scala.scalajs.js
+
+@react object TableWidget {
   case class Props(api: API)
 
   private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {
@@ -22,16 +24,17 @@ import slinky.core.annotations.react
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val classes = useStyles(())
-    val (timesRefreshingData, forceRefresh) = GenericHooks.useForceRefresh
+    val params = useParams()
+    val tableName = params.asInstanceOf[js.Dynamic].tableName.toString
 
-    RemoteDataLoader.component[AdminGetUsersResponse](
+    RemoteDataLoader.component[AdminGetTableMetadataResponse](
       RemoteDataLoader
         .Props(
-          fetch = () => props.api.client.adminGetUsers(),
-          render = response => UserList.component(UserList.Props(response, forceRefresh)),
-          progressIndicator = () => Loader(),
-          watchedObjects = List(timesRefreshingData)
+          fetch = () => props.api.client.adminGetTableMetadata(tableName),
+          render = response => Table.component(Table.Props(response)),
+          progressIndicator = () => Loader()
         )
     )
   }
+
 }

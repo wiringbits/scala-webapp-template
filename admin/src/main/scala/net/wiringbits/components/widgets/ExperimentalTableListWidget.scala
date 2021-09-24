@@ -14,12 +14,12 @@ import net.wiringbits.AppStrings
 import net.wiringbits.api.models.AdminGetTablesResponse
 import net.wiringbits.ui.components.core.widgets.{Container, Subtitle}
 import org.scalablytyped.runtime.StringDictionary
-import org.scalajs.dom
 import slinky.core.FunctionalComponent
 import slinky.core.facade.Fragment
 import slinky.web.html.className
+import typings.reactRouterDom.{mod => reactRouterDom}
 
-object TableList {
+object ExperimentalTableListWidget {
   case class Props(response: AdminGetTablesResponse)
 
   private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {
@@ -34,23 +34,24 @@ object TableList {
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val classes = useStyles(())
+    val history = reactRouterDom.useHistory()
 
-    def goTo(table_name: String): Unit = {
-      val url = s"/tables/$table_name"
-      dom.window.location.href = url
+    def goTo(tableName: String): Unit = {
+      val url = s"/tables/$tableName"
+      history.push(url)
     }
 
     val items = props.response.data.map { item =>
       mui
         .ListItem()(
           mui
-            .Typography(className := classes("tableItem"))(item.table_name)
+            .Typography(className := classes("tableItem"))(item.name)
         )
         .button(true)
         .divider(true)
         .dense(true)
-        .onClick(_ => goTo(item.table_name))
-        .withKey(item.table_name)
+        .onClick(_ => goTo(item.name))
+        .withKey(item.name)
     }
 
     Container(

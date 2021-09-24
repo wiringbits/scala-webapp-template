@@ -1,7 +1,7 @@
 package net.wiringbits.services
 
 import net.wiringbits.api.models._
-import net.wiringbits.repositories.{TablesRepository, UserLogsRepository, UsersRepository}
+import net.wiringbits.repositories.{DatabaseTablesRepository, UserLogsRepository, UsersRepository}
 
 import java.util.UUID
 import javax.inject.Inject
@@ -10,7 +10,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class AdminService @Inject() (
     userLogsRepository: UserLogsRepository,
     usersRepository: UsersRepository,
-    tablesRepository: TablesRepository
+    databaseTablesRepository: DatabaseTablesRepository
 )(implicit
     ec: ExecutionContext
 ) {
@@ -44,12 +44,25 @@ class AdminService @Inject() (
 
   def tables(): Future[AdminGetTablesResponse] = {
     for {
-      tables <- tablesRepository.all()
+      tables <- databaseTablesRepository.all()
       items = tables.map { x =>
-        AdminGetTablesResponse.Table(
-          table_name = x.table_name
+        AdminGetTablesResponse.DatabaseTable(
+          name = x.name
         )
       }
     } yield AdminGetTablesResponse(items)
+  }
+
+  def tableMetadata(tableName: String): Future[AdminGetTableMetadataResponse] = {
+    for {
+      tableMetadata <- databaseTablesRepository.getTableMetadata(tableName)
+    } yield AdminGetTableMetadataResponse(
+      name = tableMetadata.name,
+      columns = tableMetadata.columns.map(x => AdminGetTableMetadataResponse.ColumnMetadata(x.name, x.`type`)),
+      rows = tableMetadata.rows.map(x =>
+        AdminGetTableMetadataResponse.RowMetadata(x.row.map(_.data).map(AdminGetTableMetadataResponse.Cell.apply))
+      )
+    )
+
   }
 }
