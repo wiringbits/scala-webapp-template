@@ -1,7 +1,7 @@
 package net.wiringbits.repositories.daos
 
 import anorm.SqlStringInterpolation
-import net.wiringbits.repositories.models.{ColumnMetadata, DatabaseTable, TableMetadata}
+import net.wiringbits.repositories.models.{Cell, ColumnMetadata, DatabaseTable, RowMetadata, TableMetadata}
 
 import java.sql.{Connection, ResultSet}
 
@@ -19,34 +19,35 @@ object DatabaseTablesDAO {
   }
 
   def getTableMetadata(tableName: String)(implicit conn: Connection): TableMetadata = {
-    val tableData: Array[Array[String]] = Array()
+    val tableData: Array[RowMetadata] = Array()
     val columnsMetadata: Array[ColumnMetadata] = Array()
 
-    val statement = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY)
+    val statement = conn.createStatement(ResultSet.CONCUR_READ_ONLY, ResultSet.CONCUR_READ_ONLY)
     val resultSet = statement.executeQuery("SELECT * FROM " + tableName)
     val metadata = resultSet.getMetaData
 
     val numberOfColumns = metadata.getColumnCount
 
+    // It goes into the rows one by one
     while (resultSet.next) {
-      val rowData: Array[String] = Array()
+      val rowData: Array[Cell] = Array()
       for (columnNumber <- 1 to numberOfColumns) {
         val columnName = metadata.getColumnName(columnNumber)
         val columnType = metadata.getColumnTypeName(columnNumber)
-        val field = resultSet.getString(columnName)
 
         val columnMetadata = ColumnMetadata(columnName, columnType)
-
         columnsMetadata :+ columnMetadata
-        rowData :+ field
+
+        val cell = Cell(resultSet.getString(columnName))
+        rowData :+ cell
 
         println(resultSet.getObject(columnName))
-        println(field)
+        println(cell)
       }
       tableData :+ rowData
     }
 
-    val tableMetadata = TableMetadata(tableName, columnsMetadata, tableData)
+    val tableMetadata = TableMetadata(tableName, columnsMetadata.toList, tableData.toList)
     println(tableData.mkString("Array(", ", ", ")"))
     println(tableMetadata)
 

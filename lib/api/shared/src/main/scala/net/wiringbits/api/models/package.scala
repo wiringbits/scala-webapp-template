@@ -76,9 +76,28 @@ package object models {
     implicit val adminGetTablesResponseFormat: Format[DatabaseTable] = Json.format[DatabaseTable]
   }
 
-  case class AdminGetTableMetadataResponse(name: String, columns: Array[ColumnMetadata], rows: Array[Array[String]])
+  case class AdminGetTableMetadataResponse(
+      name: String,
+      columns: List[AdminGetTableMetadataResponse.ColumnMetadata],
+      rows: List[AdminGetTableMetadataResponse.RowMetadata]
+  )
 
   implicit val adminGetTableMetadataResponseFormat: Format[AdminGetTableMetadataResponse] =
     Json.format[AdminGetTableMetadataResponse]
+
+  implicit val adminGetColumnMetadataFormat: Format[AdminGetTableMetadataResponse.ColumnMetadata] =
+    Json.format[AdminGetTableMetadataResponse.ColumnMetadata]
+
+  implicit val adminGetRowMetadataFormat: Format[AdminGetTableMetadataResponse.RowMetadata] =
+    Json.format[AdminGetTableMetadataResponse.RowMetadata]
+
+  implicit val adminGetCellMetadataFormat: Format[AdminGetTableMetadataResponse.Cell] =
+    Json.format[AdminGetTableMetadataResponse.Cell]
+
+  object AdminGetTableMetadataResponse {
+    case class ColumnMetadata(name: String, `type`: String)
+    case class RowMetadata(row: List[Cell])
+    case class Cell(data: String)
+  }
 
 }

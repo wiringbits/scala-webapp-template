@@ -1,7 +1,7 @@
 package net.wiringbits.repositories
 
 import anorm._
-import net.wiringbits.repositories.models.{DatabaseTable, ColumnMetadata, User, UserLog}
+import net.wiringbits.repositories.models.{DatabaseTable, User, UserLog}
 
 package object daos {
   import anorm.{Column, MetaDataItem, TypeDoesNotMatch}
