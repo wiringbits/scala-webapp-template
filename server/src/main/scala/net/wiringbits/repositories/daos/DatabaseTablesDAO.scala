@@ -35,7 +35,6 @@ object DatabaseTablesDAO {
       val columnMetadata = ColumnMetadata(columnName, columnType)
       columnsMetadata += columnMetadata
     }
-    println(columnsMetadata.toList)
 
     // It goes into the rows one by one
     while (resultSet.next) {
@@ -43,10 +42,13 @@ object DatabaseTablesDAO {
       for (columnNumber <- 1 to numberOfColumns) {
         val columnName = metadata.getColumnName(columnNumber)
 
-        val cell = Cell(resultSet.getString(columnName))
+        val data = resultSet.getString(columnName)
+
+        // This is just a workaround. I think it'll be better if I use a Option[T] syntax
+        // so I'll do it later
+        val cell = if (data == null) Cell("null") else Cell(data)
         rowData += cell
       }
-      println(rowData.toList)
       tableData += RowMetadata(rowData.toList)
     }
 
