@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory
 import play.api.http.HeaderNames
 import play.api.libs.json.{JsValue, Json, Reads}
 import play.api.mvc.Results.InternalServerError
-import play.api.mvc._
+import play.api.mvc.*
 
 import java.time.Clock
 import java.util.UUID
