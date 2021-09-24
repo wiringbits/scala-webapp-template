@@ -58,8 +58,10 @@ class AdminService @Inject() (
       tableMetadata <- databaseTablesRepository.getTableMetadata(tableName)
     } yield AdminGetTableMetadataResponse(
       name = tableMetadata.name,
-      columns = tableMetadata.columns,
-      rows = tableMetadata.rows
+      columns = tableMetadata.columns.map(x => AdminGetTableMetadataResponse.ColumnMetadata(x.name, x.`type`)),
+      rows = tableMetadata.rows.map(x =>
+        AdminGetTableMetadataResponse.RowMetadata(x.row.map(_.data).map(AdminGetTableMetadataResponse.Cell.apply))
+      )
     )
 
   }

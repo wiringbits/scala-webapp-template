@@ -21,13 +21,6 @@ import slinky.core.annotations.react
   private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {
     val stylesCallback: StyleRulesCallback[Theme, Unit, String] = theme =>
       StringDictionary(
-        "tableRow" -> CSSProperties().setDisplay("flex"),
-        "tableCell" -> CSSProperties()
-          .setBorder("1px solid black")
-          .setPadding(0),
-        "registry" -> CSSProperties()
-          .setFlex(1),
-        "checkBox" -> CSSProperties().setPadding("1px")
       )
     makeStyles(stylesCallback, WithStylesOptions())
   }
@@ -35,42 +28,33 @@ import slinky.core.annotations.react
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val classes = useStyles(())
 
-    val tableHead = mui
-      .TableRow(
-        mui
-          .TableCell(
-            props.response.name
-          ),
-        props.response.columns.map(item =>
-          mui
-            .TableCell(
-              mui.Typography(item.name).variant(muiStrings.h6)
-            )
-            .className(classes("registry"))
-        )
+    val columns = props.response.columns.map(item =>
+      mui.TableCell(
+        mui.Typography(item.name).variant(muiStrings.h6)
       )
-      .className(classes("tableRow"))
+    )
 
-    mui
-      .Table(
-        mui.TableHead(
-          tableHead
-        ),
-        mui.TableBody(
-          mui
-            .TableRow(
-              mui
-                .TableCell(
-                  mui.Checkbox()
-                )
-                .className(classes("checkBox")),
-              mui
-                .TableCell("Yeahyeahyeah")
-                .className(classes("registry"))
-            )
-            .className(classes("tableRow"))
+    val rows = props.response.rows.map(row =>
+      mui
+        .TableRow(
+          row.row.map(item =>
+            mui
+              .TableCell(item.data)
+          )
         )
+    )
+
+    mui.Table(
+      mui.TableHead(
+        mui
+          .TableRow(
+            columns
+          )
+      ),
+      mui.TableBody(
+        rows
       )
+    )
   }
 
 }

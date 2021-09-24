@@ -4,6 +4,7 @@ import anorm.SqlStringInterpolation
 import net.wiringbits.repositories.models.{Cell, ColumnMetadata, DatabaseTable, RowMetadata, TableMetadata}
 
 import java.sql.{Connection, ResultSet}
+import scala.collection.mutable.ListBuffer
 
 object DatabaseTablesDAO {
 
@@ -19,8 +20,8 @@ object DatabaseTablesDAO {
   }
 
   def getTableMetadata(tableName: String)(implicit conn: Connection): TableMetadata = {
-    val tableData: Array[RowMetadata] = Array()
-    val columnsMetadata: Array[ColumnMetadata] = Array()
+    val tableData = new ListBuffer[RowMetadata]()
+    val columnsMetadata = new ListBuffer[ColumnMetadata]()
 
     val statement = conn.createStatement(ResultSet.CONCUR_READ_ONLY, ResultSet.CONCUR_READ_ONLY)
     val resultSet = statement.executeQuery("SELECT * FROM " + tableName)
@@ -28,28 +29,30 @@ object DatabaseTablesDAO {
 
     val numberOfColumns = metadata.getColumnCount
 
+    for (columnNumber <- 1 to numberOfColumns) {
+      val columnName = metadata.getColumnName(columnNumber)
+      val columnType = metadata.getColumnTypeName(columnNumber)
+      val columnMetadata = ColumnMetadata(columnName, columnType)
+      columnsMetadata += columnMetadata
+    }
+    println(columnsMetadata.toList)
+
     // It goes into the rows one by one
     while (resultSet.next) {
-      val rowData: Array[Cell] = Array()
+      val rowData = new ListBuffer[Cell]
       for (columnNumber <- 1 to numberOfColumns) {
         val columnName = metadata.getColumnName(columnNumber)
-        val columnType = metadata.getColumnTypeName(columnNumber)
-
-        val columnMetadata = ColumnMetadata(columnName, columnType)
-        columnsMetadata :+ columnMetadata
 
         val cell = Cell(resultSet.getString(columnName))
-        rowData :+ cell
-
-        println(resultSet.getObject(columnName))
-        println(cell)
+        rowData += cell
       }
-      tableData :+ rowData
+      println(rowData.toList)
+      tableData += RowMetadata(rowData.toList)
     }
 
+    statement.close()
+    resultSet.close()
     val tableMetadata = TableMetadata(tableName, columnsMetadata.toList, tableData.toList)
-    println(tableData.mkString("Array(", ", ", ")"))
-    println(tableMetadata)
 
     tableMetadata
   }

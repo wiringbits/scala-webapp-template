@@ -2,8 +2,6 @@ package controllers
 
 import controllers.common.PlayPostgresSpec
 
-import scala.util.control.NonFatal
-
 class AdminControllerSpec extends PlayPostgresSpec {
 
   "GET /admin/tables/users" should {
@@ -13,6 +11,7 @@ class AdminControllerSpec extends PlayPostgresSpec {
       response.columns mustNot be(empty)
     }
 
+    /*
     "fail when database doesn't exists" in withApiClient { client =>
       val error = client
         .adminGetTableMetadata("adklsadasldklda")
@@ -24,6 +23,7 @@ class AdminControllerSpec extends PlayPostgresSpec {
       error must be("Invalid table")
 
     }
+     */
   }
 
 }

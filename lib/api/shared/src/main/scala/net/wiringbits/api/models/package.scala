@@ -1,5 +1,6 @@
 package net.wiringbits.api
 
+import net.wiringbits.api.models.AdminGetTableMetadataResponse.{Cell, ColumnMetadata, RowMetadata}
 import play.api.libs.json._
 
 import java.time.Instant
