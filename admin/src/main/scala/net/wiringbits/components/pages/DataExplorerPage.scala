@@ -4,7 +4,6 @@ import net.wiringbits.API
 import net.wiringbits.components.widgets.ExperimentalTablesWidget
 import slinky.core.FunctionalComponent
 import slinky.core.annotations.react
-import slinky.core.facade.Fragment
 
 @react object DataExplorerPage {
   case class Props(api: API)

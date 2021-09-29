@@ -36,21 +36,20 @@ import slinky.core.annotations.react
     val classes = useStyles(())
 
     def formatField(fieldName: String): String = {
-      // Creo que es mejor usa regEx para esto y evitas complicarte la vida
       val splittedArray = fieldName.split("_")
       splittedArray.map(_.toLowerCase()).mkString(" ")
     }
 
-    val columns = props.response.columns.map { item =>
+    val columns = props.response.columns.map { field =>
       mui
-        .TableCell(formatField(item.name))
+        .TableCell(formatField(field.name))
         .className(classes("tableCell"))
     }
 
-    val rows = props.response.rows.map { field =>
+    val rows = props.response.rows.map { record =>
       mui
         .TableRow(
-          field.row.map { item =>
+          record.row.map { item =>
             mui
               .TableCell(item.data)
               .className(classes("tableCell"))
