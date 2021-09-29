@@ -10,9 +10,7 @@ import slinky.core.facade.Fragment
   case class Props(api: API)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
-    Fragment(
-      TableWidget(props.api)
-    )
+    TableWidget(props.api)
   }
 
 }
