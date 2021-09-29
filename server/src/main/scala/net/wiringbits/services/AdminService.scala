@@ -1,7 +1,8 @@
 package net.wiringbits.services
 
-import net.wiringbits.api.models._
+import net.wiringbits.api.models.*
 import net.wiringbits.repositories.{DatabaseTablesRepository, UserLogsRepository, UsersRepository}
+import net.wiringbits.util.Pagination
 
 import java.util.UUID
 import javax.inject.Inject
@@ -53,9 +54,10 @@ class AdminService @Inject() (
     } yield AdminGetTablesResponse(items)
   }
 
-  def tableMetadata(tableName: String): Future[AdminGetTableMetadataResponse] = {
+  def tableMetadata(tableName: String, pagination: Pagination): Future[AdminGetTableMetadataResponse] = {
     for {
-      tableMetadata <- databaseTablesRepository.getTableMetadata(tableName)
+      _ <- validateTableName(tableName)
+      tableMetadata <- databaseTablesRepository.getTableMetadata(tableName, pagination)
     } yield AdminGetTableMetadataResponse(
       name = tableMetadata.name,
       columns = tableMetadata.columns.map(x => AdminGetTableMetadataResponse.ColumnMetadata(x.name, x.`type`)),
@@ -63,6 +65,22 @@ class AdminService @Inject() (
         AdminGetTableMetadataResponse.RowMetadata(x.row.map(_.data).map(AdminGetTableMetadataResponse.Cell.apply))
       )
     )
+  }
+
+  def validateTableName(tableName: String): Future[Unit] = {
+    for {
+      tables <- databaseTablesRepository.all()
+    } yield {
+      if (
+        !tables
+          .map { maybe =>
+            maybe.name
+
+          }
+          .contains(tableName)
+      )
+        throw new RuntimeException(s"Unexpected error because the DB table wasn't found: $tableName")
+    }
 
   }
 }

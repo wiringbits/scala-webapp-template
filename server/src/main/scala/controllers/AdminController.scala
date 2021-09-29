@@ -2,6 +2,7 @@ package controllers
 
 import net.wiringbits.api.models._
 import net.wiringbits.services.AdminService
+import net.wiringbits.util.Pagination
 import org.slf4j.LoggerFactory
 import play.api.libs.json.Json
 import play.api.mvc.{AbstractController, ControllerComponents}
@@ -43,11 +44,12 @@ class AdminController @Inject() (
     } yield Ok(Json.toJson(response))
   }
 
-  def getTableMetadata(tableName: String) = handleGET { request =>
+  def getTableMetadata(tableName: String, offset: Int, limit: Int) = handleGET { request =>
+    val pagination = Pagination(offset = offset, limit = limit)
     for {
       _ <- adminUser(request)
-      _ = logger.info(s"Get table metadata from $tableName")
-      response <- adminService.tableMetadata(tableName)
+      _ = logger.info(s"Get table metadata with $offset offSet and $limit limit from $tableName")
+      response <- adminService.tableMetadata(tableName, pagination)
     } yield Ok(Json.toJson(response))
   }
 }
