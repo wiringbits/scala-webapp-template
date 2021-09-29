@@ -2,6 +2,7 @@ package net.wiringbits.repositories.daos
 
 import anorm.SqlStringInterpolation
 import net.wiringbits.repositories.models.{Cell, ColumnMetadata, DatabaseTable, RowMetadata, TableMetadata}
+import net.wiringbits.util.Pagination
 
 import java.sql.{Connection, ResultSet}
 import scala.collection.mutable.ListBuffer
@@ -9,7 +10,6 @@ import scala.collection.mutable.ListBuffer
 object DatabaseTablesDAO {
 
   def all(schema: String = "public")(implicit conn: Connection): List[DatabaseTable] = {
-    // TODO: Not generic enough
     SQL"""
       SELECT table_name
       FROM information_schema.tables
@@ -19,9 +19,16 @@ object DatabaseTablesDAO {
       """.as(tableParser.*)
   }
 
-  def getTableMetadata(tableName: String)(implicit conn: Connection): TableMetadata = {
-    val statement = conn.createStatement(ResultSet.CONCUR_READ_ONLY, ResultSet.CONCUR_READ_ONLY)
-    val resultSet = statement.executeQuery("SELECT * FROM " + tableName)
+  def getTableMetadata(tableName: String, pagination: Pagination)(implicit conn: Connection): TableMetadata = {
+    // I still haven't found how to use preparedStatement with tableName
+    val sql = f"SELECT * FROM $tableName LIMIT ? OFFSET ?"
+    val preparedStatement = conn.prepareStatement(sql)
+
+    preparedStatement.setInt(1, pagination.limit)
+    preparedStatement.setInt(2, pagination.offset)
+
+    val resultSet = preparedStatement.executeQuery()
+
     try {
       val metadata = resultSet.getMetaData
       val numberOfColumns = metadata.getColumnCount
@@ -37,7 +44,7 @@ object DatabaseTablesDAO {
       TableMetadata(tableName, columnsMetadata.toList, tableData.toList)
     } finally {
       resultSet.close()
-      statement.close()
+      preparedStatement.close()
     }
 
   }

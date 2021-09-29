@@ -28,7 +28,7 @@ import typings.reactRouterDom.{components => router}
     val home = generateRoute("/", HomePage())
     val dashboard = generateRoute("/users", UsersPage(props.api))
     val dataExplorerPage = generateRoute("/tables", DataExplorerPage(props.api))
-    val tablePage = generateRoute("/tables/:tableName", ExperimentalTablesPage(props.api))
+    val tablePage = generateRoute("/tables/:tableName/:offset?/:limit?", ExperimentalTablesPage(props.api))
     val catchAllRoute = router.Route(
       RouteProps().setRender { _ =>
         router.Redirect("/")
