@@ -6,7 +6,7 @@ class AdminControllerSpec extends PlayPostgresSpec {
 
   "GET /admin/tables/users" should {
     "return users database" in withApiClient { client =>
-      val response = client.adminGetTableMetadata("users").futureValue
+      val response = client.adminGetTableMetadata("users", 0, 10).futureValue
       response.name must be("users")
       response.columns mustNot be(empty)
     }
