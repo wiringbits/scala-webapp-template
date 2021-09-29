@@ -14,7 +14,7 @@ import typings.reactRouter.mod.useParams
 
 import scala.scalajs.js
 
-@react object TableWidget {
+@react object ExperimentalTableWidget {
   case class Props(api: API)
 
   private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {
@@ -23,7 +23,6 @@ import scala.scalajs.js
   }
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
-    val classes = useStyles(())
     val params = useParams()
     val tableName = params.asInstanceOf[js.Dynamic].tableName.toString
 
@@ -31,7 +30,7 @@ import scala.scalajs.js
       RemoteDataLoader
         .Props(
           fetch = () => props.api.client.adminGetTableMetadata(tableName),
-          render = response => Table.component(Table.Props(response)),
+          render = response => ExperimentalTable.component(ExperimentalTable.Props(response)),
           progressIndicator = () => Loader()
         )
     )
