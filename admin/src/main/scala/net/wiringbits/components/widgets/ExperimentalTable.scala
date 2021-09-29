@@ -16,7 +16,7 @@ import org.scalablytyped.runtime.StringDictionary
 import slinky.core.FunctionalComponent
 import slinky.core.annotations.react
 
-@react object Table {
+@react object ExperimentalTable {
   case class Props(response: AdminGetTableMetadataResponse)
 
   private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {
@@ -25,7 +25,7 @@ import slinky.core.annotations.react
         "table" -> CSSProperties()
           .setWidth("%80"),
         "tableCell" -> CSSProperties()
-          .setPadding("5px")
+          .setPadding("5px 10px")
           .setFontSize("0.8rem")
           .setColor("black")
       )
@@ -35,30 +35,26 @@ import slinky.core.annotations.react
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val classes = useStyles(())
 
+    def formatField(fieldName: String): String = {
+      // Creo que es mejor usa regEx para esto y evitas complicarte la vida
+      val splittedArray = fieldName.split("_")
+      splittedArray.map(_.toLowerCase()).mkString(" ")
+    }
+
     val columns = props.response.columns.map { item =>
       mui
-        .TableCell(
-          item.name
-        )
+        .TableCell(formatField(item.name))
         .className(classes("tableCell"))
     }
 
-    def slungifyReverse(fieldName: String): String = {
-      // Creo que es mejor usa regEx para esto y evitas complicarte la vida
-      val splittedArray = fieldName.split("_")
-      splittedArray.mapInPlace(word => word.toLowerCase())
-      splittedArray.mkString(" ")
-    }
-
-    val rows = props.response.rows.map { row =>
+    val rows = props.response.rows.map { field =>
       mui
         .TableRow(
-          row.row
-            .map { item =>
-              mui
-                .TableCell(slungifyReverse(item.data))
-                .className(classes("tableCell"))
-            }
+          field.row.map { item =>
+            mui
+              .TableCell(item.data)
+              .className(classes("tableCell"))
+          }
         )
     }
 
@@ -78,7 +74,7 @@ import slinky.core.annotations.react
         .className(classes("table"))
 
     Container(
-      maxWidth = Some("80%"),
+      maxWidth = Some("90%"),
       child = table
     )
 

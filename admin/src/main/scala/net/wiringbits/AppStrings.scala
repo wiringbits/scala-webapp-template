@@ -7,6 +7,7 @@ object AppStrings {
   val home = "Home"
   val users = "Users"
   val tables = "Tables"
+  val dataExplorer = "Data Explorer"
 
   val name = "Name"
   val email = "Email"
