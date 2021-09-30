@@ -19,7 +19,8 @@ class DatabaseTablesRepository @Inject() (database: Database)(implicit ec: Datab
 
   def getTableMetadata(tableName: String, pagination: Pagination): Future[TableMetadata] = Future {
     database.withConnection { implicit conn =>
-      DatabaseTablesDAO.getTableMetadata(tableName, pagination)
+      val metadata = DatabaseTablesDAO.getTableMetadata(tableName)
+      DatabaseTablesDAO.getTableData(tableName, metadata, pagination);
     }
   }
 }

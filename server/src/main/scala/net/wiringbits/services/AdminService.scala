@@ -56,7 +56,7 @@ class AdminService @Inject() (
 
   def tableMetadata(tableName: String, pagination: Pagination): Future[AdminGetTableMetadataResponse] = {
     for {
-      _ <- validateTableName(tableName)
+      _ <- validate(tableName, pagination)
       tableMetadata <- databaseTablesRepository.getTableMetadata(tableName, pagination)
     } yield AdminGetTableMetadataResponse(
       name = tableMetadata.name,
@@ -67,19 +67,26 @@ class AdminService @Inject() (
     )
   }
 
-  def validateTableName(tableName: String): Future[Unit] = {
+  private def validate(tableName: String, pagination: Pagination): Future[Unit] = {
+    for {
+      _ <- Future {
+        validateTableName(tableName)
+        validatePagination(pagination)
+      }
+    } yield ()
+  }
+
+  private def validateTableName(tableName: String): Future[Unit] = {
     for {
       tables <- databaseTablesRepository.all()
-    } yield {
-      if (
-        !tables
-          .map { maybe =>
-            maybe.name
+      exists = tables.exists(_.name == tableName)
+    } yield
+      if (exists) () else throw new RuntimeException(s"Unexpected error because the DB table wasn't found: $tableName")
+  }
 
-          }
-          .contains(tableName)
-      )
-        throw new RuntimeException(s"Unexpected error because the DB table wasn't found: $tableName")
+  private def validatePagination(pagination: Pagination): Unit = {
+    if (0 > pagination.offset || 0 > pagination.limit) {
+      throw new RuntimeException(s"You can't query a table using negative numbers as a limit or offset")
     }
 
   }
