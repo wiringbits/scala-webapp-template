@@ -70,9 +70,9 @@ class AdminService @Inject() (
   private def validate(tableName: String, pagination: Pagination): Future[Unit] = {
     for {
       _ <- Future {
-        validateTableName(tableName)
         validatePagination(pagination)
       }
+      _ <- validateTableName(tableName)
     } yield ()
   }
 
@@ -82,6 +82,7 @@ class AdminService @Inject() (
       exists = tables.exists(_.name == tableName)
     } yield
       if (exists) () else throw new RuntimeException(s"Unexpected error because the DB table wasn't found: $tableName")
+
   }
 
   private def validatePagination(pagination: Pagination): Unit = {
