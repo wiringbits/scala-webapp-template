@@ -4,7 +4,7 @@ import anorm.SqlStringInterpolation
 import net.wiringbits.repositories.models.{Cell, ColumnMetadata, DatabaseTable, RowMetadata, TableMetadata}
 import net.wiringbits.util.Pagination
 
-import java.sql.{Connection, ResultSet}
+import java.sql.Connection
 import scala.collection.mutable.ListBuffer
 
 object DatabaseTablesDAO {
@@ -19,13 +19,9 @@ object DatabaseTablesDAO {
       """.as(tableParser.*)
   }
 
-  def getTableMetadata(tableName: String, pagination: Pagination)(implicit conn: Connection): TableMetadata = {
-    // I still haven't found how to use preparedStatement with tableName
-    val sql = f"SELECT * FROM $tableName LIMIT ? OFFSET ?"
+  def getTableMetadata(tableName: String)(implicit conn: Connection): IndexedSeq[ColumnMetadata] = {
+    val sql = f"SELECT * FROM $tableName LIMIT 0"
     val preparedStatement = conn.prepareStatement(sql)
-
-    preparedStatement.setInt(1, pagination.limit)
-    preparedStatement.setInt(2, pagination.offset)
 
     val resultSet = preparedStatement.executeQuery()
 
@@ -33,15 +29,12 @@ object DatabaseTablesDAO {
       val metadata = resultSet.getMetaData
       val numberOfColumns = metadata.getColumnCount
 
-      val columnsMetadata = for {
+      for {
         columnNumber <- 1 to numberOfColumns
         columnName = metadata.getColumnName(columnNumber)
         columnType = metadata.getColumnTypeName(columnNumber)
-        columnMetadata = ColumnMetadata(columnName, columnType)
-      } yield columnMetadata
+      } yield ColumnMetadata(columnName, columnType)
 
-      val tableData = getTableData(resultSet)
-      TableMetadata(tableName, columnsMetadata.toList, tableData.toList)
     } finally {
       resultSet.close()
       preparedStatement.close()
@@ -49,16 +42,25 @@ object DatabaseTablesDAO {
 
   }
 
-  def getTableData(resultSet: ResultSet): ListBuffer[RowMetadata] = {
+  def getTableData(
+      tableName: String,
+      columns: IndexedSeq[ColumnMetadata],
+      pagination: Pagination
+  )(implicit conn: Connection): TableMetadata = {
     val tableData = new ListBuffer[RowMetadata]()
-    val metadata = resultSet.getMetaData
-    val numberOfColumns = metadata.getColumnCount
+
+    val sql = f"SELECT * FROM $tableName LIMIT ? OFFSET ?"
+    val preparedStatement = conn.prepareStatement(sql)
+    preparedStatement.setInt(1, pagination.limit)
+    preparedStatement.setInt(2, pagination.offset)
+
+    val resultSet = preparedStatement.executeQuery()
 
     // It goes into the rows one by one
     while (resultSet.next) {
       val rowData = for {
-        columnNumber <- 1 to numberOfColumns
-        columnName = metadata.getColumnName(columnNumber)
+        column <- columns
+        columnName = column.name
         data = resultSet.getString(columnName)
 
         // This is just a workaround. I think it'll be better if I use a Option[T] syntax
@@ -68,7 +70,7 @@ object DatabaseTablesDAO {
 
       tableData += RowMetadata(rowData.toList)
     }
-    tableData
+    TableMetadata(tableName, columns.toList, tableData.toList)
   }
 
 }
