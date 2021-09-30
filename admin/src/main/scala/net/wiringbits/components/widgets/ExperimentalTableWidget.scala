@@ -19,11 +19,6 @@ import scala.util.Try
 @react object ExperimentalTableWidget {
   case class Props(api: API)
 
-  private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {
-    val stylesCallback: StyleRulesCallback[Theme, Unit, String] = theme => StringDictionary()
-    makeStyles(stylesCallback, WithStylesOptions())
-  }
-
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val params = useParams()
     val tableName = params.asInstanceOf[js.Dynamic].tableName.toString
