@@ -1,6 +1,6 @@
 package net.wiringbits.repositories.daos
 
-import anorm.SqlStringInterpolation
+import net.wiringbits.modules.DataExplorerSettings
 import net.wiringbits.repositories.models.{Cell, ColumnMetadata, DatabaseTable, RowMetadata, TableMetadata}
 import net.wiringbits.util.Pagination
 
@@ -9,18 +9,19 @@ import scala.collection.mutable.ListBuffer
 
 object DatabaseTablesDAO {
 
-  def all(schema: String = "public")(implicit conn: Connection): List[DatabaseTable] = {
-    SQL"""
-      SELECT table_name
-      FROM information_schema.tables
-      WHERE table_schema=$schema
-        AND table_type='BASE TABLE'
-      ORDER BY table_name
-      """.as(tableParser.*)
+  def all(tableSettings: DataExplorerSettings): List[DatabaseTable] = {
+    for {
+      table <- tableSettings.tables
+      tableName = table.name
+    } yield DatabaseTable(tableName)
+
   }
 
-  def getTableMetadata(tableName: String)(implicit conn: Connection): IndexedSeq[ColumnMetadata] = {
+  def getTableMetadata(
+      tableName: String
+  )(implicit conn: Connection): IndexedSeq[ColumnMetadata] = {
     val sql = f"SELECT * FROM $tableName LIMIT 0"
+
     val preparedStatement = conn.prepareStatement(sql)
 
     val resultSet = preparedStatement.executeQuery()
@@ -45,14 +46,25 @@ object DatabaseTablesDAO {
   def getTableData(
       tableName: String,
       columns: IndexedSeq[ColumnMetadata],
-      pagination: Pagination
+      pagination: Pagination,
+      tableSettings: DataExplorerSettings
   )(implicit conn: Connection): TableMetadata = {
     val tableData = new ListBuffer[RowMetadata]()
 
-    val sql = f"SELECT * FROM $tableName LIMIT ? OFFSET ?"
-    val preparedStatement = conn.prepareStatement(sql)
-    preparedStatement.setInt(1, pagination.limit)
-    preparedStatement.setInt(2, pagination.offset)
+    val indexOfItem = tableSettings.tables.indexWhere(_.name == tableName)
+    val orderBy = tableSettings.tables(indexOfItem).defaultOrderByClause
+
+    val SQL =
+      s"""
+        SELECT * FROM $tableName
+        ORDER BY ?
+        LIMIT ? OFFSET ?
+        """
+
+    val preparedStatement = conn.prepareStatement(SQL)
+    preparedStatement.setString(1, orderBy)
+    preparedStatement.setInt(2, pagination.limit)
+    preparedStatement.setInt(3, pagination.offset)
 
     val resultSet = preparedStatement.executeQuery()
 
