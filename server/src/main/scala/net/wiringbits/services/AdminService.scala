@@ -1,6 +1,7 @@
 package net.wiringbits.services
 
 import net.wiringbits.api.models.*
+import net.wiringbits.modules.DataExplorerSettings
 import net.wiringbits.repositories.{DatabaseTablesRepository, UserLogsRepository, UsersRepository}
 import net.wiringbits.util.Pagination
 
@@ -11,7 +12,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class AdminService @Inject() (
     userLogsRepository: UserLogsRepository,
     usersRepository: UsersRepository,
-    databaseTablesRepository: DatabaseTablesRepository
+    databaseTablesRepository: DatabaseTablesRepository,
+    tableSettings: DataExplorerSettings
 )(implicit
     ec: ExecutionContext
 ) {
@@ -77,12 +79,12 @@ class AdminService @Inject() (
   }
 
   private def validateTableName(tableName: String): Future[Unit] = {
+    val authorizatedTables = tableSettings.tables
     for {
       tables <- databaseTablesRepository.all()
-      exists = tables.exists(_.name == tableName)
+      exists = tables.exists(_.name == tableName) && authorizatedTables.exists(_.name == tableName)
     } yield
       if (exists) () else throw new RuntimeException(s"Unexpected error because the DB table wasn't found: $tableName")
-
   }
 
   private def validatePagination(pagination: Pagination): Unit = {
