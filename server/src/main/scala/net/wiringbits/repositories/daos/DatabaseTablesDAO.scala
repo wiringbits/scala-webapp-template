@@ -1,6 +1,7 @@
 package net.wiringbits.repositories.daos
 
-import net.wiringbits.modules.DataExplorerSettings
+import anorm.SqlStringInterpolation
+import net.wiringbits.config.AdminConfig
 import net.wiringbits.repositories.models.{Cell, ColumnMetadata, DatabaseTable, RowMetadata, TableMetadata}
 import net.wiringbits.util.Pagination
 
@@ -9,7 +10,17 @@ import scala.collection.mutable.ListBuffer
 
 object DatabaseTablesDAO {
 
-  def all(tableSettings: DataExplorerSettings): List[DatabaseTable] = {
+  def all()(implicit conn: Connection): List[DatabaseTable] = {
+    SQL"""
+    SELECT table_name
+    FROM information_schema.tables
+    WHERE table_schema = 'public'
+      AND table_type = 'BASE TABLE'
+    ORDER BY table_name
+    """.as(tableParser.*)
+  }
+
+  def getSettingsTables(tableSettings: AdminConfig): List[DatabaseTable] = {
     for {
       table <- tableSettings.tables
       tableName = table.name
@@ -47,7 +58,7 @@ object DatabaseTablesDAO {
       tableName: String,
       columns: IndexedSeq[ColumnMetadata],
       pagination: Pagination,
-      tableSettings: DataExplorerSettings
+      tableSettings: AdminConfig
   )(implicit conn: Connection): TableMetadata = {
     val tableData = new ListBuffer[RowMetadata]()
 
