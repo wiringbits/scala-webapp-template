@@ -1,7 +1,7 @@
 package net.wiringbits.repositories
 
+import net.wiringbits.config.models.DataExplorerSettings
 import net.wiringbits.executors.DatabaseExecutionContext
-import net.wiringbits.modules.DataExplorerSettings
 import net.wiringbits.repositories.daos.DatabaseTablesDAO
 import net.wiringbits.repositories.models.{DatabaseTable, TableMetadata}
 import net.wiringbits.util.Pagination

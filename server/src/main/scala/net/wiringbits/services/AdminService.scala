@@ -1,7 +1,7 @@
 package net.wiringbits.services
 
 import net.wiringbits.api.models.*
-import net.wiringbits.modules.DataExplorerSettings
+import net.wiringbits.config.models.DataExplorerSettings
 import net.wiringbits.repositories.{DatabaseTablesRepository, UserLogsRepository, UsersRepository}
 import net.wiringbits.util.Pagination
 
