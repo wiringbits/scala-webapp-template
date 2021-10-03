@@ -1,7 +1,7 @@
 package net.wiringbits.repositories.daos
 
 import anorm.SqlStringInterpolation
-import net.wiringbits.config.AdminConfig
+import net.wiringbits.config.models.DataExplorerSettings
 import net.wiringbits.repositories.models.{Cell, ColumnMetadata, DatabaseTable, RowMetadata, TableMetadata}
 import net.wiringbits.util.Pagination
 
@@ -20,7 +20,7 @@ object DatabaseTablesDAO {
     """.as(tableParser.*)
   }
 
-  def getSettingsTables(tableSettings: AdminConfig): List[DatabaseTable] = {
+  def getSettingsTables(tableSettings: DataExplorerSettings): List[DatabaseTable] = {
     for {
       table <- tableSettings.tables
       tableName = table.name
@@ -67,7 +67,7 @@ object DatabaseTablesDAO {
       tableName: String,
       columns: IndexedSeq[ColumnMetadata],
       pagination: Pagination,
-      tableSettings: AdminConfig
+      tableSettings: DataExplorerSettings
   )(implicit conn: Connection): TableMetadata = {
     val tableData = new ListBuffer[RowMetadata]()
 

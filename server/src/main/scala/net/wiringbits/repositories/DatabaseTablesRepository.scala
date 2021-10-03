@@ -1,6 +1,6 @@
 package net.wiringbits.repositories
 
-import net.wiringbits.config.AdminConfig
+import net.wiringbits.config.models.DataExplorerSettings
 import net.wiringbits.executors.DatabaseExecutionContext
 import net.wiringbits.repositories.daos.DatabaseTablesDAO
 import net.wiringbits.repositories.models.{DatabaseTable, TableMetadata}
@@ -12,7 +12,7 @@ import scala.concurrent.Future
 
 class DatabaseTablesRepository @Inject() (database: Database)(implicit
     ec: DatabaseExecutionContext,
-    tableSettings: AdminConfig
+    tableSettings: DataExplorerSettings
 ) {
 
   def all(): Future[List[DatabaseTable]] = Future {
@@ -21,7 +21,7 @@ class DatabaseTablesRepository @Inject() (database: Database)(implicit
     }
   }
 
-  def getSettingsTables(tableSettings: AdminConfig): Future[List[DatabaseTable]] = Future {
+  def getSettingsTables(tableSettings: DataExplorerSettings): Future[List[DatabaseTable]] = Future {
     DatabaseTablesDAO.getSettingsTables(tableSettings)
   }
 
