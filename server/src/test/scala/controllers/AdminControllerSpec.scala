@@ -39,7 +39,7 @@ class AdminControllerSpec extends PlayPostgresSpec {
   }
 
   "GET /admin/tables/aaaaaaaaaaa" should {
-    "fail when database doesn't exists" in withApiClient { client =>
+    "fail when table doesn't exists" in withApiClient { client =>
       val invalidTableName = "aaaaaaaaaaa"
       val error = client
         .adminGetTableMetadata(invalidTableName, 0, 10)

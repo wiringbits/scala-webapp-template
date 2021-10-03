@@ -1,7 +1,7 @@
 package net.wiringbits.services
 
 import net.wiringbits.api.models.*
-import net.wiringbits.modules.DataExplorerSettings
+import net.wiringbits.config.models.DataExplorerSettings
 import net.wiringbits.repositories.{DatabaseTablesRepository, UserLogsRepository, UsersRepository}
 import net.wiringbits.util.Pagination
 
@@ -47,7 +47,7 @@ class AdminService @Inject() (
 
   def tables(): Future[AdminGetTablesResponse] = {
     for {
-      tables <- databaseTablesRepository.all()
+      tables <- databaseTablesRepository.getSettingsTables(tableSettings)
       items = tables.map { x =>
         AdminGetTablesResponse.DatabaseTable(
           name = x.name

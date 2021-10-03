@@ -1,7 +1,7 @@
 package net.wiringbits.repositories
 
+import net.wiringbits.config.models.DataExplorerSettings
 import net.wiringbits.executors.DatabaseExecutionContext
-import net.wiringbits.modules.DataExplorerSettings
 import net.wiringbits.repositories.daos.DatabaseTablesDAO
 import net.wiringbits.repositories.models.{DatabaseTable, TableMetadata}
 import net.wiringbits.util.Pagination
@@ -16,7 +16,13 @@ class DatabaseTablesRepository @Inject() (database: Database)(implicit
 ) {
 
   def all(): Future[List[DatabaseTable]] = Future {
-    DatabaseTablesDAO.all(tableSettings)
+    database.withConnection { implicit conn =>
+      DatabaseTablesDAO.all()
+    }
+  }
+
+  def getSettingsTables(tableSettings: DataExplorerSettings): Future[List[DatabaseTable]] = Future {
+    DatabaseTablesDAO.getSettingsTables(tableSettings)
   }
 
   def getTableMetadata(tableName: String, pagination: Pagination): Future[TableMetadata] = Future {

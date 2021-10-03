@@ -1,6 +1,7 @@
 package net.wiringbits.modules
 
 import com.google.inject.{AbstractModule, Provides}
+import net.wiringbits.config.models.{DataExplorerSettings, TableSettings}
 
 class DataExplorerModule extends AbstractModule {
 
@@ -13,6 +14,3 @@ class DataExplorerModule extends AbstractModule {
     TableSettings("users", "created_at DESC, user_id")
   )
 }
-
-case class DataExplorerSettings(tables: List[TableSettings])
-case class TableSettings(name: String, defaultOrderByClause: String)
