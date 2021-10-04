@@ -15,6 +15,7 @@ import net.wiringbits.ui.components.core.widgets.Container
 import org.scalablytyped.runtime.StringDictionary
 import slinky.core.FunctionalComponent
 import slinky.core.annotations.react
+import slinky.core.facade.Fragment
 
 @react object ExperimentalTable {
   case class Props(response: AdminGetTableMetadataResponse)
@@ -40,18 +41,18 @@ import slinky.core.annotations.react
       splittedArray.map(_.toLowerCase()).mkString(" ")
     }
 
-    val columns = props.response.columns.map { field =>
+    val columns = props.response.fields.map { field =>
       mui
         .TableCell(formatField(field.name))
         .className(classes("tableCell"))
     }
 
-    val rows = props.response.rows.map { record =>
+    val rows = props.response.rows.map { row =>
       mui
         .TableRow(
-          record.row.map { item =>
+          row.data.map { cell =>
             mui
-              .TableCell(item.data)
+              .TableCell(cell.value)
               .className(classes("tableCell"))
           }
         )

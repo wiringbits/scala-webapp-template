@@ -1,13 +1,8 @@
 package net.wiringbits.components.widgets
 
-import com.alexitc.materialui.facade.materialUiCore.createMuiThemeMod.Theme
-import com.alexitc.materialui.facade.materialUiStyles.makeStylesMod.StylesHook
-import com.alexitc.materialui.facade.materialUiStyles.mod.makeStyles
-import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{StyleRulesCallback, Styles, WithStylesOptions}
 import net.wiringbits.API
 import net.wiringbits.api.models.AdminGetTableMetadataResponse
 import net.wiringbits.ui.components.core.RemoteDataLoader
-import org.scalablytyped.runtime.StringDictionary
 import slinky.core.FunctionalComponent
 import slinky.core.annotations.react
 import typings.reactRouter.mod.{useLocation, useParams}

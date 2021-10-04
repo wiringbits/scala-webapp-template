@@ -4,7 +4,7 @@ import net.wiringbits.config.models.DataExplorerSettings
 import net.wiringbits.executors.DatabaseExecutionContext
 import net.wiringbits.repositories.daos.DatabaseTablesDAO
 import net.wiringbits.repositories.models.{DatabaseTable, TableMetadata}
-import net.wiringbits.util.Pagination
+import net.wiringbits.util.models.pagination.{PaginatedQuery, PaginatedResult}
 import play.api.db.Database
 
 import javax.inject.Inject
@@ -25,9 +25,9 @@ class DatabaseTablesRepository @Inject() (database: Database)(implicit
     DatabaseTablesDAO.getSettingsTables(tableSettings)
   }
 
-  def getTableMetadata(tableName: String, pagination: Pagination): Future[TableMetadata] = Future {
+  def getTableMetadata(tableName: String, pagination: PaginatedQuery): Future[PaginatedResult[TableMetadata]] = Future {
     database.withConnection { implicit conn =>
-      val metadata = DatabaseTablesDAO.getTableMetadata(tableName)
+      val metadata = DatabaseTablesDAO.getTableFields(tableName)
       DatabaseTablesDAO.getTableData(tableName, metadata, pagination, tableSettings);
     }
   }

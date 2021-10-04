@@ -1,6 +1,6 @@
 package net.wiringbits.repositories.models
 
-case class ColumnMetadata(
+case class TableField(
     name: String,
     `type`: String
 )
