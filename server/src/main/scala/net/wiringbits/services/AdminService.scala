@@ -3,7 +3,7 @@ package net.wiringbits.services
 import net.wiringbits.api.models.*
 import net.wiringbits.config.models.DataExplorerSettings
 import net.wiringbits.repositories.{DatabaseTablesRepository, UserLogsRepository, UsersRepository}
-import net.wiringbits.util.Pagination
+import net.wiringbits.util.models.pagination.PaginatedQuery
 
 import java.util.UUID
 import javax.inject.Inject
@@ -56,20 +56,23 @@ class AdminService @Inject() (
     } yield AdminGetTablesResponse(items)
   }
 
-  def tableMetadata(tableName: String, pagination: Pagination): Future[AdminGetTableMetadataResponse] = {
+  def tableMetadata(tableName: String, pagination: PaginatedQuery): Future[AdminGetTableMetadataResponse] = {
     for {
       _ <- validate(tableName, pagination)
       tableMetadata <- databaseTablesRepository.getTableMetadata(tableName, pagination)
     } yield AdminGetTableMetadataResponse(
-      name = tableMetadata.name,
-      columns = tableMetadata.columns.map(x => AdminGetTableMetadataResponse.ColumnMetadata(x.name, x.`type`)),
-      rows = tableMetadata.rows.map(x =>
-        AdminGetTableMetadataResponse.RowMetadata(x.row.map(_.data).map(AdminGetTableMetadataResponse.Cell.apply))
-      )
+      name = tableMetadata.data.name,
+      fields = tableMetadata.data.fields.map(x => AdminGetTableMetadataResponse.TableField(x.name, x.`type`)),
+      rows = tableMetadata.data.rows.map(x =>
+        AdminGetTableMetadataResponse.TableRow(x.data.map(_.value).map(AdminGetTableMetadataResponse.Cell.apply))
+      ),
+      offSet = tableMetadata.offset.int,
+      limit = tableMetadata.limit.int,
+      count = tableMetadata.total.int
     )
   }
 
-  private def validate(tableName: String, pagination: Pagination): Future[Unit] = {
+  private def validate(tableName: String, pagination: PaginatedQuery): Future[Unit] = {
     for {
       _ <- Future {
         validatePagination(pagination)
@@ -87,8 +90,8 @@ class AdminService @Inject() (
       if (exists) () else throw new RuntimeException(s"Unexpected error because the DB table wasn't found: $tableName")
   }
 
-  private def validatePagination(pagination: Pagination): Unit = {
-    if (0 > pagination.offset || 0 > pagination.limit) {
+  private def validatePagination(pagination: PaginatedQuery): Unit = {
+    if (0 > pagination.offset.int || 0 > pagination.limit.int) {
       throw new RuntimeException(s"You can't query a table using negative numbers as a limit or offset")
     }
 

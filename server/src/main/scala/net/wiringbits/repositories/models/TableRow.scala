@@ -1,5 +1,5 @@
 package net.wiringbits.repositories.models
 
-case class RowMetadata(
-    row: List[Cell]
+case class TableRow(
+    data: List[Cell]
 )

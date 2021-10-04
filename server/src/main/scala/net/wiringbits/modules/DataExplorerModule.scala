@@ -2,6 +2,7 @@ package net.wiringbits.modules
 
 import com.google.inject.{AbstractModule, Provides}
 import net.wiringbits.config.models.{DataExplorerSettings, TableSettings}
+import net.wiringbits.util.models.ordering.OrderingCondition
 
 class DataExplorerModule extends AbstractModule {
 
@@ -11,6 +12,6 @@ class DataExplorerModule extends AbstractModule {
   }
 
   val settings: List[TableSettings] = List(
-    TableSettings("users", "created_at DESC, user_id")
+    TableSettings("users", OrderingCondition("created_at DESC, user_id"))
   )
 }

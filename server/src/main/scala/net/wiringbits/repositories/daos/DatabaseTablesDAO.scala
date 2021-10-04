@@ -2,8 +2,8 @@ package net.wiringbits.repositories.daos
 
 import anorm.SqlStringInterpolation
 import net.wiringbits.config.models.DataExplorerSettings
-import net.wiringbits.repositories.models.{Cell, ColumnMetadata, DatabaseTable, RowMetadata, TableMetadata}
-import net.wiringbits.util.Pagination
+import net.wiringbits.repositories.models.{Cell, DatabaseTable, TableField, TableMetadata, TableRow}
+import net.wiringbits.util.models.pagination.{Count, Limit, Offset, PaginatedQuery, PaginatedResult}
 
 import java.sql.Connection
 import scala.collection.mutable.ListBuffer
@@ -37,9 +37,9 @@ object DatabaseTablesDAO {
 
   }
 
-  def getTableMetadata(
+  def getTableFields(
       tableName: String
-  )(implicit conn: Connection): IndexedSeq[ColumnMetadata] = {
+  )(implicit conn: Connection): IndexedSeq[TableField] = {
     val sql = f"SELECT * FROM $tableName LIMIT 0"
 
     val preparedStatement = conn.prepareStatement(sql)
@@ -54,7 +54,7 @@ object DatabaseTablesDAO {
         columnNumber <- 1 to numberOfColumns
         columnName = metadata.getColumnName(columnNumber)
         columnType = metadata.getColumnTypeName(columnNumber)
-      } yield ColumnMetadata(columnName, columnType)
+      } yield TableField(columnName, columnType)
 
     } finally {
       resultSet.close()
@@ -65,14 +65,15 @@ object DatabaseTablesDAO {
 
   def getTableData(
       tableName: String,
-      columns: IndexedSeq[ColumnMetadata],
-      pagination: Pagination,
+      fields: IndexedSeq[TableField],
+      pagination: PaginatedQuery,
       tableSettings: DataExplorerSettings
-  )(implicit conn: Connection): TableMetadata = {
-    val tableData = new ListBuffer[RowMetadata]()
+  )(implicit conn: Connection): PaginatedResult[TableMetadata] = {
+    val tableData = new ListBuffer[TableRow]()
 
     val indexOfItem = tableSettings.tables.indexWhere(_.name == tableName)
     val orderBy = tableSettings.tables(indexOfItem).defaultOrderByClause
+    val count = countRecordsOnTable(tableName)
 
     val SQL =
       s"""
@@ -82,27 +83,42 @@ object DatabaseTablesDAO {
         """
 
     val preparedStatement = conn.prepareStatement(SQL)
-    preparedStatement.setString(1, orderBy)
-    preparedStatement.setInt(2, pagination.limit)
-    preparedStatement.setInt(3, pagination.offset)
+    preparedStatement.setString(1, orderBy.string)
+    preparedStatement.setInt(2, pagination.limit.int)
+    preparedStatement.setInt(3, pagination.offset.int)
 
     val resultSet = preparedStatement.executeQuery()
 
     // It goes into the rows one by one
     while (resultSet.next) {
       val rowData = for {
-        column <- columns
-        columnName = column.name
-        data = resultSet.getString(columnName)
+        field <- fields
+        fieldName = field.name
+        data = resultSet.getString(fieldName)
 
         // This is just a workaround. I think it'll be better if I use a Option[T] syntax
         // so I'll do it later
         cell = if (data == null) Cell("null") else Cell(data)
       } yield cell
 
-      tableData += RowMetadata(rowData.toList)
+      tableData += TableRow(rowData.toList)
     }
-    TableMetadata(tableName, columns.toList, tableData.toList)
+    val table = TableMetadata(tableName, fields.toList, tableData.toList)
+
+    PaginatedResult[TableMetadata](table, Offset(pagination.offset.int), Limit(pagination.limit.int), Count(count))
   }
 
+  def countRecordsOnTable(tableName: String)(implicit conn: Connection): Int = {
+    val SQL = s"SELECT COUNT(*) FROM $tableName"
+
+    val preparedStatement = conn.prepareStatement(SQL)
+    val resultSet = preparedStatement.executeQuery()
+    try {
+      resultSet.next()
+      resultSet.getInt(1)
+    } finally {
+      preparedStatement.close()
+      resultSet.close()
+    }
+  }
 }

@@ -1,6 +1,5 @@
 package net.wiringbits.api
 
-import net.wiringbits.api.models.AdminGetTableMetadataResponse.{Cell, ColumnMetadata, RowMetadata}
 import play.api.libs.json._
 
 import java.time.Instant
@@ -79,23 +78,26 @@ package object models {
 
   case class AdminGetTableMetadataResponse(
       name: String,
-      columns: List[AdminGetTableMetadataResponse.ColumnMetadata],
-      rows: List[AdminGetTableMetadataResponse.RowMetadata]
+      fields: List[AdminGetTableMetadataResponse.TableField],
+      rows: List[AdminGetTableMetadataResponse.TableRow],
+      offSet: Int,
+      limit: Int,
+      count: Int
   )
 
   object AdminGetTableMetadataResponse {
-    case class ColumnMetadata(name: String, `type`: String)
-    case class RowMetadata(row: List[Cell])
-    case class Cell(data: String)
+    case class TableField(name: String, `type`: String)
+    case class TableRow(data: List[Cell])
+    case class Cell(value: String)
 
     implicit val adminGetCellMetadataFormat: Format[AdminGetTableMetadataResponse.Cell] =
       Json.format[AdminGetTableMetadataResponse.Cell]
 
-    implicit val adminGetColumnMetadataFormat: Format[AdminGetTableMetadataResponse.ColumnMetadata] =
-      Json.format[AdminGetTableMetadataResponse.ColumnMetadata]
+    implicit val adminGetColumnMetadataFormat: Format[AdminGetTableMetadataResponse.TableField] =
+      Json.format[AdminGetTableMetadataResponse.TableField]
 
-    implicit val adminGetRowMetadataFormat: Format[AdminGetTableMetadataResponse.RowMetadata] =
-      Json.format[AdminGetTableMetadataResponse.RowMetadata]
+    implicit val adminGetRowMetadataFormat: Format[AdminGetTableMetadataResponse.TableRow] =
+      Json.format[AdminGetTableMetadataResponse.TableRow]
 
     implicit val adminGetTableMetadataResponseFormat: Format[AdminGetTableMetadataResponse] =
       Json.format[AdminGetTableMetadataResponse]
