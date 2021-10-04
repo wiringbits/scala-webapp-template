@@ -1,5 +1,6 @@
 package net.wiringbits.components.widgets
 
+import com.alexitc.materialui.facade.materialUiCore.components.TableCell
 import com.alexitc.materialui.facade.materialUiCore.createMuiThemeMod.Theme
 import com.alexitc.materialui.facade.materialUiStyles.makeStylesMod.StylesHook
 import com.alexitc.materialui.facade.materialUiStyles.mod.makeStyles
@@ -41,6 +42,15 @@ import slinky.core.facade.Fragment
       splittedArray.map(_.toLowerCase()).mkString(" ")
     }
 
+    def cellBuilder(value: String): TableCell.Builder = {
+      // Temp solution
+      if (value != "null")
+        mui
+          .TableCell(value)
+          .className(classes("tableCell"))
+      else mui.TableCell().className(classes("tableCell"))
+    }
+
     val columns = props.response.fields.map { field =>
       mui
         .TableCell(formatField(field.name))
@@ -51,9 +61,7 @@ import slinky.core.facade.Fragment
       mui
         .TableRow(
           row.data.map { cell =>
-            mui
-              .TableCell(cell.value)
-              .className(classes("tableCell"))
+            cellBuilder(cell.value)
           }
         )
     }
@@ -74,8 +82,11 @@ import slinky.core.facade.Fragment
         .className(classes("table"))
 
     Container(
-      maxWidth = Some("90%"),
-      child = table
+      maxWidth = Some("100%"),
+      child = Fragment(
+        table,
+        Pagination(props.response)
+      )
     )
 
   }
