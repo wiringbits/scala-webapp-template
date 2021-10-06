@@ -1,6 +1,6 @@
 package net.wiringbits.repositories.daos
 
-import anorm.SqlStringInterpolation
+import anorm.{SqlParser, SqlStringInterpolation}
 import net.wiringbits.config.models.DataExplorerSettings
 import net.wiringbits.repositories.models.{Cell, DatabaseTable, TableField, TableMetadata, TableRow}
 import net.wiringbits.util.models.pagination.{Count, Limit, Offset, PaginatedQuery, PaginatedResult}
@@ -73,7 +73,7 @@ object DatabaseTablesDAO {
 
     val indexOfItem = tableSettings.tables.indexWhere(_.name == tableName)
     val orderBy = tableSettings.tables(indexOfItem).defaultOrderByClause
-    val count = countRecordsOnTable(tableName)
+    val numberOfRecords = countRecordsOnTable(tableName)
 
     val SQL =
       s"""
@@ -98,27 +98,25 @@ object DatabaseTablesDAO {
 
         // This is just a workaround. I think it'll be better if I use a Option[T] syntax
         // so I'll do it later
-        cell = if (data == null) Cell("null") else Cell(data)
+        cell = Cell(Option(data).getOrElse("null"))
       } yield cell
 
       tableData += TableRow(rowData.toList)
     }
     val table = TableMetadata(tableName, fields.toList, tableData.toList)
 
-    PaginatedResult[TableMetadata](table, Offset(pagination.offset.int), Limit(pagination.limit.int), Count(count))
+    PaginatedResult[TableMetadata](
+      table,
+      Offset(pagination.offset.int),
+      Limit(pagination.limit.int),
+      Count(numberOfRecords)
+    )
   }
 
   def countRecordsOnTable(tableName: String)(implicit conn: Connection): Int = {
-    val SQL = s"SELECT COUNT(*) FROM $tableName"
-
-    val preparedStatement = conn.prepareStatement(SQL)
-    val resultSet = preparedStatement.executeQuery()
-    try {
-      resultSet.next()
-      resultSet.getInt(1)
-    } finally {
-      preparedStatement.close()
-      resultSet.close()
-    }
+    SQL"""
+      SELECT COUNT(*)
+      FROM #$tableName
+       """.as(SqlParser.int("count").single)
   }
 }
