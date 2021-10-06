@@ -32,7 +32,7 @@ class AdminConfig @Inject() (
       )
     }
 
-    // Validate that the field on orderingCondition exists?
+    // TODO: Validate that the field on orderingCondition exists
     // val fields = database.withConnection { implicit conn => DatabaseTablesDAO.getTableFields(tableSettings.name) }
   }
 
