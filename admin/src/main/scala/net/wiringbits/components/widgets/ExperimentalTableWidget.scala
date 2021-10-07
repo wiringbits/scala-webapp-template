@@ -16,8 +16,8 @@ import scala.util.Try
   case class Props(api: API)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
-    // 10
-    val pageLength = 10
+    val defaultPageLength = 10
+    val defaultOffset = 0
 
     val urlSearchParams = new URLSearchParams(dom.window.location.search)
 
@@ -31,7 +31,7 @@ import scala.util.Try
         .Props(
           fetch = () =>
             props.api.client
-              .adminGetTableMetadata(tableName, offset.getOrElse(0), limit.getOrElse(pageLength)),
+              .adminGetTableMetadata(tableName, offset.getOrElse(defaultOffset), limit.getOrElse(defaultPageLength)),
           render = response => ExperimentalTable.component(ExperimentalTable.Props(response)),
           progressIndicator = () => Loader()
         )

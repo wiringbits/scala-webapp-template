@@ -13,6 +13,7 @@ import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
 import net.wiringbits.AppStrings
 import net.wiringbits.api.models.AdminGetTablesResponse
 import net.wiringbits.ui.components.core.widgets.{Container, Subtitle}
+import net.wiringbits.util.formatField
 import org.scalablytyped.runtime.StringDictionary
 import slinky.core.FunctionalComponent
 import slinky.core.facade.Fragment
@@ -41,17 +42,17 @@ object ExperimentalTableListWidget {
       history.push(url)
     }
 
-    val items = props.response.data.map { item =>
+    val items = props.response.data.map { table =>
       mui
         .ListItem()(
           mui
-            .Typography(className := classes("tableItem"))(item.name)
+            .Typography(className := classes("tableItem"))(formatField(table.name))
         )
         .button(true)
         .divider(true)
         .dense(true)
-        .onClick(_ => goTo(item.name))
-        .withKey(item.name)
+        .onClick(_ => goTo(table.name))
+        .withKey(table.name)
     }
 
     Container(

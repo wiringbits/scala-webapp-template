@@ -20,24 +20,12 @@ class AdminConfig @Inject() (
     for (settingsTable <- settingsTables) {
       validateTable(tables, settingsTable)
       validateOrderingCondition(settingsTable)
+      // validateIDFieldName(settingsTable)
     }
-  }
-
-  def validateOrderingCondition(tableSettings: TableSettings): Unit = {
-    val orderingCondition = tableSettings.defaultOrderByClause.string
-    if (orderingCondition.contains("DESC") || orderingCondition.contains("ASC")) ()
-    else {
-      throw new RuntimeException(
-        s"You need to include a DESC or ASC property on tableSettings"
-      )
-    }
-
-    // TODO: Validate that the field on orderingCondition exists
-    // val fields = database.withConnection { implicit conn => DatabaseTablesDAO.getTableFields(tableSettings.name) }
   }
 
   def validateTable(tablesInDB: List[DatabaseTable], tableSettings: TableSettings): Unit = {
-    val settingsTableName = tableSettings.name
+    val settingsTableName = tableSettings.tableName
     if (tablesInDB.exists(_.name == settingsTableName)) ()
     else
       throw new RuntimeException(
@@ -45,4 +33,23 @@ class AdminConfig @Inject() (
       )
 
   }
+
+  def validateOrderingCondition(tableSettings: TableSettings): Unit = {
+    val orderingCondition = tableSettings.defaultOrderByClause.string
+    if (orderingCondition.contains("DESC") || orderingCondition.contains("ASC")) ()
+    else
+      throw new RuntimeException(
+        s"You need to include a DESC or ASC property on tableSettings"
+      )
+
+    // TODO: Validate that the field on orderingCondition exists
+    // val fields = database.withConnection { implicit conn => DatabaseTablesDAO.getTableFields(tableSettings.name) }
+  }
+
+  /*
+  def validateIDFieldName(settingsTable: TableSettings): Unit = {
+    // TODO: Check if exists
+  }
+   */
+
 }
