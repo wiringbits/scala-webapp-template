@@ -23,7 +23,7 @@ object DatabaseTablesDAO {
   def getSettingsTables(tableSettings: DataExplorerSettings): List[DatabaseTable] = {
     for {
       table <- tableSettings.tables
-      tableName = table.name
+      tableName = table.tableName
     } yield DatabaseTable(tableName)
   }
 
@@ -71,7 +71,7 @@ object DatabaseTablesDAO {
   )(implicit conn: Connection): PaginatedResult[TableMetadata] = {
     val tableData = new ListBuffer[TableRow]()
 
-    val indexOfItem = tableSettings.tables.indexWhere(_.name == tableName)
+    val indexOfItem = tableSettings.tables.indexWhere(_.tableName == tableName)
     val orderBy = tableSettings.tables(indexOfItem).defaultOrderByClause
     val numberOfRecords = countRecordsOnTable(tableName)
 
@@ -119,4 +119,5 @@ object DatabaseTablesDAO {
       FROM #$tableName
        """.as(SqlParser.int("count").single)
   }
+
 }

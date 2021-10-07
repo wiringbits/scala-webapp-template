@@ -85,7 +85,7 @@ class AdminService @Inject() (
     val authorizatedTables = tableSettings.tables
     for {
       tables <- databaseTablesRepository.all()
-      exists = tables.exists(_.name == tableName) && authorizatedTables.exists(_.name == tableName)
+      exists = tables.exists(_.name == tableName) && authorizatedTables.exists(_.tableName == tableName)
     } yield
       if (exists) () else throw new RuntimeException(s"Unexpected error because the DB table wasn't found: $tableName")
   }

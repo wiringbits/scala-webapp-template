@@ -12,6 +12,6 @@ class DataExplorerModule extends AbstractModule {
   }
 
   val settings: List[TableSettings] = List(
-    TableSettings("users", OrderingCondition("created_at DESC, user_id"))
+    TableSettings("users", OrderingCondition("created_at DESC, user_id"), "user_id")
   )
 }
