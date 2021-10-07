@@ -1,6 +1,6 @@
 package net.wiringbits.components.widgets
 
-import com.alexitc.materialui.facade.materialUiCore.components.TableCell
+import com.alexitc.materialui.facade.csstype.mod.TableLayoutProperty
 import com.alexitc.materialui.facade.materialUiCore.createMuiThemeMod.Theme
 import com.alexitc.materialui.facade.materialUiStyles.makeStylesMod.StylesHook
 import com.alexitc.materialui.facade.materialUiStyles.mod.makeStyles
@@ -12,7 +12,8 @@ import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
   WithStylesOptions
 }
 import net.wiringbits.api.models.AdminGetTableMetadataResponse
-import net.wiringbits.ui.components.core.widgets.Container
+import net.wiringbits.ui.components.core.widgets.{Container, Subtitle}
+import net.wiringbits.util.formatField
 import org.scalablytyped.runtime.StringDictionary
 import slinky.core.FunctionalComponent
 import slinky.core.annotations.react
@@ -25,11 +26,7 @@ import slinky.core.facade.Fragment
     val stylesCallback: StyleRulesCallback[Theme, Unit, String] = theme =>
       StringDictionary(
         "table" -> CSSProperties()
-          .setWidth("%80"),
-        "tableCell" -> CSSProperties()
-          .setPadding("5px 10px")
-          .setFontSize("0.8rem")
-          .setColor("black")
+          .setTableLayout(TableLayoutProperty.fixed)
       )
     makeStyles(stylesCallback, WithStylesOptions())
   }
@@ -37,31 +34,17 @@ import slinky.core.facade.Fragment
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val classes = useStyles(())
 
-    def formatField(fieldName: String): String = {
-      val splittedArray = fieldName.split("_")
-      splittedArray.map(_.toLowerCase()).mkString(" ")
-    }
-
-    def cellBuilder(value: String): TableCell.Builder = {
-      // Temp solution
-      if (value != "null")
-        mui
-          .TableCell(value)
-          .className(classes("tableCell"))
-      else mui.TableCell().className(classes("tableCell"))
-    }
-
     val columns = props.response.fields.map { field =>
-      mui
-        .TableCell(formatField(field.name))
-        .className(classes("tableCell"))
+      Cell(field.name, props.response.name, isField = true)
     }
 
     val rows = props.response.rows.map { row =>
       mui
         .TableRow(
           row.data.map { cell =>
-            cellBuilder(cell.value)
+            // Here I'm supossing that the first column belongs to table ID
+            if (row.data.indexOf(cell) == 0) Cell(cell.value, props.response.name, isNav = true)
+            else Cell(cell.value, props.response.name)
           }
         )
     }
@@ -70,10 +53,7 @@ import slinky.core.facade.Fragment
       mui
         .Table(
           mui.TableHead(
-            mui
-              .TableRow(
-                columns
-              )
+            columns
           ),
           mui.TableBody(
             rows
@@ -84,6 +64,7 @@ import slinky.core.facade.Fragment
     Container(
       maxWidth = Some("100%"),
       child = Fragment(
+        Subtitle(formatField(props.response.name)),
         table,
         Pagination(props.response)
       )
