@@ -388,7 +388,8 @@ lazy val admin = (project in file("admin"))
       "react-router" -> "5.1.2",
       "@types/react-router" -> "5.1.2",
       "react-router-dom" -> "5.1.2",
-      "@types/react-router-dom" -> "5.1.2"
+      "@types/react-router-dom" -> "5.1.2",
+      "react-admin" -> "3.18.3"
     ),
     libraryDependencies ++= Seq(
       "com.typesafe.play" %%% "play-json" % playJson,
