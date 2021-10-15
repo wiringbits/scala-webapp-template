@@ -30,4 +30,11 @@ GET /admin/tables controllers.AdminController.getTables()
 # get database table fields
 GET /admin/tables/:tableName controllers.AdminController.getTableMetadata(tableName, offset: Int ?= 0, limit: Int ?= 10)
 
+# create table resource
+POST /admin/tables/:tableName controllers.AdminController.create(tableName)
 
+# update table resource
+PUT /admin/tables/:tableName/:resourceID controllers.AdminController.update(tableName, resourceID)
+
+# delete table resource
+DELETE /admin/tables/:tableName/:resourceID controllers.AdminController.delete(tableName, resourceID)

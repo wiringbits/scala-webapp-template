@@ -103,4 +103,26 @@ package object models {
       Json.format[AdminGetTableMetadataResponse]
   }
 
+  case class AdminUpdateTableRequest(data: Map[String, String])
+  case class AdminUpdateTableResponse(noData: String = "")
+
+  implicit val adminUpdateTableRequestFormat: Format[AdminUpdateTableRequest] =
+    Json.format[AdminUpdateTableRequest]
+
+  implicit val adminUpdateTableResponseFormat: Format[AdminUpdateTableResponse] =
+    Json.format[AdminUpdateTableResponse]
+
+  case class AdminCreateTableRequest(data: Map[String, String])
+  case class AdminCreateTableResponse(noData: String = "")
+
+  implicit val adminCreateTableRequestFormat: Format[AdminCreateTableRequest] =
+    Json.format[AdminCreateTableRequest]
+
+  implicit val adminCreateTableResponseFormat: Format[AdminCreateTableResponse] =
+    Json.format[AdminCreateTableResponse]
+
+  case class AdminDeleteTableResponse(noData: String = "")
+
+  implicit val adminDeleteTableResponseFormat: Format[AdminDeleteTableResponse] =
+    Json.format[AdminDeleteTableResponse]
 }
