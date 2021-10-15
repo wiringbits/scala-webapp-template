@@ -52,4 +52,33 @@ class AdminController @Inject() (
       response <- adminService.tableMetadata(tableName, query)
     } yield Ok(Json.toJson(response))
   }
+
+  def create(tableName: String) = handleJsonBody[AdminCreateTableRequest] { request =>
+    val body = request.body
+    for {
+      _ <- adminUser(request)
+      _ = logger.info(s"Create on $tableName with ${body.data}")
+      _ <- adminService.create(tableName, body)
+      response = AdminCreateTableResponse()
+    } yield Ok(Json.toJson(response))
+  }
+
+  def update(tableName: String, resourceID: String) = handleJsonBody[AdminUpdateTableRequest] { request =>
+    val body = request.body
+    for {
+      _ <- adminUser(request)
+      _ = logger.info(s"Update $resourceID on $tableName with ${body.data}")
+      _ <- adminService.update(tableName, resourceID, body)
+      response = AdminUpdateTableResponse()
+    } yield Ok(Json.toJson(response))
+  }
+
+  def delete(tableName: String, resourceID: String) = handleGET { request =>
+    for {
+      _ <- adminUser(request)
+      _ = logger.info(s"Delete on $tableName")
+      _ <- adminService.delete(tableName, resourceID)
+      response = AdminDeleteTableResponse()
+    } yield Ok(Json.toJson(response))
+  }
 }

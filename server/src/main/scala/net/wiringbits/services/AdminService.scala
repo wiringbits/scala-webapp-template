@@ -72,6 +72,57 @@ class AdminService @Inject() (
     )
   }
 
+  def create(tableName: String, request: AdminCreateTableRequest): Future[Unit] = {
+    val body = request.data
+    val validate = for {
+      _ <- validateTableName(tableName)
+      _ <- validateTableFields(tableName, body)
+      obligatoryFields <- databaseTablesRepository.getObligatoryFields(tableName)
+      nameOfObligatoryFields = obligatoryFields.map(_.name)
+    } yield
+      if (nameOfObligatoryFields.forall(request.data.contains)) ()
+      else
+        throw new RuntimeException(
+          s"Requires: ${nameOfObligatoryFields.filterNot(request.data.contains).mkString(", ")}"
+        )
+
+    for {
+      _ <- validate
+      _ <- databaseTablesRepository.create(tableName, body)
+    } yield ()
+  }
+
+  def update(tableName: String, resourceID: String, request: AdminUpdateTableRequest): Future[Unit] = {
+    val validate = Future {
+      if (request.data.isEmpty) throw new RuntimeException(s"You need to send some data")
+      else ()
+    }
+
+    val body = request.data
+    for {
+      _ <- validate
+      _ <- validateTableName(tableName)
+      _ <- validateTableFields(tableName, body)
+      _ <- databaseTablesRepository.update(tableName, resourceID, body)
+    } yield ()
+  }
+
+  def delete(tableName: String, resourceID: String): Future[Unit] = {
+    for {
+      _ <- validateTableName(tableName)
+      _ <- databaseTablesRepository.delete(tableName, resourceID)
+    } yield ()
+  }
+
+  private def validateTableFields(tableName: String, body: Map[String, String]): Future[Unit] = {
+    for {
+      fields <- databaseTablesRepository.getTableFields(tableName)
+      fieldsNames = fields.map(_.name)
+      requestFields = body.keys
+      exists = requestFields.forall(fieldsNames.contains)
+    } yield if (exists) () else throw new RuntimeException(s"A field doesn't correspond to this table schema")
+  }
+
   private def validate(tableName: String, pagination: PaginatedQuery): Future[Unit] = {
     for {
       _ <- Future {
