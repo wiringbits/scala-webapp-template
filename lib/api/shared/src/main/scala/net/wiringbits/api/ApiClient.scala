@@ -24,15 +24,17 @@ trait ApiClient {
   def adminGetTables(): Future[AdminGetTablesResponse]
   def adminGetTableMetadata(tableName: String, offset: Int, limit: Int): Future[AdminGetTableMetadataResponse]
 
+  def adminFind(tableName: String, ID: String): Future[AdminFindTableResponse]
+
   def adminCreate(tableName: String, request: AdminCreateTableRequest): Future[AdminCreateTableResponse]
 
   def adminUpdate(
       tableName: String,
-      resourceID: String,
+      ID: String,
       request: AdminUpdateTableRequest
   ): Future[AdminUpdateTableResponse]
 
-  def adminDelete(tableName: String, resourceID: String): Future[AdminDeleteTableResponse]
+  def adminDelete(tableName: String, ID: String): Future[AdminDeleteTableResponse]
 }
 
 object ApiClient {
@@ -201,6 +203,17 @@ object ApiClient {
         .flatMap(Future.fromTry)
     }
 
+    override def adminFind(tableName: String, ID: String): Future[AdminFindTableResponse] = {
+      val path = ServerAPI.path :+ "admin" :+ "tables" :+ tableName :+ ID
+      val uri = ServerAPI.path(path)
+
+      prepareRequest[AdminFindTableResponse]
+        .get(uri)
+        .send()
+        .map(_.body)
+        .flatMap(Future.fromTry)
+    }
+
     override def adminCreate(tableName: String, request: AdminCreateTableRequest): Future[AdminCreateTableResponse] = {
       val path = ServerAPI.path :+ "admin" :+ "tables" :+ tableName
       val uri = ServerAPI.path(path)
@@ -215,10 +228,10 @@ object ApiClient {
 
     override def adminUpdate(
         tableName: String,
-        resourceID: String,
+        ID: String,
         request: AdminUpdateTableRequest
     ): Future[AdminUpdateTableResponse] = {
-      val path = ServerAPI.path :+ "admin" :+ "tables" :+ tableName :+ resourceID
+      val path = ServerAPI.path :+ "admin" :+ "tables" :+ tableName :+ ID
       val uri = ServerAPI.path(path)
 
       prepareRequest[AdminUpdateTableResponse]
@@ -229,8 +242,8 @@ object ApiClient {
         .flatMap(Future.fromTry)
     }
 
-    override def adminDelete(tableName: String, resourceID: String): Future[AdminDeleteTableResponse] = {
-      val path = ServerAPI.path :+ "admin" :+ "tables" :+ tableName :+ resourceID
+    override def adminDelete(tableName: String, ID: String): Future[AdminDeleteTableResponse] = {
+      val path = ServerAPI.path :+ "admin" :+ "tables" :+ tableName :+ ID
       val uri = ServerAPI.path(path)
 
       prepareRequest[AdminDeleteTableResponse]

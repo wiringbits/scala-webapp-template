@@ -47,7 +47,7 @@ class AdminService @Inject() (
 
   def tables(): Future[AdminGetTablesResponse] = {
     for {
-      tables <- databaseTablesRepository.getSettingsTables(tableSettings)
+      tables <- databaseTablesRepository.getTablesInSettings(tableSettings)
       items = tables.map { x =>
         AdminGetTablesResponse.DatabaseTable(
           name = x.name
@@ -72,6 +72,15 @@ class AdminService @Inject() (
     )
   }
 
+  def find(tableName: String, ID: String): Future[AdminFindTableResponse] = {
+    for {
+      _ <- validateTableName(tableName)
+      row <- databaseTablesRepository.find(tableName, ID)
+    } yield AdminFindTableResponse(
+      row = AdminGetTableMetadataResponse.TableRow(row.data.map(_.value).map(AdminGetTableMetadataResponse.Cell.apply))
+    )
+  }
+
   def create(tableName: String, request: AdminCreateTableRequest): Future[Unit] = {
     val body = request.data
     val validate = for {
@@ -92,7 +101,7 @@ class AdminService @Inject() (
     } yield ()
   }
 
-  def update(tableName: String, resourceID: String, request: AdminUpdateTableRequest): Future[Unit] = {
+  def update(tableName: String, ID: String, request: AdminUpdateTableRequest): Future[Unit] = {
     val validate = Future {
       if (request.data.isEmpty) throw new RuntimeException(s"You need to send some data")
       else ()
@@ -103,14 +112,14 @@ class AdminService @Inject() (
       _ <- validate
       _ <- validateTableName(tableName)
       _ <- validateTableFields(tableName, body)
-      _ <- databaseTablesRepository.update(tableName, resourceID, body)
+      _ <- databaseTablesRepository.update(tableName, ID, body)
     } yield ()
   }
 
-  def delete(tableName: String, resourceID: String): Future[Unit] = {
+  def delete(tableName: String, ID: String): Future[Unit] = {
     for {
       _ <- validateTableName(tableName)
-      _ <- databaseTablesRepository.delete(tableName, resourceID)
+      _ <- databaseTablesRepository.delete(tableName, ID)
     } yield ()
   }
 
@@ -133,10 +142,9 @@ class AdminService @Inject() (
   }
 
   private def validateTableName(tableName: String): Future[Unit] = {
-    val authorizatedTables = tableSettings.tables
     for {
-      tables <- databaseTablesRepository.all()
-      exists = tables.exists(_.name == tableName) && authorizatedTables.exists(_.tableName == tableName)
+      tables <- databaseTablesRepository.getTablesInSettings(tableSettings)
+      exists = tables.exists(_.name == tableName)
     } yield
       if (exists) () else throw new RuntimeException(s"Unexpected error because the DB table wasn't found: $tableName")
   }

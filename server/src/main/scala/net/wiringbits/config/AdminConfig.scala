@@ -20,7 +20,7 @@ class AdminConfig @Inject() (
         val fields = DatabaseTablesDAO.getTableFields(settingsTable.tableName)
         validateTableName(settingsTable.tableName, tables)
         validateOrderingCondition(settingsTable.defaultOrderByClause.string, fields)
-        validateIDFieldName(settingsTable.idFieldName, fields)
+        validateIDFieldName(settingsTable.IDFieldName, fields)
       }
     }
   }
@@ -35,14 +35,14 @@ class AdminConfig @Inject() (
 
   def validateOrderingCondition(orderingCondition: String, fields: List[TableField]): Unit = {
     // TODO: I don't think these validators are enough
-    if (orderingCondition.contains("DESC") || orderingCondition.contains("ASC")) ()
-    else
-      throw new RuntimeException(
-        s"You need to include a DESC or ASC property on tableSettings"
-      )
+    val splittedCondition = orderingCondition.split(",")
 
-    val exists = fields.exists(x => orderingCondition.contains(x.name))
-    if (exists) () else throw new RuntimeException(s"You need to include a valid field name on OrderingCondition")
+    val _ = for {
+      orderSQL <- splittedCondition
+      fieldName = orderSQL.toUpperCase.replaceAll("(ASC)|(DESC)", "").trim
+      exists = fields.exists(_.name.toUpperCase == fieldName)
+    } yield
+      if (exists) () else throw new RuntimeException(s"You need to include a valid field name on OrderingCondition")
   }
 
   def validateIDFieldName(IDFieldName: String, fields: List[TableField]): Unit = {

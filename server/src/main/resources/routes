@@ -30,11 +30,14 @@ GET /admin/tables controllers.AdminController.getTables()
 # get database table fields
 GET /admin/tables/:tableName controllers.AdminController.getTableMetadata(tableName, offset: Int ?= 0, limit: Int ?= 10)
 
+# get table resource by id (depends on IDFieldName on AdminConfig)
+GET /admin/tables/:tableName/:ID controllers.AdminController.find(tableName, ID)
+
 # create table resource
 POST /admin/tables/:tableName controllers.AdminController.create(tableName)
 
 # update table resource
-PUT /admin/tables/:tableName/:resourceID controllers.AdminController.update(tableName, resourceID)
+PUT /admin/tables/:tableName/:ID controllers.AdminController.update(tableName, ID)
 
 # delete table resource
-DELETE /admin/tables/:tableName/:resourceID controllers.AdminController.delete(tableName, resourceID)
+DELETE /admin/tables/:tableName/:ID controllers.AdminController.delete(tableName, ID)
