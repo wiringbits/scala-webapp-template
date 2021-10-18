@@ -107,8 +107,9 @@ object DatabaseTablesDAO {
   def getObligatoryFields(tableName: String, tableSettings: DataExplorerSettings)(implicit
       conn: Connection
   ): List[TableField] = {
-    val IDFieldName = tableSettings.tables.find(_.tableName == tableName).get.IDFieldName
     val obligatoryFields = new ListBuffer[TableField]()
+
+    val IDFieldName = tableSettings.tables.find(_.tableName == tableName).get.IDFieldName
     val SQL =
       s"""
       SELECT column_name, is_nullable, 
