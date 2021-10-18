@@ -21,7 +21,7 @@ object DatabaseTablesDAO {
     """.as(tableParser.*)
   }
 
-  def getSettingsTables(tableSettings: DataExplorerSettings): List[DatabaseTable] = {
+  def getTablesInSettings(tableSettings: DataExplorerSettings): List[DatabaseTable] = {
     for {
       table <- tableSettings.tables
       tableName = table.tableName
@@ -107,7 +107,7 @@ object DatabaseTablesDAO {
   def getObligatoryFields(tableName: String, tableSettings: DataExplorerSettings)(implicit
       conn: Connection
   ): List[TableField] = {
-    val IDFieldName = tableSettings.tables.find(_.tableName == tableName).get.idFieldName
+    val IDFieldName = tableSettings.tables.find(_.tableName == tableName).get.IDFieldName
     val obligatoryFields = new ListBuffer[TableField]()
     val SQL =
       s"""
@@ -137,10 +137,34 @@ object DatabaseTablesDAO {
     obligatoryFields.toList
   }
 
+  def find(tableName: String, ID: String, tableSettings: DataExplorerSettings)(implicit conn: Connection): TableRow = {
+    val IDFieldName = tableSettings.tables.find(_.tableName == tableName).get.IDFieldName
+    val SQL =
+      s"""
+      SELECT *
+      FROM $tableName
+      WHERE $IDFieldName = ?
+      """
+
+    val preparedStatement = conn.prepareStatement(SQL)
+    preparedStatement.setObject(1, UUID.fromString(ID))
+
+    val resultSet = preparedStatement.executeQuery()
+
+    resultSet.next()
+
+    val numberOfColumns = resultSet.getMetaData.getColumnCount
+    val row = for {
+      columnNumber <- 1 to numberOfColumns
+      cellData = resultSet.getString(columnNumber)
+    } yield Cell(Option(cellData).getOrElse("null"))
+    TableRow(row.toList)
+  }
+
   def create(tableName: String, body: Map[String, String], tableSettings: DataExplorerSettings)(implicit
       conn: Connection
   ): Unit = {
-    val IDFieldName = tableSettings.tables.find(_.tableName == tableName).get.idFieldName
+    val IDFieldName = tableSettings.tables.find(_.tableName == tableName).get.IDFieldName
 
     val SQLFields = new StringBuilder(IDFieldName)
     val SQLValues = new StringBuilder("?")
@@ -170,11 +194,11 @@ object DatabaseTablesDAO {
 
   def update(
       tableName: String,
-      resourceID: String,
+      ID: String,
       tableSettings: DataExplorerSettings,
       body: Map[String, String]
   )(implicit conn: Connection): Unit = {
-    val IDFieldName = tableSettings.tables.find(_.tableName == tableName).get.idFieldName
+    val IDFieldName = tableSettings.tables.find(_.tableName == tableName).get.IDFieldName
 
     val updateStatement = new StringBuilder("SET")
     for ((name, _) <- body) {
@@ -193,15 +217,15 @@ object DatabaseTablesDAO {
       val value = body(body.keys.toList(i - 1))
       preparedStatement.setObject(i, value)
     }
-    preparedStatement.setObject(body.size + 1, UUID.fromString(resourceID))
+    preparedStatement.setObject(body.size + 1, UUID.fromString(ID))
 
     val _ = preparedStatement.executeUpdate()
   }
 
-  def delete(tableName: String, resourceID: String, tableSettings: DataExplorerSettings)(implicit
+  def delete(tableName: String, ID: String, tableSettings: DataExplorerSettings)(implicit
       conn: Connection
   ): Unit = {
-    val IDFieldName = tableSettings.tables.find(_.tableName == tableName).get.idFieldName
+    val IDFieldName = tableSettings.tables.find(_.tableName == tableName).get.IDFieldName
 
     val sql =
       s"""
@@ -210,7 +234,7 @@ object DatabaseTablesDAO {
       """
 
     val preparedStatement = conn.prepareStatement(sql)
-    preparedStatement.setObject(1, UUID.fromString(resourceID))
+    preparedStatement.setObject(1, UUID.fromString(ID))
 
     val _ = preparedStatement.executeUpdate()
   }

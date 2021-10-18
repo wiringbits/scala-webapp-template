@@ -20,7 +20,7 @@ class AdminConfig @Inject() (
         val fields = DatabaseTablesDAO.getTableFields(settingsTable.tableName)
         validateTableName(settingsTable.tableName, tables)
         validateOrderingCondition(settingsTable.defaultOrderByClause.string, fields)
-        validateIDFieldName(settingsTable.idFieldName, fields)
+        validateIDFieldName(settingsTable.IDFieldName, fields)
       }
     }
   }

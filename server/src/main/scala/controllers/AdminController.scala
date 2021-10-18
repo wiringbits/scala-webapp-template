@@ -53,6 +53,14 @@ class AdminController @Inject() (
     } yield Ok(Json.toJson(response))
   }
 
+  def find(tableName: String, ID: String) = handleGET { request =>
+    for {
+      _ <- adminUser(request)
+      _ = logger.info(s"Find $ID on $tableName")
+      response <- adminService.find(tableName, ID)
+    } yield Ok(Json.toJson(response))
+  }
+
   def create(tableName: String) = handleJsonBody[AdminCreateTableRequest] { request =>
     val body = request.body
     for {
@@ -63,21 +71,21 @@ class AdminController @Inject() (
     } yield Ok(Json.toJson(response))
   }
 
-  def update(tableName: String, resourceID: String) = handleJsonBody[AdminUpdateTableRequest] { request =>
+  def update(tableName: String, ID: String) = handleJsonBody[AdminUpdateTableRequest] { request =>
     val body = request.body
     for {
       _ <- adminUser(request)
-      _ = logger.info(s"Update $resourceID on $tableName with ${body.data}")
-      _ <- adminService.update(tableName, resourceID, body)
+      _ = logger.info(s"Update $ID on $tableName with ${body.data}")
+      _ <- adminService.update(tableName, ID, body)
       response = AdminUpdateTableResponse()
     } yield Ok(Json.toJson(response))
   }
 
-  def delete(tableName: String, resourceID: String) = handleGET { request =>
+  def delete(tableName: String, ID: String) = handleGET { request =>
     for {
       _ <- adminUser(request)
       _ = logger.info(s"Delete on $tableName")
-      _ <- adminService.delete(tableName, resourceID)
+      _ <- adminService.delete(tableName, ID)
       response = AdminDeleteTableResponse()
     } yield Ok(Json.toJson(response))
   }

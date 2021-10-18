@@ -3,7 +3,7 @@ package net.wiringbits.repositories
 import net.wiringbits.config.models.DataExplorerSettings
 import net.wiringbits.executors.DatabaseExecutionContext
 import net.wiringbits.repositories.daos.DatabaseTablesDAO
-import net.wiringbits.repositories.models.{DatabaseTable, TableField, TableMetadata}
+import net.wiringbits.repositories.models.{DatabaseTable, TableField, TableMetadata, TableRow}
 import net.wiringbits.util.models.pagination.{PaginatedQuery, PaginatedResult}
 import play.api.db.Database
 
@@ -21,8 +21,8 @@ class DatabaseTablesRepository @Inject() (database: Database)(implicit
     }
   }
 
-  def getSettingsTables(tableSettings: DataExplorerSettings): Future[List[DatabaseTable]] = Future {
-    DatabaseTablesDAO.getSettingsTables(tableSettings)
+  def getTablesInSettings(tableSettings: DataExplorerSettings): Future[List[DatabaseTable]] = Future {
+    DatabaseTablesDAO.getTablesInSettings(tableSettings)
   }
 
   def getTableFields(tableName: String): Future[List[TableField]] = Future {
@@ -35,7 +35,6 @@ class DatabaseTablesRepository @Inject() (database: Database)(implicit
     database.withConnection { implicit conn =>
       DatabaseTablesDAO.getObligatoryFields(tableName, tableSettings)
     }
-
   }
 
   def getTableMetadata(tableName: String, pagination: PaginatedQuery): Future[PaginatedResult[TableMetadata]] = Future {
@@ -45,23 +44,29 @@ class DatabaseTablesRepository @Inject() (database: Database)(implicit
     }
   }
 
+  def find(tableName: String, ID: String): Future[TableRow] = Future {
+    database.withConnection { implicit conn =>
+      DatabaseTablesDAO.find(tableName, ID, tableSettings);
+    }
+  }
+
   def create(tableName: String, body: Map[String, String]): Future[Unit] = Future {
     database.withConnection { implicit conn =>
       DatabaseTablesDAO.create(tableName, body, tableSettings);
     }
   }
 
-  def update(tableName: String, resourceID: String, body: Map[String, String]): Future[Unit] =
+  def update(tableName: String, ID: String, body: Map[String, String]): Future[Unit] =
     Future {
       database.withConnection { implicit conn =>
-        DatabaseTablesDAO.update(tableName, resourceID, tableSettings, body);
+        DatabaseTablesDAO.update(tableName, ID, tableSettings, body);
       }
     }
 
-  def delete(tableName: String, resourceID: String): Future[Unit] =
+  def delete(tableName: String, ID: String): Future[Unit] =
     Future {
       database.withConnection { implicit conn =>
-        DatabaseTablesDAO.delete(tableName, resourceID, tableSettings);
+        DatabaseTablesDAO.delete(tableName, ID, tableSettings);
       }
     }
 }
