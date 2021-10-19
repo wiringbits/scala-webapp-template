@@ -11,12 +11,16 @@ While this is still a work in progress, it has enough details to save a couple o
 Check the [infra](./infra) docs to deploy your application.
 
 ## Demo
+
 To get an idea on what the template provides, play with the live demos, what you see there is what you will get by cloning the template:
+
 - [Web App](https://template-demo.wiringbits.net)
 - [Admin App](https://template-demo-admin.wiringbits.net) (username = `demo`, password = `wiringbits`)
 
 ## Goal
+
 The goal for this project is to include more functionality that is common for web projects, like:
+
 - Better authentication instead of just using a JSON Web Token.
 - Allow updating user details as well as changing password.
 - Enable accounts after verifying the email address (by sending an email).
@@ -47,9 +51,10 @@ The stack used is:
 - [nginx](https://nginx.org/en/) as the reverse proxy for handling the internet traffic, as well as the authentication mechanism for the admin portal.
 - [CircleCi](https://circleci.org) integration so that you have a way every commit gets tested.
 
-
 ## Features
+
 By cloning this template you will gain a skeleton with:
+
 - A backend server exposing a REST API with a simple JWT based authentication mechanism.
 - A web application intended to be used by multiple users, allowing them to create an account, and to log into it.
 - An admin web application intended to be used by administrators only, using the http basic authentication capability from nginx.
@@ -64,18 +69,24 @@ By cloning this template you will gain a skeleton with:
 - A user log displaying the interactions with the app.
 
 ## Code format
+
 The code format is checked by [scalafmt](https://scalameta.org/scalafmt) when the CI complains about the format, running `sbt scalafmtAll` should fix it.
 
+## Ubuntu Setup
+
+1. [SDKMan java/sbt setup](./docs/sdkman-java-sbt.md)
+2. [Postgres setup](./docs/postgres.md)
 
 ## server
+
 This is the server side for the project.
 
 Run it with `sbt server/run`, you are expected to have updated the [application.conf](server/src/main/resources/application.conf) to reach your postgres instance.
 
 NOTE: The server doesn't really start until you send the first request, like `curl localhost:9000/health`
 
-
 ## web
+
 This is the main web app for the users.
 
 Run `sbt dev-web` to launch the website on `localhost:8080` pointing to the server url at `localhost:9000`, which reloads on code changes.
@@ -88,25 +99,27 @@ Run this command to package the app for release, the output is stored at `./web/
 API_URL="https://REPLACE_ME" sbt web/build
 ```
 
-
 ## admin
+
 This is the admin web app.
 
 Run `sbt dev-admin` to launch the website on `localhost:8081` pointing to the server url at `localhost:9000`, which reloads on code changes.
 
-
 ## lib
+
 This is the shared library powering all the Scala apps.
 
 ### common
+
 The [common](lib/common) module includes all the logic that can be shared on all the apps.
 
 ### api
+
 The [api](lib/api) module includes the shared APIs like the backend client.
 
 ### ui
-The [ui](lib/ui) module includes the shared UI like some reusable react components.
 
+The [ui](lib/ui) module includes the shared UI like some reusable react components.
 
 ## Scala.js hints
 
