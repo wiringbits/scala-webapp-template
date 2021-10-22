@@ -1,6 +1,5 @@
 package net.wiringbits.components.pages
 
-import net.wiringbits.components.widgets.{AppBar, Footer}
 import net.wiringbits.ui.components.core.widgets._
 import slinky.core.FunctionalComponent
 import slinky.core.annotations.react
