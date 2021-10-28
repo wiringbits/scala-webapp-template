@@ -14,25 +14,28 @@ import typings.reactRouterDom.{components => router}
   case class Props(api: API)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
-    def generateRoute(path: String, child: => ReactElement): Route.Builder[RouteProps] = {
-      router.Route(
-        RouteProps()
-          .setExact(true)
-          .setPath(path)
-          .setRender { route =>
-            Scaffold(appbar = Some(AppBar()), body = child, footer = Some(Footer()))
-          }
-      )
-    }
-
-    val home = generateRoute("/", HomePage())
-    val dashboard = generateRoute("/users", UsersPage(props.api))
-    val catchAllRoute = router.Route(
-      RouteProps().setRender { _ =>
-        router.Redirect("/")
-      }
-    )
-
-    router.Switch(home, dashboard, catchAllRoute)
+//    def generateRoute(path: String, child: => ReactElement): Route.Builder[RouteProps] = {
+//      router.Route(
+//        RouteProps()
+//          .setExact(true)
+//          .setPath(path)
+//          .setRender { route =>
+//            Scaffold(appbar = Some(AppBar()), body = child, footer = Some(Footer()))
+//          }
+//      )
+//    }
+//
+//    val home = generateRoute("/", HomePage())
+//    val dashboard = generateRoute("/users", UsersPage(props.api))
+//    val catchAllRoute = router.Route(
+//      RouteProps().setRender { _ =>
+//        router.Redirect("/")
+//      }
+//    )
+//
+//    router.BrowserRouter(
+//      router.Switch(home, dashboard, catchAllRoute)
+//    )
+    HomePage()
   }
 }

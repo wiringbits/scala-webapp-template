@@ -262,8 +262,8 @@ lazy val ui = (project in file("lib/ui"))
       "@material-ui/styles" -> "3.0.0-alpha.10", // note: version 4 is not supported yet
       "@material-ui/icons" -> "3.0.2",
       "@types/classnames" -> "2.2.10",
-      "react-router" -> "5.1.2",
-      "@types/react-router" -> "5.1.2",
+//      "react-router" -> "5.1.2",
+//      "@types/react-router" -> "5.1.2",
       "react-router-dom" -> "5.1.2",
       "@types/react-router-dom" -> "5.1.2"
     ),
@@ -385,8 +385,8 @@ lazy val admin = (project in file("admin"))
       "@material-ui/styles" -> "3.0.0-alpha.10", // note: version 4 is not supported yet
       "@material-ui/icons" -> "3.0.2",
       "@types/classnames" -> "2.2.10",
-      "react-router" -> "5.1.2",
-      "@types/react-router" -> "5.1.2",
+//      "react-router" -> "5.1.2",
+//      "@types/react-router" -> "5.1.2",
       "react-router-dom" -> "5.1.2",
       "@types/react-router-dom" -> "5.1.2",
       "react-admin" -> "3.18.3"
