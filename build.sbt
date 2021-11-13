@@ -9,9 +9,8 @@ val sttp = "2.2.10"
 
 val consoleDisabledOptions = Seq("-Xfatal-warnings", "-Ywarn-unused", "-Ywarn-unused-import")
 
-/**
- * Say just `build` or `sbt build` to make a production bundle in `build`
- */
+/** Say just `build` or `sbt build` to make a production bundle in `build`
+  */
 lazy val build = TaskKey[File]("build")
 
 // Used only by the server
@@ -85,10 +84,8 @@ lazy val baseLibSettings: Project => Project =
       )
     )
 
-/**
- * Implement the  `build` task define above.
- * Most of this is really just to copy the index.html file around.
- */
+/** Implement the `build` task define above. Most of this is really just to copy the index.html file around.
+  */
 lazy val browserProject: Project => Project =
   _.settings(
     build := {
