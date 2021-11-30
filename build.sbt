@@ -291,7 +291,8 @@ lazy val server = (project in file("server"))
       "com.dimafeng" %% "testcontainers-scala-scalatest" % "0.39.12" % "test",
       "com.dimafeng" %% "testcontainers-scala-postgresql" % "0.39.12" % "test",
       "com.softwaremill.sttp.client" %% "core" % sttp % "test",
-      "com.softwaremill.sttp.client" %% "async-http-client-backend-future" % sttp % "test"
+      "com.softwaremill.sttp.client" %% "async-http-client-backend-future" % sttp % "test",
+      "com.alexitc" %% "webapp-utils-server" % "0.1.0-SNAPSHOT"
     )
   )
 
@@ -390,7 +391,8 @@ lazy val admin = (project in file("admin"))
     libraryDependencies ++= Seq(
       "com.typesafe.play" %%% "play-json" % playJson,
       "com.softwaremill.sttp.client" %%% "core" % sttp,
-      "com.alexitc" %%% "sjs-material-ui-facade" % "0.1.5"
+      "com.alexitc" %%% "sjs-material-ui-facade" % "0.1.5",
+      "com.alexitc" %%% "webapp-utils-ui" % "0.1.0-SNAPSHOT"
     ),
     libraryDependencies ++= Seq(
       "org.scalatest" %%% "scalatest" % "3.2.10" % Test
