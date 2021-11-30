@@ -66,4 +66,67 @@ package object models {
     case class User(id: UUID, name: String, email: String, createdAt: Instant)
     implicit val adminGetUsersResponseUserFormat: Format[User] = Json.format[User]
   }
+
+  case class AdminGetTablesResponse(data: List[AdminGetTablesResponse.DatabaseTable])
+  implicit val adminGetTablesResponseFormat: Format[AdminGetTablesResponse] = Json.format[AdminGetTablesResponse]
+
+  object AdminGetTablesResponse {
+    case class DatabaseTable(name: String)
+    implicit val adminGetTablesResponseFormat: Format[DatabaseTable] = Json.format[DatabaseTable]
+  }
+
+  case class AdminGetTableMetadataResponse(
+      name: String,
+      fields: List[AdminGetTableMetadataResponse.TableField],
+      rows: List[AdminGetTableMetadataResponse.TableRow],
+      offSet: Int,
+      limit: Int,
+      count: Int
+  )
+
+  object AdminGetTableMetadataResponse {
+    case class TableField(name: String, `type`: String)
+    case class TableRow(data: List[Cell])
+    case class Cell(value: String)
+
+    implicit val adminGetCellMetadataFormat: Format[AdminGetTableMetadataResponse.Cell] =
+      Json.format[AdminGetTableMetadataResponse.Cell]
+
+    implicit val adminGetColumnMetadataFormat: Format[AdminGetTableMetadataResponse.TableField] =
+      Json.format[AdminGetTableMetadataResponse.TableField]
+
+    implicit val adminGetRowMetadataFormat: Format[AdminGetTableMetadataResponse.TableRow] =
+      Json.format[AdminGetTableMetadataResponse.TableRow]
+
+    implicit val adminGetTableMetadataResponseFormat: Format[AdminGetTableMetadataResponse] =
+      Json.format[AdminGetTableMetadataResponse]
+  }
+
+  case class AdminFindTableResponse(row: AdminGetTableMetadataResponse.TableRow)
+
+  implicit val adminFindTableResponseFormat: Format[AdminFindTableResponse] =
+    Json.format[AdminFindTableResponse]
+
+  case class AdminCreateTableRequest(data: Map[String, String])
+  case class AdminCreateTableResponse(noData: String = "")
+
+  implicit val adminCreateTableRequestFormat: Format[AdminCreateTableRequest] =
+    Json.format[AdminCreateTableRequest]
+
+  implicit val adminCreateTableResponseFormat: Format[AdminCreateTableResponse] =
+    Json.format[AdminCreateTableResponse]
+
+  case class AdminUpdateTableRequest(data: Map[String, String])
+  case class AdminUpdateTableResponse(noData: String = "")
+
+  implicit val adminUpdateTableRequestFormat: Format[AdminUpdateTableRequest] =
+    Json.format[AdminUpdateTableRequest]
+
+  implicit val adminUpdateTableResponseFormat: Format[AdminUpdateTableResponse] =
+    Json.format[AdminUpdateTableResponse]
+
+  case class AdminDeleteTableResponse(noData: String = "")
+
+  implicit val adminDeleteTableResponseFormat: Format[AdminDeleteTableResponse] =
+    Json.format[AdminDeleteTableResponse]
 }
