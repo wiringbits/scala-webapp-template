@@ -9,9 +9,8 @@ val sttp = "2.2.10"
 
 val consoleDisabledOptions = Seq("-Xfatal-warnings", "-Ywarn-unused", "-Ywarn-unused-import")
 
-/**
- * Say just `build` or `sbt build` to make a production bundle in `build`
- */
+/** Say just `build` or `sbt build` to make a production bundle in `build`
+  */
 lazy val build = TaskKey[File]("build")
 
 // Used only by the server
@@ -85,10 +84,8 @@ lazy val baseLibSettings: Project => Project =
       )
     )
 
-/**
- * Implement the  `build` task define above.
- * Most of this is really just to copy the index.html file around.
- */
+/** Implement the `build` task define above. Most of this is really just to copy the index.html file around.
+  */
 lazy val browserProject: Project => Project =
   _.settings(
     build := {
@@ -287,12 +284,12 @@ lazy val server = (project in file("server"))
     libraryDependencies ++= Seq(
       "org.playframework.anorm" %% "anorm" % "2.6.10",
       "com.typesafe.play" %% "play-json" % "2.9.2",
-      "org.postgresql" % "postgresql" % "42.3.0",
+      "org.postgresql" % "postgresql" % "42.3.1",
       "com.github.jwt-scala" %% "jwt-core" % "9.0.2",
       "de.svenkubiak" % "jBCrypt" % "0.4.3",
       "commons-validator" % "commons-validator" % "1.7",
-      "com.dimafeng" %% "testcontainers-scala-scalatest" % "0.39.10" % "test",
-      "com.dimafeng" %% "testcontainers-scala-postgresql" % "0.39.10" % "test",
+      "com.dimafeng" %% "testcontainers-scala-scalatest" % "0.39.12" % "test",
+      "com.dimafeng" %% "testcontainers-scala-postgresql" % "0.39.12" % "test",
       "com.softwaremill.sttp.client" %% "core" % sttp % "test",
       "com.softwaremill.sttp.client" %% "async-http-client-backend-future" % sttp % "test"
     )

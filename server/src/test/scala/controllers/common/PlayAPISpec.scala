@@ -12,9 +12,8 @@ import play.api.{Application, Mode}
 import java.net.URLEncoder
 import scala.concurrent.Future
 
-/**
- * A PlayAPISpec allow us to write tests for the API calls.
- */
+/** A PlayAPISpec allow us to write tests for the API calls.
+  */
 trait PlayAPISpec extends PlaySpec with ScalaFutures {
 
   protected def defaultGuiceApplicationBuilder: GuiceApplicationBuilder =
