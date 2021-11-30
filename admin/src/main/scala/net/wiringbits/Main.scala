@@ -23,7 +23,7 @@ object Main {
 
     val app = ErrorBoundaryComponent(
       ErrorBoundaryComponent.Props(
-        child = App(API()),
+        child = App(APIs()),
         renderError = e => ErrorBoundaryInfo(e)
       )
     )
