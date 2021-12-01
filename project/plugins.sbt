@@ -1,6 +1,6 @@
 addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "1.1.0")
 
-addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.8.8")
+addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.8.10")
 
 addSbtPlugin("org.scala-js" % "sbt-scalajs" % "1.7.1")
 
