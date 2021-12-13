@@ -20,7 +20,7 @@ import org.scalajs.dom
 import slinky.core.{FunctionalComponent, SyntheticEvent}
 import slinky.web.html._
 
-import scala.concurrent.ExecutionContext.Implicits.global
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 import scala.util.{Failure, Success}
 
 @react object SignInForm {

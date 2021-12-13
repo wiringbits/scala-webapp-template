@@ -3,7 +3,7 @@ package net.wiringbits
 import net.wiringbits.api.ApiClient
 import net.wiringbits.services.StorageService
 
-import scala.concurrent.ExecutionContext
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 
 case class API(client: ApiClient, storage: StorageService)
 
@@ -16,7 +16,7 @@ object API {
     }
   }
 
-  def apply()(implicit ec: ExecutionContext): API = {
+  def apply(): API = {
     println(s"Server API expected at: $apiUrl")
 
     implicit val sttpBackend = sttp.client.FetchBackend()
