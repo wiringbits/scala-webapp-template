@@ -5,7 +5,6 @@ import org.scalajs.dom
 import slinky.hot
 import slinky.web.ReactDOM
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js.annotation.JSImport
 import scala.scalajs.{LinkingInfo, js}
 
