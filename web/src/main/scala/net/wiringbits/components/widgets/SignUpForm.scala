@@ -15,7 +15,7 @@ import slinky.core.annotations.react
 import slinky.core.facade.{Fragment, Hooks}
 import typings.reactRouterDom.{mod => reactRouterDom}
 
-import scala.concurrent.ExecutionContext.Implicits.global
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 import scala.util.{Failure, Success}
 import org.scalajs.dom
 import slinky.core.{FunctionalComponent, SyntheticEvent}
