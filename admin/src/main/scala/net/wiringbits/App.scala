@@ -7,7 +7,7 @@ import slinky.core.annotations.react
 import typings.reactRouterDom.{components => router}
 
 @react object App {
-  case class Props(api: APIs)
+  case class Props(api: API)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     ThemeProvider(AppTheme.value)(

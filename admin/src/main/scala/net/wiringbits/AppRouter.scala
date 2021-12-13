@@ -12,7 +12,7 @@ import typings.reactRouterDom.components.Route
 import typings.reactRouterDom.{components => router}
 
 @react object AppRouter {
-  case class Props(api: APIs)
+  case class Props(api: API)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     def generateRoute(path: String, child: => ReactElement): Route.Builder[RouteProps] = {
@@ -27,7 +27,7 @@ import typings.reactRouterDom.{components => router}
     }
 
     val home = generateRoute("/", HomePage())
-    val dashboard = generateRoute("/users", UsersPage(props.api.client))
+    val dashboard = generateRoute("/users", UsersPage(props.api))
     val tables = generateRoute("/tables", DataExplorerPage.component(DataExplorerPage.Props(props.api.admin)))
     val dataExplorer = generateRoute(
       "/tables/:tableName",
