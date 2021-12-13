@@ -5,11 +5,9 @@ import net.wiringbits.webapp.utils.api.AdminDataExplorerApiClient
 import net.wiringbits.webapp.utils.ui.web.{API => APIAdmin}
 import scala.concurrent.ExecutionContext
 
-case class APIs(client: API, admin: APIAdmin)
+case class API(client: ApiClient, admin: APIAdmin)
 
-case class API(client: ApiClient)
-
-object APIs {
+object API {
 
   // allows overriding the server url
   private val apiUrl = {
@@ -18,14 +16,13 @@ object APIs {
     }
   }
 
-  def apply()(implicit ec: ExecutionContext): APIs = {
+  def apply()(implicit ec: ExecutionContext): API = {
     println(s"Server API expected at: $apiUrl")
 
     implicit val sttpBackend = sttp.client.FetchBackend()
     val client = new ApiClient.DefaultImpl(ApiClient.Config(apiUrl))
     val admin = new AdminDataExplorerApiClient.DefaultImpl(AdminDataExplorerApiClient.Config(apiUrl))
-    val clientApi = API(client)
     val adminApi = APIAdmin(admin)
-    APIs(client = clientApi, admin = adminApi)
+    API(client, adminApi)
   }
 }
