@@ -194,8 +194,8 @@ lazy val playSettings: Project => Project = {
       // test
       libraryDependencies ++= Seq(
         "org.scalatestplus.play" %% "scalatestplus-play" % "5.1.0" % Test,
-        "org.mockito" %% "mockito-scala" % "1.16.46" % Test,
-        "org.mockito" %% "mockito-scala-scalatest" % "1.16.46" % Test
+        "org.mockito" %% "mockito-scala" % "1.16.49" % Test,
+        "org.mockito" %% "mockito-scala-scalatest" % "1.16.49" % Test
       )
     )
 }
@@ -270,6 +270,7 @@ lazy val ui = (project in file("lib/ui"))
     Compile / stMinimize := Selection.All,
     libraryDependencies ++= Seq(
       "io.github.cquiroz" %%% "scala-java-time" % "2.0.0",
+      "org.scala-js" %%% "scala-js-macrotask-executor" % "1.0.0",
       "com.alexitc" %%% "sjs-material-ui-facade" % "0.1.5"
     )
   )
@@ -340,6 +341,7 @@ lazy val web = (project in file("web"))
     libraryDependencies ++= Seq(
       "com.typesafe.play" %%% "play-json" % playJson,
       "com.softwaremill.sttp.client" %%% "core" % sttp,
+      "org.scala-js" %%% "scala-js-macrotask-executor" % "1.0.0",
       "com.alexitc" %%% "sjs-material-ui-facade" % "0.1.5"
     ),
     libraryDependencies ++= Seq(
@@ -391,6 +393,8 @@ lazy val admin = (project in file("admin"))
     libraryDependencies ++= Seq(
       "com.typesafe.play" %%% "play-json" % playJson,
       "com.softwaremill.sttp.client" %%% "core" % sttp,
+      "com.alexitc" %%% "sjs-material-ui-facade" % "0.1.5",
+      "org.scala-js" %%% "scala-js-macrotask-executor" % "1.0.0",
       "com.alexitc" %%% "sjs-material-ui-facade" % "0.1.5",
       "net.wiringbits" %%% "admin-data-explorer-slinky" % "0.2.0"
     ),

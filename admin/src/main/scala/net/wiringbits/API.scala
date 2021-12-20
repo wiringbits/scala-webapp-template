@@ -3,7 +3,8 @@ package net.wiringbits
 import net.wiringbits.api.ApiClient
 import net.wiringbits.webapp.utils.api.AdminDataExplorerApiClient
 import net.wiringbits.webapp.utils.ui.web.{API => APIAdmin}
-import scala.concurrent.ExecutionContext
+
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 
 case class API(client: ApiClient, admin: APIAdmin)
 
@@ -16,7 +17,7 @@ object API {
     }
   }
 
-  def apply()(implicit ec: ExecutionContext): API = {
+  def apply(): API = {
     println(s"Server API expected at: $apiUrl")
 
     implicit val sttpBackend = sttp.client.FetchBackend()
