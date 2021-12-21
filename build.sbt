@@ -56,7 +56,7 @@ lazy val baseWebSettings: Project => Project =
       /* disabled because it somehow triggers many warnings */
       scalaJSLinkerConfig := scalaJSLinkerConfig.value.withSourceMap(false),
       /* for slinky */
-      libraryDependencies ++= Seq("me.shadaj" %%% "slinky-hot" % "0.6.8"),
+      libraryDependencies ++= Seq("me.shadaj" %%% "slinky-hot" % "0.7.0"),
       libraryDependencies ++= Seq(
         "io.github.cquiroz" %%% "scala-java-time" % "2.3.0",
         "io.github.cquiroz" %%% "scala-java-time-tzdb" % "2.3.0"
