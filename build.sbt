@@ -396,7 +396,6 @@ lazy val admin = (project in file("admin"))
       "com.softwaremill.sttp.client" %%% "core" % sttp,
       "com.alexitc" %%% "sjs-material-ui-facade" % "0.1.5",
       "org.scala-js" %%% "scala-js-macrotask-executor" % "1.0.0",
-      "com.alexitc" %%% "sjs-material-ui-facade" % "0.1.5",
       "net.wiringbits" %%% "admin-data-explorer-slinky" % "0.2.0"
     ),
     libraryDependencies ++= Seq(
