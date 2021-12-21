@@ -3,7 +3,7 @@ package net.wiringbits
 import net.wiringbits.components.pages._
 import net.wiringbits.components.widgets.{AppBar, Footer}
 import net.wiringbits.models.{AuthState, User}
-import net.wiringbits.ui.components.core.widgets
+import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Scaffold
 import slinky.core.FunctionalComponent
 import slinky.core.annotations.react
 import slinky.core.facade.ReactElement
@@ -20,7 +20,7 @@ import typings.reactRouterDom.{components => router}
         .setExact(true)
         .setPath(path)
         .setRender { route =>
-          widgets.Scaffold(
+          Scaffold(
             appbar = Some(AppBar(auth)),
             body = child,
             footer = Some(Footer())

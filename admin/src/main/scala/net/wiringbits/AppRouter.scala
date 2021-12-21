@@ -2,7 +2,7 @@ package net.wiringbits
 
 import net.wiringbits.components.pages.{HomePage, UsersPage}
 import net.wiringbits.components.widgets.{AppBar, Footer}
-import net.wiringbits.ui.components.core.widgets.Scaffold
+import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Scaffold
 import net.wiringbits.webapp.utils.ui.web.components.pages.{DataExplorerPage, ExperimentalTablesPage}
 import slinky.core.FunctionalComponent
 import slinky.core.annotations.react
