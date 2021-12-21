@@ -20,6 +20,15 @@ package object models {
   case class ErrorResponse(error: String)
   implicit val errorResponseFormat: Format[ErrorResponse] = Json.format[ErrorResponse]
 
+  case class PlayErrorResponse(error: PlayErrorResponse.PlayError)
+
+  object PlayErrorResponse {
+    case class PlayError(message: String)
+
+    implicit val playErrorResponseErrorFormat: Format[PlayError] = Json.format[PlayError]
+  }
+
+  implicit val playErrorResponseFormat: Format[PlayErrorResponse] = Json.format[PlayErrorResponse]
   case class CreateUserRequest(name: String, email: String, password: String)
   case class CreateUserResponse(name: String, email: String, token: String)
   implicit val createUserRequestFormat: Format[CreateUserRequest] = Json.format[CreateUserRequest]

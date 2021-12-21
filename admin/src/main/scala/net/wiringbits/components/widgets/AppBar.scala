@@ -14,9 +14,9 @@ import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
   WithStylesOptions
 }
 import net.wiringbits.AppStrings
-import net.wiringbits.ui.components.core.widgets.Container._
-import net.wiringbits.ui.components.core.widgets.{Container, NavLinkButton, Subtitle, Title}
-import net.wiringbits.ui.core.MediaQueryHooks
+import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container._
+import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{Container, NavLinkButton, Subtitle, Title}
+import net.wiringbits.webapp.utils.slinkyUtils.core.MediaQueryHooks
 import org.scalablytyped.runtime.StringDictionary
 import slinky.core.FunctionalComponent
 import slinky.core.annotations.react

@@ -1,6 +1,5 @@
 package net.wiringbits.components.widgets
 
-import com.alexitc.materialui.facade.csstype.mod.FlexDirectionProperty
 import com.alexitc.materialui.facade.materialUiCore.createMuiThemeMod.Theme
 import com.alexitc.materialui.facade.materialUiCore.mod.PropTypes.Color
 import com.alexitc.materialui.facade.materialUiCore.{typographyTypographyMod, components => mui}
@@ -13,14 +12,13 @@ import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
   WithStylesOptions
 }
 import net.wiringbits.AppStrings
-import net.wiringbits.ui.components.core.widgets.Container.EdgeInsets
-import net.wiringbits.ui.components.core.widgets.{Container, Title}
-import net.wiringbits.ui.core.MediaQueryHooks
+import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container
+import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.EdgeInsets
+import net.wiringbits.webapp.utils.slinkyUtils.core.MediaQueryHooks
 import org.scalablytyped.runtime.StringDictionary
 import slinky.core.FunctionalComponent
 import slinky.core.annotations.react
 import slinky.core.facade.Fragment
-import slinky.web.html._
 
 @react object Footer {
   type Props = Unit

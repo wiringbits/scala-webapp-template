@@ -13,7 +13,7 @@ import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
 }
 import net.wiringbits.AppStrings
 import net.wiringbits.api.models.AdminGetUsersResponse
-import net.wiringbits.ui.components.core.widgets.{Container, Subtitle}
+import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{Container, Subtitle}
 import org.scalablytyped.runtime.StringDictionary
 import slinky.core.FunctionalComponent
 import slinky.core.facade.Fragment
