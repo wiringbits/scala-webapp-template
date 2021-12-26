@@ -271,7 +271,7 @@ lazy val ui = (project in file("lib/ui"))
     libraryDependencies ++= Seq(
       "io.github.cquiroz" %%% "scala-java-time" % "2.0.0",
       "org.scala-js" %%% "scala-js-macrotask-executor" % "1.0.0",
-      "com.alexitc" %%% "sjs-material-ui-facade" % "0.1.5"
+      "com.alexitc" %%% "sjs-material-ui-facade" % "0.1.6"
     )
   )
 
@@ -341,7 +341,7 @@ lazy val web = (project in file("web"))
       "com.typesafe.play" %%% "play-json" % playJson,
       "com.softwaremill.sttp.client" %%% "core" % sttp,
       "org.scala-js" %%% "scala-js-macrotask-executor" % "1.0.0",
-      "com.alexitc" %%% "sjs-material-ui-facade" % "0.1.5"
+      "com.alexitc" %%% "sjs-material-ui-facade" % "0.1.6"
     ),
     libraryDependencies ++= Seq(
       "org.scalatest" %%% "scalatest" % "3.2.10" % Test
@@ -393,7 +393,7 @@ lazy val admin = (project in file("admin"))
       "com.typesafe.play" %%% "play-json" % playJson,
       "com.softwaremill.sttp.client" %%% "core" % sttp,
       "org.scala-js" %%% "scala-js-macrotask-executor" % "1.0.0",
-      "com.alexitc" %%% "sjs-material-ui-facade" % "0.1.5"
+      "com.alexitc" %%% "sjs-material-ui-facade" % "0.1.6"
     ),
     libraryDependencies ++= Seq(
       "org.scalatest" %%% "scalatest" % "3.2.10" % Test
