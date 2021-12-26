@@ -5,7 +5,7 @@ ThisBuild / scalaVersion := "2.13.6"
 ThisBuild / organization := "net.wiringbits"
 
 val playJson = "2.9.2"
-val sttp = "2.2.10"
+val sttp = "3.3.18"
 
 val consoleDisabledOptions = Seq("-Xfatal-warnings", "-Ywarn-unused", "-Ywarn-unused-import")
 
@@ -56,7 +56,7 @@ lazy val baseWebSettings: Project => Project =
       /* disabled because it somehow triggers many warnings */
       scalaJSLinkerConfig := scalaJSLinkerConfig.value.withSourceMap(false),
       /* for slinky */
-      libraryDependencies ++= Seq("me.shadaj" %%% "slinky-hot" % "0.6.8"),
+      libraryDependencies ++= Seq("me.shadaj" %%% "slinky-hot" % "0.7.0"),
       libraryDependencies ++= Seq(
         "io.github.cquiroz" %%% "scala-java-time" % "2.3.0",
         "io.github.cquiroz" %%% "scala-java-time-tzdb" % "2.3.0"
@@ -229,7 +229,7 @@ lazy val api = (crossProject(JSPlatform, JVMPlatform) in file("lib/api"))
   .jvmSettings(
     libraryDependencies ++= Seq(
       "com.typesafe.play" %% "play-json" % playJson,
-      "com.softwaremill.sttp.client" %% "core" % sttp
+      "com.softwaremill.sttp.client3" %% "core" % sttp
     )
   )
   .jsSettings(
@@ -237,7 +237,7 @@ lazy val api = (crossProject(JSPlatform, JVMPlatform) in file("lib/api"))
     Compile / stMinimize := Selection.All,
     libraryDependencies ++= Seq(
       "com.typesafe.play" %%% "play-json" % playJson,
-      "com.softwaremill.sttp.client" %%% "core" % sttp
+      "com.softwaremill.sttp.client3" %%% "core" % sttp
     )
   )
 
@@ -291,8 +291,8 @@ lazy val server = (project in file("server"))
       "commons-validator" % "commons-validator" % "1.7",
       "com.dimafeng" %% "testcontainers-scala-scalatest" % "0.39.12" % "test",
       "com.dimafeng" %% "testcontainers-scala-postgresql" % "0.39.12" % "test",
-      "com.softwaremill.sttp.client" %% "core" % sttp % "test",
-      "com.softwaremill.sttp.client" %% "async-http-client-backend-future" % sttp % "test"
+      "com.softwaremill.sttp.client3" %% "core" % sttp % "test",
+      "com.softwaremill.sttp.client3" %% "async-http-client-backend-future" % sttp % "test"
     )
   )
 
@@ -339,7 +339,7 @@ lazy val web = (project in file("web"))
     ),
     libraryDependencies ++= Seq(
       "com.typesafe.play" %%% "play-json" % playJson,
-      "com.softwaremill.sttp.client" %%% "core" % sttp,
+      "com.softwaremill.sttp.client3" %%% "core" % sttp,
       "org.scala-js" %%% "scala-js-macrotask-executor" % "1.0.0",
       "com.alexitc" %%% "sjs-material-ui-facade" % "0.1.6"
     ),
@@ -391,7 +391,7 @@ lazy val admin = (project in file("admin"))
     ),
     libraryDependencies ++= Seq(
       "com.typesafe.play" %%% "play-json" % playJson,
-      "com.softwaremill.sttp.client" %%% "core" % sttp,
+      "com.softwaremill.sttp.client3" %%% "core" % sttp,
       "org.scala-js" %%% "scala-js-macrotask-executor" % "1.0.0",
       "com.alexitc" %%% "sjs-material-ui-facade" % "0.1.6"
     ),
