@@ -2,7 +2,7 @@ package net.wiringbits.api
 
 import net.wiringbits.api.models._
 import play.api.libs.json._
-import sttp.client._
+import sttp.client3._
 import sttp.model._
 
 import java.util.UUID
@@ -61,7 +61,7 @@ object ApiClient {
   // TODO: X-Authorization header is being used to keep the nginx basic-authentication
   // once that's removed, Authorization header can be used instead.
   class DefaultImpl(config: Config)(implicit
-      backend: SttpBackend[Future, Nothing, Nothing],
+      backend: SttpBackend[Future, _],
       ec: ExecutionContext
   ) extends ApiClient {
 
@@ -77,83 +77,83 @@ object ApiClient {
 
     override def createUser(request: CreateUserRequest): Future[CreateUserResponse] = {
       val path = ServerAPI.path :+ "users"
-      val uri = ServerAPI.path(path)
+      val uri = ServerAPI.withPath(path)
 
       prepareRequest[CreateUserResponse]
         .post(uri)
         .body(Json.toJson(request).toString())
-        .send()
+        .send(backend)
         .map(_.body)
         .flatMap(Future.fromTry)
     }
 
     override def login(request: LoginRequest): Future[LoginResponse] = {
       val path = ServerAPI.path :+ "users" :+ "login"
-      val uri = ServerAPI.path(path)
+      val uri = ServerAPI.withPath(path)
 
       prepareRequest[LoginResponse]
         .post(uri)
         .body(Json.toJson(request).toString())
-        .send()
+        .send(backend)
         .map(_.body)
         .flatMap(Future.fromTry)
     }
 
     override def currentUser(jwt: String): Future[GetCurrentUserResponse] = {
       val path = ServerAPI.path :+ "users" :+ "me"
-      val uri = ServerAPI.path(path)
+      val uri = ServerAPI.withPath(path)
 
       prepareRequest[GetCurrentUserResponse]
         .get(uri)
         .header("X-Authorization", s"Bearer $jwt")
-        .send()
+        .send(backend)
         .map(_.body)
         .flatMap(Future.fromTry)
     }
 
     override def updateUser(jwt: String, request: UpdateUserRequest): Future[UpdateUserResponse] = {
       val path = ServerAPI.path :+ "users"
-      val uri = ServerAPI.path(path)
+      val uri = ServerAPI.withPath(path)
 
       prepareRequest[UpdateUserResponse]
         .put(uri)
         .header("X-Authorization", s"Bearer $jwt")
         .body(Json.toJson(request).toString())
-        .send()
+        .send(backend)
         .map(_.body)
         .flatMap(Future.fromTry)
     }
 
     override def getUserLogs(jwt: String): Future[GetUserLogsResponse] = {
       val path = ServerAPI.path :+ "users" :+ "me" :+ "logs"
-      val uri = ServerAPI.path(path)
+      val uri = ServerAPI.withPath(path)
 
       prepareRequest[GetUserLogsResponse]
         .get(uri)
         .header("X-Authorization", s"Bearer $jwt")
-        .send()
+        .send(backend)
         .map(_.body)
         .flatMap(Future.fromTry)
     }
 
     override def adminGetUserLogs(userId: UUID): Future[AdminGetUserLogsResponse] = {
       val path = ServerAPI.path :+ "admin" :+ "users" :+ userId.toString :+ "logs"
-      val uri = ServerAPI.path(path)
+      val uri = ServerAPI.withPath(path)
 
       prepareRequest[AdminGetUserLogsResponse]
         .get(uri)
-        .send()
+        .send(backend)
         .map(_.body)
         .flatMap(Future.fromTry)
     }
 
     override def adminGetUsers(): Future[AdminGetUsersResponse] = {
       val path = ServerAPI.path :+ "admin" :+ "users"
-      val uri = ServerAPI.path(path)
+      val uri = ServerAPI.withPath(path)
 
       prepareRequest[AdminGetUsersResponse]
         .get(uri)
-        .send()
+        .send(backend)
         .map(_.body)
         .flatMap(Future.fromTry)
     }

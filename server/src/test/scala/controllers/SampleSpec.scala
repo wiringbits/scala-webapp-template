@@ -4,7 +4,7 @@ import net.wiringbits.api.models.{ErrorResponse, PlayErrorResponse}
 import org.scalatest.concurrent.ScalaFutures.*
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.{JsValue, Json, Reads}
-import sttp.client.{UriContext, asString, basicRequest}
+import sttp.client3.{UriContext, asString, basicRequest}
 
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
@@ -75,7 +75,7 @@ class SampleSpec extends AnyWordSpec {
 
   // https://hopin.com/api/v2/events/219273/users/paginated?page%5Bafter%5D=XO3rUDNbAA0TsdwlsfEczdQ3y
   private def runIt(): Unit = {
-    import sttp.client.asynchttpclient.future.AsyncHttpClientFutureBackend
+    import sttp.client3.asynchttpclient.future.AsyncHttpClientFutureBackend
 
     import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -85,13 +85,13 @@ class SampleSpec extends AnyWordSpec {
       val dest = cursorMaybe
         .map { cursor =>
           serverApi
-            .querySegment(Uri.QuerySegment.KeyValue("page[after]", cursor))
+            .addQuerySegment(Uri.QuerySegment.KeyValue("page[after]", cursor))
         }
         .getOrElse(serverApi)
 
       val response = prepareRequest[JsValue]
         .get(dest)
-        .send()
+        .send(sttpBackend)
         .map(_.body)
         .flatMap(Future.fromTry)
         .futureValue
