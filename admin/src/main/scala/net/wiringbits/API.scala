@@ -2,7 +2,7 @@ package net.wiringbits
 
 import net.wiringbits.api.ApiClient
 
-import scala.concurrent.ExecutionContext
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 
 case class API(client: ApiClient)
 
@@ -15,10 +15,10 @@ object API {
     }
   }
 
-  def apply()(implicit ec: ExecutionContext): API = {
+  def apply(): API = {
     println(s"Server API expected at: $apiUrl")
 
-    implicit val sttpBackend = sttp.client.FetchBackend()
+    implicit val sttpBackend = sttp.client3.FetchBackend()
     val client = new ApiClient.DefaultImpl(ApiClient.Config(apiUrl))
     API(client)
   }

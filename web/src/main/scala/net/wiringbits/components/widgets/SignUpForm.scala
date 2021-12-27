@@ -9,17 +9,15 @@ import net.wiringbits.ui.components.core.ErrorLabel
 import net.wiringbits.ui.components.core.widgets.Container.{Alignment, EdgeInsets}
 import net.wiringbits.ui.components.core.widgets.{CircularLoader, Container, Title}
 import net.wiringbits.{API, AppStrings}
-import org.scalajs.dom.raw.HTMLInputElement
-import slinky.core.FunctionalComponent
+import org.scalajs.dom
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 import slinky.core.annotations.react
 import slinky.core.facade.{Fragment, Hooks}
-import typings.reactRouterDom.{mod => reactRouterDom}
-
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.util.{Failure, Success}
-import org.scalajs.dom
 import slinky.core.{FunctionalComponent, SyntheticEvent}
 import slinky.web.html._
+import typings.reactRouterDom.{mod => reactRouterDom}
+
+import scala.util.{Failure, Success}
 
 @react object SignUpForm {
   case class Props(api: API, loggedIn: User => Unit)
@@ -105,7 +103,7 @@ import slinky.web.html._
           mui.InputLabel(AppStrings.name),
           mui.Input().name("name").`type`("name").disabled(loading)
         )
-        .onChange(e => setName(e.target.asInstanceOf[HTMLInputElement].value))
+        .onChange(e => setName(e.target.asInstanceOf[dom.HTMLInputElement].value))
         .fullWidth(true)
     )
 
@@ -117,7 +115,7 @@ import slinky.web.html._
           mui.InputLabel(AppStrings.email),
           mui.Input().name("email").`type`("email").disabled(loading)
         )
-        .onChange(e => setEmail(e.target.asInstanceOf[HTMLInputElement].value))
+        .onChange(e => setEmail(e.target.asInstanceOf[dom.HTMLInputElement].value))
         .fullWidth(true)
     )
 
@@ -129,7 +127,7 @@ import slinky.web.html._
           mui.InputLabel(AppStrings.password),
           mui.Input().name("password").`type`("password").disabled(loading)
         )
-        .onChange(e => setPassword(e.target.asInstanceOf[HTMLInputElement].value))
+        .onChange(e => setPassword(e.target.asInstanceOf[dom.HTMLInputElement].value))
         .fullWidth(true)
     )
 

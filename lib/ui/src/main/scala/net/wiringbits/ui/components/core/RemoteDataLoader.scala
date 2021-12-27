@@ -5,17 +5,16 @@ import slinky.core.FunctionalComponent
 import slinky.core.facade.{Hooks, ReactElement}
 import slinky.web.html._
 
-import scala.concurrent.ExecutionContext.Implicits.global
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
-/**
- * A reusable component to render some data that's retrieved from a remote source, providing:
- * - A progress indicator when the data is being retrieved.
- * - Invoking the render function when the data is available, to render such data.
- * - Displaying an error message when retrieving the data has failed, as well as displaying a
- *   retry button so that the user is able to try again.
- */
+/** A reusable component to render some data that's retrieved from a remote source, providing:
+  *   - A progress indicator when the data is being retrieved.
+  *   - Invoking the render function when the data is available, to render such data.
+  *   - Displaying an error message when retrieving the data has failed, as well as displaying a retry button so that
+  *     the user is able to try again.
+  */
 object RemoteDataLoader {
 
   sealed trait DataState[T] extends Product with Serializable {
@@ -31,16 +30,21 @@ object RemoteDataLoader {
     def loading[T]: DataState[T] = Loading[T]()
   }
 
-  /**
-   * @param fetch the function to fetch the data
-   * @param render the function to render the data once it is available
-   * @param onDataLoaded a function invoked when the remote data has been loaded
-   * @param progressIndicator the component rendered when the data is being loaded
-   * @param progressIndicatorWhileReloadingData whether to display the progress indicator every time
-   *                                            the data is being reloaded
-   * @param retryLabel the label to use in the button that retries the operation
-   * @param watchedObjects objects being watched, when any of those changes, the data is loaded again
-   */
+  /** @param fetch
+    *   the function to fetch the data
+    * @param render
+    *   the function to render the data once it is available
+    * @param onDataLoaded
+    *   a function invoked when the remote data has been loaded
+    * @param progressIndicator
+    *   the component rendered when the data is being loaded
+    * @param progressIndicatorWhileReloadingData
+    *   whether to display the progress indicator every time the data is being reloaded
+    * @param retryLabel
+    *   the label to use in the button that retries the operation
+    * @param watchedObjects
+    *   objects being watched, when any of those changes, the data is loaded again
+    */
   case class Props[D](
       fetch: () => Future[D],
       render: D => ReactElement,
@@ -51,10 +55,11 @@ object RemoteDataLoader {
       watchedObjects: Iterable[Any] = List("")
   )
 
-  /**
-   * @tparam D The data to fetch and render
-   * @return the component
-   */
+  /** @tparam D
+    *   The data to fetch and render
+    * @return
+    *   the component
+    */
   def component[D]: FunctionalComponent[Props[D]] = FunctionalComponent[Props[D]] { props =>
     val (dataState, setDataState) = Hooks.useState[DataState[D]](DataState.loading[D])
 

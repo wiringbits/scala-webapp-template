@@ -19,12 +19,10 @@ trait PlayPostgresSpec extends PlayAPISpec with TestContainerForEach with GuiceO
   private val postgresImage = DockerImageName.parse("postgres:13")
   override val containerDef: PostgreSQLContainer.Def = PostgreSQLContainer.Def(dockerImageName = postgresImage)
 
-  /**
-   * Loads configuration disabling evolutions on default database.
-   *
-   * This allows to not write a custom application.conf for testing
-   * and ensure play evolutions are disabled.
-   */
+  /** Loads configuration disabling evolutions on default database.
+    *
+    * This allows to not write a custom application.conf for testing and ensure play evolutions are disabled.
+    */
   private def loadConfigWithoutEvolutions(env: Environment, container: PostgreSQLContainer): Configuration = {
     val map = Map(
       "db.default.username" -> container.username,
@@ -46,7 +44,7 @@ trait PlayPostgresSpec extends PlayAPISpec with TestContainerForEach with GuiceO
   }
 
   def withApiClient[A](runTest: ApiClient => A): A = {
-    import sttp.client.asynchttpclient.future.AsyncHttpClientFutureBackend
+    import sttp.client3.asynchttpclient.future.AsyncHttpClientFutureBackend
 
     implicit val sttpBackend = AsyncHttpClientFutureBackend()
 
