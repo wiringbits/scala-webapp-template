@@ -6,6 +6,7 @@ ThisBuild / organization := "net.wiringbits"
 
 val playJson = "2.9.2"
 val sttp = "3.3.18"
+val webappUtils = "0.3.3"
 
 val consoleDisabledOptions = Seq("-Xfatal-warnings", "-Ywarn-unused", "-Ywarn-unused-import")
 
@@ -293,7 +294,7 @@ lazy val server = (project in file("server"))
       "com.dimafeng" %% "testcontainers-scala-postgresql" % "0.39.12" % "test",
       "com.softwaremill.sttp.client3" %% "core" % sttp % "test",
       "com.softwaremill.sttp.client3" %% "async-http-client-backend-future" % sttp % "test",
-      "net.wiringbits" %% "admin-data-explorer-play-server" % "0.2.0"
+      "net.wiringbits" %% "admin-data-explorer-play-server" % webappUtils
     )
   )
 
@@ -343,7 +344,7 @@ lazy val web = (project in file("web"))
       "com.softwaremill.sttp.client3" %%% "core" % sttp,
       "org.scala-js" %%% "scala-js-macrotask-executor" % "1.0.0",
       "com.alexitc" %%% "sjs-material-ui-facade" % "0.1.6",
-      "net.wiringbits" %%% "admin-data-explorer-slinky" % "0.2.0"
+      "net.wiringbits" %%% "admin-data-explorer-slinky" % webappUtils
     ),
     libraryDependencies ++= Seq(
       "org.scalatest" %%% "scalatest" % "3.2.10" % Test
@@ -396,7 +397,7 @@ lazy val admin = (project in file("admin"))
       "com.softwaremill.sttp.client3" %%% "core" % sttp,
       "org.scala-js" %%% "scala-js-macrotask-executor" % "1.0.0",
       "com.alexitc" %%% "sjs-material-ui-facade" % "0.1.6",
-      "net.wiringbits" %%% "admin-data-explorer-slinky" % "0.2.0"
+      "net.wiringbits" %%% "admin-data-explorer-slinky" % webappUtils
     ),
     libraryDependencies ++= Seq(
       "org.scalatest" %%% "scalatest" % "3.2.10" % Test
