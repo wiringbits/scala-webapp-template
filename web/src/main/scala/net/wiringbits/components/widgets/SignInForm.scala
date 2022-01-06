@@ -10,7 +10,6 @@ import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container, Title}
 import net.wiringbits.{API, AppStrings}
 import org.scalajs.dom
-import org.scalajs.dom.raw.HTMLInputElement
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 import slinky.core.{FunctionalComponent, SyntheticEvent}
 import slinky.core.annotations.react
@@ -99,7 +98,7 @@ import scala.util.{Failure, Success}
           mui.InputLabel(AppStrings.email),
           mui.Input().name("email").`type`("email").disabled(loading)
         )
-        .onChange(e => setEmail(e.target.asInstanceOf[HTMLInputElement].value))
+        .onChange(e => setEmail(e.target.asInstanceOf[dom.HTMLInputElement].value))
         .fullWidth(true)
     )
 
@@ -111,7 +110,7 @@ import scala.util.{Failure, Success}
           mui.InputLabel(AppStrings.password),
           mui.Input().name("password").`type`("password").disabled(loading)
         )
-        .onChange(e => setPassword(e.target.asInstanceOf[HTMLInputElement].value))
+        .onChange(e => setPassword(e.target.asInstanceOf[dom.HTMLInputElement].value))
         .fullWidth(true)
     )
 
