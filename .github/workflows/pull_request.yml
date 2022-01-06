@@ -19,7 +19,7 @@ jobs:
         uses: japgolly/setup-everything-scala@v1.0
 
       - name: Check code format
-        run: sbt scalafmtCheck
+        run: sbt scalafmtCheckAll
 
       - name: Compile
         run: sbt compile

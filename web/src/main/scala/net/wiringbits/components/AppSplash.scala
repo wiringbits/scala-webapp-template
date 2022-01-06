@@ -1,14 +1,14 @@
 package net.wiringbits.components
 
 import net.wiringbits.models.User
-import net.wiringbits.ui.components.core.widgets.Container.Alignment
-import net.wiringbits.ui.components.core.widgets.{Container, Subtitle, Title}
+import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{Container, Subtitle, Title}
+import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.Alignment
 import net.wiringbits.{API, AppStrings}
 import slinky.core.FunctionalComponent
 import slinky.core.annotations.react
 import slinky.core.facade.{Fragment, Hooks, ReactElement}
-
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
+
 import scala.util.{Failure, Success}
 
 @react object AppSplash {

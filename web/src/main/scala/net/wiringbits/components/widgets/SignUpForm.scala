@@ -5,21 +5,20 @@ import com.alexitc.materialui.facade.materialUiCore.{components => mui, material
 import net.wiringbits.api.models.CreateUserRequest
 import net.wiringbits.api.utils.Validator
 import net.wiringbits.models.User
-import net.wiringbits.ui.components.core.ErrorLabel
-import net.wiringbits.ui.components.core.widgets.Container.{Alignment, EdgeInsets}
-import net.wiringbits.ui.components.core.widgets.{CircularLoader, Container, Title}
+import net.wiringbits.webapp.utils.slinkyUtils.components.core.ErrorLabel
+import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.{Alignment, EdgeInsets}
+import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container, Title}
 import net.wiringbits.{API, AppStrings}
+import org.scalajs.dom
 import org.scalajs.dom.raw.HTMLInputElement
-import slinky.core.FunctionalComponent
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
+import slinky.core.{FunctionalComponent, SyntheticEvent}
 import slinky.core.annotations.react
 import slinky.core.facade.{Fragment, Hooks}
+import slinky.web.html._
 import typings.reactRouterDom.{mod => reactRouterDom}
 
-import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 import scala.util.{Failure, Success}
-import org.scalajs.dom
-import slinky.core.{FunctionalComponent, SyntheticEvent}
-import slinky.web.html._
 
 @react object SignUpForm {
   case class Props(api: API, loggedIn: User => Unit)
