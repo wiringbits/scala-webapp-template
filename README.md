@@ -1,6 +1,7 @@
 # Wiringbits Web Application Template
 
-[![wiringbits](https://circleci.com/gh/wiringbits/scala-webapp-template.svg?style=svg)](https://circleci.com/gh/wiringbits/scala-webapp-template) [![Scala.js](https://www.scala-js.org/assets/badges/scalajs-1.6.0.svg)](https://www.scala-js.org)
+![wiringbits](https://github.com/wiringbits/scala-webapp-template/workflows/Build%20the%20server%20app/badge.svg)
+[![Scala.js](https://www.scala-js.org/assets/badges/scalajs-1.6.0.svg)](https://www.scala-js.org)
 
 This is the Wiringbits Web Application Template.
 
@@ -49,7 +50,7 @@ The stack used is:
 - [yarn](https://yarnpkg.com) as the JavaScript package manager.
 - [ansible](https://ansible.com/) as the tool for deploying everything to a VM.
 - [nginx](https://nginx.org/en/) as the reverse proxy for handling the internet traffic, as well as the authentication mechanism for the admin portal.
-- [CircleCi](https://circleci.org) integration so that you have a way every commit gets tested.
+- [GitHub](https://github.com/features/actions) actions integration so that you have a way every commit gets tested.
 
 ## Features
 
