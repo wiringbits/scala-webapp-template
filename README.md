@@ -1,6 +1,7 @@
 # Wiringbits Web Application Template
 
 ![wiringbits](https://github.com/wiringbits/scala-webapp-template/workflows/Build%20the%20server%20app/badge.svg)
+[![Scala.js](https://www.scala-js.org/assets/badges/scalajs-1.6.0.svg)](https://www.scala-js.org)
 
 This is the Wiringbits Web Application Template.
 
