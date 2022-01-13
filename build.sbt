@@ -1,7 +1,7 @@
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption.REPLACE_EXISTING
 
-ThisBuild / scalaVersion := "2.13.7"
+ThisBuild / scalaVersion := "2.13.8"
 ThisBuild / organization := "net.wiringbits"
 
 val playJson = "2.9.2"
