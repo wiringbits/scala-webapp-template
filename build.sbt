@@ -1,7 +1,7 @@
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption.REPLACE_EXISTING
 
-ThisBuild / scalaVersion := "2.13.7"
+ThisBuild / scalaVersion := "2.13.8"
 ThisBuild / organization := "net.wiringbits"
 
 val playJson = "2.9.2"
@@ -272,7 +272,7 @@ lazy val ui = (project in file("lib/ui"))
     libraryDependencies ++= Seq(
       "io.github.cquiroz" %%% "scala-java-time" % "2.0.0",
       "org.scala-js" %%% "scala-js-macrotask-executor" % "1.0.0",
-      "com.alexitc" %%% "sjs-material-ui-facade" % "0.1.6"
+      "com.alexitc" %%% "sjs-material-ui-facade" % "0.2.0"
     )
   )
 
@@ -343,7 +343,7 @@ lazy val web = (project in file("web"))
       "com.typesafe.play" %%% "play-json" % playJson,
       "com.softwaremill.sttp.client3" %%% "core" % sttp,
       "org.scala-js" %%% "scala-js-macrotask-executor" % "1.0.0",
-      "com.alexitc" %%% "sjs-material-ui-facade" % "0.1.6",
+      "com.alexitc" %%% "sjs-material-ui-facade" % "0.2.0",
       "net.wiringbits" %%% "admin-data-explorer-slinky" % webappUtils
     ),
     libraryDependencies ++= Seq(
@@ -396,7 +396,7 @@ lazy val admin = (project in file("admin"))
       "com.typesafe.play" %%% "play-json" % playJson,
       "com.softwaremill.sttp.client3" %%% "core" % sttp,
       "org.scala-js" %%% "scala-js-macrotask-executor" % "1.0.0",
-      "com.alexitc" %%% "sjs-material-ui-facade" % "0.1.6",
+      "com.alexitc" %%% "sjs-material-ui-facade" % "0.2.0",
       "net.wiringbits" %%% "admin-data-explorer-slinky" % webappUtils
     ),
     libraryDependencies ++= Seq(
