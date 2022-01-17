@@ -9,6 +9,8 @@ GET /health controllers.HealthController.check()
 POST /users controllers.UsersController.create()
 # login user (public)
 POST /users/login controllers.UsersController.login()
+# verify new user's email
+POST /verify-email controllers.UsersController.verifyEmail()
 
 # get the current user details
 GET /users/me controllers.UsersController.getCurrentUser()

@@ -13,6 +13,7 @@ trait ApiClient {
 
   def createUser(request: CreateUserRequest): Future[CreateUserResponse]
   def login(request: LoginRequest): Future[LoginResponse]
+  def verifyEmail(request: VerifyEmailRequest): Future[VerifyEmailResponse]
 
   def currentUser(jwt: String): Future[GetCurrentUserResponse]
   def updateUser(jwt: String, request: UpdateUserRequest): Future[UpdateUserResponse]
@@ -80,6 +81,18 @@ object ApiClient {
       val uri = ServerAPI.withPath(path)
 
       prepareRequest[CreateUserResponse]
+        .post(uri)
+        .body(Json.toJson(request).toString())
+        .send(backend)
+        .map(_.body)
+        .flatMap(Future.fromTry)
+    }
+
+    override def verifyEmail(request: VerifyEmailRequest): Future[VerifyEmailResponse] = {
+      val path = ServerAPI.path :+ "verify-email"
+      val uri = ServerAPI.withPath(path)
+
+      prepareRequest[VerifyEmailResponse]
         .post(uri)
         .body(Json.toJson(request).toString())
         .send(backend)

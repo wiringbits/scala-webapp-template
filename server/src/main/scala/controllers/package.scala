@@ -47,6 +47,17 @@ package object controllers {
     }
   }
 
+  def decodeAWSToken(token: String): (UUID, UUID) = {
+    val uuidFormat = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+    val tokenRegexp = s"($uuidFormat)_($uuidFormat)".r
+
+    token match {
+      case tokenRegexp(userId, token) =>
+        (UUID.fromString(userId), UUID.fromString(token))
+      case _ => throw new RuntimeException("Incorrect token format.")
+    }
+  }
+
   def handleJsonBody[T: Reads](
       block: Request[T] => Future[Result]
   )(implicit cc: ControllerComponents, ec: ExecutionContext): Action[T] = {

@@ -21,12 +21,12 @@ package object models {
   implicit val errorResponseFormat: Format[ErrorResponse] = Json.format[ErrorResponse]
 
   case class CreateUserRequest(name: String, email: String, password: String)
-  case class CreateUserResponse(name: String, email: String, token: String)
+  case class CreateUserResponse(id: UUID, name: String, email: String)
   implicit val createUserRequestFormat: Format[CreateUserRequest] = Json.format[CreateUserRequest]
   implicit val createUserResponseFormat: Format[CreateUserResponse] = Json.format[CreateUserResponse]
 
   case class LoginRequest(email: String, password: String)
-  case class LoginResponse(name: String, email: String, token: String)
+  case class LoginResponse(id: UUID, name: String, email: String, token: String)
   implicit val loginRequestFormat: Format[LoginRequest] = Json.format[LoginRequest]
   implicit val loginResponseFormat: Format[LoginResponse] = Json.format[LoginResponse]
 
@@ -58,6 +58,16 @@ package object models {
     case class UserLog(id: UUID, message: String, createdAt: Instant)
     implicit val adminGetUserLogsResponseUserLogFormat: Format[UserLog] = Json.format[UserLog]
   }
+
+  case class VerifyEmailRequest(
+      token: String
+  )
+  case class VerifyEmailResponse(
+      noData: String = ""
+  )
+
+  implicit val verifyEmailRequestFormat: Format[VerifyEmailRequest] = Json.format[VerifyEmailRequest]
+  implicit val verifyEmailResponseFormat: Format[VerifyEmailResponse] = Json.format[VerifyEmailResponse]
 
   case class AdminGetUsersResponse(data: List[AdminGetUsersResponse.User])
   implicit val adminGetUsersResponseFormat: Format[AdminGetUsersResponse] = Json.format[AdminGetUsersResponse]

@@ -25,6 +25,15 @@ class UsersController @Inject() (
     } yield Ok(Json.toJson(response))
   }
 
+  def verifyEmail() = handleJsonBody[VerifyEmailRequest] { request =>
+    val body = request.body
+    val (userId, token) = decodeAWSToken(body.token)
+    logger.info(s"Verify user's email: $userId")
+    for {
+      response <- usersService.verifyEmail(userId, token)
+    } yield Ok(Json.toJson(response))
+  }
+
   def login() = handleJsonBody[LoginRequest] { request =>
     val body = request.body
     logger.info(s"Login: ${body.email}")

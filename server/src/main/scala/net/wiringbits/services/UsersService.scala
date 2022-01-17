@@ -6,13 +6,16 @@ import net.wiringbits.api.models.{
   GetCurrentUserResponse,
   LoginRequest,
   LoginResponse,
-  UpdateUserRequest
+  UpdateUserRequest,
+  VerifyEmailResponse
 }
-import net.wiringbits.config.JwtConfig
+import net.wiringbits.apis.EmailApi
+import net.wiringbits.apis.models.{EmailRequest, TokenType}
+import net.wiringbits.config.{FrontendConfig, JwtConfig}
 import net.wiringbits.repositories
 import net.wiringbits.repositories.models.User
-import net.wiringbits.repositories.{UserLogsRepository, UsersRepository}
-import net.wiringbits.util.JwtUtils
+import net.wiringbits.repositories.{TokensRepository, UserLogsRepository, UsersRepository}
+import net.wiringbits.util.{EmailMessage, JwtUtils}
 import org.apache.commons.validator.routines.EmailValidator
 import org.mindrot.jbcrypt.BCrypt
 
@@ -24,7 +27,10 @@ import scala.concurrent.{ExecutionContext, Future}
 class UsersService @Inject() (
     jwtConfig: JwtConfig,
     repository: UsersRepository,
-    userLogsRepository: UserLogsRepository
+    userLogsRepository: UserLogsRepository,
+    tokensRepository: TokensRepository,
+    frontendConfig: FrontendConfig,
+    emailApi: EmailApi
 )(implicit
     ec: ExecutionContext
 ) {
@@ -52,9 +58,39 @@ class UsersService @Inject() (
         createUser.id,
         s"Account created, name = ${request.name}, email = ${request.email}"
       )
-      token = JwtUtils.createToken(jwtConfig, createUser.id)
-    } yield CreateUserResponse(request.name, request.email, token)
+      createToken = repositories.models.Token
+        .CreateToken(
+          id = UUID.randomUUID(),
+          token = UUID.randomUUID(),
+          tokenType = TokenType.VerificationToken,
+          userId = createUser.id
+        )
+      _ <- tokensRepository.create(createToken)
+      emailRequest = EmailMessage.registration(
+        name = createUser.name,
+        url = frontendConfig.host,
+        emailEndpoint = s"${createToken.userId}_${createToken.token}"
+      )
+      _ = emailApi.sendEmail(EmailRequest(request.email, emailRequest))
+    } yield CreateUserResponse(createUser.id, request.name, request.email)
   }
+
+  def verifyEmail(userId: UUID, token: UUID): Future[VerifyEmailResponse] = for {
+    userMaybe <- repository.find(userId)
+    user = userMaybe.getOrElse(throw new RuntimeException(s"User wasn't found"))
+    _ = if (user.verifiedOn.isDefined)
+      throw new RuntimeException(s"User $userId email is already verified")
+    tokenMaybe <- tokensRepository.find(userId, token)
+    token = tokenMaybe.getOrElse(throw new RuntimeException(s"Token for user $userId wasn't found"))
+    tokenExpiresAt = token.expiresAt
+    _ = if (tokenExpiresAt.isBefore(clock.instant()))
+      throw new RuntimeException("Token is expired")
+    // TODO: Should I use a transaction for this?
+    _ <- repository.verify(userId, token.token)
+    _ <- userLogsRepository.create(userId, "Email was verified")
+    _ <- tokensRepository.delete(token)
+    _ = emailApi.sendEmail(EmailRequest(user.email, EmailMessage.confirm(user.name)))
+  } yield VerifyEmailResponse()
 
   // returns the token to use for authenticating requests
   def login(request: LoginRequest): Future[LoginResponse] = {
@@ -63,9 +99,12 @@ class UsersService @Inject() (
       user = maybe
         .filter(user => BCrypt.checkpw(request.password, user.hashedPassword))
         .getOrElse(throw new RuntimeException("The given email/password doesn't match"))
+
+      _ = if (user.verifiedOn.isEmpty)
+        throw new RuntimeException("The email is not verified, check your spam folder if you don't see the email.")
       _ <- userLogsRepository.create(user.id, "Logged in successfully")
       token = JwtUtils.createToken(jwtConfig, user.id)
-    } yield LoginResponse(user.name, user.email, token)
+    } yield LoginResponse(user.id, user.name, user.email, token)
   }
 
   def update(userId: UUID, request: UpdateUserRequest): Future[Unit] = {

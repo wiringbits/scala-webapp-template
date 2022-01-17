@@ -8,7 +8,8 @@ case class User(
     name: String,
     email: String,
     hashedPassword: String,
-    createdAt: Instant
+    createdAt: Instant,
+    verifiedOn: Option[Instant]
 )
 
 object User {
