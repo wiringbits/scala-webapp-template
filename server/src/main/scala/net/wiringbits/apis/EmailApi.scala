@@ -12,8 +12,8 @@ class EmailApi @Inject() (
     awsConfig: AwsConfig
 ) {
 
-  /* TODO: To send mails to unverified accounts you need to configure aws to production mode
-      in sandbox mode you can only send emails to verified accounts
+  /* To send mails to unverified accounts you need to configure aws to production mode.
+     In sandbox mode you can only send emails to verified accounts
       to configure your aws credentials you need to add it at ~/.aws/credentials with
       [default]
         aws_access_key_id = ...

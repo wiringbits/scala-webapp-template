@@ -72,7 +72,7 @@ class UsersService @Inject() (
         emailEndpoint = s"${createToken.userId}_${createToken.token}"
       )
       _ = emailApi.sendEmail(EmailRequest(request.email, emailRequest))
-    } yield CreateUserResponse(createUser.id, request.name, request.email)
+    } yield CreateUserResponse()
   }
 
   def verifyEmail(userId: UUID, token: UUID): Future[VerifyEmailResponse] = for {

@@ -1,13 +1,14 @@
 package net.wiringbits.util
 
 case class EmailMessage(subject: String, body: String)
+
 object EmailMessage {
 
   def registration(name: String, url: String, emailEndpoint: String): EmailMessage = {
-    val subject = "Registration Confirmation On SWAN"
+    val subject = "Registration Confirmation"
     val body =
       s"""Hi $name,
-         |Thanks for creating a SWAN account.
+         |Thanks for creating an account.
          |To continue, please confirm your email address by clicking the button below.
          |<a href=\"$url/verify-email/$emailEndpoint\">Confirm email address</a>
          |""".stripMargin

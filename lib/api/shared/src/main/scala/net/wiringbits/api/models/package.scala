@@ -21,7 +21,7 @@ package object models {
   implicit val errorResponseFormat: Format[ErrorResponse] = Json.format[ErrorResponse]
 
   case class CreateUserRequest(name: String, email: String, password: String)
-  case class CreateUserResponse(id: UUID, name: String, email: String)
+  case class CreateUserResponse(noData: String = "")
   implicit val createUserRequestFormat: Format[CreateUserRequest] = Json.format[CreateUserRequest]
   implicit val createUserResponseFormat: Format[CreateUserResponse] = Json.format[CreateUserResponse]
 
