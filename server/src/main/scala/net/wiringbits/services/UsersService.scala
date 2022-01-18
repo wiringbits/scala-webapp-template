@@ -9,7 +9,7 @@ import net.wiringbits.api.models.{
   UpdateUserRequest,
   VerifyEmailResponse
 }
-import net.wiringbits.apis.EmailApi
+import net.wiringbits.apis.EmailApiAWSImpl
 import net.wiringbits.apis.models.{EmailRequest, TokenType}
 import net.wiringbits.config.{JwtConfig, WebAppConfig}
 import net.wiringbits.repositories
@@ -30,7 +30,7 @@ class UsersService @Inject() (
     userLogsRepository: UserLogsRepository,
     tokensRepository: TokensRepository,
     webAppConfig: WebAppConfig,
-    emailApi: EmailApi,
+    emailApi: EmailApiAWSImpl,
     clock: Clock
 )(implicit
     ec: ExecutionContext

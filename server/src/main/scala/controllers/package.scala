@@ -1,5 +1,6 @@
 import net.wiringbits.api.models.ErrorResponse
 import net.wiringbits.config.JwtConfig
+import net.wiringbits.models.UserToken
 import net.wiringbits.util.JwtUtils
 import org.slf4j.LoggerFactory
 import play.api.http.HeaderNames
@@ -47,15 +48,8 @@ package object controllers {
     }
   }
 
-  def decodeAWSToken(token: String): (UUID, UUID) = {
-    val uuidFormat = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
-    val tokenRegexp = s"($uuidFormat)_($uuidFormat)".r
-
-    token match {
-      case tokenRegexp(userId, token) =>
-        (UUID.fromString(userId), UUID.fromString(token))
-      case _ => throw new RuntimeException("Incorrect token format.")
-    }
+  def decodeUserToken(userToken: String): UserToken = {
+    UserToken.validate(userToken).getOrElse(throw new RuntimeException("Incorrect token format"))
   }
 
   def handleJsonBody[T: Reads](

@@ -89,7 +89,7 @@ object ApiClient {
     }
 
     override def verifyEmail(request: VerifyEmailRequest): Future[VerifyEmailResponse] = {
-      val path = ServerAPI.path :+ "verify-email"
+      val path = ServerAPI.path :+ "users" :+ "verify-email"
       val uri = ServerAPI.withPath(path)
 
       prepareRequest[VerifyEmailResponse]

@@ -1,6 +1,6 @@
 package controllers
 
-import net.wiringbits.api.models._
+import net.wiringbits.api.models.*
 import net.wiringbits.config.JwtConfig
 import net.wiringbits.services.{UserLogsService, UsersService}
 import org.slf4j.LoggerFactory
@@ -8,7 +8,8 @@ import play.api.libs.json.Json
 import play.api.mvc.{AbstractController, ControllerComponents}
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
 
 class UsersController @Inject() (
     usersService: UsersService,
@@ -27,10 +28,11 @@ class UsersController @Inject() (
 
   def verifyEmail() = handleJsonBody[VerifyEmailRequest] { request =>
     val body = request.body
-    val (userId, token) = decodeAWSToken(body.token)
-    logger.info(s"Verify user's email: $userId")
+    val userToken = Future.fromTry(Try(decodeUserToken(body.token)))
     for {
-      response <- usersService.verifyEmail(userId, token)
+      token <- userToken
+      _ = logger.info(s"Verify user's email: ${token.userId}")
+      response <- usersService.verifyEmail(token.userId, token.token)
     } yield Ok(Json.toJson(response))
   }
 

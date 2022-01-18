@@ -293,9 +293,9 @@ lazy val server = (project in file("server"))
       "com.dimafeng" %% "testcontainers-scala-scalatest" % "0.39.12" % "test",
       "com.dimafeng" %% "testcontainers-scala-postgresql" % "0.39.12" % "test",
       "com.softwaremill.sttp.client3" %% "core" % sttp % "test",
-      "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.13.1",
       "com.softwaremill.sttp.client3" %% "async-http-client-backend-future" % sttp % "test",
-      "com.amazonaws" % "aws-java-sdk-ses" % "1.12.141"
+      "com.amazonaws" % "aws-java-sdk-ses" % "1.12.141",
+      "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.13.1"
     )
   )
 

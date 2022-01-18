@@ -10,7 +10,7 @@ object EmailMessage {
       s"""Hi $name,
          |Thanks for creating an account.
          |To continue, please confirm your email address by clicking the button below.
-         |<a href=\"$url/verify-email/$emailEndpoint\">Confirm email address</a>
+         |<a href="$url/verify-email/$emailEndpoint">Confirm email address</a>
          |""".stripMargin
 
     EmailMessage(subject, body)
