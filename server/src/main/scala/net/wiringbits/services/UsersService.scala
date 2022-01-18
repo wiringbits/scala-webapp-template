@@ -1,15 +1,8 @@
 package net.wiringbits.services
 
-import net.wiringbits.api.models.{
-  CreateUserRequest,
-  CreateUserResponse,
-  GetCurrentUserResponse,
-  LoginRequest,
-  LoginResponse,
-  UpdateUserRequest
-}
 import net.wiringbits.apis.ReCaptchaApi
 import net.wiringbits.common.models.Captcha
+import net.wiringbits.api.models.{CreateUser, GetCurrentUser, Login, UpdateUser}
 import net.wiringbits.config.JwtConfig
 import net.wiringbits.repositories
 import net.wiringbits.repositories.models.User
@@ -34,7 +27,7 @@ class UsersService @Inject() (
   private implicit val clock: Clock = Clock.systemUTC
 
   // returns the login token
-  def create(request: CreateUserRequest): Future[CreateUserResponse] = {
+  def create(request: CreateUser.Request): Future[CreateUser.Response] = {
     val validations = {
       for {
         _ <- validateCaptcha(request.captcha)
@@ -57,11 +50,11 @@ class UsersService @Inject() (
         s"Account created, name = ${request.name}, email = ${request.email}"
       )
       token = JwtUtils.createToken(jwtConfig, createUser.id)
-    } yield CreateUserResponse(request.name, request.email, token)
+    } yield CreateUser.Response(request.name, request.email, token)
   }
 
   // returns the token to use for authenticating requests
-  def login(request: LoginRequest): Future[LoginResponse] = {
+  def login(request: Login.Request): Future[Login.Response] = {
     for {
       _ <- validateCaptcha(request.captcha)
       maybe <- repository.find(request.email)
@@ -70,10 +63,10 @@ class UsersService @Inject() (
         .getOrElse(throw new RuntimeException("The given email/password doesn't match"))
       _ <- userLogsRepository.create(user.id, "Logged in successfully")
       token = JwtUtils.createToken(jwtConfig, user.id)
-    } yield LoginResponse(user.name, user.email, token)
+    } yield Login.Response(user.name, user.email, token)
   }
 
-  def update(userId: UUID, request: UpdateUserRequest): Future[Unit] = {
+  def update(userId: UUID, request: UpdateUser.Request): Future[Unit] = {
     val validate = Future {
       if (request.name.isEmpty) new RuntimeException(s"the name is required")
       else ()
@@ -87,10 +80,10 @@ class UsersService @Inject() (
     } yield ()
   }
 
-  def getCurrentUser(userId: UUID): Future[GetCurrentUserResponse] = {
+  def getCurrentUser(userId: UUID): Future[GetCurrentUser.Response] = {
     for {
       user <- unsafeUser(userId)
-    } yield GetCurrentUserResponse(
+    } yield GetCurrentUser.Response(
       id = user.id,
       email = user.email,
       name = user.name

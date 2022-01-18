@@ -12,14 +12,14 @@ import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
   WithStylesOptions
 }
 import net.wiringbits.AppStrings
-import net.wiringbits.api.models.AdminGetUsersResponse
+import net.wiringbits.api.models.AdminGetUsers
 import net.wiringbits.ui.components.core.widgets.{Container, Subtitle}
 import org.scalablytyped.runtime.StringDictionary
 import slinky.core.FunctionalComponent
 import slinky.core.facade.Fragment
 
 object UserList {
-  case class Props(response: AdminGetUsersResponse, forceRefresh: () => Unit)
+  case class Props(response: AdminGetUsers.Response, forceRefresh: () => Unit)
 
   private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {
     val stylesCallback: StyleRulesCallback[Theme, Unit, String] = theme =>

@@ -2,7 +2,7 @@ package net.wiringbits.components.widgets
 
 import com.alexitc.materialui.facade.materialUiCore.mod.PropTypes.Color
 import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
-import net.wiringbits.api.models.CreateUserRequest
+import net.wiringbits.api.models.CreateUser
 import net.wiringbits.api.utils.Validator
 import net.wiringbits.common.models.Captcha
 import net.wiringbits.models.User
@@ -76,7 +76,7 @@ import scala.util.{Failure, Success}
 
         case None =>
           props.api.client
-            .createUser(CreateUserRequest(name = name, email = email, password = password, captcha = captcha))
+            .createUser(CreateUser.Request(name = name, email = email, password = password, captcha = captcha))
             .onComplete {
               case Success(res) =>
                 setState(state.copy(loading = Some(false), error = None))
