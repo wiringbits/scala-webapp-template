@@ -21,7 +21,7 @@ import typings.reactRouterDom.{mod => reactRouterDom}
 import scala.util.{Failure, Success}
 
 @react object SignUpForm {
-  case class Props(api: API, loggedIn: User => Unit)
+  case class Props(api: API, loggedIn: User => Unit, captchaKey: String)
 
   private case class State(
       name: Option[String] = None,
@@ -139,7 +139,7 @@ import scala.util.{Failure, Success}
 
     val error = ErrorLabel(state.error.getOrElse(""))
 
-    val recaptcha = ReCaptcha(onChange = captchaOpt => setCaptcha(captchaOpt))
+    val recaptcha = ReCaptcha(onChange = captchaOpt => setCaptcha(captchaOpt), props.captchaKey)
 
     val signUpButton = {
       val text =

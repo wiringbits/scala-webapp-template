@@ -6,14 +6,10 @@ import slinky.core.annotations.react
 import typings.reactGoogleRecaptcha.components.ReactGoogleRecaptcha
 
 @react object ReCaptcha {
-  case class Props(onChange: Option[Captcha] => Unit)
-
-  private val siteKey = net.wiringbits.BuildInfo.recaptchaKey.filter(_.nonEmpty).getOrElse {
-    "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"
-  }
+  case class Props(onChange: Option[Captcha] => Unit, captchaKey: String)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
-    ReactGoogleRecaptcha(siteKey)
+    ReactGoogleRecaptcha(props.captchaKey)
       .onChange(x => props.onChange(Captcha.validate(x.asInstanceOf[String]).toOption))
   }
 }

@@ -12,6 +12,10 @@ import typings.reactRouterDom.{components => router}
 @react object App {
   case class Props(api: API)
 
+  private val captchaKey = net.wiringbits.BuildInfo.recaptchaKey.filter(_.nonEmpty).getOrElse {
+    "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"
+  }
+
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val (auth, setAuth) = Hooks.useState[AuthState](AuthState.Unauthenticated)
 
@@ -25,7 +29,7 @@ import typings.reactRouterDom.{components => router}
       setAuth(AuthState.Unauthenticated)
     }
 
-    val appRouter = AppRouter(props.api, auth, loggedIn, () => loggedOut())
+    val appRouter = AppRouter(props.api, auth, loggedIn, () => loggedOut(), captchaKey)
 
     ThemeProvider(AppTheme.value)(
       mui.MuiThemeProvider(AppTheme.value)(
