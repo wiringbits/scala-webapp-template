@@ -1,17 +1,9 @@
 package net.wiringbits.services
 
-import net.wiringbits.api.models.{
-  CreateUserRequest,
-  CreateUserResponse,
-  GetCurrentUserResponse,
-  LoginRequest,
-  LoginResponse,
-  UpdateUserRequest,
-  VerifyEmailResponse
-}
 import net.wiringbits.apis.EmailApiAWSImpl
 import net.wiringbits.apis.models.EmailRequest
 import net.wiringbits.config.{JwtConfig, WebAppConfig}
+import net.wiringbits.api.models.{CreateUser, GetCurrentUser, Login, UpdateUser, VerifyEmail}
 import net.wiringbits.repositories
 import net.wiringbits.repositories.models.User
 import net.wiringbits.repositories.{UserLogsRepository, UsersRepository}
@@ -36,7 +28,7 @@ class UsersService @Inject() (
 ) {
 
   // returns the login token
-  def create(request: CreateUserRequest): Future[CreateUserResponse] = {
+  def create(request: CreateUser.Request): Future[CreateUser.Response] = {
     val validations = {
       for {
         _ <- Future {
@@ -63,10 +55,10 @@ class UsersService @Inject() (
         emailEndpoint = s"${createUser.id}"
       )
       _ = emailApi.sendEmail(EmailRequest(request.email, emailRequest))
-    } yield CreateUserResponse(id = createUser.id, email = createUser.email, name = createUser.name)
+    } yield CreateUser.Response(id = createUser.id, email = createUser.email, name = createUser.name)
   }
 
-  def verifyEmail(userId: UUID): Future[VerifyEmailResponse] = for {
+  def verifyEmail(userId: UUID): Future[VerifyEmail.Response] = for {
     userMaybe <- repository.find(userId)
     user = userMaybe.getOrElse(throw new RuntimeException(s"User wasn't found"))
     _ = if (user.verifiedOn.isDefined)
@@ -74,10 +66,10 @@ class UsersService @Inject() (
     _ <- repository.verify(userId)
     _ <- userLogsRepository.create(userId, "Email was verified")
     _ = emailApi.sendEmail(EmailRequest(user.email, EmailMessage.confirm(user.name)))
-  } yield VerifyEmailResponse()
+  } yield VerifyEmail.Response()
 
   // returns the token to use for authenticating requests
-  def login(request: LoginRequest): Future[LoginResponse] = {
+  def login(request: Login.Request): Future[Login.Response] = {
     for {
       maybe <- repository.find(request.email)
       user = maybe
@@ -88,10 +80,10 @@ class UsersService @Inject() (
         throw new RuntimeException("The email is not verified, check your spam folder if you don't see the email.")
       _ <- userLogsRepository.create(user.id, "Logged in successfully")
       token = JwtUtils.createToken(jwtConfig, user.id)(clock)
-    } yield LoginResponse(user.id, user.name, user.email, token)
+    } yield Login.Response(user.id, user.name, user.email, token)
   }
 
-  def update(userId: UUID, request: UpdateUserRequest): Future[Unit] = {
+  def update(userId: UUID, request: UpdateUser.Request): Future[Unit] = {
     val validate = Future {
       if (request.name.isEmpty) new RuntimeException(s"the name is required")
       else ()
@@ -105,10 +97,10 @@ class UsersService @Inject() (
     } yield ()
   }
 
-  def getCurrentUser(userId: UUID): Future[GetCurrentUserResponse] = {
+  def getCurrentUser(userId: UUID): Future[GetCurrentUser.Response] = {
     for {
       user <- unsafeUser(userId)
-    } yield GetCurrentUserResponse(
+    } yield GetCurrentUser.Response(
       id = user.id,
       email = user.email,
       name = user.name

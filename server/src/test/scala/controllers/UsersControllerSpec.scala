@@ -2,7 +2,6 @@ package controllers
 
 import com.dimafeng.testcontainers.PostgreSQLContainer
 import controllers.common.PlayPostgresSpec
-import net.wiringbits.api.models.{CreateUserRequest, LoginRequest, VerifyEmailRequest}
 import net.wiringbits.apis.EmailApi
 import net.wiringbits.apis.models.EmailRequest
 import org.mockito.ArgumentMatchers.any
@@ -10,6 +9,7 @@ import org.mockito.MockitoSugar.{mock, when}
 import play.api.inject
 import play.api.inject.guice.GuiceApplicationBuilder
 import utils.LoginUtils
+import net.wiringbits.api.models.{CreateUser, Login, VerifyEmail}
 
 import java.time.{Clock, Instant}
 import scala.concurrent.Future
@@ -35,7 +35,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
     "return the email verification after creating a user" in withApiClient { client =>
       val name = "wiringbits"
       val email = "test@wiringbits.net"
-      val request = CreateUserRequest(name = name, email = email, password = "test123...")
+      val request = CreateUser.Request(name = name, email = email, password = "test123...")
 
       val response = client.createUser(request).futureValue
 
@@ -44,7 +44,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
     }
 
     "fail when the email is already taken" in withApiClient { client =>
-      val request = CreateUserRequest(name = "someone", email = "test@wiringbits.net", password = "test123...")
+      val request = CreateUser.Request(name = "someone", email = "test@wiringbits.net", password = "test123...")
 
       // take the email
       client.createUser(request).futureValue
@@ -61,7 +61,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
     }
 
     "fail when the email has a wrong format" in withApiClient { client =>
-      val request = CreateUserRequest(name = "someone", email = "test1@email.@", password = "test123...")
+      val request = CreateUser.Request(name = "someone", email = "test1@email.@", password = "test123...")
 
       val error = client
         .createUser(request)
@@ -74,7 +74,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
     }
 
     "fail when the password is too short" in withApiClient { client =>
-      val request = CreateUserRequest(name = "someone", email = "test1@email.com", password = "test123")
+      val request = CreateUser.Request(name = "someone", email = "test1@email.com", password = "test123")
 
       val error = client
         .createUser(request)
@@ -87,7 +87,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
     }
 
     "fail when the name is too short" in withApiClient { client =>
-      val request = CreateUserRequest(name = "n", email = "test2@email.com", password = "test123...")
+      val request = CreateUser.Request(name = "n", email = "test2@email.com", password = "test123...")
 
       val error = client
         .createUser(request)
@@ -104,29 +104,29 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
     "login after successful email confirmation" in withApiClient { client =>
       val email = "test1@email.com"
       val password = "test123..."
-      val request = CreateUserRequest(
+      val request = CreateUser.Request(
         name = "wiringbits",
         email = email,
         password = password
       )
       val user = client.createUser(request).futureValue
 
-      client.verifyEmail(VerifyEmailRequest(user.id.toString)).futureValue
+      client.verifyEmail(VerifyEmail.Request(user.id.toString)).futureValue
 
-      val response = client.login(LoginRequest(email = email, password = password)).futureValue
+      val response = client.login(Login.Request(email = email, password = password)).futureValue
       response.email must be(email)
       response.token mustNot be(empty)
     }
 
     "fail when the user tries to login without an email verification" in withApiClient { client =>
-      val request = CreateUserRequest(
+      val request = CreateUser.Request(
         name = "wiringbits",
         email = "test1@email.com",
         password = "test123..."
       )
       val user = client.createUser(request).futureValue
 
-      val loginRequest = LoginRequest(
+      val loginRequest = Login.Request(
         email = user.email,
         password = "test123..."
       )
@@ -143,7 +143,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
     }
 
     "fail when trying to verify an already verified user's email" in withApiClient { client =>
-      val request = CreateUserRequest(
+      val request = CreateUser.Request(
         name = "wiringbits",
         email = "test1@email.com",
         password = "test123..."
@@ -151,7 +151,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
       val response = createVerifyLoginUser(request, client).futureValue
 
       val error = client
-        .verifyEmail(VerifyEmailRequest(response.id.toString))
+        .verifyEmail(VerifyEmail.Request(response.id.toString))
         .map(_ => "Success when failure expected")
         .recover { case NonFatal(ex) =>
           ex.getMessage
@@ -164,16 +164,16 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
 
   "POST /users/login" should {
     "return the response from a correct user" in withApiClient { client =>
-      val request = CreateUserRequest(
+      val request = CreateUser.Request(
         name = "wiringbits",
         email = "test1@email.com",
         password = "test123..."
       )
       val user = client.createUser(request).futureValue
 
-      client.verifyEmail(VerifyEmailRequest(user.id.toString)).futureValue
+      client.verifyEmail(VerifyEmail.Request(user.id.toString)).futureValue
 
-      val loginRequest = LoginRequest(
+      val loginRequest = Login.Request(
         email = user.email,
         password = "test123..."
       )
@@ -183,16 +183,16 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
     }
 
     "fail when password is incorrect" in withApiClient { client =>
-      val request = CreateUserRequest(
+      val request = CreateUser.Request(
         name = "wiringbits",
         email = "test1@email.com",
         password = "test123..."
       )
       val user = client.createUser(request).futureValue
 
-      client.verifyEmail(VerifyEmailRequest(user.id.toString)).futureValue
+      client.verifyEmail(VerifyEmail.Request(user.id.toString)).futureValue
 
-      val loginRequest = LoginRequest(
+      val loginRequest = Login.Request(
         email = user.email,
         password = "Incorrect password"
       )

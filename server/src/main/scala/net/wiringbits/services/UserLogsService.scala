@@ -1,6 +1,6 @@
 package net.wiringbits.services
 
-import net.wiringbits.api.models.GetUserLogsResponse
+import net.wiringbits.api.models.GetUserLogs
 import net.wiringbits.repositories.UserLogsRepository
 
 import java.util.UUID
@@ -11,16 +11,16 @@ class UserLogsService @Inject() (userLogsRepository: UserLogsRepository)(implici
     ec: ExecutionContext
 ) {
 
-  def logs(userId: UUID): Future[GetUserLogsResponse] = {
+  def logs(userId: UUID): Future[GetUserLogs.Response] = {
     for {
       logs <- userLogsRepository.logs(userId)
       items = logs.map { x =>
-        GetUserLogsResponse.UserLog(
+        GetUserLogs.Response.UserLog(
           id = x.userLogId,
           message = x.message,
           createdAt = x.createdAt
         )
       }
-    } yield GetUserLogsResponse(items)
+    } yield GetUserLogs.Response(items)
   }
 }

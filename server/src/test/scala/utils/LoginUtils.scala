@@ -1,21 +1,21 @@
 package utils
 
 import net.wiringbits.api.ApiClient
-import net.wiringbits.api.models.{CreateUserRequest, LoginRequest, LoginResponse, VerifyEmailRequest}
+import net.wiringbits.api.models.{CreateUser, Login, VerifyEmail}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 trait LoginUtils {
 
   def createVerifyLoginUser(
-      request: CreateUserRequest,
+      request: CreateUser.Request,
       client: ApiClient
-  )(implicit ec: ExecutionContext): Future[LoginResponse] = for {
+  )(implicit ec: ExecutionContext): Future[Login.Response] = for {
     user <- client.createUser(request)
 
-    _ <- client.verifyEmail(VerifyEmailRequest(user.id.toString))
+    _ <- client.verifyEmail(VerifyEmail.Request(user.id.toString))
 
-    loginRequest = LoginRequest(
+    loginRequest = Login.Request(
       email = user.email,
       password = "test123..."
     )
