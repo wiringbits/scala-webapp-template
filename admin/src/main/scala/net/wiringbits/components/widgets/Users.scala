@@ -5,7 +5,7 @@ import com.alexitc.materialui.facade.materialUiCore.{components => mui, material
 import com.alexitc.materialui.facade.materialUiStyles.makeStylesMod.StylesHook
 import com.alexitc.materialui.facade.materialUiStyles.mod.makeStyles
 import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{StyleRulesCallback, Styles, WithStylesOptions}
-import net.wiringbits.api.models.AdminGetUsersResponse
+import net.wiringbits.api.models.AdminGetUsers
 import net.wiringbits.ui.components.core.RemoteDataLoader
 import net.wiringbits.ui.components.core.widgets.{CircularLoader, Container}
 import net.wiringbits.ui.core.GenericHooks
@@ -27,7 +27,7 @@ import slinky.core.facade.Fragment
     val classes = useStyles(())
     val (timesRefreshingData, forceRefresh) = GenericHooks.useForceRefresh
 
-    RemoteDataLoader.component[AdminGetUsersResponse](
+    RemoteDataLoader.component[AdminGetUsers.Response](
       RemoteDataLoader
         .Props(
           fetch = () => props.api.client.adminGetUsers(),

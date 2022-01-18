@@ -2,7 +2,7 @@ package net.wiringbits.components.widgets
 
 import com.alexitc.materialui.facade.materialUiCore.mod.PropTypes.Color
 import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
-import net.wiringbits.api.models.CreateUserRequest
+import net.wiringbits.api.models.CreateUser
 import net.wiringbits.api.utils.Validator
 import net.wiringbits.models.User
 import net.wiringbits.ui.components.core.ErrorLabel
@@ -71,7 +71,7 @@ import scala.util.{Failure, Success}
 
         case None =>
           props.api.client
-            .createUser(CreateUserRequest(name = name, email = email, password = password))
+            .createUser(CreateUser.Request(name = name, email = email, password = password))
             .onComplete {
               case Success(res) =>
                 setState(state.copy(loading = Some(false), error = None))

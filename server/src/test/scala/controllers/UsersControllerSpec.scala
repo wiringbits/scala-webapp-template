@@ -1,7 +1,7 @@
 package controllers
 
 import controllers.common.PlayPostgresSpec
-import net.wiringbits.api.models.CreateUserRequest
+import net.wiringbits.api.models.CreateUser
 
 import scala.util.control.NonFatal
 
@@ -11,7 +11,7 @@ class UsersControllerSpec extends PlayPostgresSpec {
     "return the authentication token after creating a user" in withApiClient { client =>
       val name = "wiringbits"
       val email = "test@wiringbits.net"
-      val request = CreateUserRequest(name = name, email = email, password = "test123...")
+      val request = CreateUser.Request(name = name, email = email, password = "test123...")
 
       val response = client.createUser(request).futureValue
       response.name must be(name)
@@ -20,7 +20,7 @@ class UsersControllerSpec extends PlayPostgresSpec {
     }
 
     "fail when the email is already taken" in withApiClient { client =>
-      val request = CreateUserRequest(name = "someone", email = "test@wiringbits.net", password = "test123...")
+      val request = CreateUser.Request(name = "someone", email = "test@wiringbits.net", password = "test123...")
 
       // take the email
       client.createUser(request).futureValue
@@ -37,7 +37,7 @@ class UsersControllerSpec extends PlayPostgresSpec {
     }
 
     "fail when the email has a wrong format" in withApiClient { client =>
-      val request = CreateUserRequest(name = "someone", email = "test1@email.@", password = "test123...")
+      val request = CreateUser.Request(name = "someone", email = "test1@email.@", password = "test123...")
 
       val error = client
         .createUser(request)
@@ -50,7 +50,7 @@ class UsersControllerSpec extends PlayPostgresSpec {
     }
 
     "fail when the password is too short" in withApiClient { client =>
-      val request = CreateUserRequest(name = "someone", email = "test1@email.com", password = "test123")
+      val request = CreateUser.Request(name = "someone", email = "test1@email.com", password = "test123")
 
       val error = client
         .createUser(request)
@@ -63,7 +63,7 @@ class UsersControllerSpec extends PlayPostgresSpec {
     }
 
     "fail when the name is too short" in withApiClient { client =>
-      val request = CreateUserRequest(name = "n", email = "test2@email.com", password = "test123...")
+      val request = CreateUser.Request(name = "n", email = "test2@email.com", password = "test123...")
 
       val error = client
         .createUser(request)
