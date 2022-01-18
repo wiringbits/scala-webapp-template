@@ -12,8 +12,8 @@ import play.api.inject
 import play.api.inject.guice.GuiceApplicationBuilder
 import utils.LoginUtils
 
-import java.time.{Clock, Instant}
 import java.time.temporal.ChronoUnit
+import java.time.{Clock, Instant}
 import java.util.UUID
 import scala.util.control.NonFatal
 
@@ -31,7 +31,8 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
     super
       .guiceApplicationBuilder(container)
       .overrides(
-        inject.bind[EmailApi].to(emailApi)
+        inject.bind[EmailApi].to(emailApi),
+        inject.bind[Clock].to(clock)
       )
 
   "POST /users" should {
@@ -170,7 +171,6 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
     }
 
     "fail when the user tries to verify with an expired token" in withApiClient { client =>
-      when(clock.instant()).thenAnswer(Instant.now())
       val request = CreateUserRequest(
         name = "wiringbits",
         email = "test1@email.com",
@@ -265,30 +265,6 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
         .futureValue
 
       error must be("The given email/password doesn't match")
-    }
-
-    "fail when the captcha isn't valid" in withApiClient { client =>
-      val request = CreateUserRequest(
-        name = "wiringbits",
-        email = "test1@email.com",
-        password = "test123..."
-      )
-      client.createUser(request).futureValue
-
-      val loginRequest = LoginRequest(
-        email = "test1@email.com",
-        password = "test123..."
-      )
-
-      val error = client
-        .login(loginRequest)
-        .map(_ => "Success when failure expected")
-        .recover { case NonFatal(ex) =>
-          ex.getMessage
-        }
-        .futureValue
-
-      error must be("Invalid captcha, try again")
     }
   }
 }

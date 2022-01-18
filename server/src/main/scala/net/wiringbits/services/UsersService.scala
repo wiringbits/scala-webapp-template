@@ -30,11 +30,11 @@ class UsersService @Inject() (
     userLogsRepository: UserLogsRepository,
     tokensRepository: TokensRepository,
     frontendConfig: FrontendConfig,
-    emailApi: EmailApi
+    emailApi: EmailApi,
+    clock: Clock
 )(implicit
     ec: ExecutionContext
 ) {
-  private implicit val clock: Clock = Clock.systemUTC
 
   // returns the login token
   def create(request: CreateUserRequest): Future[CreateUserResponse] = {
@@ -72,7 +72,7 @@ class UsersService @Inject() (
         emailEndpoint = s"${createToken.userId}_${createToken.token}"
       )
       _ = emailApi.sendEmail(EmailRequest(request.email, emailRequest))
-    } yield CreateUserResponse()
+    } yield CreateUserResponse(id = createUser.id, email = createUser.email, name = createUser.name)
   }
 
   def verifyEmail(userId: UUID, token: UUID): Future[VerifyEmailResponse] = for {
@@ -85,7 +85,6 @@ class UsersService @Inject() (
     tokenExpiresAt = token.expiresAt
     _ = if (tokenExpiresAt.isBefore(clock.instant()))
       throw new RuntimeException("Token is expired")
-    // TODO: Should I use a transaction for this?
     _ <- repository.verify(userId, token.token)
     _ <- userLogsRepository.create(userId, "Email was verified")
     _ <- tokensRepository.delete(token)
@@ -103,7 +102,7 @@ class UsersService @Inject() (
       _ = if (user.verifiedOn.isEmpty)
         throw new RuntimeException("The email is not verified, check your spam folder if you don't see the email.")
       _ <- userLogsRepository.create(user.id, "Logged in successfully")
-      token = JwtUtils.createToken(jwtConfig, user.id)
+      token = JwtUtils.createToken(jwtConfig, user.id)(clock)
     } yield LoginResponse(user.id, user.name, user.email, token)
   }
 

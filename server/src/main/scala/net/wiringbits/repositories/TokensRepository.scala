@@ -6,20 +6,22 @@ import net.wiringbits.repositories.daos.TokensDAO
 import net.wiringbits.repositories.models.Token
 import play.api.db.Database
 
+import java.time.Clock
 import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.Future
 
 class TokensRepository @Inject() (
     database: Database,
-    tokensConfig: TokensConfig
+    tokensConfig: TokensConfig,
+    clock: Clock
 )(implicit
     ec: DatabaseExecutionContext
 ) {
 
   def create(request: Token.CreateToken): Future[Unit] = Future {
     database.withConnection { implicit conn =>
-      TokensDAO.create(request, tokensConfig.verificationTokenExp)
+      TokensDAO.create(request, tokensConfig.verificationTokenExp, clock)
     }
   }
 

@@ -4,13 +4,13 @@ import anorm.SqlStringInterpolation
 import net.wiringbits.repositories.models.Token
 
 import java.sql.Connection
-import java.time.Instant
+import java.time.{Clock, Instant}
 import java.util.UUID
 import scala.concurrent.duration.FiniteDuration
 
 object TokensDAO {
 
-  def create(request: Token.CreateToken, tokenExp: FiniteDuration)(implicit conn: Connection): Unit = {
+  def create(request: Token.CreateToken, tokenExp: FiniteDuration, clock: Clock)(implicit conn: Connection): Unit = {
     val _ =
       SQL"""
         INSERT INTO tokens
@@ -19,8 +19,8 @@ object TokensDAO {
           ${request.id.toString}::UUID,
           ${request.token.toString}::UUID,
           ${request.tokenType.toString}::TEXT,
-          ${Instant.now}::TIMESTAMP,
-          ${request.expirationHour(tokenExp)}::TIMESTAMP,
+          ${Instant.now()}::TIMESTAMP,
+          ${request.expirationHour(tokenExp)(clock)}::TIMESTAMP,
           ${request.userId.toString}::UUID
         )
         """

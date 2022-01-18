@@ -24,7 +24,7 @@ class EmailApi @Inject() (
 
     val htmlBody =
       s"""
-      <h1>SWAN FINANCE</h1>
+      <h1>WIRING BITS</h1>
       <p>${emailRequest.message.body}</p>""".stripMargin
 
     try {
