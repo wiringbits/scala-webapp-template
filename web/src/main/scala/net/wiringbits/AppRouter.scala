@@ -33,9 +33,13 @@ import typings.reactRouterDom.{components => router}
     val home = route("/", props.auth)(HomePage())
     val about = route("/about", props.auth)(AboutPage())
     val signIn = route("/signin", props.auth)(SignInPage(props.api, props.loggedIn))
-    val signUp = route("/signup", props.auth)(SignUpPage(props.api))
-    val email = route("/verify-email", props.auth)(EmailPage())
-    val emailCode = route("/verify-email/:emailCode", props.auth)(EmailCodePage(props.api))
+    val signUp = route("/signup", props.auth)(SignUpPage(props.api, props.loggedIn))
+
+    def dashboard(user: User) = route("/dashboard", props.auth)(DashboardPage(props.api, user))
+    val signOut = route("/signout", props.auth) {
+      props.logout()
+      router.Redirect("/")
+    }
 
     val catchAllRoute = router.Route(
       RouteProps().setRender { _ =>
@@ -45,14 +49,9 @@ import typings.reactRouterDom.{components => router}
 
     props.auth match {
       case AuthState.Unauthenticated =>
-        router.Switch(home, about, signIn, signUp, email, emailCode, catchAllRoute)
+        router.Switch(home, about, signIn, signUp, catchAllRoute)
 
       case AuthState.Authenticated(user) =>
-        def dashboard(user: User) = route("/dashboard", props.auth)(DashboardPage(props.api, user))
-        val signOut = route("/signout", props.auth) {
-          props.logout()
-          router.Redirect("/")
-        }
         router.Switch(home, dashboard(user), about, signOut, catchAllRoute)
     }
   }

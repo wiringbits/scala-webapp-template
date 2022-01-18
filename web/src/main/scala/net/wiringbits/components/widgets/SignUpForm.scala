@@ -4,6 +4,7 @@ import com.alexitc.materialui.facade.materialUiCore.mod.PropTypes.Color
 import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
 import net.wiringbits.api.models.CreateUserRequest
 import net.wiringbits.api.utils.Validator
+import net.wiringbits.models.User
 import net.wiringbits.ui.components.core.ErrorLabel
 import net.wiringbits.ui.components.core.widgets.Container.{Alignment, EdgeInsets}
 import net.wiringbits.ui.components.core.widgets.{CircularLoader, Container, Title}
@@ -19,7 +20,7 @@ import typings.reactRouterDom.{mod => reactRouterDom}
 import scala.util.{Failure, Success}
 
 @react object SignUpForm {
-  case class Props(api: API)
+  case class Props(api: API, loggedIn: User => Unit)
 
   private case class State(
       name: Option[String] = None,
@@ -72,9 +73,10 @@ import scala.util.{Failure, Success}
           props.api.client
             .createUser(CreateUserRequest(name = name, email = email, password = password))
             .onComplete {
-              case Success(_) =>
+              case Success(res) =>
                 setState(state.copy(loading = Some(false), error = None))
-                history.push("/verify-email")
+                props.loggedIn(User(res.name, res.email, res.token))
+                history.push("/dashboard") // redirects to dashboard
 
               case Failure(ex) =>
                 setState(
