@@ -32,7 +32,7 @@ class UsersController @Inject() (
     for {
       token <- userToken
       _ = logger.info(s"Verify user's email: ${token.userId}")
-      response <- usersService.verifyEmail(token.userId, token.token)
+      response <- usersService.verifyEmail(token.userId)
     } yield Ok(Json.toJson(response))
   }
 

@@ -41,9 +41,9 @@ class UsersRepository @Inject() (database: Database)(implicit ec: DatabaseExecut
     }
   }
 
-  def verify(userId: UUID, token: UUID): Future[Unit] = Future {
+  def verify(userId: UUID): Future[Unit] = Future {
     database.withConnection { implicit conn =>
-      UsersDAO.verify(userId, token)
+      UsersDAO.verify(userId)
     }
   }
 }

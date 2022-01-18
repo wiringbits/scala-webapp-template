@@ -55,14 +55,11 @@ object UsersDAO {
     """.execute()
   }
 
-  def verify(userId: UUID, token: UUID)(implicit conn: Connection): Unit = {
+  def verify(userId: UUID)(implicit conn: Connection): Unit = {
     val _ = SQL"""
       UPDATE users
       SET verified_on = NOW()
-      FROM tokens
-      WHERE users.user_id = tokens.user_id
-      AND tokens.user_id = ${userId.toString}::UUID
-      AND tokens.token = ${token.toString}::UUID
+      WHERE user_id = ${userId.toString}::UUID
     """.execute()
   }
 

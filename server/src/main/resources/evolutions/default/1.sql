@@ -29,16 +29,3 @@ CREATE TABLE user_logs (
 );
 
 CREATE INDEX user_logs_user_id_index ON user_logs USING BTREE (user_id);
-
-CREATE TABLE tokens (
-    token_id UUID NOT NULL,
-    token UUID NOT NULL,
-    token_type TEXT NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL,
-    expires_at TIMESTAMPTZ NOT NULL,
-    user_id UUID NOT NULL,
-    CONSTRAINT tokens_id_pk PRIMARY KEY (token_id),
-    CONSTRAINT tokens_user_id_fk FOREIGN KEY (user_id) REFERENCES users (user_id)
-);
-
-CREATE INDEX tokens_user_id_index ON tokens USING BTREE (user_id);

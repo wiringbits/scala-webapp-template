@@ -10,11 +10,11 @@ import net.wiringbits.api.models.{
   VerifyEmailResponse
 }
 import net.wiringbits.apis.EmailApiAWSImpl
-import net.wiringbits.apis.models.{EmailRequest, TokenType}
+import net.wiringbits.apis.models.EmailRequest
 import net.wiringbits.config.{JwtConfig, WebAppConfig}
 import net.wiringbits.repositories
 import net.wiringbits.repositories.models.User
-import net.wiringbits.repositories.{TokensRepository, UserLogsRepository, UsersRepository}
+import net.wiringbits.repositories.{UserLogsRepository, UsersRepository}
 import net.wiringbits.util.{EmailMessage, JwtUtils}
 import org.apache.commons.validator.routines.EmailValidator
 import org.mindrot.jbcrypt.BCrypt
@@ -28,7 +28,6 @@ class UsersService @Inject() (
     jwtConfig: JwtConfig,
     repository: UsersRepository,
     userLogsRepository: UserLogsRepository,
-    tokensRepository: TokensRepository,
     webAppConfig: WebAppConfig,
     emailApi: EmailApiAWSImpl,
     clock: Clock
@@ -58,36 +57,22 @@ class UsersService @Inject() (
         createUser.id,
         s"Account created, name = ${request.name}, email = ${request.email}"
       )
-      createToken = repositories.models.Token
-        .CreateToken(
-          id = UUID.randomUUID(),
-          token = UUID.randomUUID(),
-          tokenType = TokenType.VerificationToken,
-          userId = createUser.id
-        )
-      _ <- tokensRepository.create(createToken)
       emailRequest = EmailMessage.registration(
         name = createUser.name,
         url = webAppConfig.host,
-        emailEndpoint = s"${createToken.userId}_${createToken.token}"
+        emailEndpoint = s"${createUser.id}"
       )
       _ = emailApi.sendEmail(EmailRequest(request.email, emailRequest))
     } yield CreateUserResponse(id = createUser.id, email = createUser.email, name = createUser.name)
   }
 
-  def verifyEmail(userId: UUID, token: UUID): Future[VerifyEmailResponse] = for {
+  def verifyEmail(userId: UUID): Future[VerifyEmailResponse] = for {
     userMaybe <- repository.find(userId)
     user = userMaybe.getOrElse(throw new RuntimeException(s"User wasn't found"))
     _ = if (user.verifiedOn.isDefined)
       throw new RuntimeException(s"User $userId email is already verified")
-    tokenMaybe <- tokensRepository.find(userId, token)
-    token = tokenMaybe.getOrElse(throw new RuntimeException(s"Token for user $userId wasn't found"))
-    tokenExpiresAt = token.expiresAt
-    _ = if (tokenExpiresAt.isBefore(clock.instant()))
-      throw new RuntimeException("Token is expired")
-    _ <- repository.verify(userId, token.token)
+    _ <- repository.verify(userId)
     _ <- userLogsRepository.create(userId, "Email was verified")
-    _ <- tokensRepository.delete(token)
     _ = emailApi.sendEmail(EmailRequest(user.email, EmailMessage.confirm(user.name)))
   } yield VerifyEmailResponse()
 
