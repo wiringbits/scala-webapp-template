@@ -12,7 +12,7 @@ object AppStrings {
   val signOut = "Sign out"
   val logs = "Logs"
 
-  val name = "Nombre"
+  val name = "Name"
   val email = "Email"
   val password = "Password"
   val login = "Login"
