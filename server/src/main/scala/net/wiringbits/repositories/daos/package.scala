@@ -1,6 +1,7 @@
 package net.wiringbits.repositories
 
-import anorm._
+import anorm.*
+import net.wiringbits.common.models.{Email, Name}
 import net.wiringbits.repositories.models.{User, UserLog}
 
 package object daos {
@@ -20,6 +21,9 @@ package object daos {
         )
     }
   }
+
+  implicit val nameParser: Column[Name] = Column.columnToString.map(Name.trusted)
+  implicit val emailParser: Column[Email] = citextToString.map(Email.trusted)
 
   val userParser: RowParser[User] = {
     Macro.parser[User](
