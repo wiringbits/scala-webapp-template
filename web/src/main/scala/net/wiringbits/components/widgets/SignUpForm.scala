@@ -74,7 +74,7 @@ import scala.util.{Failure, Success}
             .onComplete {
               case Success(_) =>
                 setState(state.copy(loading = Some(false), error = None))
-                history.push("/verify-email") // redirects to dashboard
+                history.push("/verify-email")
 
               case Failure(ex) =>
                 setState(
