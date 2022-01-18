@@ -4,6 +4,7 @@ import com.alexitc.materialui.facade.materialUiCore.mod.PropTypes.Color
 import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
 import net.wiringbits.api.models.LoginRequest
 import net.wiringbits.api.utils.Validator
+import net.wiringbits.common.models.Captcha
 import net.wiringbits.models.User
 import net.wiringbits.ui.components.core.ErrorLabel
 import net.wiringbits.ui.components.core.widgets.Container.{Alignment, EdgeInsets}
@@ -25,6 +26,7 @@ import scala.util.{Failure, Success}
   private case class State(
       email: Option[String] = None,
       password: Option[String] = None,
+      captcha: Option[Captcha] = None,
       loading: Option[Boolean] = None,
       error: Option[String] = None
   )
@@ -39,6 +41,8 @@ import scala.util.{Failure, Success}
         Some(AppStrings.emailAddressError)
       } else if (state.password.isEmpty) {
         Some(AppStrings.passwordRequiredError)
+      } else if (state.captcha.isEmpty) {
+        Some(AppStrings.captchaRequiredError)
       } else {
         None
       }
@@ -55,6 +59,7 @@ import scala.util.{Failure, Success}
 
       val email = state.email.getOrElse("")
       val password = state.password.getOrElse("")
+      val captcha = Captcha.trusted(state.captcha.map(_.string).getOrElse(""))
 
       validateForm() match {
         case Some(validationError) =>
@@ -67,7 +72,7 @@ import scala.util.{Failure, Success}
 
         case None =>
           props.api.client
-            .login(LoginRequest(email = email, password = password))
+            .login(LoginRequest(email = email, password = password, captcha = captcha))
             .onComplete {
               case Success(res) =>
                 setState(state.copy(loading = Some(false), error = None))
@@ -87,6 +92,7 @@ import scala.util.{Failure, Success}
 
     def setEmail(value: String): Unit = { setState(state.copy(email = Some(value))) }
     def setPassword(value: String): Unit = { setState(state.copy(password = Some(value))) }
+    def setCaptcha(value: Option[Captcha]): Unit = { setState(state.copy(captcha = value)) }
 
     val loading = state.loading.getOrElse(false)
 
@@ -115,6 +121,8 @@ import scala.util.{Failure, Success}
     )
 
     val error = ErrorLabel(state.error.getOrElse(""))
+
+    val recaptcha = ReCaptcha(onChange = captchaOpt => setCaptcha(captchaOpt))
 
     val loginButton = {
       val text =
@@ -149,6 +157,7 @@ import scala.util.{Failure, Success}
               Title(AppStrings.signIn),
               emailInput,
               passwordInput,
+              recaptcha,
               error,
               Container(
                 minWidth = Some("100%"),

@@ -26,4 +26,5 @@ object AppStrings {
   val nameRequiredError = "Please enter a name"
   val emailAddressError = "Please enter a valid email address"
   val passwordRequiredError = "Please enter password"
+  val captchaRequiredError = "Please complete the captcha"
 }
