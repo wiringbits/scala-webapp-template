@@ -8,6 +8,8 @@ import net.wiringbits.api.models.{
   LoginResponse,
   UpdateUserRequest
 }
+import net.wiringbits.apis.ReCaptchaApi
+import net.wiringbits.common.models.Captcha
 import net.wiringbits.config.JwtConfig
 import net.wiringbits.repositories
 import net.wiringbits.repositories.models.User
@@ -24,7 +26,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class UsersService @Inject() (
     jwtConfig: JwtConfig,
     repository: UsersRepository,
-    userLogsRepository: UserLogsRepository
+    userLogsRepository: UserLogsRepository,
+    captchaApi: ReCaptchaApi
 )(implicit
     ec: ExecutionContext
 ) {
@@ -34,6 +37,7 @@ class UsersService @Inject() (
   def create(request: CreateUserRequest): Future[CreateUserResponse] = {
     val validations = {
       for {
+        _ <- validateCaptcha(request.captcha)
         _ <- Future {
           validateName(request.name)
           validatePassword(request.password)
@@ -59,6 +63,7 @@ class UsersService @Inject() (
   // returns the token to use for authenticating requests
   def login(request: LoginRequest): Future[LoginResponse] = {
     for {
+      _ <- validateCaptcha(request.captcha)
       maybe <- repository.find(request.email)
       user = maybe
         .filter(user => BCrypt.checkpw(request.password, user.hashedPassword))
@@ -119,6 +124,12 @@ class UsersService @Inject() (
       if (maybe.isDefined) throw new RuntimeException(s"Email already in use, pick another one")
       else ()
     }
+  }
+
+  private def validateCaptcha(captcha: Captcha): Future[Unit] = {
+    captchaApi
+      .verify(captcha)
+      .map(valid => if (!valid) throw new RuntimeException(s"Invalid captcha, try again") else ())
   }
 
   private def validateName(name: String): Unit = {

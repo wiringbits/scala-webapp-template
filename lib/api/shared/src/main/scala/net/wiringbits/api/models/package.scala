@@ -1,5 +1,6 @@
 package net.wiringbits.api
 
+import net.wiringbits.common.models.Captcha
 import play.api.libs.json._
 
 import java.time.Instant
@@ -20,12 +21,12 @@ package object models {
   case class ErrorResponse(error: String)
   implicit val errorResponseFormat: Format[ErrorResponse] = Json.format[ErrorResponse]
 
-  case class CreateUserRequest(name: String, email: String, password: String)
+  case class CreateUserRequest(name: String, email: String, captcha: Captcha, password: String)
   case class CreateUserResponse(name: String, email: String, token: String)
   implicit val createUserRequestFormat: Format[CreateUserRequest] = Json.format[CreateUserRequest]
   implicit val createUserResponseFormat: Format[CreateUserResponse] = Json.format[CreateUserResponse]
 
-  case class LoginRequest(email: String, password: String)
+  case class LoginRequest(email: String, password: String, captcha: Captcha)
   case class LoginResponse(name: String, email: String, token: String)
   implicit val loginRequestFormat: Format[LoginRequest] = Json.format[LoginRequest]
   implicit val loginResponseFormat: Format[LoginResponse] = Json.format[LoginResponse]
