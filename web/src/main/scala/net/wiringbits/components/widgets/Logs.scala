@@ -10,7 +10,7 @@ import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
   Styles,
   WithStylesOptions
 }
-import net.wiringbits.api.models.GetUserLogsResponse
+import net.wiringbits.api.models.GetUserLogs
 import net.wiringbits.models.User
 import net.wiringbits.ui.components.core.RemoteDataLoader
 import net.wiringbits.ui.components.core.widgets._
@@ -19,7 +19,7 @@ import net.wiringbits.{API, AppStrings}
 import org.scalablytyped.runtime.StringDictionary
 import slinky.core.FunctionalComponent
 import slinky.core.annotations.react
-import slinky.core.facade.{Fragment, Hooks}
+import slinky.core.facade.Fragment
 
 @react object Logs {
   case class Props(api: API, user: User)
@@ -37,7 +37,7 @@ import slinky.core.facade.{Fragment, Hooks}
     val classes = useStyles(())
     val (timesRefreshingData, forceRefresh) = GenericHooks.useForceRefresh
 
-    RemoteDataLoader.component[GetUserLogsResponse](
+    RemoteDataLoader.component[GetUserLogs.Response](
       RemoteDataLoader.Props(
         fetch = () => props.api.client.getUserLogs(props.user.jwt),
         render = response => LogList.component(LogList.Props(response, () => forceRefresh())),

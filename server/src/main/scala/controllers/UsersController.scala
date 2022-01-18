@@ -17,7 +17,7 @@ class UsersController @Inject() (
     extends AbstractController(cc) {
   private val logger = LoggerFactory.getLogger(this.getClass)
 
-  def create() = handleJsonBody[CreateUserRequest] { request =>
+  def create() = handleJsonBody[CreateUser.Request] { request =>
     val body = request.body
     logger.info(s"Create user: $body")
     for {
@@ -25,7 +25,7 @@ class UsersController @Inject() (
     } yield Ok(Json.toJson(response))
   }
 
-  def login() = handleJsonBody[LoginRequest] { request =>
+  def login() = handleJsonBody[Login.Request] { request =>
     val body = request.body
     logger.info(s"Login: ${body.email}")
     for {
@@ -33,13 +33,13 @@ class UsersController @Inject() (
     } yield Ok(Json.toJson(response))
   }
 
-  def update() = handleJsonBody[UpdateUserRequest] { request =>
+  def update() = handleJsonBody[UpdateUser.Request] { request =>
     val body = request.body
     logger.info(s"Update user: $body")
     for {
       userId <- authenticate(request)
       _ <- usersService.update(userId, body)
-      response = UpdateUserResponse()
+      response = UpdateUser.Response()
     } yield Ok(Json.toJson(response))
   }
 
