@@ -1,6 +1,5 @@
-package apis
+package net.wiringbits.apis
 
-import net.wiringbits.apis.ReCaptchaApi
 import net.wiringbits.common.models.Captcha
 import net.wiringbits.config.ReCaptchaConfig
 import org.mockito.ArgumentMatchers
