@@ -12,8 +12,6 @@ import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
   WithStylesOptions
 }
 import net.wiringbits.api.models.VerifyEmailRequest
-import net.wiringbits.components.widgets.AppBar
-import net.wiringbits.models.AuthState
 import net.wiringbits.ui.components.core.widgets.{CircularLoader, Container}
 import net.wiringbits.{API, AppStrings}
 import org.scalablytyped.runtime.StringDictionary
@@ -29,7 +27,7 @@ import scala.scalajs.js.timers.setTimeout
 import scala.util.{Failure, Success}
 
 @react object EmailCodePage {
-  case class Props(auth: AuthState, api: API)
+  case class Props(api: API)
 
   private case class State(
       loading: Boolean,
@@ -103,7 +101,6 @@ import scala.util.{Failure, Success}
 
     div(className := classes("emailCodePage"))(
       Fragment(
-        AppBar(props.auth),
         mui.Typography(state.title).variant(muiStrings.h5).className(classes("emailTitle")),
         mui.Typography(state.message).variant(muiStrings.h6),
         loading

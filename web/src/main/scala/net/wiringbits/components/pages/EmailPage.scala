@@ -12,8 +12,6 @@ import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
   WithStylesOptions
 }
 import net.wiringbits.AppStrings
-import net.wiringbits.components.widgets.AppBar
-import net.wiringbits.models.AuthState
 import org.scalablytyped.runtime.StringDictionary
 import slinky.core.FunctionalComponent
 import slinky.core.annotations.react
@@ -21,7 +19,7 @@ import slinky.core.facade.Fragment
 import slinky.web.html.{br, className, div}
 
 @react object EmailPage {
-  case class Props(auth: AuthState)
+  type Props = Unit
 
   private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {
     val stylesCallback: StyleRulesCallback[Theme, Unit, String] = _ =>
@@ -46,7 +44,6 @@ import slinky.web.html.{br, className, div}
     val classes = useStyles(())
 
     Fragment(
-      AppBar(props.auth),
       div(className := classes("emailPage"))(
         Fragment(
           mui
