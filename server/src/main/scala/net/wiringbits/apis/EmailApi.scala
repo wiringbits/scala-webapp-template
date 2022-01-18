@@ -4,12 +4,12 @@ import com.amazonaws.regions.Regions
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailServiceClientBuilder
 import com.amazonaws.services.simpleemail.model.*
 import net.wiringbits.apis.models.EmailRequest
-import net.wiringbits.config.AwsConfig
+import net.wiringbits.config.EmailConfig
 
 import javax.inject.Inject
 
 class EmailApi @Inject() (
-    awsConfig: AwsConfig
+    emailConfig: EmailConfig
 ) {
 
   /* To send mails to unverified accounts you need to configure aws to production mode.
@@ -20,7 +20,7 @@ class EmailApi @Inject() (
         aws_secret_access_key = ...
    */
   def sendEmail(emailRequest: EmailRequest): Unit = {
-    val from = awsConfig.senderEmail
+    val from = emailConfig.senderAddress
 
     val htmlBody =
       s"""

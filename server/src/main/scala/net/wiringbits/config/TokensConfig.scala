@@ -8,7 +8,7 @@ case class TokensConfig(verificationTokenExp: FiniteDuration)
 
 object TokensConfig {
   def apply(config: Configuration): TokensConfig = {
-    val verificationExpiration = config.get[FiniteDuration]("verification.expirationTime")
+    val verificationExpiration = config.get[FiniteDuration]("emailVerification.expirationTime")
 
     TokensConfig(verificationExpiration)
   }

@@ -11,7 +11,7 @@ import net.wiringbits.api.models.{
 }
 import net.wiringbits.apis.EmailApi
 import net.wiringbits.apis.models.{EmailRequest, TokenType}
-import net.wiringbits.config.{FrontendConfig, JwtConfig}
+import net.wiringbits.config.{JwtConfig, WebAppConfig}
 import net.wiringbits.repositories
 import net.wiringbits.repositories.models.User
 import net.wiringbits.repositories.{TokensRepository, UserLogsRepository, UsersRepository}
@@ -29,7 +29,7 @@ class UsersService @Inject() (
     repository: UsersRepository,
     userLogsRepository: UserLogsRepository,
     tokensRepository: TokensRepository,
-    frontendConfig: FrontendConfig,
+    webAppConfig: WebAppConfig,
     emailApi: EmailApi,
     clock: Clock
 )(implicit
@@ -68,7 +68,7 @@ class UsersService @Inject() (
       _ <- tokensRepository.create(createToken)
       emailRequest = EmailMessage.registration(
         name = createUser.name,
-        url = frontendConfig.host,
+        url = webAppConfig.host,
         emailEndpoint = s"${createToken.userId}_${createToken.token}"
       )
       _ = emailApi.sendEmail(EmailRequest(request.email, emailRequest))

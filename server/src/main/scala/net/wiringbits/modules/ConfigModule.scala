@@ -1,7 +1,7 @@
 package net.wiringbits.modules
 
 import com.google.inject.{AbstractModule, Provides}
-import net.wiringbits.config.{AwsConfig, FrontendConfig, JwtConfig, TokensConfig}
+import net.wiringbits.config.{EmailConfig, WebAppConfig, JwtConfig, TokensConfig}
 import play.api.Configuration
 
 class ConfigModule extends AbstractModule {
@@ -12,8 +12,8 @@ class ConfigModule extends AbstractModule {
   }
 
   @Provides()
-  def awsConfig(global: Configuration): AwsConfig = {
-    AwsConfig(global.get[Configuration]("aws"))
+  def emailConfig(global: Configuration): EmailConfig = {
+    EmailConfig(global.get[Configuration]("email"))
   }
 
   @Provides()
@@ -22,7 +22,7 @@ class ConfigModule extends AbstractModule {
   }
 
   @Provides()
-  def frontendConfig(global: Configuration): FrontendConfig = {
-    FrontendConfig(global.get[Configuration]("frontend"))
+  def webAppConfig(global: Configuration): WebAppConfig = {
+    WebAppConfig(global.get[Configuration]("webapp"))
   }
 }
