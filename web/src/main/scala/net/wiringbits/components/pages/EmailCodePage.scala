@@ -21,7 +21,7 @@ import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 import slinky.core.FunctionalComponent
 import slinky.core.annotations.react
 import slinky.core.facade.{Fragment, Hooks}
-import slinky.web.html.{className, div, img, src}
+import slinky.web.html.{className, div}
 import typings.reactRouterDom.mod.{useHistory, useParams}
 
 import scala.scalajs.js
@@ -104,7 +104,6 @@ import scala.util.{Failure, Success}
     div(className := classes("emailCodePage"))(
       Fragment(
         AppBar(props.auth),
-        img(src := "assets/images/mailbox.svg", className := classes("emailPhoto")),
         mui.Typography(state.title).variant(muiStrings.h5).className(classes("emailTitle")),
         mui.Typography(state.message).variant(muiStrings.h6),
         loading
