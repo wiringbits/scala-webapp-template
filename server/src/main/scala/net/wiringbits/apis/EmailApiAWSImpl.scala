@@ -20,9 +20,7 @@ class EmailApiAWSImpl @Inject() (
     val from = emailConfig.senderAddress
 
     val htmlBody =
-      s"""
-      <h1>WIRING BITS</h1>
-      <p>${emailRequest.message.body}</p>""".stripMargin
+      s"""<p>${emailRequest.message.body}</p>""".stripMargin
 
     def unsafe(): Unit = try {
       val client =
