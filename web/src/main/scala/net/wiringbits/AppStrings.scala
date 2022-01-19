@@ -15,6 +15,7 @@ object AppStrings {
   val name = "Nombre"
   val email = "Email"
   val password = "Password"
+  val repeatPassword = "Repeat the password"
   val login = "Login"
 
   val loading = "Loading"

@@ -2,16 +2,16 @@ package net.wiringbits.components.widgets
 
 import com.alexitc.materialui.facade.materialUiCore.mod.PropTypes.Color
 import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
-import net.wiringbits.api.models.CreateUser
-import net.wiringbits.api.utils.Validator
-import net.wiringbits.common.models.Captcha
+import net.wiringbits.api.forms.StatefulFormData
+import net.wiringbits.forms.SignUpFormData
 import net.wiringbits.models.User
 import net.wiringbits.ui.components.core.ErrorLabel
 import net.wiringbits.ui.components.core.widgets.Container.{Alignment, EdgeInsets}
 import net.wiringbits.ui.components.core.widgets.{CircularLoader, Container, Title}
+import net.wiringbits.ui.components.inputs.{EmailInput, NameInput, PasswordInput}
 import net.wiringbits.{API, AppStrings}
 import org.scalajs.dom
-import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 import slinky.core.annotations.react
 import slinky.core.facade.{Fragment, Hooks}
 import slinky.core.{FunctionalComponent, SyntheticEvent}
@@ -23,144 +23,132 @@ import scala.util.{Failure, Success}
 @react object SignUpForm {
   case class Props(api: API, loggedIn: User => Unit, captchaKey: String)
 
-  private case class State(
-      name: Option[String] = None,
-      email: Option[String] = None,
-      captcha: Option[Captcha] = None,
-      password: Option[String] = None,
-      loading: Option[Boolean] = None,
-      error: Option[String] = None
-  )
-  private val initialState = State()
-
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val history = reactRouterDom.useHistory()
-    val (state, setState) = Hooks.useState(initialState)
-
-    def validateForm() = {
-      if (state.name.isEmpty) {
-        Some(AppStrings.nameRequiredError)
-      } else if (!Validator.isValidEmail(state.email.getOrElse(""))) {
-        Some(AppStrings.emailAddressError)
-      } else if (state.password.isEmpty) {
-        Some(AppStrings.passwordRequiredError)
-      } else if (state.captcha.isEmpty) {
-        Some(AppStrings.captchaRequiredError)
-      } else {
-        None
-      }
-    }
-
-    def doSignUp(e: SyntheticEvent[_, dom.Event]): Unit = {
-      e.preventDefault()
-      setState(
-        state.copy(
-          error = None,
-          loading = Some(true)
+    val (formData, setFormData) = Hooks.useState(
+      StatefulFormData(
+        SignUpFormData.initial(
+          nameLabel = AppStrings.name,
+          emailLabel = AppStrings.email,
+          passwordLabel = AppStrings.password,
+          repeatPasswordLabel = AppStrings.repeatPassword
         )
       )
+    )
 
-      val name = state.name.getOrElse("")
-      val email = state.email.getOrElse("")
-      val password = state.password.getOrElse("")
-      val captcha = Captcha.trusted(state.captcha.map(_.string).getOrElse(""))
-
-      validateForm() match {
-        case Some(validationError) =>
-          setState(
-            state.copy(
-              error = Some(validationError),
-              loading = Some(false)
-            )
-          )
-
-        case None =>
-          props.api.client
-            .createUser(CreateUser.Request(name = name, email = email, password = password, captcha = captcha))
-            .onComplete {
-              case Success(res) =>
-                setState(state.copy(loading = Some(false), error = None))
-                props.loggedIn(User(res.name, res.email, res.token))
-                history.push("/dashboard") // redirects to dashboard
-
-              case Failure(ex) =>
-                setState(
-                  state.copy(
-                    loading = Some(false),
-                    error = Some(ex.getMessage)
-                  )
-                )
-            }
+    def onDataChanged(f: SignUpFormData => SignUpFormData): Unit = {
+      setFormData { current =>
+        current.filling.copy(data = f(current.data))
       }
     }
 
-    def setName(value: String): Unit = { setState(state.copy(name = Some(value))) }
-    def setEmail(value: String): Unit = { setState(state.copy(email = Some(value))) }
-    def setPassword(value: String): Unit = { setState(state.copy(password = Some(value))) }
-    def setCaptcha(value: Option[Captcha]): Unit = { setState(state.copy(captcha = value)) }
+    def handleSubmit(e: SyntheticEvent[_, dom.Event]): Unit = {
+      e.preventDefault()
 
-    val loading = state.loading.getOrElse(false)
+      if (formData.isSubmitButtonEnabled) {
+        setFormData(_.submit)
+        for {
+          request <- formData.data.submitRequest
+            .orElse {
+              setFormData(_.submissionFailed("Complete the necessary data"))
+              None
+            }
+        } yield props.api.client
+          .createUser(request)
+          .onComplete {
+            case Success(res) =>
+              setFormData(_.submitted)
+              props.loggedIn(User(res.name, res.email, res.token))
+              history.push("/dashboard") // redirects to dashboard
+
+            case Failure(ex) =>
+              setFormData(_.submissionFailed(ex.getMessage))
+          }
+      } else {
+        println("Submit fired when it is not available")
+      }
+    }
 
     val nameInput = Container(
       minWidth = Some("100%"),
       margin = EdgeInsets.bottom(8),
-      child = mui
-        .FormControl(
-          mui.InputLabel(AppStrings.name),
-          mui.Input().name("name").`type`("name").disabled(loading)
+      child = NameInput.component(
+        NameInput.Props(
+          formData.data.name,
+          disabled = formData.isInputDisabled,
+          onChange = value => onDataChanged(x => x.copy(name = x.name.updated(value)))
         )
-        .onChange(e => setName(e.target.asInstanceOf[dom.HTMLInputElement].value))
-        .fullWidth(true)
+      )
     )
 
     val emailInput = Container(
       minWidth = Some("100%"),
       margin = EdgeInsets.bottom(8),
-      child = mui
-        .FormControl(
-          mui.InputLabel(AppStrings.email),
-          mui.Input().name("email").`type`("email").disabled(loading)
+      child = EmailInput.component(
+        EmailInput.Props(
+          formData.data.email,
+          disabled = formData.isInputDisabled,
+          onChange = value => onDataChanged(x => x.copy(email = x.email.updated(value)))
         )
-        .onChange(e => setEmail(e.target.asInstanceOf[dom.HTMLInputElement].value))
-        .fullWidth(true)
+      )
     )
 
     val passwordInput = Container(
       minWidth = Some("100%"),
       margin = EdgeInsets.bottom(16),
-      child = mui
-        .FormControl(
-          mui.InputLabel(AppStrings.password),
-          mui.Input().name("password").`type`("password").disabled(loading)
+      child = PasswordInput
+        .component(
+          PasswordInput.Props(
+            formData.data.password,
+            disabled = formData.isInputDisabled,
+            onChange = value => onDataChanged(x => x.copy(password = x.password.updated(value)))
+          )
         )
-        .onChange(e => setPassword(e.target.asInstanceOf[dom.HTMLInputElement].value))
-        .fullWidth(true)
     )
 
-    val error = ErrorLabel(state.error.getOrElse(""))
+    val repeatPasswordInput = Container(
+      minWidth = Some("100%"),
+      margin = EdgeInsets.bottom(16),
+      child = PasswordInput
+        .component(
+          PasswordInput.Props(
+            formData.data.repeatPassword,
+            disabled = formData.isInputDisabled,
+            onChange = value => onDataChanged(x => x.copy(repeatPassword = x.repeatPassword.updated(value)))
+          )
+        )
+    )
 
-    val recaptcha = ReCaptcha(onChange = captchaOpt => setCaptcha(captchaOpt), props.captchaKey)
+    val error = formData.firstValidationError.map { text =>
+      Container(
+        margin = Container.EdgeInsets.top(16),
+        child = ErrorLabel(text)
+      )
+    }
+
+    val recaptcha =
+      ReCaptcha(onChange = captchaOpt => onDataChanged(x => x.copy(captcha = captchaOpt)), props.captchaKey)
 
     val signUpButton = {
       val text =
-        if (!loading) Fragment(AppStrings.createAccount)
-        else
+        if (formData.isSubmitting) {
           Fragment(
             CircularLoader(),
             Container(margin = EdgeInsets.left(8), child = AppStrings.loading)
           )
+        } else Fragment(AppStrings.createAccount)
 
       mui
         .Button(text)
         .fullWidth(true)
-        .disabled(loading)
+        .disabled(formData.isSubmitButtonDisabled)
         .variant(muiStrings.contained)
         .color(Color.primary)
         .`type`(muiStrings.submit)
     }
 
     // TODO: Use a form to get the enter key submitting the form
-    form(onSubmit := (doSignUp(_)))(
+    form(onSubmit := (handleSubmit(_)))(
       mui
         .Paper()
         .elevation(1)(
@@ -173,6 +161,7 @@ import scala.util.{Failure, Success}
               nameInput,
               emailInput,
               passwordInput,
+              repeatPasswordInput,
               recaptcha,
               error,
               Container(

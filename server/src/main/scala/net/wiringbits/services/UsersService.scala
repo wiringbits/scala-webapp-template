@@ -3,12 +3,12 @@ package net.wiringbits.services
 import net.wiringbits.apis.ReCaptchaApi
 import net.wiringbits.common.models.Captcha
 import net.wiringbits.api.models.{CreateUser, GetCurrentUser, Login, UpdateUser}
+import net.wiringbits.common.models.Email
 import net.wiringbits.config.JwtConfig
 import net.wiringbits.repositories
 import net.wiringbits.repositories.models.User
 import net.wiringbits.repositories.{UserLogsRepository, UsersRepository}
 import net.wiringbits.util.JwtUtils
-import org.apache.commons.validator.routines.EmailValidator
 import org.mindrot.jbcrypt.BCrypt
 
 import java.time.Clock
@@ -31,17 +31,13 @@ class UsersService @Inject() (
     val validations = {
       for {
         _ <- validateCaptcha(request.captcha)
-        _ <- Future {
-          validateName(request.name)
-          validatePassword(request.password)
-        }
         _ <- validateEmail(request.email)
       } yield ()
     }
 
     for {
       _ <- validations
-      hashedPassword = BCrypt.hashpw(request.password, BCrypt.gensalt())
+      hashedPassword = BCrypt.hashpw(request.password.string, BCrypt.gensalt())
       createUser = repositories.models.User
         .CreateUser(id = UUID.randomUUID(), name = request.name, email = request.email, hashedPassword = hashedPassword)
       _ <- repository.create(createUser)
@@ -59,7 +55,7 @@ class UsersService @Inject() (
       _ <- validateCaptcha(request.captcha)
       maybe <- repository.find(request.email)
       user = maybe
-        .filter(user => BCrypt.checkpw(request.password, user.hashedPassword))
+        .filter(user => BCrypt.checkpw(request.password.string, user.hashedPassword))
         .getOrElse(throw new RuntimeException("The given email/password doesn't match"))
       _ <- userLogsRepository.create(user.id, "Logged in successfully")
       token = JwtUtils.createToken(jwtConfig, user.id)
@@ -102,16 +98,8 @@ class UsersService @Inject() (
       }
   }
 
-  private def validateEmail(email: String): Future[Unit] = {
-    val formatValidation = Future {
-      val validator = EmailValidator.getInstance()
-      if (!validator.isValid(email)) {
-        throw new RuntimeException(s"Invalid email address")
-      } else ()
-    }
-
+  private def validateEmail(email: Email): Future[Unit] = {
     for {
-      _ <- formatValidation
       maybe <- repository.find(email)
     } yield {
       if (maybe.isDefined) throw new RuntimeException(s"Email already in use, pick another one")
@@ -123,19 +111,5 @@ class UsersService @Inject() (
     captchaApi
       .verify(captcha)
       .map(valid => if (!valid) throw new RuntimeException(s"Invalid captcha, try again") else ())
-  }
-
-  private def validateName(name: String): Unit = {
-    val minLength = 2
-    if (name.length < minLength) {
-      throw new RuntimeException(s"The name must contain at least $minLength characters")
-    } else ()
-  }
-
-  private def validatePassword(pass: String): Unit = {
-    val minLength = 8
-    if (pass.length < minLength) {
-      throw new RuntimeException(s"The password must contain at least $minLength characters")
-    } else ()
   }
 }

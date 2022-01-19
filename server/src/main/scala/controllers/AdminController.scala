@@ -1,5 +1,6 @@
 package controllers
 
+import net.wiringbits.common.models.Email
 import net.wiringbits.services.AdminService
 import org.slf4j.LoggerFactory
 import play.api.libs.json.Json
@@ -30,7 +31,7 @@ class AdminController @Inject() (
       _ = logger.info(s"Get users")
       response <- adminService.users()
       // TODO: Avoid masking data when this the admin website is not public
-      maskedResponse = response.copy(data = response.data.map(_.copy(email = "masked_email")))
+      maskedResponse = response.copy(data = response.data.map(_.copy(email = Email.trusted("email@wiringbits.net"))))
     } yield Ok(Json.toJson(maskedResponse))
   }
 }
