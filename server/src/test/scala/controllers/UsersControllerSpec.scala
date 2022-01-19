@@ -95,49 +95,19 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
   }
 
   "POST /users/verify-email" should {
-    "fail when the user tries to login without an email verification" in withApiClient { client =>
-      val request = CreateUser.Request(
-        name = Name.trusted("wiringbits"),
-        email = Email.trusted("test1@email.com"),
-        password = Password.trusted("test123..."),
-        captcha = Captcha.trusted("test")
-      )
-      val user = client.createUser(request).futureValue
-
-      val loginRequest = Login.Request(
-        email = user.email,
-        password = Password.trusted("test123..."),
-        captcha = Captcha.trusted("test")
-      )
-
-      val error = client
-        .login(loginRequest)
-        .map(_ => "Success when failure expected")
-        .recover { case NonFatal(ex) =>
-          ex.getMessage
-        }
-        .futureValue
-
-      error must be("The email is not verified, check your spam folder if you don't see the email.")
-    }
-
-    "login after successful email confirmation" in withApiClient { client =>
+    "success on verifying user's email" in withApiClient { client =>
+      val name = Name.trusted("wiringbits")
       val email = Email.trusted("test1@email.com")
-      val password = Password.trusted("test123...")
       val request = CreateUser.Request(
-        name = Name.trusted("wiringbits"),
+        name = name,
         email = email,
-        password = password,
+        password = Password.trusted("test123..."),
         captcha = Captcha.trusted("test")
       )
-      val user = client.createUser(request).futureValue
+      val response = createVerifyLoginUser(request, client).futureValue
 
-      client.verifyEmail(VerifyEmail.Request(user.id.toString)).futureValue
-
-      val response =
-        client.login(Login.Request(email = email, password = password, captcha = Captcha.trusted("test"))).futureValue
+      response.name must be(name)
       response.email must be(email)
-      response.token mustNot be(empty)
     }
 
     "fail when trying to verify an already verified user's email" in withApiClient { client =>
@@ -181,6 +151,51 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
       val loginResponse = client.login(loginRequest).futureValue
       loginResponse.name must be(user.name)
       loginResponse.email must be(user.email)
+    }
+
+    "fail when the user tries to login without an email verification" in withApiClient { client =>
+      val request = CreateUser.Request(
+        name = Name.trusted("wiringbits"),
+        email = Email.trusted("test1@email.com"),
+        password = Password.trusted("test123..."),
+        captcha = Captcha.trusted("test")
+      )
+      val user = client.createUser(request).futureValue
+
+      val loginRequest = Login.Request(
+        email = user.email,
+        password = Password.trusted("test123..."),
+        captcha = Captcha.trusted("test")
+      )
+
+      val error = client
+        .login(loginRequest)
+        .map(_ => "Success when failure expected")
+        .recover { case NonFatal(ex) =>
+          ex.getMessage
+        }
+        .futureValue
+
+      error must be("The email is not verified, check your spam folder if you don't see the email.")
+    }
+
+    "login after successful email confirmation" in withApiClient { client =>
+      val email = Email.trusted("test1@email.com")
+      val password = Password.trusted("test123...")
+      val request = CreateUser.Request(
+        name = Name.trusted("wiringbits"),
+        email = email,
+        password = password,
+        captcha = Captcha.trusted("test")
+      )
+      val user = client.createUser(request).futureValue
+
+      client.verifyEmail(VerifyEmail.Request(user.id.toString)).futureValue
+
+      val response =
+        client.login(Login.Request(email = email, password = password, captcha = Captcha.trusted("test"))).futureValue
+      response.email must be(email)
+      response.token mustNot be(empty)
     }
 
     "fail when password is incorrect" in withApiClient { client =>

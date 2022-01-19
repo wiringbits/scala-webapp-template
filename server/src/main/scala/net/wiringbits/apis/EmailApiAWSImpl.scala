@@ -4,6 +4,7 @@ import com.amazonaws.services.simpleemail.AmazonSimpleEmailServiceClientBuilder
 import com.amazonaws.services.simpleemail.model.*
 import net.wiringbits.apis.models.EmailRequest
 import net.wiringbits.config.EmailConfig
+import org.slf4j.LoggerFactory
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -12,8 +13,10 @@ import scala.concurrent.{Future, blocking}
 class EmailApiAWSImpl @Inject() (
     emailConfig: EmailConfig
 ) extends EmailApi {
+  private val logger = LoggerFactory.getLogger(this.getClass)
 
   override def sendEmail(emailRequest: EmailRequest): Future[Unit] = {
+
     val from = emailConfig.senderAddress
 
     val htmlBody =
@@ -34,12 +37,12 @@ class EmailApiAWSImpl @Inject() (
         .withDestination(destination)
         .withMessage(message)
         .withSource(from)
-
       client.sendEmail(request)
+      logger.info(s"Sent email to: $from, with subject: ${emailRequest.message.subject}")
       ()
     } catch {
       case ex: Exception =>
-        throw new RuntimeException("The email was not sent", ex);
+        throw new RuntimeException(s"Email was not sent to: $from, with subject: ${emailRequest.message.subject}", ex);
     }
 
     Future {

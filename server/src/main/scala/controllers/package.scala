@@ -1,12 +1,11 @@
 import net.wiringbits.api.models.ErrorResponse
 import net.wiringbits.config.JwtConfig
-import net.wiringbits.models.UserToken
 import net.wiringbits.util.JwtUtils
 import org.slf4j.LoggerFactory
 import play.api.http.HeaderNames
 import play.api.libs.json.{JsValue, Json, Reads}
-import play.api.mvc.Results.InternalServerError
 import play.api.mvc.*
+import play.api.mvc.Results.InternalServerError
 
 import java.time.Clock
 import java.util.UUID
@@ -46,10 +45,6 @@ package object controllers {
         .map(header => decodeAuthorizationHeader(header))
         .getOrElse(Failure(new RuntimeException("Authorization header not found")))
     }
-  }
-
-  def decodeUserToken(userToken: String): UserToken = {
-    UserToken.validate(userToken).getOrElse(throw new RuntimeException("Incorrect token format"))
   }
 
   def handleJsonBody[T: Reads](

@@ -1,10 +1,11 @@
 package net.wiringbits.api.models
 
+import net.wiringbits.common.models.UserToken
 import play.api.libs.json.{Format, Json}
 
 object VerifyEmail {
   case class Request(
-      token: String
+      token: UserToken
   )
   case class Response(
       noData: String = ""

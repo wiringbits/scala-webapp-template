@@ -73,12 +73,11 @@ class UsersService @Inject() (
     for {
       _ <- validateCaptcha(request.captcha)
       maybe <- repository.find(request.email)
+      _ = if (maybe.flatMap(_.verifiedOn).isEmpty)
+        throw new RuntimeException("The email is not verified, check your spam folder if you don't see the email.")
       user = maybe
         .filter(user => BCrypt.checkpw(request.password.string, user.hashedPassword))
         .getOrElse(throw new RuntimeException("The given email/password doesn't match"))
-
-      _ = if (user.verifiedOn.isEmpty)
-        throw new RuntimeException("The email is not verified, check your spam folder if you don't see the email.")
       _ <- userLogsRepository.create(user.id, "Logged in successfully")
       token = JwtUtils.createToken(jwtConfig, user.id)
     } yield Login.Response(user.id, user.name, user.email, token)
