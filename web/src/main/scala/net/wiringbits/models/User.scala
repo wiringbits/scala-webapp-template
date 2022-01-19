@@ -1,3 +1,5 @@
 package net.wiringbits.models
 
-case class User(name: String, email: String, jwt: String)
+import net.wiringbits.common.models.{Email, Name}
+
+case class User(name: Name, email: Email, jwt: String)

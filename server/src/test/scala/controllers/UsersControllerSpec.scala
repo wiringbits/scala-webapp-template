@@ -2,6 +2,7 @@ package controllers
 
 import controllers.common.PlayPostgresSpec
 import net.wiringbits.api.models.CreateUser
+import net.wiringbits.common.models.{Email, Name, Password}
 
 import scala.util.control.NonFatal
 
@@ -9,9 +10,9 @@ class UsersControllerSpec extends PlayPostgresSpec {
 
   "POST /users" should {
     "return the authentication token after creating a user" in withApiClient { client =>
-      val name = "wiringbits"
-      val email = "test@wiringbits.net"
-      val request = CreateUser.Request(name = name, email = email, password = "test123...")
+      val name = Name.trusted("wiringbits")
+      val email = Email.trusted("test@wiringbits.net")
+      val request = CreateUser.Request(name = name, email = email, password = Password.trusted("test123..."))
 
       val response = client.createUser(request).futureValue
       response.name must be(name)
@@ -20,7 +21,11 @@ class UsersControllerSpec extends PlayPostgresSpec {
     }
 
     "fail when the email is already taken" in withApiClient { client =>
-      val request = CreateUser.Request(name = "someone", email = "test@wiringbits.net", password = "test123...")
+      val request = CreateUser.Request(
+        name = Name.trusted("someone"),
+        email = Email.trusted("test@wiringbits.net"),
+        password = Password.trusted("test123...")
+      )
 
       // take the email
       client.createUser(request).futureValue
@@ -34,45 +39,6 @@ class UsersControllerSpec extends PlayPostgresSpec {
         }
         .futureValue
       error must be("Email already in use, pick another one")
-    }
-
-    "fail when the email has a wrong format" in withApiClient { client =>
-      val request = CreateUser.Request(name = "someone", email = "test1@email.@", password = "test123...")
-
-      val error = client
-        .createUser(request)
-        .map(_ => "Success when failure expected")
-        .recover { case NonFatal(ex) =>
-          ex.getMessage
-        }
-        .futureValue
-      error must be("Invalid email address")
-    }
-
-    "fail when the password is too short" in withApiClient { client =>
-      val request = CreateUser.Request(name = "someone", email = "test1@email.com", password = "test123")
-
-      val error = client
-        .createUser(request)
-        .map(_ => "Success when failure expected")
-        .recover { case NonFatal(ex) =>
-          ex.getMessage
-        }
-        .futureValue
-      error must be("The password must contain at least 8 characters")
-    }
-
-    "fail when the name is too short" in withApiClient { client =>
-      val request = CreateUser.Request(name = "n", email = "test2@email.com", password = "test123...")
-
-      val error = client
-        .createUser(request)
-        .map(_ => "Success when failure expected")
-        .recover { case NonFatal(ex) =>
-          ex.getMessage
-        }
-        .futureValue
-      error must be("The name must contain at least 2 characters")
     }
   }
 }
