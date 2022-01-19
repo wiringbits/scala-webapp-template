@@ -2,19 +2,15 @@ package controllers
 
 import com.dimafeng.testcontainers.PostgreSQLContainer
 import controllers.common.PlayPostgresSpec
-import net.wiringbits.apis.EmailApi
+import net.wiringbits.api.models.{CreateUser, Login, VerifyEmail}
+import net.wiringbits.apis.{EmailApi, ReCaptchaApi}
 import net.wiringbits.apis.models.EmailRequest
-import net.wiringbits.apis.ReCaptchaApi
-import net.wiringbits.common.models.Captcha
+import net.wiringbits.common.models.{Captcha, Email, Name, Password}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoSugar.{mock, when}
 import play.api.inject
 import play.api.inject.guice.GuiceApplicationBuilder
 import utils.LoginUtils
-import net.wiringbits.api.models.{CreateUser, Login, VerifyEmail}
-
-import java.time.{Clock, Instant}
-import net.wiringbits.common.models.{Email, Name, Password}
 
 import scala.concurrent.Future
 import scala.util.control.NonFatal
@@ -24,9 +20,6 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
   private val emailApi = mock[EmailApi]
   when(emailApi.sendEmail(any[EmailRequest]())).thenReturn(Future.unit)
 
-  private val clock = mock[Clock]
-  when(clock.instant()).thenReturn(Instant.now())
-
   private val captchaApi = mock[ReCaptchaApi]
   when(captchaApi.verify(any[Captcha]())).thenReturn(Future.successful(true))
 
@@ -35,7 +28,6 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
       .guiceApplicationBuilder(container)
       .overrides(
         inject.bind[EmailApi].to(emailApi),
-        inject.bind[Clock].to(clock),
         inject.bind[ReCaptchaApi].to(captchaApi)
       )
 
