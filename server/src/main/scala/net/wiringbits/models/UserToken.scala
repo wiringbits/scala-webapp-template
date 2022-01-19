@@ -6,7 +6,10 @@ case class UserToken(userId: UUID)
 
 object UserToken {
   def validate(userToken: String): Option[UserToken] = {
-    val userId = UUID.fromString(userToken)
-    Some(UserToken(userId))
+    try {
+      Some(UserToken(UUID.fromString(userToken)))
+    } catch {
+      case _: Exception => None
+    }
   }
 }
