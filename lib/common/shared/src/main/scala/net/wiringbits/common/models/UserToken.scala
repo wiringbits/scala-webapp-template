@@ -3,8 +3,13 @@ package net.wiringbits.common.models
 import java.util.UUID
 import scala.util.Try
 
-case class UserToken(userId: UUID) {
-  def validate(token: String): Option[UserToken] = {
-    Try(UUID.fromString(token)).map(UserToken).toOption
+class UserToken private (val userId: UUID)
+
+object UserToken {
+
+  def validate(tokenStr: String): Option[UserToken] = {
+    Try(UUID.fromString(tokenStr)).map(x => new UserToken(x)).toOption
   }
+
+  def trusted(token: UUID): UserToken = new UserToken(token)
 }

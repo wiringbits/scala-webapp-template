@@ -5,7 +5,7 @@ import controllers.common.PlayPostgresSpec
 import net.wiringbits.api.models.{CreateUser, Login, VerifyEmail}
 import net.wiringbits.apis.{EmailApi, ReCaptchaApi}
 import net.wiringbits.apis.models.EmailRequest
-import net.wiringbits.common.models.{Captcha, Email, Name, Password}
+import net.wiringbits.common.models.{Captcha, Email, Name, Password, UserToken}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoSugar.{mock, when}
 import play.api.inject
@@ -120,7 +120,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
       val response = createVerifyLoginUser(request, client).futureValue
 
       val error = client
-        .verifyEmail(VerifyEmail.Request(response.id.toString))
+        .verifyEmail(VerifyEmail.Request(UserToken.trusted(response.id)))
         .map(_ => "Success when failure expected")
         .recover { case NonFatal(ex) =>
           ex.getMessage
@@ -141,7 +141,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
       )
       val user = client.createUser(request).futureValue
 
-      client.verifyEmail(VerifyEmail.Request(user.id.toString)).futureValue
+      client.verifyEmail(VerifyEmail.Request(UserToken.trusted(user.id))).futureValue
 
       val loginRequest = Login.Request(
         email = user.email,
@@ -190,7 +190,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
       )
       val user = client.createUser(request).futureValue
 
-      client.verifyEmail(VerifyEmail.Request(user.id.toString)).futureValue
+      client.verifyEmail(VerifyEmail.Request(UserToken.trusted(user.id))).futureValue
 
       val response =
         client.login(Login.Request(email = email, password = password, captcha = Captcha.trusted("test"))).futureValue
@@ -207,11 +207,11 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
       )
       val user = client.createUser(request).futureValue
 
-      client.verifyEmail(VerifyEmail.Request(user.id.toString)).futureValue
+      client.verifyEmail(VerifyEmail.Request(UserToken.trusted(user.id))).futureValue
 
       val loginRequest = Login.Request(
         email = user.email,
-        password = Password.trusted("incorrect password"),
+        password = Password.trusted("Incorrect password"),
         captcha = Captcha.trusted("test")
       )
 
