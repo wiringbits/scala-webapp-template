@@ -295,6 +295,7 @@ lazy val server = (project in file("server"))
       "com.softwaremill.sttp.client3" %% "core" % sttp % "test",
       "com.softwaremill.sttp.client3" %% "async-http-client-backend-future" % sttp % "test",
       "com.amazonaws" % "aws-java-sdk-ses" % "1.12.141",
+      // aws-java-sdk-ses requires this to work
       "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.13.1"
     )
   )
