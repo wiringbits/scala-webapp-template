@@ -1,6 +1,6 @@
 package net.wiringbits.forms
 
-import net.wiringbits.common.models.{Email, Name, Password}
+import net.wiringbits.common.models.{Captcha, Email, Name, Password}
 import org.scalatest.matchers.must.Matchers._
 import org.scalatest.wordspec.AnyWordSpec
 
@@ -18,7 +18,8 @@ class SignUpFormDataSpec extends AnyWordSpec {
       name = initialForm.name.updated(Name.validate("someone")),
       email = initialForm.email.updated(Email.validate("hello@test.com")),
       password = initialForm.password.updated(Password.validate("123456789")),
-      repeatPassword = initialForm.repeatPassword.updated(Password.validate("123456789"))
+      repeatPassword = initialForm.repeatPassword.updated(Password.validate("123456789")),
+      captcha = Some(Captcha.trusted("test"))
     )
 
   private val allDataInvalidForm = initialForm
@@ -26,7 +27,8 @@ class SignUpFormDataSpec extends AnyWordSpec {
       name = initialForm.name.updated(Name.validate("x")),
       email = initialForm.email.updated(Email.validate("x@")),
       password = initialForm.password.updated(Password.validate("x")),
-      repeatPassword = initialForm.repeatPassword.updated(Password.validate("x"))
+      repeatPassword = initialForm.repeatPassword.updated(Password.validate("x")),
+      captcha = None
     )
 
   "fields" should {
