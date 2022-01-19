@@ -87,60 +87,6 @@ class UsersControllerSpec extends PlayPostgresSpec {
 
       when(captchaApi.verify(any[Captcha]())).thenReturn(Future.successful(true))
     }
-
-    "fail when the email has a wrong format" in withApiClient { client =>
-      val request = CreateUser.Request(
-        name = Name.trusted("someone"),
-        email = Email.trusted("test1@email.@"),
-        password = Password.trusted("test123..."),
-        captcha = Captcha.trusted("test")
-      )
-
-      val error = client
-        .createUser(request)
-        .map(_ => "Success when failure expected")
-        .recover { case NonFatal(ex) =>
-          ex.getMessage
-        }
-        .futureValue
-      error must be("Invalid email address")
-    }
-
-    "fail when the password is too short" in withApiClient { client =>
-      val request = CreateUser.Request(
-        name = Name.trusted("someone"),
-        email = Email.trusted("test1@email.com"),
-        password = Password.trusted("test123"),
-        captcha = Captcha.trusted("test")
-      )
-
-      val error = client
-        .createUser(request)
-        .map(_ => "Success when failure expected")
-        .recover { case NonFatal(ex) =>
-          ex.getMessage
-        }
-        .futureValue
-      error must be("The password must contain at least 8 characters")
-    }
-
-    "fail when the name is too short" in withApiClient { client =>
-      val request = CreateUser.Request(
-        name = Name.trusted("n"),
-        email = Email.trusted("test2@email.com"),
-        password = Password.trusted("test123..."),
-        captcha = Captcha.trusted("test")
-      )
-
-      val error = client
-        .createUser(request)
-        .map(_ => "Success when failure expected")
-        .recover { case NonFatal(ex) =>
-          ex.getMessage
-        }
-        .futureValue
-      error must be("The name must contain at least 2 characters")
-    }
   }
 
   "POST /users/login" should {
