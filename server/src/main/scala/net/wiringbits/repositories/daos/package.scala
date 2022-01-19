@@ -31,7 +31,8 @@ package object daos {
       "name",
       "email",
       "password",
-      "created_at"
+      "created_at",
+      "verified_on"
     )
   }
 

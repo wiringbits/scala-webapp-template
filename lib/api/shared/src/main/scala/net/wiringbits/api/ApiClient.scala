@@ -10,9 +10,9 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
 
 trait ApiClient {
-
   def createUser(request: CreateUser.Request): Future[CreateUser.Response]
   def login(request: Login.Request): Future[Login.Response]
+  def verifyEmail(request: VerifyEmail.Request): Future[VerifyEmail.Response]
 
   def currentUser(jwt: String): Future[GetCurrentUser.Response]
   def updateUser(jwt: String, request: UpdateUser.Request): Future[UpdateUser.Response]
@@ -80,6 +80,18 @@ object ApiClient {
       val uri = ServerAPI.withPath(path)
 
       prepareRequest[CreateUser.Response]
+        .post(uri)
+        .body(Json.toJson(request).toString())
+        .send(backend)
+        .map(_.body)
+        .flatMap(Future.fromTry)
+    }
+
+    override def verifyEmail(request: VerifyEmail.Request): Future[VerifyEmail.Response] = {
+      val path = ServerAPI.path :+ "users" :+ "verify-email"
+      val uri = ServerAPI.withPath(path)
+
+      prepareRequest[VerifyEmail.Response]
         .post(uri)
         .body(Json.toJson(request).toString())
         .send(backend)

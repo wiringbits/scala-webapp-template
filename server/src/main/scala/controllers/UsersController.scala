@@ -1,6 +1,6 @@
 package controllers
 
-import net.wiringbits.api.models._
+import net.wiringbits.api.models.*
 import net.wiringbits.config.JwtConfig
 import net.wiringbits.services.{UserLogsService, UsersService}
 import org.slf4j.LoggerFactory
@@ -22,6 +22,14 @@ class UsersController @Inject() (
     logger.info(s"Create user: $body")
     for {
       response <- usersService.create(body)
+    } yield Ok(Json.toJson(response))
+  }
+
+  def verifyEmail() = handleJsonBody[VerifyEmail.Request] { request =>
+    val token = request.body.token
+    logger.info(s"Verify user's email: ${token.userId}")
+    for {
+      response <- usersService.verifyEmail(token.userId)
     } yield Ok(Json.toJson(response))
   }
 
