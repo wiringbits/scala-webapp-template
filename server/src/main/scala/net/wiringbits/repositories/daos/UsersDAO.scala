@@ -1,5 +1,6 @@
 package net.wiringbits.repositories.daos
 
+import net.wiringbits.common.models.Email
 import net.wiringbits.repositories.models.User
 
 import java.sql.Connection
@@ -15,8 +16,8 @@ object UsersDAO {
           (user_id, name, email, password, created_at)
         VALUES (
           ${request.id.toString}::UUID,
-          ${request.name},
-          ${request.email},
+          ${request.name.string},
+          ${request.email.string},
           ${request.hashedPassword},
           NOW()
         )
@@ -31,11 +32,11 @@ object UsersDAO {
         """.as(userParser.*)
   }
 
-  def find(email: String)(implicit conn: Connection): Option[User] = {
+  def find(email: Email)(implicit conn: Connection): Option[User] = {
     SQL"""
         SELECT user_id, name, email, password, created_at, verified_on
         FROM users
-        WHERE email = $email
+        WHERE email = ${email.string}
         """.as(userParser.singleOpt)
   }
 

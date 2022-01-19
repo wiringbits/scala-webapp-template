@@ -24,7 +24,7 @@ class EmailApiAWSImpl @Inject() (
     def unsafe(): Unit = try {
       val client =
         AmazonSimpleEmailServiceClientBuilder.standard.build()
-      val destination = new Destination().withToAddresses(emailRequest.destination)
+      val destination = new Destination().withToAddresses(emailRequest.destination.string)
       val body = new Body()
         .withHtml(new Content().withCharset("UTF-8").withData(htmlBody))
         .withText(new Content().withCharset("UTF-8").withData(emailRequest.message.body))

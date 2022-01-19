@@ -2,6 +2,7 @@ package utils
 
 import net.wiringbits.api.ApiClient
 import net.wiringbits.api.models.{CreateUser, Login, VerifyEmail}
+import net.wiringbits.common.models.{Captcha, Password}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -17,7 +18,8 @@ trait LoginUtils {
 
     loginRequest = Login.Request(
       email = user.email,
-      password = "test123..."
+      password = Password.trusted("test123..."),
+      captcha = Captcha.trusted("test")
     )
     response <- client.login(loginRequest)
   } yield response

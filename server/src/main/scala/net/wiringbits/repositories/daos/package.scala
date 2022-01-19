@@ -1,6 +1,7 @@
 package net.wiringbits.repositories
 
 import anorm.*
+import net.wiringbits.common.models.{Email, Name}
 import net.wiringbits.repositories.models.{User, UserLog}
 
 package object daos {
@@ -21,10 +22,8 @@ package object daos {
     }
   }
 
-  def enumColumn[A](f: String => Option[A]): Column[A] = Column.columnToString.mapResult { string =>
-    f(string)
-      .toRight(SqlRequestError(new RuntimeException(s"The value $string doesn't exists")))
-  }
+  implicit val nameParser: Column[Name] = Column.columnToString.map(Name.trusted)
+  implicit val emailParser: Column[Email] = citextToString.map(Email.trusted)
 
   val userParser: RowParser[User] = {
     Macro.parser[User](

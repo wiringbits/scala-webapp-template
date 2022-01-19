@@ -15,6 +15,7 @@ object AppStrings {
   val name = "Nombre"
   val email = "Email"
   val password = "Password"
+  val repeatPassword = "Repeat the password"
   val login = "Login"
 
   val loading = "Loading"
@@ -26,4 +27,5 @@ object AppStrings {
   val nameRequiredError = "Please enter a name"
   val emailAddressError = "Please enter a valid email address"
   val passwordRequiredError = "Please enter password"
+  val captchaRequiredError = "Please complete the captcha"
 }

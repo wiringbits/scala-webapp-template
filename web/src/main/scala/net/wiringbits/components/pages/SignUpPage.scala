@@ -9,14 +9,14 @@ import slinky.core.FunctionalComponent
 import slinky.core.annotations.react
 
 @react object SignUpPage {
-  case class Props(api: API, loggedIn: User => Unit)
+  case class Props(api: API, loggedIn: User => Unit, captchaKey: String)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     Container(
       flex = Some(1),
       alignItems = Alignment.center,
       justifyContent = Alignment.center,
-      child = SignUpForm(props.api, props.loggedIn)
+      child = SignUpForm(props.api, props.loggedIn, props.captchaKey)
     )
   }
 }

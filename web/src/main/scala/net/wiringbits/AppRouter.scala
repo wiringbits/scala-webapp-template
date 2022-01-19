@@ -12,7 +12,7 @@ import typings.reactRouterDom.components.Route
 import typings.reactRouterDom.{components => router}
 
 @react object AppRouter {
-  case class Props(api: API, auth: AuthState, loggedIn: User => Unit, logout: () => Unit)
+  case class Props(api: API, auth: AuthState, loggedIn: User => Unit, logout: () => Unit, captchaKey: String)
 
   private def route(path: String, auth: AuthState)(child: => ReactElement): Route.Builder[RouteProps] = {
     router.Route(
@@ -32,8 +32,8 @@ import typings.reactRouterDom.{components => router}
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val home = route("/", props.auth)(HomePage())
     val about = route("/about", props.auth)(AboutPage())
-    val signIn = route("/signin", props.auth)(SignInPage(props.api, props.loggedIn))
-    val signUp = route("/signup", props.auth)(SignUpPage(props.api, props.loggedIn))
+    val signIn = route("/signin", props.auth)(SignInPage(props.api, props.loggedIn, props.captchaKey))
+    val signUp = route("/signup", props.auth)(SignUpPage(props.api, props.loggedIn, props.captchaKey))
 
     def dashboard(user: User) = route("/dashboard", props.auth)(DashboardPage(props.api, user))
     val signOut = route("/signout", props.auth) {

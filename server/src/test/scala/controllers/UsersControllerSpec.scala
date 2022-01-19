@@ -4,6 +4,8 @@ import com.dimafeng.testcontainers.PostgreSQLContainer
 import controllers.common.PlayPostgresSpec
 import net.wiringbits.apis.EmailApi
 import net.wiringbits.apis.models.EmailRequest
+import net.wiringbits.apis.ReCaptchaApi
+import net.wiringbits.common.models.Captcha
 import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoSugar.{mock, when}
 import play.api.inject
@@ -12,6 +14,8 @@ import utils.LoginUtils
 import net.wiringbits.api.models.{CreateUser, Login, VerifyEmail}
 
 import java.time.{Clock, Instant}
+import net.wiringbits.common.models.{Email, Name, Password}
+
 import scala.concurrent.Future
 import scala.util.control.NonFatal
 
@@ -23,19 +27,28 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
   private val clock = mock[Clock]
   when(clock.instant()).thenReturn(Instant.now())
 
+  private val captchaApi = mock[ReCaptchaApi]
+  when(captchaApi.verify(any[Captcha]())).thenReturn(Future.successful(true))
+
   override def guiceApplicationBuilder(container: PostgreSQLContainer): GuiceApplicationBuilder =
     super
       .guiceApplicationBuilder(container)
       .overrides(
         inject.bind[EmailApi].to(emailApi),
-        inject.bind[Clock].to(clock)
+        inject.bind[Clock].to(clock),
+        inject.bind[ReCaptchaApi].to(captchaApi)
       )
 
   "POST /users" should {
     "return the email verification after creating a user" in withApiClient { client =>
-      val name = "wiringbits"
-      val email = "test@wiringbits.net"
-      val request = CreateUser.Request(name = name, email = email, password = "test123...")
+      val name = Name.trusted("wiringbits")
+      val email = Email.trusted("test1@email.com")
+      val request = CreateUser.Request(
+        name = name,
+        email = email,
+        password = Password.trusted("test123..."),
+        captcha = Captcha.trusted("test")
+      )
 
       val response = client.createUser(request).futureValue
 
@@ -44,7 +57,12 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
     }
 
     "fail when the email is already taken" in withApiClient { client =>
-      val request = CreateUser.Request(name = "someone", email = "test@wiringbits.net", password = "test123...")
+      val request = CreateUser.Request(
+        name = Name.trusted("someone"),
+        email = Email.trusted("test@wiringbits.net"),
+        password = Password.trusted("test123..."),
+        captcha = Captcha.trusted("test")
+      )
 
       // take the email
       client.createUser(request).futureValue
@@ -60,8 +78,15 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
       error must be("Email already in use, pick another one")
     }
 
-    "fail when the email has a wrong format" in withApiClient { client =>
-      val request = CreateUser.Request(name = "someone", email = "test1@email.@", password = "test123...")
+    "fail when the captcha isn't valid" in withApiClient { client =>
+      val request = CreateUser.Request(
+        name = Name.trusted("wiringbits"),
+        email = Email.trusted("test1@email.com"),
+        password = Password.trusted("test123..."),
+        captcha = Captcha.trusted("test")
+      )
+
+      when(captchaApi.verify(any[Captcha]())).thenReturn(Future.successful(false))
 
       val error = client
         .createUser(request)
@@ -70,65 +95,27 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
           ex.getMessage
         }
         .futureValue
-      error must be("Invalid email address")
-    }
 
-    "fail when the password is too short" in withApiClient { client =>
-      val request = CreateUser.Request(name = "someone", email = "test1@email.com", password = "test123")
+      error must be("Invalid captcha, try again")
 
-      val error = client
-        .createUser(request)
-        .map(_ => "Success when failure expected")
-        .recover { case NonFatal(ex) =>
-          ex.getMessage
-        }
-        .futureValue
-      error must be("The password must contain at least 8 characters")
-    }
-
-    "fail when the name is too short" in withApiClient { client =>
-      val request = CreateUser.Request(name = "n", email = "test2@email.com", password = "test123...")
-
-      val error = client
-        .createUser(request)
-        .map(_ => "Success when failure expected")
-        .recover { case NonFatal(ex) =>
-          ex.getMessage
-        }
-        .futureValue
-      error must be("The name must contain at least 2 characters")
+      when(captchaApi.verify(any[Captcha]())).thenReturn(Future.successful(true))
     }
   }
 
   "POST /users/verify-email" should {
-    "login after successful email confirmation" in withApiClient { client =>
-      val email = "test1@email.com"
-      val password = "test123..."
-      val request = CreateUser.Request(
-        name = "wiringbits",
-        email = email,
-        password = password
-      )
-      val user = client.createUser(request).futureValue
-
-      client.verifyEmail(VerifyEmail.Request(user.id.toString)).futureValue
-
-      val response = client.login(Login.Request(email = email, password = password)).futureValue
-      response.email must be(email)
-      response.token mustNot be(empty)
-    }
-
     "fail when the user tries to login without an email verification" in withApiClient { client =>
       val request = CreateUser.Request(
-        name = "wiringbits",
-        email = "test1@email.com",
-        password = "test123..."
+        name = Name.trusted("wiringbits"),
+        email = Email.trusted("test1@email.com"),
+        password = Password.trusted("test123..."),
+        captcha = Captcha.trusted("test")
       )
       val user = client.createUser(request).futureValue
 
       val loginRequest = Login.Request(
         email = user.email,
-        password = "test123..."
+        password = Password.trusted("test123..."),
+        captcha = Captcha.trusted("test")
       )
 
       val error = client
@@ -142,11 +129,31 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
       error must be("The email is not verified, check your spam folder if you don't see the email.")
     }
 
+    "login after successful email confirmation" in withApiClient { client =>
+      val email = Email.trusted("test1@email.com")
+      val password = Password.trusted("test123...")
+      val request = CreateUser.Request(
+        name = Name.trusted("wiringbits"),
+        email = email,
+        password = password,
+        captcha = Captcha.trusted("test")
+      )
+      val user = client.createUser(request).futureValue
+
+      client.verifyEmail(VerifyEmail.Request(user.id.toString)).futureValue
+
+      val response =
+        client.login(Login.Request(email = email, password = password, captcha = Captcha.trusted("test"))).futureValue
+      response.email must be(email)
+      response.token mustNot be(empty)
+    }
+
     "fail when trying to verify an already verified user's email" in withApiClient { client =>
       val request = CreateUser.Request(
-        name = "wiringbits",
-        email = "test1@email.com",
-        password = "test123..."
+        name = Name.trusted("wiringbits"),
+        email = Email.trusted("test1@email.com"),
+        password = Password.trusted("test123..."),
+        captcha = Captcha.trusted("test")
       )
       val response = createVerifyLoginUser(request, client).futureValue
 
@@ -165,9 +172,10 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
   "POST /users/login" should {
     "return the response from a correct user" in withApiClient { client =>
       val request = CreateUser.Request(
-        name = "wiringbits",
-        email = "test1@email.com",
-        password = "test123..."
+        name = Name.trusted("wiringbits"),
+        email = Email.trusted("test1@email.com"),
+        password = Password.trusted("test123..."),
+        captcha = Captcha.trusted("test")
       )
       val user = client.createUser(request).futureValue
 
@@ -175,7 +183,8 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
 
       val loginRequest = Login.Request(
         email = user.email,
-        password = "test123..."
+        password = Password.trusted("test123..."),
+        captcha = Captcha.trusted("test")
       )
       val loginResponse = client.login(loginRequest).futureValue
       loginResponse.name must be(user.name)
@@ -184,9 +193,10 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
 
     "fail when password is incorrect" in withApiClient { client =>
       val request = CreateUser.Request(
-        name = "wiringbits",
-        email = "test1@email.com",
-        password = "test123..."
+        name = Name.trusted("wiringbits"),
+        email = Email.trusted("test1@email.com"),
+        password = Password.trusted("test123..."),
+        captcha = Captcha.trusted("test")
       )
       val user = client.createUser(request).futureValue
 
@@ -194,7 +204,8 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
 
       val loginRequest = Login.Request(
         email = user.email,
-        password = "Incorrect password"
+        password = Password.trusted("incorrect password"),
+        captcha = Captcha.trusted("test")
       )
 
       val error = client
@@ -207,5 +218,63 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
 
       error must be("The given email/password doesn't match")
     }
+
+    "fail when the captcha isn't valid" in withApiClient { client =>
+      val request = CreateUser.Request(
+        name = Name.trusted("wiringbits"),
+        email = Email.trusted("test1@email.com"),
+        password = Password.trusted("test123..."),
+        captcha = Captcha.trusted("test")
+      )
+      client.createUser(request).futureValue
+
+      val loginRequest = Login.Request(
+        email = Email.trusted("test1@email.com"),
+        password = Password.trusted("test123..."),
+        captcha = Captcha.trusted("test")
+      )
+
+      when(captchaApi.verify(any[Captcha]())).thenReturn(Future.successful(false))
+
+      val error = client
+        .login(loginRequest)
+        .map(_ => "Success when failure expected")
+        .recover { case NonFatal(ex) =>
+          ex.getMessage
+        }
+        .futureValue
+
+      error must be("Invalid captcha, try again")
+
+      when(captchaApi.verify(any[Captcha]())).thenReturn(Future.successful(true))
+    }
+
+    "fail when user isn't email confirmed" in withApiClient { client =>
+      val password = Password.trusted("test123...")
+      val request = CreateUser.Request(
+        name = Name.trusted("wiringbits"),
+        email = Email.trusted("test1@email.com"),
+        password = password,
+        captcha = Captcha.trusted("test")
+      )
+      val user = client.createUser(request).futureValue
+
+      val loginRequest = Login.Request(
+        email = user.email,
+        password = password,
+        captcha = Captcha.trusted("test")
+      )
+
+      val error = client
+        .login(loginRequest)
+        .map(_ => "Success when failure expected")
+        .recover { case NonFatal(ex) =>
+          ex.getMessage
+        }
+        .futureValue
+
+      error must be("The email is not verified, check your spam folder if you don't see the email.")
+    }
+
   }
 }

@@ -1,5 +1,6 @@
 package net.wiringbits.repositories
 
+import net.wiringbits.common.models.Email
 import net.wiringbits.executors.DatabaseExecutionContext
 import net.wiringbits.repositories.daos.UsersDAO
 import net.wiringbits.repositories.models.User
@@ -23,7 +24,7 @@ class UsersRepository @Inject() (database: Database)(implicit ec: DatabaseExecut
     }
   }
 
-  def find(email: String): Future[Option[User]] = Future {
+  def find(email: Email): Future[Option[User]] = Future {
     database.withConnection { implicit conn =>
       UsersDAO.find(email)
     }

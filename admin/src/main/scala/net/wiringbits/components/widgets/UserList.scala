@@ -37,8 +37,8 @@ object UserList {
         .ListItem(
           mui
             .ListItemText()
-            .primary(item.name)
-            .secondary(item.email)
+            .primary(item.name.string)
+            .secondary(item.email.string)
         )
         .divider(true)
         .withKey(item.id.toString)

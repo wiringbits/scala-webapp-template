@@ -1,5 +1,6 @@
 package net.wiringbits.api.models
 
+import net.wiringbits.common.models.{Email, Name}
 import play.api.libs.json.{Format, Json}
 
 import java.time.Instant
@@ -10,7 +11,7 @@ object AdminGetUsers {
   implicit val adminGetUsersResponseFormat: Format[Response] = Json.format[Response]
 
   object Response {
-    case class User(id: UUID, name: String, email: String, createdAt: Instant)
+    case class User(id: UUID, name: Name, email: Email, createdAt: Instant)
     implicit val adminGetUsersResponseUserFormat: Format[User] = Json.format[User]
   }
 }
