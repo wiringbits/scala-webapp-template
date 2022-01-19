@@ -11,6 +11,7 @@ object VerifyEmail {
       noData: String = ""
   )
 
+  implicit val userTokenFormat: Format[UserToken] = Json.format[UserToken]
   implicit val verifyEmailRequestFormat: Format[Request] = Json.format[Request]
   implicit val verifyEmailResponseFormat: Format[Response] = Json.format[Response]
 }

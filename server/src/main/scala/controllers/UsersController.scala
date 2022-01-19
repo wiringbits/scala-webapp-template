@@ -8,8 +8,7 @@ import play.api.libs.json.Json
 import play.api.mvc.{AbstractController, ControllerComponents}
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Try
+import scala.concurrent.ExecutionContext
 
 class UsersController @Inject() (
     usersService: UsersService,
@@ -28,8 +27,8 @@ class UsersController @Inject() (
 
   def verifyEmail() = handleJsonBody[VerifyEmail.Request] { request =>
     val token = request.body.token
+    logger.info(s"Verify user's email: ${token.userId}")
     for {
-      _ <- logger.info(s"Verify user's email: ${token.userId}")
       response <- usersService.verifyEmail(token.userId)
     } yield Ok(Json.toJson(response))
   }

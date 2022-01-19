@@ -2,7 +2,7 @@ package utils
 
 import net.wiringbits.api.ApiClient
 import net.wiringbits.api.models.{CreateUser, Login, VerifyEmail}
-import net.wiringbits.common.models.{Captcha, Password}
+import net.wiringbits.common.models.{Captcha, Password, UserToken}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -14,7 +14,7 @@ trait LoginUtils {
   )(implicit ec: ExecutionContext): Future[Login.Response] = for {
     user <- client.createUser(request)
 
-    _ <- client.verifyEmail(VerifyEmail.Request(user.id.toString))
+    _ <- client.verifyEmail(VerifyEmail.Request(UserToken(user.id)))
 
     loginRequest = Login.Request(
       email = user.email,
