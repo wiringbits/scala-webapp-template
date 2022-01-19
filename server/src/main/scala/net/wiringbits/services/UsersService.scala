@@ -1,14 +1,16 @@
 package net.wiringbits.services
 
-import net.wiringbits.apis.ReCaptchaApi
-import net.wiringbits.common.models.Captcha
-import net.wiringbits.api.models.{CreateUser, GetCurrentUser, Login, UpdateUser}
-import net.wiringbits.common.models.Email
-import net.wiringbits.config.JwtConfig
+import net.wiringbits.apis.EmailApiAWSImpl
+import net.wiringbits.apis.models.EmailRequest
+import net.wiringbits.config.{JwtConfig, WebAppConfig}
+import net.wiringbits.api.models.{CreateUser, GetCurrentUser, Login, UpdateUser, VerifyEmail}
 import net.wiringbits.repositories
 import net.wiringbits.repositories.models.User
 import net.wiringbits.repositories.{UserLogsRepository, UsersRepository}
-import net.wiringbits.util.JwtUtils
+import net.wiringbits.util.{EmailMessage, JwtUtils}
+import net.wiringbits.apis.ReCaptchaApi
+import net.wiringbits.common.models.Captcha
+import net.wiringbits.common.models.Email
 import org.mindrot.jbcrypt.BCrypt
 
 import java.time.Clock
@@ -20,6 +22,8 @@ class UsersService @Inject() (
     jwtConfig: JwtConfig,
     repository: UsersRepository,
     userLogsRepository: UserLogsRepository,
+    webAppConfig: WebAppConfig,
+    emailApi: EmailApiAWSImpl,
     captchaApi: ReCaptchaApi
 )(implicit
     ec: ExecutionContext
@@ -45,21 +49,38 @@ class UsersService @Inject() (
         createUser.id,
         s"Account created, name = ${request.name}, email = ${request.email}"
       )
-      token = JwtUtils.createToken(jwtConfig, createUser.id)
-    } yield CreateUser.Response(request.name, request.email, token)
+      emailRequest = EmailMessage.registration(
+        name = createUser.name,
+        url = webAppConfig.host,
+        emailEndpoint = s"${createUser.id}"
+      )
+      _ = emailApi.sendEmail(EmailRequest(request.email, emailRequest))
+    } yield CreateUser.Response(id = createUser.id, email = createUser.email, name = createUser.name)
   }
+
+  def verifyEmail(userId: UUID): Future[VerifyEmail.Response] = for {
+    userMaybe <- repository.find(userId)
+    user = userMaybe.getOrElse(throw new RuntimeException(s"User wasn't found"))
+    _ = if (user.verifiedOn.isDefined)
+      throw new RuntimeException(s"User $userId email is already verified")
+    _ <- repository.verify(userId)
+    _ <- userLogsRepository.create(userId, "Email was verified")
+    _ = emailApi.sendEmail(EmailRequest(user.email, EmailMessage.confirm(user.name)))
+  } yield VerifyEmail.Response()
 
   // returns the token to use for authenticating requests
   def login(request: Login.Request): Future[Login.Response] = {
     for {
       _ <- validateCaptcha(request.captcha)
       maybe <- repository.find(request.email)
+      _ = if (maybe.flatMap(_.verifiedOn).isEmpty)
+        throw new RuntimeException("The email is not verified, check your spam folder if you don't see the email.")
       user = maybe
         .filter(user => BCrypt.checkpw(request.password.string, user.hashedPassword))
         .getOrElse(throw new RuntimeException("The given email/password doesn't match"))
       _ <- userLogsRepository.create(user.id, "Logged in successfully")
       token = JwtUtils.createToken(jwtConfig, user.id)
-    } yield Login.Response(user.name, user.email, token)
+    } yield Login.Response(user.id, user.name, user.email, token)
   }
 
   def update(userId: UUID, request: UpdateUser.Request): Future[Unit] = {

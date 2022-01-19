@@ -38,7 +38,13 @@ class UsersRepository @Inject() (database: Database)(implicit ec: DatabaseExecut
 
   def update(userId: UUID, name: String): Future[Unit] = Future {
     database.withConnection { implicit conn =>
-      UsersDAO.update(userId, name)
+      UsersDAO.updateName(userId, name)
+    }
+  }
+
+  def verify(userId: UUID): Future[Unit] = Future {
+    database.withConnection { implicit conn =>
+      UsersDAO.verify(userId)
     }
   }
 }

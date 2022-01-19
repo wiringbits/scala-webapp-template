@@ -84,6 +84,16 @@ This is the server side for the project.
 
 Run it with `sbt server/run`, you are expected to have updated the [application.conf](server/src/main/resources/application.conf) to reach your postgres instance.
 
+The template uses AWS SES to send emails.
+To send mails to unverified accounts you need to configure AWS to production mode. 
+In sandbox mode you can only send emails to verified accounts. 
+To configure your aws credentials you need to add them to ~/.aws/credentials
+```
+[default]
+aws_access_key_id = ...
+aws_secret_access_key = ...
+region = ...
+```
 NOTE: The server doesn't really start until you send the first request, like `curl localhost:9000/health`
 
 ## web

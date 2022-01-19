@@ -27,14 +27,14 @@ object UsersDAO {
 
   def all()(implicit conn: Connection): List[User] = {
     SQL"""
-        SELECT user_id, name, email, password, created_at
+        SELECT user_id, name, email, password, created_at, verified_on
         FROM users
         """.as(userParser.*)
   }
 
   def find(email: Email)(implicit conn: Connection): Option[User] = {
     SQL"""
-        SELECT user_id, name, email, password, created_at
+        SELECT user_id, name, email, password, created_at, verified_on
         FROM users
         WHERE email = ${email.string}
         """.as(userParser.singleOpt)
@@ -42,23 +42,31 @@ object UsersDAO {
 
   def find(userId: UUID)(implicit conn: Connection): Option[User] = {
     SQL"""
-        SELECT user_id, name, email, password, created_at
+        SELECT user_id, name, email, password, created_at, verified_on
         FROM users
         WHERE user_id = ${userId.toString}::UUID
         """.as(userParser.singleOpt)
   }
 
-  def update(userId: UUID, name: String)(implicit conn: Connection): Unit = {
+  def updateName(userId: UUID, name: String)(implicit conn: Connection): Unit = {
     val _ = SQL"""
       UPDATE users
-      SET name = ${name}
+      SET name = $name
+      WHERE user_id = ${userId.toString}::UUID
+    """.execute()
+  }
+
+  def verify(userId: UUID)(implicit conn: Connection): Unit = {
+    val _ = SQL"""
+      UPDATE users
+      SET verified_on = NOW()
       WHERE user_id = ${userId.toString}::UUID
     """.execute()
   }
 
   def findUserForUpdate(userId: UUID)(implicit conn: Connection): Option[User] = {
     SQL"""
-        SELECT user_id, email, password, created_at, name
+        SELECT user_id, name, email, password, created_at, verified_on
         FROM users
         WHERE user_id = ${userId.toString}::UUID
         FOR UPDATE NOWAIT

@@ -80,7 +80,8 @@ lazy val baseLibSettings: Project => Project =
         "-unchecked" // Enable additional warnings where generated code depends on assumptions.
       ),
       libraryDependencies ++= Seq(
-        "org.scalatest" %%% "scalatest" % "3.2.10" % Test
+        "org.scalatest" %%% "scalatest" % "3.2.10" % Test,
+        "com.beachape" %%% "enumeratum" % "1.7.0"
       )
     )
 
@@ -292,7 +293,10 @@ lazy val server = (project in file("server"))
       "com.dimafeng" %% "testcontainers-scala-scalatest" % "0.39.12" % "test",
       "com.dimafeng" %% "testcontainers-scala-postgresql" % "0.39.12" % "test",
       "com.softwaremill.sttp.client3" %% "core" % sttp % "test",
-      "com.softwaremill.sttp.client3" %% "async-http-client-backend-future" % sttp % "test"
+      "com.softwaremill.sttp.client3" %% "async-http-client-backend-future" % sttp % "test",
+      "com.amazonaws" % "aws-java-sdk-ses" % "1.12.141",
+      // aws-java-sdk-ses requires this to work
+      "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.13.1"
     )
   )
 

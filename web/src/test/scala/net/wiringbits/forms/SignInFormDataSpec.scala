@@ -1,6 +1,6 @@
 package net.wiringbits.forms
 
-import net.wiringbits.common.models.{Email, Password}
+import net.wiringbits.common.models.{Captcha, Email, Password}
 import org.scalatest.matchers.must.Matchers._
 import org.scalatest.wordspec.AnyWordSpec
 
@@ -14,13 +14,15 @@ class SignInFormDataSpec extends AnyWordSpec {
   private val validForm = initialForm
     .copy(
       email = initialForm.email.updated(Email.validate("hello@test.com")),
-      password = initialForm.password.updated(Password.validate("123456789"))
+      password = initialForm.password.updated(Password.validate("123456789")),
+      captcha = Some(Captcha.trusted("test"))
     )
 
   private val allDataInvalidForm = initialForm
     .copy(
       email = initialForm.email.updated(Email.validate("x@")),
-      password = initialForm.password.updated(Password.validate("x"))
+      password = initialForm.password.updated(Password.validate("x")),
+      captcha = None
     )
 
   "fields" should {
