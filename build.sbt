@@ -301,8 +301,10 @@ lazy val webBuildInfoSettings: Project => Project = _.enablePlugins(BuildInfoPlu
     buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
     buildInfoKeys ++= {
       val apiUrl = sys.env.get("API_URL")
+      val recaptchaKey = sys.env.get("RECAPTCHA_KEY")
       val values = Seq(
-        "apiUrl" -> apiUrl
+        "apiUrl" -> apiUrl,
+        "recaptchaKey" -> recaptchaKey
       )
       // Logging these values is useful to make sure that the necessary settings
       // are being overriden when packaging the app.
@@ -335,7 +337,9 @@ lazy val web = (project in file("web"))
       "react-router" -> "5.1.2",
       "@types/react-router" -> "5.1.2",
       "react-router-dom" -> "5.1.2",
-      "@types/react-router-dom" -> "5.1.2"
+      "@types/react-router-dom" -> "5.1.2",
+      "react-google-recaptcha" -> "2.1.0",
+      "@types/react-google-recaptcha" -> "2.1.0"
     ),
     libraryDependencies ++= Seq(
       "com.typesafe.play" %%% "play-json" % playJson,

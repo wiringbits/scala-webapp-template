@@ -11,7 +11,7 @@ import net.wiringbits.ui.components.core.widgets.{CircularLoader, Container, Tit
 import net.wiringbits.ui.components.inputs.{EmailInput, NameInput, PasswordInput}
 import net.wiringbits.{API, AppStrings}
 import org.scalajs.dom
-import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 import slinky.core.annotations.react
 import slinky.core.facade.{Fragment, Hooks}
 import slinky.core.{FunctionalComponent, SyntheticEvent}
@@ -21,7 +21,7 @@ import typings.reactRouterDom.{mod => reactRouterDom}
 import scala.util.{Failure, Success}
 
 @react object SignUpForm {
-  case class Props(api: API, loggedIn: User => Unit)
+  case class Props(api: API, loggedIn: User => Unit, captchaKey: String)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val history = reactRouterDom.useHistory()
@@ -44,6 +44,7 @@ import scala.util.{Failure, Success}
 
     def handleSubmit(e: SyntheticEvent[_, dom.Event]): Unit = {
       e.preventDefault()
+
       if (formData.isSubmitButtonEnabled) {
         setFormData(_.submit)
         for {
@@ -125,6 +126,9 @@ import scala.util.{Failure, Success}
       )
     }
 
+    val recaptcha =
+      ReCaptcha(onChange = captchaOpt => onDataChanged(x => x.copy(captcha = captchaOpt)), props.captchaKey)
+
     val signUpButton = {
       val text =
         if (formData.isSubmitting) {
@@ -158,6 +162,7 @@ import scala.util.{Failure, Success}
               emailInput,
               passwordInput,
               repeatPasswordInput,
+              recaptcha,
               error,
               Container(
                 minWidth = Some("100%"),

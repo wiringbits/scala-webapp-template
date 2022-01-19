@@ -2,6 +2,7 @@ package net.wiringbits.components.widgets
 
 import com.alexitc.materialui.facade.materialUiCore.mod.PropTypes.Color
 import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
+import net.wiringbits.common.models.Captcha
 import net.wiringbits.api.forms.StatefulFormData
 import net.wiringbits.forms.SignInFormData
 import net.wiringbits.models.User
@@ -21,7 +22,7 @@ import typings.reactRouterDom.{mod => reactRouterDom}
 import scala.util.{Failure, Success}
 
 @react object SignInForm {
-  case class Props(api: API, loggedIn: User => Unit)
+  case class Props(api: API, loggedIn: User => Unit, captchaKey: String)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val history = reactRouterDom.useHistory()
@@ -100,6 +101,11 @@ import scala.util.{Failure, Success}
       )
     }
 
+    val recaptcha = ReCaptcha(
+      onChange = captchaOpt => onDataChanged(x => x.copy(captcha = captchaOpt)),
+      props.captchaKey
+    )
+
     val loginButton = {
       val text =
         if (formData.isSubmitting)
@@ -134,6 +140,7 @@ import scala.util.{Failure, Success}
               Title(AppStrings.signIn),
               emailInput,
               passwordInput,
+              recaptcha,
               error,
               Container(
                 minWidth = Some("100%"),

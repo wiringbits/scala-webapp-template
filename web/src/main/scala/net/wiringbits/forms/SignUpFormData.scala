@@ -2,13 +2,14 @@ package net.wiringbits.forms
 
 import net.wiringbits.api.forms.{FormData, FormField}
 import net.wiringbits.api.models.CreateUser
-import net.wiringbits.common.models.{Email, Name, Password}
+import net.wiringbits.common.models.{Captcha, Email, Name, Password}
 
 case class SignUpFormData(
     name: FormField[Name],
     email: FormField[Email],
     password: FormField[Password],
-    repeatPassword: FormField[Password]
+    repeatPassword: FormField[Password],
+    captcha: Option[Captcha] = None
 ) extends FormData[CreateUser.Request] {
   override def fields: List[FormField[_]] = List(name, email, password, repeatPassword)
 
@@ -33,10 +34,12 @@ case class SignUpFormData(
       name <- formData.name.valueOpt
       email <- formData.email.valueOpt
       password <- formData.password.valueOpt
+      captcha <- formData.captcha
     } yield CreateUser.Request(
       name,
       email,
-      password
+      password,
+      captcha
     )
   }
 }

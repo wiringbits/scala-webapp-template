@@ -2,11 +2,12 @@ package net.wiringbits.forms
 
 import net.wiringbits.api.forms.{FormData, FormField}
 import net.wiringbits.api.models.Login
-import net.wiringbits.common.models.{Email, Password}
+import net.wiringbits.common.models.{Captcha, Email, Password}
 
 case class SignInFormData(
     email: FormField[Email],
-    password: FormField[Password]
+    password: FormField[Password],
+    captcha: Option[Captcha] = None
 ) extends FormData[Login.Request] {
   override def fields: List[FormField[_]] = List(email, password)
 
@@ -21,9 +22,11 @@ case class SignInFormData(
     for {
       email <- formData.email.valueOpt
       password <- formData.password.valueOpt
+      captcha <- formData.captcha
     } yield Login.Request(
       email,
-      password
+      password,
+      captcha
     )
   }
 }
