@@ -24,11 +24,11 @@ class UsersService @Inject() (
     userLogsRepository: UserLogsRepository,
     webAppConfig: WebAppConfig,
     emailApi: EmailApiAWSImpl,
-    clock: Clock,
     captchaApi: ReCaptchaApi
 )(implicit
     ec: ExecutionContext
 ) {
+  private implicit val clock: Clock = Clock.systemUTC
 
   // returns the login token
   def create(request: CreateUser.Request): Future[CreateUser.Response] = {
@@ -80,7 +80,7 @@ class UsersService @Inject() (
       _ = if (user.verifiedOn.isEmpty)
         throw new RuntimeException("The email is not verified, check your spam folder if you don't see the email.")
       _ <- userLogsRepository.create(user.id, "Logged in successfully")
-      token = JwtUtils.createToken(jwtConfig, user.id)(clock)
+      token = JwtUtils.createToken(jwtConfig, user.id)
     } yield Login.Response(user.id, user.name, user.email, token)
   }
 
