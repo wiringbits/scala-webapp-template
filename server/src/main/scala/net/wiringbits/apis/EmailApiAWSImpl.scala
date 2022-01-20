@@ -8,7 +8,8 @@ import net.wiringbits.config.{AWSRegionConfig, EmailConfig}
 import org.slf4j.LoggerFactory
 
 import javax.inject.Inject
-import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{Future, blocking}
 
 class EmailApiAWSImpl @Inject() (
     emailConfig: EmailConfig,
@@ -23,7 +24,7 @@ class EmailApiAWSImpl @Inject() (
     val htmlBody =
       s"""<p>${emailRequest.message.body}</p>""".stripMargin
 
-    try {
+    def unsafe(): Unit = try {
       val region = Regions.fromName(regionConfig.region)
       val client =
         AmazonSimpleEmailServiceClientBuilder.standard.withRegion(region).build()
@@ -39,10 +40,13 @@ class EmailApiAWSImpl @Inject() (
         .withSource(from)
       client.sendEmail(request)
       logger.info(s"Sent email to: $from, with subject: ${emailRequest.message.subject}")
-      Future.unit
     } catch {
       case ex: Exception =>
         throw new RuntimeException(s"Email was not sent to: $from, with subject: ${emailRequest.message.subject}", ex);
+    }
+
+    Future {
+      blocking(unsafe())
     }
   }
 }
