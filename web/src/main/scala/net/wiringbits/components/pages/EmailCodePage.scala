@@ -11,7 +11,8 @@ import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
   Styles,
   WithStylesOptions
 }
-import net.wiringbits.api.models.VerifyEmail.Request
+import net.wiringbits.api.models.VerifyEmail
+import net.wiringbits.common.models.UserToken
 import net.wiringbits.ui.components.core.widgets.{CircularLoader, Container}
 import net.wiringbits.{API, AppStrings}
 import org.scalablytyped.runtime.StringDictionary
@@ -67,23 +68,30 @@ import scala.util.{Failure, Success}
     val history = useHistory()
     val params = useParams()
     val (state, setState) = Hooks.useState(initialState)
-    val emailCode = params.asInstanceOf[js.Dynamic].emailCode.toString
+    val emailCodeOpt = UserToken.validate(params.asInstanceOf[js.Dynamic].emailCode.toString)
 
     def sendEmailCode(): Unit = {
       setState(_.copy(loading = true))
-      props.api.client.verifyEmail(VerifyEmail.Request(emailCode)).onComplete {
-        case Success(_) =>
-          val title = AppStrings.successfulEmailVerification
-          val message = AppStrings.goingToBeRedirected
-          setState(_.copy(loading = false, title = title, message = message))
-          setTimeout(2000) {
-            history.push("/signin")
-          }
+      emailCodeOpt match {
+        case Some(emailCode) =>
+          props.api.client.verifyEmail(VerifyEmail.Request(emailCode)).onComplete {
+            case Success(_) =>
+              val title = AppStrings.successfulEmailVerification
+              val message = AppStrings.goingToBeRedirected
+              setState(_.copy(loading = false, title = title, message = message))
+              setTimeout(2000) {
+                history.push("/signin")
+              }
 
-        case Failure(ex) =>
+            case Failure(ex) =>
+              val title = AppStrings.failedEmailVerification
+              val message = ex.getMessage
+              setState(_.copy(loading = false, title = title, message = message, error = Some(message)))
+          }
+        case None =>
           val title = AppStrings.failedEmailVerification
-          val message = ex.getMessage
-          setState(_.copy(loading = false, title = title, message = message, error = Some(ex.getMessage)))
+          val message = "Can't parse the email code"
+          setState(_.copy(loading = false, title = title, message = message, error = Some(message)))
       }
     }
 
