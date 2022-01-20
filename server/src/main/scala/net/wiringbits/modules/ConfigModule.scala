@@ -1,7 +1,7 @@
 package net.wiringbits.modules
 
 import com.google.inject.{AbstractModule, Provides}
-import net.wiringbits.config.{EmailConfig, JwtConfig, ReCaptchaConfig, WebAppConfig}
+import net.wiringbits.config.{AWSRegionConfig, EmailConfig, JwtConfig, ReCaptchaConfig, WebAppConfig}
 import org.slf4j.LoggerFactory
 import play.api.Configuration
 
@@ -34,6 +34,13 @@ class ConfigModule extends AbstractModule {
   def webAppConfig(global: Configuration): WebAppConfig = {
     val config = WebAppConfig(global.get[Configuration]("webapp"))
     logger.info(s"Loading webAppConfig, host = ${config.host}")
+    config
+  }
+
+  @Provides()
+  def awsRegionConfig(global: Configuration): AWSRegionConfig = {
+    val config = AWSRegionConfig(global.get[Configuration]("aws"))
+    logger.info(s"Loading AWSRegionConfig, region = ${config.region}")
     config
   }
 }
