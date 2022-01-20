@@ -27,7 +27,7 @@ import scala.scalajs.js
 import scala.scalajs.js.timers.setTimeout
 import scala.util.{Failure, Success}
 
-@react object EmailCodePage {
+@react object VerifyEmailWithTokenPage {
   case class Props(api: API)
 
   private case class State(
@@ -90,7 +90,7 @@ import scala.util.{Failure, Success}
           }
         case None =>
           val title = AppStrings.failedEmailVerification
-          val message = "Can't parse the email code"
+          val message = "Invalid verification token"
           setState(_.copy(loading = false, title = title, message = message, error = Some(message)))
       }
     }

@@ -18,7 +18,7 @@ import slinky.core.annotations.react
 import slinky.core.facade.Fragment
 import slinky.web.html.{br, className, div}
 
-@react object EmailPage {
+@react object VerifyEmailPage {
   type Props = Unit
 
   private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {

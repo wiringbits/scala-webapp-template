@@ -34,8 +34,8 @@ import typings.reactRouterDom.{components => router}
     val about = route("/about", props.auth)(AboutPage())
     val signIn = route("/signin", props.auth)(SignInPage(props.api, props.loggedIn, props.captchaKey))
     val signUp = route("/signup", props.auth)(SignUpPage(props.api, props.captchaKey))
-    val email = route("/verify-email", props.auth)(EmailPage())
-    val emailCode = route("/verify-email/:emailCode", props.auth)(EmailCodePage(props.api))
+    val email = route("/verify-email", props.auth)(VerifyEmailPage())
+    val emailCode = route("/verify-email/:emailCode", props.auth)(VerifyEmailWithTokenPage(props.api))
 
     def dashboard(user: User) = route("/dashboard", props.auth)(DashboardPage(props.api, user))
     val signOut = route("/signout", props.auth) {
