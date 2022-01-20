@@ -7,7 +7,7 @@ case class ReCaptchaSecret(string: String) extends SecretValue(string)
 
 object ReCaptchaSecret {
 
-  implicit val configLoader: ConfigLoader[SecretAccessKey] = (config: Config, path: String) => {
-    SecretAccessKey(string = config.getString(path))
+  implicit val configLoader: ConfigLoader[ReCaptchaSecret] = (config: Config, path: String) => {
+    ReCaptchaSecret(string = config.getString(path))
   }
 }
