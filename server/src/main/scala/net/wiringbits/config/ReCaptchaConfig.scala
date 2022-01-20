@@ -1,13 +1,13 @@
 package net.wiringbits.config
 
-import net.wiringbits.models.SecretAccessKey
+import net.wiringbits.models.ReCaptchaSecret
 import play.api.Configuration
 
-case class ReCaptchaConfig(secret: SecretAccessKey)
+case class ReCaptchaConfig(secret: ReCaptchaSecret)
 
 object ReCaptchaConfig {
   def apply(config: Configuration): ReCaptchaConfig = {
     val secret = config.get[String]("secretKey")
-    ReCaptchaConfig(SecretAccessKey(secret))
+    ReCaptchaConfig(ReCaptchaSecret(secret))
   }
 }

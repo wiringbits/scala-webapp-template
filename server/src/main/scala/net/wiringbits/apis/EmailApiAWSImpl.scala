@@ -1,7 +1,6 @@
 package net.wiringbits.apis
 
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
-import com.amazonaws.regions.Regions
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailServiceClientBuilder
 import com.amazonaws.services.simpleemail.model.*
 import net.wiringbits.apis.models.EmailRequest
@@ -26,12 +25,14 @@ class EmailApiAWSImpl @Inject() (
       s"""<p>${emailRequest.message.body}</p>""".stripMargin
 
     def unsafe(): Unit = try {
-      val region = Regions.fromName(awsConfig.region)
       val credentials = new BasicAWSCredentials(awsConfig.accessKeyId.string, awsConfig.secretAccessKey.string)
       val credentialsProvider = new AWSStaticCredentialsProvider(credentials)
 
       val client =
-        AmazonSimpleEmailServiceClientBuilder.standard.withCredentials(credentialsProvider).withRegion(region).build()
+        AmazonSimpleEmailServiceClientBuilder.standard
+          .withCredentials(credentialsProvider)
+          .withRegion(awsConfig.region)
+          .build()
       val destination = new Destination().withToAddresses(emailRequest.destination.string)
       val body = new Body()
         .withHtml(new Content().withCharset("UTF-8").withData(htmlBody))
@@ -49,7 +50,7 @@ class EmailApiAWSImpl @Inject() (
         throw new RuntimeException(
           s"Email was not sent, to: ${emailRequest.destination}, subject = ${emailRequest.message.subject}",
           ex
-        );
+        )
     }
 
     Future {
