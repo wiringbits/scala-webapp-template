@@ -195,8 +195,8 @@ lazy val playSettings: Project => Project = {
       // test
       libraryDependencies ++= Seq(
         "org.scalatestplus.play" %% "scalatestplus-play" % "5.1.0" % Test,
-        "org.mockito" %% "mockito-scala" % "1.16.55" % Test,
-        "org.mockito" %% "mockito-scala-scalatest" % "1.16.55" % Test
+        "org.mockito" %% "mockito-scala" % "1.17.0" % Test,
+        "org.mockito" %% "mockito-scala-scalatest" % "1.17.0" % Test
       )
     )
 }
