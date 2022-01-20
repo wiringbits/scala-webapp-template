@@ -2,9 +2,10 @@ package net.wiringbits.repositories
 
 import anorm.*
 import net.wiringbits.common.models.{Email, Name}
-import net.wiringbits.repositories.models.{User, UserLog}
+import net.wiringbits.repositories.models.{Token, TokenType, User, UserLog}
 
 package object daos {
+
   import anorm.{Column, MetaDataItem, TypeDoesNotMatch}
   import org.postgresql.util.PGobject
 
@@ -38,5 +39,18 @@ package object daos {
 
   val userLogParser: RowParser[UserLog] = {
     Macro.parser[UserLog]("user_log_id", "user_id", "message", "created_at")
+  }
+
+  def enumColumn[A](f: String => Option[A]): Column[A] = Column.columnToString.mapResult { string =>
+    f(string)
+      .toRight(SqlRequestError(new RuntimeException(s"The value $string doesn't exists")))
+  }
+
+  implicit val tokenTypeColumn: Column[TokenType] = enumColumn(
+    TokenType.withNameInsensitiveOption
+  )
+
+  implicit val tokenParser: RowParser[Token] = {
+    Macro.parser[Token]("token_id", "token", "token_type", "created_at", "expires_at", "user_id")
   }
 }

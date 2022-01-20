@@ -5,8 +5,8 @@ import net.wiringbits.apis.models.EmailRequest
 import net.wiringbits.config.{JwtConfig, WebAppConfig}
 import net.wiringbits.api.models.{CreateUser, GetCurrentUser, Login, UpdateUser, VerifyEmail}
 import net.wiringbits.repositories
-import net.wiringbits.repositories.models.User
-import net.wiringbits.repositories.{UserLogsRepository, UsersRepository}
+import net.wiringbits.repositories.models.{TokenType, User}
+import net.wiringbits.repositories.{TokensRepository, UserLogsRepository, UsersRepository}
 import net.wiringbits.util.{EmailMessage, JwtUtils}
 import net.wiringbits.apis.ReCaptchaApi
 import net.wiringbits.common.models.Captcha
@@ -22,13 +22,14 @@ class UsersService @Inject() (
     jwtConfig: JwtConfig,
     repository: UsersRepository,
     userLogsRepository: UserLogsRepository,
+    tokensRepository: TokensRepository,
     webAppConfig: WebAppConfig,
     emailApi: EmailApiAWSImpl,
-    captchaApi: ReCaptchaApi
+    captchaApi: ReCaptchaApi,
+    clock: Clock
 )(implicit
     ec: ExecutionContext
 ) {
-  private implicit val clock: Clock = Clock.systemUTC
 
   // returns the login token
   def create(request: CreateUser.Request): Future[CreateUser.Response] = {
@@ -49,22 +50,37 @@ class UsersService @Inject() (
         createUser.id,
         s"Account created, name = ${request.name}, email = ${request.email}"
       )
+      createToken = repositories.models.Token
+        .CreateToken(
+          id = UUID.randomUUID(),
+          token = UUID.randomUUID(),
+          tokenType = TokenType.VerificationToken,
+          userId = createUser.id
+        )
+      _ <- tokensRepository.create(createToken)
       emailRequest = EmailMessage.registration(
         name = createUser.name,
         url = webAppConfig.host,
-        emailEndpoint = s"${createUser.id}"
+        emailEndpoint = s"${createUser.id}_${createToken.token}"
       )
       _ = emailApi.sendEmail(EmailRequest(request.email, emailRequest))
     } yield CreateUser.Response(id = createUser.id, email = createUser.email, name = createUser.name)
   }
 
-  def verifyEmail(userId: UUID): Future[VerifyEmail.Response] = for {
+  // TODO: Replace arguments for UserToken
+  def verifyEmail(userId: UUID, token: UUID): Future[VerifyEmail.Response] = for {
     userMaybe <- repository.find(userId)
     user = userMaybe.getOrElse(throw new RuntimeException(s"User wasn't found"))
     _ = if (user.verifiedOn.isDefined)
       throw new RuntimeException(s"User $userId email is already verified")
+    tokenMaybe <- tokensRepository.find(userId, token)
+    token = tokenMaybe.getOrElse(throw new RuntimeException(s"Token for user $userId wasn't found"))
+    tokenExpiresAt = token.expiresAt
+    _ = if (tokenExpiresAt.isBefore(clock.instant()))
+      throw new RuntimeException("Token is expired")
     _ <- repository.verify(userId)
     _ <- userLogsRepository.create(userId, "Email was verified")
+    _ <- tokensRepository.delete(token.id)
     _ = emailApi.sendEmail(EmailRequest(user.email, EmailMessage.confirm(user.name)))
   } yield VerifyEmail.Response()
 
@@ -79,7 +95,7 @@ class UsersService @Inject() (
         .filter(user => BCrypt.checkpw(request.password.string, user.hashedPassword))
         .getOrElse(throw new RuntimeException("The given email/password doesn't match"))
       _ <- userLogsRepository.create(user.id, "Logged in successfully")
-      token = JwtUtils.createToken(jwtConfig, user.id)
+      token = JwtUtils.createToken(jwtConfig, user.id)(clock)
     } yield Login.Response(user.id, user.name, user.email, token)
   }
 

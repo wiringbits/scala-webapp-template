@@ -1,7 +1,7 @@
 package net.wiringbits.modules
 
 import com.google.inject.{AbstractModule, Provides}
-import net.wiringbits.config.{EmailConfig, JwtConfig, ReCaptchaConfig, WebAppConfig}
+import net.wiringbits.config.{EmailConfig, JwtConfig, ReCaptchaConfig, TokensConfig, WebAppConfig}
 import org.slf4j.LoggerFactory
 import play.api.Configuration
 
@@ -34,6 +34,13 @@ class ConfigModule extends AbstractModule {
   def webAppConfig(global: Configuration): WebAppConfig = {
     val config = WebAppConfig(global.get[Configuration]("webapp"))
     logger.info(s"Loading webAppConfig, host = ${config.host}")
+    config
+  }
+
+  @Provides()
+  def tokensConfig(global: Configuration): TokensConfig = {
+    val config = TokensConfig(global.get[Configuration]("tokens"))
+    logger.info(s"Loading tokensConfig, verificationTokenExp = ${config.verificationTokenExp}")
     config
   }
 }
