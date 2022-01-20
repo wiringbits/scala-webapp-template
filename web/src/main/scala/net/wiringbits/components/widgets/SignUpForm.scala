@@ -4,7 +4,6 @@ import com.alexitc.materialui.facade.materialUiCore.mod.PropTypes.Color
 import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
 import net.wiringbits.api.forms.StatefulFormData
 import net.wiringbits.forms.SignUpFormData
-import net.wiringbits.models.User
 import net.wiringbits.ui.components.core.ErrorLabel
 import net.wiringbits.ui.components.core.widgets.Container.{Alignment, EdgeInsets}
 import net.wiringbits.ui.components.core.widgets.{CircularLoader, Container, Title}
@@ -21,7 +20,7 @@ import typings.reactRouterDom.{mod => reactRouterDom}
 import scala.util.{Failure, Success}
 
 @react object SignUpForm {
-  case class Props(api: API, loggedIn: User => Unit, captchaKey: String)
+  case class Props(api: API, captchaKey: String)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val history = reactRouterDom.useHistory()
@@ -58,8 +57,7 @@ import scala.util.{Failure, Success}
           .onComplete {
             case Success(res) =>
               setFormData(_.submitted)
-              props.loggedIn(User(res.name, res.email, res.token))
-              history.push("/dashboard") // redirects to dashboard
+              history.push("/verify-email") // redirects to email page
 
             case Failure(ex) =>
               setFormData(_.submissionFailed(ex.getMessage))
