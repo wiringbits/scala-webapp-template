@@ -1,16 +1,22 @@
 package net.wiringbits.services
 
-import net.wiringbits.apis.EmailApiAWSImpl
+import net.wiringbits.api.models.{
+  CreateUser,
+  ForgotPassword,
+  GetCurrentUser,
+  Login,
+  ResetPassword,
+  UpdateUser,
+  VerifyEmail
+}
+import net.wiringbits.apis.{EmailApiAWSImpl, ReCaptchaApi}
 import net.wiringbits.apis.models.EmailRequest
+import net.wiringbits.common.models.{Captcha, Email, Password}
 import net.wiringbits.config.{JwtConfig, WebAppConfig}
-import net.wiringbits.api.models.{CreateUser, GetCurrentUser, Login, UpdateUser, VerifyEmail}
 import net.wiringbits.repositories
 import net.wiringbits.repositories.models.User
 import net.wiringbits.repositories.{UserLogsRepository, UsersRepository}
 import net.wiringbits.util.{EmailMessage, JwtUtils}
-import net.wiringbits.apis.ReCaptchaApi
-import net.wiringbits.common.models.Captcha
-import net.wiringbits.common.models.Email
 import org.mindrot.jbcrypt.BCrypt
 
 import java.time.Clock
@@ -81,6 +87,35 @@ class UsersService @Inject() (
       _ <- userLogsRepository.create(user.id, "Logged in successfully")
       token = JwtUtils.createToken(jwtConfig, user.id)
     } yield Login.Response(user.id, user.name, user.email, token)
+  }
+
+  def forgotPassword(request: ForgotPassword.Request): Future[ForgotPassword.Response] = {
+    for {
+      _ <- validateCaptcha(request.captcha)
+      userMaybe <- repository.find(request.email)
+      _ = userMaybe.foreach(user => {
+        if (user.verifiedOn.isEmpty)
+          throw new RuntimeException(s"User's email ${request.email} hasn't been verified yet")
+        val emailMessage = EmailMessage.forgotPassword(user.name, webAppConfig.host, s"${user.id}")
+        emailApi.sendEmail(EmailRequest(user.email, emailMessage))
+      })
+    } yield ForgotPassword.Response()
+  }
+
+  def resetPassword(userId: UUID, password: Password): Future[ResetPassword.Response] = {
+    val userMaybe = repository.find(userId)
+    userMaybe.flatMap {
+      case None => Future(ResetPassword.Response(None))
+      case Some(user) =>
+        val hashedPassword = BCrypt.hashpw(password.string, BCrypt.gensalt())
+        for {
+          _ <- repository.resetPassword(userId, hashedPassword)
+          _ <- userLogsRepository.create(user.id, "Password was reset")
+          emailMessage = EmailMessage.resetPassword(user.name)
+          _ = emailApi.sendEmail(EmailRequest(user.email, emailMessage))
+          token = JwtUtils.createToken(jwtConfig, user.id)(clock)
+        } yield ResetPassword.Response(Some(token))
+    }
   }
 
   def update(userId: UUID, request: UpdateUser.Request): Future[Unit] = {

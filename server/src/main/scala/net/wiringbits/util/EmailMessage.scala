@@ -24,4 +24,28 @@ object EmailMessage {
 
     EmailMessage(subject, body)
   }
+
+  def forgotPassword(name: Name, url: String, emailEndpoint: String): EmailMessage = {
+    val subject = "Password Reset"
+    val body =
+      s"""<h2>Password Reset Instructions</h2>
+         |Hi ${name.string},
+         |Here is the link to reset your password.
+         |To continue, please click the button below.
+         |<a href="$url/reset-password/$emailEndpoint">Reset your password</a>
+         |If you did not perform this request, you can safely ignore this email.
+         |""".stripMargin
+
+    EmailMessage(subject, body)
+  }
+  def resetPassword(name: Name): EmailMessage = {
+    val subject = "Your SWAN password has been reset"
+    val body =
+      s"""Hi ${name.string},
+         |<h2>Your SWAN password has been changed.</h2>
+         |If this was not you, click the 'Forgot password' link on the sign in page and follow the steps to reset your password.
+         |""".stripMargin
+
+    EmailMessage(subject, body)
+  }
 }

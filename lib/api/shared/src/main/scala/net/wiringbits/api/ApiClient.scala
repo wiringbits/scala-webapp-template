@@ -12,7 +12,10 @@ import scala.util.{Failure, Success, Try}
 trait ApiClient {
   def createUser(request: CreateUser.Request): Future[CreateUser.Response]
   def login(request: Login.Request): Future[Login.Response]
+
   def verifyEmail(request: VerifyEmail.Request): Future[VerifyEmail.Response]
+  def forgotPassword(request: ForgotPassword.Request): Future[ForgotPassword.Response]
+  def resetPassword(request: ResetPassword.Request): Future[ResetPassword.Response]
 
   def currentUser(jwt: String): Future[GetCurrentUser.Response]
   def updateUser(jwt: String, request: UpdateUser.Request): Future[UpdateUser.Response]
@@ -99,6 +102,30 @@ object ApiClient {
         .flatMap(Future.fromTry)
     }
 
+    override def forgotPassword(request: ForgotPassword.Request): Future[ForgotPassword.Response] = {
+      val path = ServerAPI.path :+ "users" :+ "forgot-password"
+      val uri = ServerAPI.withPath(path)
+
+      prepareRequest[ForgotPassword.Response]
+        .post(uri)
+        .body(Json.toJson(request).toString())
+        .send(backend)
+        .map(_.body)
+        .flatMap(Future.fromTry)
+    }
+
+    override def resetPassword(request: ResetPassword.Request): Future[ResetPassword.Response] = {
+      val path = ServerAPI.path :+ "users" :+ "reset-password"
+      val uri = ServerAPI.withPath(path)
+
+      prepareRequest[ResetPassword.Response]
+        .post(uri)
+        .body(Json.toJson(request).toString())
+        .send(backend)
+        .map(_.body)
+        .flatMap(Future.fromTry)
+    }
+
     override def login(request: Login.Request): Future[Login.Response] = {
       val path = ServerAPI.path :+ "users" :+ "login"
       val uri = ServerAPI.withPath(path)
@@ -169,5 +196,6 @@ object ApiClient {
         .map(_.body)
         .flatMap(Future.fromTry)
     }
+
   }
 }

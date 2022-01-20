@@ -47,4 +47,10 @@ class UsersRepository @Inject() (database: Database)(implicit ec: DatabaseExecut
       UsersDAO.verify(userId)
     }
   }
+
+  def resetPassword(userId: UUID, password: String): Future[Unit] = Future {
+    database.withConnection { implicit conn =>
+      UsersDAO.resetPassword(userId, password)
+    }
+  }
 }
