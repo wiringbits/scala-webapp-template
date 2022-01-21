@@ -72,13 +72,12 @@ class UsersService @Inject() (
     } yield CreateUser.Response(id = createUser.id, email = createUser.email, name = createUser.name)
   }
 
-  // TODO: Replace arguments for UserToken
   def verifyEmail(userId: UUID, token: UUID): Future[VerifyEmail.Response] = for {
     userMaybe <- repository.find(userId)
     user = userMaybe.getOrElse(throw new RuntimeException(s"User wasn't found"))
     _ = if (user.verifiedOn.isDefined)
       throw new RuntimeException(s"User $userId email is already verified")
-    tokenMaybe <- userTokensRepository.find(userId, token)
+    tokenMaybe <- userTokensRepository.find(s"${userId}_$token")
     token = tokenMaybe.getOrElse(throw new RuntimeException(s"Token for user $userId wasn't found"))
     tokenExpiresAt = token.expiresAt
     _ = if (tokenExpiresAt.isBefore(clock.instant()))

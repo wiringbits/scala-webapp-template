@@ -135,7 +135,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
 
       val token = userTokensRepository.find(user.id).futureValue.headOption.value.token
 
-      client.verifyEmail(VerifyEmail.Request(UserToken(user.id, token))).futureValue
+      client.verifyEmail(VerifyEmail.Request(UserToken.validate(token).value)).futureValue
 
       userTokensRepository.find(user.id).futureValue must be(empty)
     }
@@ -175,7 +175,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
 
       val token = userTokensRepository.find(user.id).futureValue.headOption.value.token
 
-      client.verifyEmail(VerifyEmail.Request(UserToken(user.id, token))).futureValue
+      client.verifyEmail(VerifyEmail.Request(UserToken.validate(token).value)).futureValue
 
       val loginRequest = Login.Request(
         email = user.email,
@@ -250,7 +250,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
       when(clock.instant()).thenAnswer(Instant.now().plus(2, ChronoUnit.DAYS))
 
       val error = client
-        .verifyEmail(VerifyEmail.Request(UserToken(user.id, token)))
+        .verifyEmail(VerifyEmail.Request(UserToken.validate(token).value))
         .map(_ => "Success when failure expected")
         .recover { case NonFatal(ex) =>
           ex.getMessage
@@ -272,7 +272,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
       val user = client.createUser(request).futureValue
       val token = userTokensRepository.find(user.id).futureValue.headOption.value.token
 
-      client.verifyEmail(VerifyEmail.Request(UserToken(user.id, token))).futureValue
+      client.verifyEmail(VerifyEmail.Request(UserToken.validate(token).value)).futureValue
 
       val response =
         client.login(Login.Request(email = email, password = password, captcha = Captcha.trusted("test"))).futureValue
@@ -290,7 +290,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
       val user = client.createUser(request).futureValue
       val token = userTokensRepository.find(user.id).futureValue.headOption.value.token
 
-      client.verifyEmail(VerifyEmail.Request(UserToken(user.id, token))).futureValue
+      client.verifyEmail(VerifyEmail.Request(UserToken.validate(token).value)).futureValue
 
       val loginRequest = Login.Request(
         email = user.email,
