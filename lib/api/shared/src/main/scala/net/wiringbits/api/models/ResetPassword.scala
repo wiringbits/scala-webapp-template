@@ -5,7 +5,7 @@ import play.api.libs.json.{Format, Json}
 
 object ResetPassword {
   case class Request(token: UserToken, password: Password)
-  case class Response(token: Option[String])
+  case class Response(token: String)
 
   implicit val userTokenFormat: Format[UserToken] = Json.format[UserToken]
   implicit val resetPasswordRequestFormat: Format[Request] = Json.format[Request]

@@ -93,29 +93,28 @@ class UsersService @Inject() (
     for {
       _ <- validateCaptcha(request.captcha)
       userMaybe <- repository.find(request.email)
-      _ = userMaybe.foreach(user => {
-        if (user.verifiedOn.isEmpty)
-          throw new RuntimeException(s"User's email ${request.email} hasn't been verified yet")
-        val emailMessage = EmailMessage.forgotPassword(user.name, webAppConfig.host, s"${user.id}")
-        emailApi.sendEmail(EmailRequest(user.email, emailMessage))
-      })
+      user = userMaybe.getOrElse(throw new RuntimeException("Email not registered"))
+      _ = enforeVerifiedUser(user)
+      emailMessage = EmailMessage.forgotPassword(user.name, webAppConfig.host, s"${user.id}")
+      _ <- emailApi.sendEmail(EmailRequest(user.email, emailMessage))
     } yield ForgotPassword.Response()
   }
 
   def resetPassword(userId: UUID, password: Password): Future[ResetPassword.Response] = {
-    val userMaybe = repository.find(userId)
-    userMaybe.flatMap {
-      case None => Future(ResetPassword.Response(None))
-      case Some(user) =>
-        val hashedPassword = BCrypt.hashpw(password.string, BCrypt.gensalt())
-        for {
-          _ <- repository.resetPassword(userId, hashedPassword)
-          _ <- userLogsRepository.create(user.id, "Password was reset")
-          emailMessage = EmailMessage.resetPassword(user.name)
-          _ = emailApi.sendEmail(EmailRequest(user.email, emailMessage))
-          token = JwtUtils.createToken(jwtConfig, user.id)(clock)
-        } yield ResetPassword.Response(Some(token))
-    }
+    for {
+      userMaybe <- repository.find(userId)
+      user = userMaybe.getOrElse(throw new RuntimeException("Email not registered"))
+      _ = enforeVerifiedUser(user)
+      hashedPassword = BCrypt.hashpw(password.string, BCrypt.gensalt())
+      _ <- repository.resetPassword(userId, hashedPassword)
+      emailMessage = EmailMessage.resetPassword(user.name)
+      _ <- emailApi.sendEmail(EmailRequest(user.email, emailMessage))
+      token = JwtUtils.createToken(jwtConfig, user.id)(clock)
+    } yield ResetPassword.Response(token)
+  }
+
+  private def enforeVerifiedUser(user: User): Unit = {
+    if (user.verifiedOn.isEmpty) throw new RuntimeException(s"User's ${user.email} hasn't been verified yet")
   }
 
   def update(userId: UUID, request: UpdateUser.Request): Future[Unit] = {

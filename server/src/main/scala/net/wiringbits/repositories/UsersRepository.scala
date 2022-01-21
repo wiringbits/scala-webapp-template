@@ -2,8 +2,8 @@ package net.wiringbits.repositories
 
 import net.wiringbits.common.models.Email
 import net.wiringbits.executors.DatabaseExecutionContext
-import net.wiringbits.repositories.daos.UsersDAO
-import net.wiringbits.repositories.models.User
+import net.wiringbits.repositories.daos.{UserLogsDAO, UsersDAO}
+import net.wiringbits.repositories.models.{User, UserLog}
 import play.api.db.Database
 
 import java.util.UUID
@@ -49,8 +49,10 @@ class UsersRepository @Inject() (database: Database)(implicit ec: DatabaseExecut
   }
 
   def resetPassword(userId: UUID, password: String): Future[Unit] = Future {
-    database.withConnection { implicit conn =>
+    database.withTransaction { implicit conn =>
       UsersDAO.resetPassword(userId, password)
+      val request = UserLog.CreateUserLog(UUID.randomUUID(), userId, "Password was reset")
+      UserLogsDAO.create(request)
     }
   }
 }

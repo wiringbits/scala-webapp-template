@@ -6,7 +6,7 @@ import net.wiringbits.api.models.{CreateUser, ForgotPassword, Login, ResetPasswo
 import net.wiringbits.apis.models.EmailRequest
 import net.wiringbits.apis.{EmailApi, ReCaptchaApi}
 import net.wiringbits.common.models.*
-import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.{any, anyString}
 import org.mockito.MockitoSugar.{mock, when}
 import play.api.inject
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -305,24 +305,19 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
       response must be(ForgotPassword.Response())
     }
 
-    "ignore the request when the user tries to reset a password for unknown email" in withApiClient { client =>
-      val name = Name.trusted("wiringbits")
-      val email = Email.trusted("test1@email.com")
-      val request = CreateUser.Request(
-        name = name,
-        email = email,
-        password = Password.trusted("test123..."),
-        captcha = Captcha.trusted("test")
-      )
+    "fail when the user tries to reset a password for nonexistent email" in withApiClient { client =>
+      val email = Email.trusted("test@email.com")
+      val forgotPasswordRequest = ForgotPassword.Request(email, Captcha.trusted("test"))
 
-      createVerifyLoginUser(request, client).futureValue
+      val error = client
+        .forgotPassword(forgotPasswordRequest)
+        .map(_ => "Success when failure expected")
+        .recover { case NonFatal(ex) =>
+          ex.getMessage
+        }
+        .futureValue
 
-      val email2 = Email.trusted("test2@email.com")
-      val forgotPasswordRequest = ForgotPassword.Request(email2, Captcha.trusted("test"))
-
-      val response2 = client.forgotPassword(forgotPasswordRequest).futureValue
-
-      response2 must be(ForgotPassword.Response())
+      error must be(s"Email not registered")
     }
 
     "fail when the user tries to reset a password without their email verification step" in withApiClient { client =>
@@ -347,7 +342,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
         }
         .futureValue
 
-      error must be(s"User's email $email hasn't been verified yet")
+      error must be(s"User's $email hasn't been verified yet")
     }
 
     "fail when the captcha isn't valid" in withApiClient { client =>
@@ -381,7 +376,6 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
 
   "POST /reset-password" should {
     "reset a password for a given user" in withApiClient { client =>
-      when(captchaApi.verify(any[Captcha]())).thenReturn(Future.successful(true))
       val name = Name.trusted("wiringbits")
       val email = Email.trusted("test1@email.com")
       val request = CreateUser.Request(
@@ -432,18 +426,22 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
         .resetPassword(resetPasswordRequest)
         .futureValue
 
-      response mustNot be(ResetPassword.Response(None))
+      response must be(ResetPassword.Response(anyString()))
     }
 
-    "return a None token when a nonexistent user tries to reset a password" in withApiClient { client =>
+    "fail when a nonexistent user tries to reset a password" in withApiClient { client =>
       val resetPasswordRequest =
         ResetPassword.Request(UserToken(UUID.randomUUID()), Password.trusted("test456..."))
 
-      val response = client
+      val error = client
         .resetPassword(resetPasswordRequest)
+        .map(_ => "Success when failure expected")
+        .recover { case NonFatal(ex) =>
+          ex.getMessage
+        }
         .futureValue
 
-      response must be(ResetPassword.Response(None))
+      error must be("Email not registered")
     }
 
     "fail when the user tries to login with their old password after the password resetting" in withApiClient {
@@ -482,6 +480,5 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
 
         error must be("The given email/password doesn't match")
     }
-
   }
 }
