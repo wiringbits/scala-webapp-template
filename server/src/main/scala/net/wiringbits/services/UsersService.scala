@@ -96,19 +96,20 @@ class UsersService @Inject() (
       user = userMaybe.getOrElse(throw new RuntimeException("Email not registered"))
       _ = enforeVerifiedUser(user)
       emailMessage = EmailMessage.forgotPassword(user.name, webAppConfig.host, s"${user.id}")
-      _ <- emailApi.sendEmail(EmailRequest(user.email, emailMessage))
+      _ = emailApi.sendEmail(EmailRequest(user.email, emailMessage))
     } yield ForgotPassword.Response()
   }
 
   def resetPassword(userId: UUID, password: Password): Future[ResetPassword.Response] = {
     for {
+      // TODO: Validate token
       userMaybe <- repository.find(userId)
       user = userMaybe.getOrElse(throw new RuntimeException("Email not registered"))
       _ = enforeVerifiedUser(user)
       hashedPassword = BCrypt.hashpw(password.string, BCrypt.gensalt())
       _ <- repository.resetPassword(userId, hashedPassword)
       emailMessage = EmailMessage.resetPassword(user.name)
-      _ <- emailApi.sendEmail(EmailRequest(user.email, emailMessage))
+      _ = emailApi.sendEmail(EmailRequest(user.email, emailMessage))
       token = JwtUtils.createToken(jwtConfig, user.id)(clock)
     } yield ResetPassword.Response(token)
   }

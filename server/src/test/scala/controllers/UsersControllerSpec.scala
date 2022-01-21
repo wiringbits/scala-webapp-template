@@ -425,16 +425,16 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
         .resetPassword(resetPasswordRequest)
         .futureValue
 
-      response must be(ResetPassword.Response(anyString()))
+      response.token mustNot be(empty)
     }
 
     "ignore the request when the user tries to reset a password for unknown email" in withApiClient { client =>
       val email = Email.trusted("test2@email.com")
       val forgotPasswordRequest = ForgotPassword.Request(email, Captcha.trusted("test"))
 
-      val response2 = client.forgotPassword(forgotPasswordRequest).futureValue
+      val response = client.forgotPassword(forgotPasswordRequest).futureValue
 
-      response2 must be(ForgotPassword.Response())
+      response must be(ForgotPassword.Response())
     }
 
     "fail when the user tries to login with their old password after the password resetting" in withApiClient {
