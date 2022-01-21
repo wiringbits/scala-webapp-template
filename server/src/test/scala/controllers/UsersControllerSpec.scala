@@ -12,7 +12,6 @@ import play.api.inject
 import play.api.inject.guice.GuiceApplicationBuilder
 import utils.LoginUtils
 
-import java.util.UUID
 import scala.concurrent.Future
 import scala.util.control.NonFatal
 
@@ -429,19 +428,13 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
       response must be(ResetPassword.Response(anyString()))
     }
 
-    "fail when a nonexistent user tries to reset a password" in withApiClient { client =>
-      val resetPasswordRequest =
-        ResetPassword.Request(UserToken(UUID.randomUUID()), Password.trusted("test456..."))
+    "ignore the request when the user tries to reset a password for unknown email" in withApiClient { client =>
+      val email = Email.trusted("test2@email.com")
+      val forgotPasswordRequest = ForgotPassword.Request(email, Captcha.trusted("test"))
 
-      val error = client
-        .resetPassword(resetPasswordRequest)
-        .map(_ => "Success when failure expected")
-        .recover { case NonFatal(ex) =>
-          ex.getMessage
-        }
-        .futureValue
+      val response2 = client.forgotPassword(forgotPasswordRequest).futureValue
 
-      error must be("Email not registered")
+      response2 must be(ForgotPassword.Response())
     }
 
     "fail when the user tries to login with their old password after the password resetting" in withApiClient {
