@@ -387,19 +387,13 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
       response must be(ForgotPassword.Response())
     }
 
-    "fail when the user tries to reset a password for nonexistent email" in withApiClient { client =>
+    "ignore the request when the user tries to reset a password for nonexistent email" in withApiClient { client =>
       val email = Email.trusted("test@email.com")
       val forgotPasswordRequest = ForgotPassword.Request(email, Captcha.trusted("test"))
 
-      val error = client
-        .forgotPassword(forgotPasswordRequest)
-        .map(_ => "Success when failure expected")
-        .recover { case NonFatal(ex) =>
-          ex.getMessage
-        }
-        .futureValue
+      val response = client.forgotPassword(forgotPasswordRequest).futureValue
 
-      error must be(s"Email not registered")
+      response must be(ForgotPassword.Response())
     }
 
     "fail when the user tries to reset a password without their email verification step" in withApiClient { client =>
@@ -468,10 +462,11 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
       )
 
       val user = createVerifyLoginUser(request, client, userTokensRepository).futureValue
-      val token = userTokensRepository.find(user.id).futureValue.headOption.value.token
 
       val forgotPasswordRequest = ForgotPassword.Request(email, Captcha.trusted("test"))
       client.forgotPassword(forgotPasswordRequest).futureValue
+
+      val token = userTokensRepository.find(user.id).futureValue.headOption.value.token
 
       val resetPasswordRequest =
         ResetPassword.Request(UserToken(user.id, UUID.fromString(token)), Password.trusted("test456..."))
@@ -499,10 +494,11 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
       )
 
       val userId = createVerifyLoginUser(request, client, userTokensRepository).futureValue.id
-      val token = userTokensRepository.find(userId).futureValue.headOption.value.token
 
       val forgotPasswordRequest = ForgotPassword.Request(email, Captcha.trusted("test"))
       client.forgotPassword(forgotPasswordRequest).futureValue
+
+      val token = userTokensRepository.find(userId).futureValue.headOption.value.token
 
       val resetPasswordRequest =
         ResetPassword.Request(UserToken(userId, UUID.fromString(token)), Password.trusted("test456..."))
@@ -512,15 +508,6 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
         .futureValue
 
       response.token mustNot be(empty)
-    }
-
-    "ignore the request when the user tries to reset a password for unknown email" in withApiClient { client =>
-      val email = Email.trusted("test2@email.com")
-      val forgotPasswordRequest = ForgotPassword.Request(email, Captcha.trusted("test"))
-
-      val response = client.forgotPassword(forgotPasswordRequest).futureValue
-
-      response must be(ForgotPassword.Response())
     }
 
     "fail when the user tries to login with their old password after the password resetting" in withApiClient {
@@ -535,10 +522,11 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
         )
 
         val user = createVerifyLoginUser(request, client, userTokensRepository).futureValue
-        val token = userTokensRepository.find(user.id).futureValue.headOption.value.token
 
         val forgotPasswordRequest = ForgotPassword.Request(email, Captcha.trusted("test"))
         client.forgotPassword(forgotPasswordRequest).futureValue
+
+        val token = userTokensRepository.find(user.id).futureValue.headOption.value.token
 
         val resetPasswordRequest =
           ResetPassword.Request(UserToken(user.id, UUID.fromString(token)), Password.trusted("test456..."))

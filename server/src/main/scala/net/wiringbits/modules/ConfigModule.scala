@@ -40,7 +40,9 @@ class ConfigModule extends AbstractModule {
   @Provides()
   def userTokensConfig(global: Configuration): UserTokensConfig = {
     val config = UserTokensConfig(global.get[Configuration]("userTokens"))
-    logger.info(s"Loading userTokensConfig, emailVerificationExp = ${config.emailVerificationExp}")
+    logger.info(
+      s"Loading userTokensConfig, emailVerificationExp = ${config.emailVerificationExp}, resetPasswordExp = ${config.resetPasswordExp}"
+    )
     config
   }
 

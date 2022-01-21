@@ -53,7 +53,7 @@ class UsersController @Inject() (
     val body = request.body
     logger.info(s"Reset user's password: ${body.token.userId}")
     for {
-      response <- usersService.resetPassword(body.token.userId, body.password)
+      response <- usersService.resetPassword(body.token.userId, body.token.token, body.password)
     } yield Ok(Json.toJson(response))
   }
 

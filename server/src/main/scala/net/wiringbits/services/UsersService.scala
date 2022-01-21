@@ -85,9 +85,7 @@ class UsersService @Inject() (
       throw new RuntimeException(s"User $userId email is already verified")
     tokenMaybe <- userTokensRepository.find(userId, token)
     token = tokenMaybe.getOrElse(throw new RuntimeException(s"Token for user $userId wasn't found"))
-    tokenExpiresAt = token.expiresAt
-    _ = if (tokenExpiresAt.isBefore(clock.instant()))
-      throw new RuntimeException("Token is expired")
+    _ = enforceValidToken(token)
     _ <- repository.verify(userId)
     _ <- userLogsRepository.create(userId, "Email was verified")
     _ <- userTokensRepository.delete(token.id, userId)
@@ -110,23 +108,40 @@ class UsersService @Inject() (
   }
 
   def forgotPassword(request: ForgotPassword.Request): Future[ForgotPassword.Response] = {
+
+    def whenExists(user: User) = {
+      val createToken = UserToken
+        .Create(
+          id = UUID.randomUUID(),
+          token = UUID.randomUUID.toString,
+          tokenType = UserTokenType.ResetPassword,
+          createdAt = Instant.now(clock),
+          userId = user.id,
+          expiresAt = Instant.now(clock).plus(userTokensConfig.resetPasswordExp.toHours, ChronoUnit.HOURS)
+        )
+      enforceVerifiedUser(user)
+      val emailMessage = EmailMessage.forgotPassword(user.name, webAppConfig.host, s"${user.id}_${createToken.id}")
+      for {
+        _ <- userTokensRepository.create(createToken)
+        _ = emailApi.sendEmail(EmailRequest(user.email, emailMessage))
+      } yield ()
+    }
+
     for {
       _ <- validateCaptcha(request.captcha)
       userMaybe <- repository.find(request.email)
-      user = userMaybe.getOrElse(throw new RuntimeException("Email not registered"))
-      _ = enforeVerifiedUser(user)
-      emailMessage = EmailMessage.forgotPassword(user.name, webAppConfig.host, s"${user.id}")
-      _ = emailApi.sendEmail(EmailRequest(user.email, emailMessage))
+      _ <- userMaybe.map(whenExists).getOrElse(Future.unit)
     } yield ForgotPassword.Response()
   }
 
-  def resetPassword(userId: UUID, password: Password): Future[ResetPassword.Response] = {
+  def resetPassword(userId: UUID, token: UUID, password: Password): Future[ResetPassword.Response] = {
+    val hashedPassword = BCrypt.hashpw(password.string, BCrypt.gensalt())
     for {
-      // TODO: Validate token
+      tokenMaybe <- userTokensRepository.find(userId, token)
+      token = tokenMaybe.getOrElse(throw new RuntimeException(s"Token for user $userId wasn't found"))
+      _ = enforceValidToken(token)
       userMaybe <- repository.find(userId)
-      user = userMaybe.getOrElse(throw new RuntimeException("Email not registered"))
-      _ = enforeVerifiedUser(user)
-      hashedPassword = BCrypt.hashpw(password.string, BCrypt.gensalt())
+      user = userMaybe.getOrElse(throw new RuntimeException(s"User with id $userId wasn't found"))
       _ <- repository.resetPassword(userId, hashedPassword)
       emailMessage = EmailMessage.resetPassword(user.name)
       _ = emailApi.sendEmail(EmailRequest(user.email, emailMessage))
@@ -134,8 +149,12 @@ class UsersService @Inject() (
     } yield ResetPassword.Response(token)
   }
 
-  private def enforeVerifiedUser(user: User): Unit = {
+  private def enforceVerifiedUser(user: User): Unit = {
     if (user.verifiedOn.isEmpty) throw new RuntimeException(s"User's ${user.email} hasn't been verified yet")
+  }
+
+  private def enforceValidToken(token: UserToken): Unit = {
+    if (token.expiresAt.isBefore(clock.instant())) throw new RuntimeException("Token is expired")
   }
 
   def update(userId: UUID, request: UpdateUser.Request): Future[Unit] = {
