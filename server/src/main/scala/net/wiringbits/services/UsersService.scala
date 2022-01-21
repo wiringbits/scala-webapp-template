@@ -52,21 +52,21 @@ class UsersService @Inject() (
         createUser.id,
         s"Account created, name = ${request.name}, email = ${request.email}"
       )
-      token = s"${createUser.id}_${UUID.randomUUID()}"
       createToken = UserToken
         .Create(
           id = UUID.randomUUID(),
-          token = token,
+          token = UUID.randomUUID.toString,
           tokenType = UserTokenType.EmailVerification,
           createdAt = Instant.now(clock),
           userId = createUser.id,
           expiresAt = Instant.now(clock).plus(userTokensConfig.emailVerificationExp.toHours, ChronoUnit.HOURS)
         )
       _ <- userTokensRepository.create(createToken)
+      emailParameter = s"${createUser.id}_${createToken.token}"
       emailRequest = EmailMessage.registration(
         name = createUser.name,
         url = webAppConfig.host,
-        emailEndpoint = token
+        emailParameter = emailParameter
       )
       _ = emailApi.sendEmail(EmailRequest(request.email, emailRequest))
     } yield CreateUser.Response(id = createUser.id, email = createUser.email, name = createUser.name)
@@ -77,7 +77,7 @@ class UsersService @Inject() (
     user = userMaybe.getOrElse(throw new RuntimeException(s"User wasn't found"))
     _ = if (user.verifiedOn.isDefined)
       throw new RuntimeException(s"User $userId email is already verified")
-    tokenMaybe <- userTokensRepository.find(s"${userId}_$token")
+    tokenMaybe <- userTokensRepository.find(userId, token)
     token = tokenMaybe.getOrElse(throw new RuntimeException(s"Token for user $userId wasn't found"))
     tokenExpiresAt = token.expiresAt
     _ = if (tokenExpiresAt.isBefore(clock.instant()))

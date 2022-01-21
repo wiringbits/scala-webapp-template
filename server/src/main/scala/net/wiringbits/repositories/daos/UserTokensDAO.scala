@@ -26,11 +26,12 @@ object UserTokensDAO {
       .execute()
   }
 
-  def find(token: String)(implicit conn: Connection): Option[UserToken] = {
+  def find(token: UUID, userId: UUID)(implicit conn: Connection): Option[UserToken] = {
     SQL"""
         SELECT user_token_id, token, token_type, created_at, expires_at, user_id
         FROM user_tokens
-        WHERE token = $token::TEXT
+        WHERE user_id = ${userId.toString}::UUID
+          AND token = ${token.toString}::TEXT
         """.as(tokenParser.singleOpt)
   }
 
