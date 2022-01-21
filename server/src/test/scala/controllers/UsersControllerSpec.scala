@@ -6,8 +6,8 @@ import net.wiringbits.api.models.{CreateUser, Login, VerifyEmail}
 import net.wiringbits.apis.{EmailApi, ReCaptchaApi}
 import net.wiringbits.apis.models.EmailRequest
 import net.wiringbits.common.models.{Captcha, Email, Name, Password, UserToken}
-import net.wiringbits.repositories.TokensRepository
-import net.wiringbits.repositories.models.TokenType
+import net.wiringbits.repositories.UserTokensRepository
+import net.wiringbits.repositories.models.UserTokenType
 import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoSugar.{mock, when}
 import play.api.inject
@@ -22,7 +22,7 @@ import scala.util.control.NonFatal
 
 class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
 
-  def tokensRepository: TokensRepository = app.injector.instanceOf(classOf[TokensRepository])
+  def userTokensRepository: UserTokensRepository = app.injector.instanceOf(classOf[UserTokensRepository])
 
   private val emailApi = mock[EmailApi]
   when(emailApi.sendEmail(any[EmailRequest]())).thenReturn(Future.unit)
@@ -54,12 +54,12 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
       )
 
       val response = client.createUser(request).futureValue
-      val token = tokensRepository.find(response.id).futureValue.headOption
+      val token = userTokensRepository.find(response.id).futureValue.headOption
 
       response.name must be(name)
       response.email must be(email)
       token mustNot be(empty)
-      token.value.tokenType must be(TokenType.VerificationToken)
+      token.value.tokenType must be(UserTokenType.EmailVerification)
     }
 
     "fail when the email is already taken" in withApiClient { client =>
@@ -118,7 +118,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
         password = Password.trusted("test123..."),
         captcha = Captcha.trusted("test")
       )
-      val response = createVerifyLoginUser(request, client, tokensRepository).futureValue
+      val response = createVerifyLoginUser(request, client, userTokensRepository).futureValue
 
       response.name must be(name)
       response.email must be(email)
@@ -133,11 +133,11 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
       )
       val user = client.createUser(request).futureValue
 
-      val token = tokensRepository.find(user.id).futureValue.headOption.value.token
+      val token = userTokensRepository.find(user.id).futureValue.headOption.value.token
 
       client.verifyEmail(VerifyEmail.Request(UserToken(user.id, token))).futureValue
 
-      tokensRepository.find(user.id).futureValue must be(empty)
+      userTokensRepository.find(user.id).futureValue must be(empty)
     }
 
     "fail when trying to verify an already verified user's email" in withApiClient { client =>
@@ -147,7 +147,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
         password = Password.trusted("test123..."),
         captcha = Captcha.trusted("test")
       )
-      val response = createVerifyLoginUser(request, client, tokensRepository).futureValue
+      val response = createVerifyLoginUser(request, client, userTokensRepository).futureValue
 
       val token = UUID.randomUUID()
 
@@ -173,7 +173,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
       )
       val user = client.createUser(request).futureValue
 
-      val token = tokensRepository.find(user.id).futureValue.headOption.value.token
+      val token = userTokensRepository.find(user.id).futureValue.headOption.value.token
 
       client.verifyEmail(VerifyEmail.Request(UserToken(user.id, token))).futureValue
 
@@ -245,7 +245,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
       )
       val user = client.createUser(request).futureValue
 
-      val token = tokensRepository.find(user.id).futureValue.headOption.value.token
+      val token = userTokensRepository.find(user.id).futureValue.headOption.value.token
 
       when(clock.instant()).thenAnswer(Instant.now().plus(2, ChronoUnit.DAYS))
 
@@ -270,7 +270,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
         captcha = Captcha.trusted("test")
       )
       val user = client.createUser(request).futureValue
-      val token = tokensRepository.find(user.id).futureValue.headOption.value.token
+      val token = userTokensRepository.find(user.id).futureValue.headOption.value.token
 
       client.verifyEmail(VerifyEmail.Request(UserToken(user.id, token))).futureValue
 
@@ -288,7 +288,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
         captcha = Captcha.trusted("test")
       )
       val user = client.createUser(request).futureValue
-      val token = tokensRepository.find(user.id).futureValue.headOption.value.token
+      val token = userTokensRepository.find(user.id).futureValue.headOption.value.token
 
       client.verifyEmail(VerifyEmail.Request(UserToken(user.id, token))).futureValue
 

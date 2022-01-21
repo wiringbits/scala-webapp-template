@@ -3,7 +3,7 @@ package utils
 import net.wiringbits.api.ApiClient
 import net.wiringbits.api.models.{CreateUser, Login, VerifyEmail}
 import net.wiringbits.common.models.{Captcha, Password, UserToken}
-import net.wiringbits.repositories.TokensRepository
+import net.wiringbits.repositories.UserTokensRepository
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -12,11 +12,11 @@ trait LoginUtils {
   def createVerifyLoginUser(
       request: CreateUser.Request,
       client: ApiClient,
-      tokensRepository: TokensRepository
+      userTokensRepository: UserTokensRepository
   )(implicit ec: ExecutionContext): Future[Login.Response] = for {
     user <- client.createUser(request)
 
-    tokenMaybe <- tokensRepository.find(user.id).map(_.headOption)
+    tokenMaybe <- userTokensRepository.find(user.id).map(_.headOption)
     token = tokenMaybe.map(_.token).getOrElse(throw new RuntimeException("Could not find the token"))
 
     _ <- client.verifyEmail(VerifyEmail.Request(UserToken(user.id, token)))

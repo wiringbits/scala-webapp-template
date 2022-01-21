@@ -38,12 +38,13 @@ class ConfigModule extends AbstractModule {
   }
 
   @Provides()
-  def tokensConfig(global: Configuration): TokensConfig = {
-    val config = TokensConfig(global.get[Configuration]("tokens"))
-    logger.info(s"Loading tokensConfig, verificationTokenExp = ${config.verificationTokenExp}")
+  def userTokensConfig(global: Configuration): UserTokensConfig = {
+    val config = UserTokensConfig(global.get[Configuration]("userTokens"))
+    logger.info(s"Loading userTokensConfig, emailVerificationExp = ${config.emailVerificationExp}")
     config
   }
 
+  @Provides()
   def awsConfig(global: Configuration): AWSConfig = {
     val config = AWSConfig(global.get[Configuration]("aws"))
     logger.info(

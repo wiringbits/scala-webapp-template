@@ -2,7 +2,7 @@ package net.wiringbits.repositories
 
 import anorm.*
 import net.wiringbits.common.models.{Email, Name}
-import net.wiringbits.repositories.models.{Token, TokenType, User, UserLog}
+import net.wiringbits.repositories.models.{User, UserLog, UserToken, UserTokenType}
 
 package object daos {
 
@@ -46,11 +46,11 @@ package object daos {
       .toRight(SqlRequestError(new RuntimeException(s"The value $string doesn't exists")))
   }
 
-  implicit val tokenTypeColumn: Column[TokenType] = enumColumn(
-    TokenType.withNameInsensitiveOption
+  implicit val tokenTypeColumn: Column[UserTokenType] = enumColumn(
+    UserTokenType.withNameInsensitiveOption
   )
 
-  implicit val tokenParser: RowParser[Token] = {
-    Macro.parser[Token]("token_id", "token", "token_type", "created_at", "expires_at", "user_id")
+  implicit val tokenParser: RowParser[UserToken] = {
+    Macro.parser[UserToken]("token_id", "token", "token_type", "created_at", "expires_at", "user_id")
   }
 }

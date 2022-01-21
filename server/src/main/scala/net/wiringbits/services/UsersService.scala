@@ -2,18 +2,19 @@ package net.wiringbits.services
 
 import net.wiringbits.apis.EmailApiAWSImpl
 import net.wiringbits.apis.models.EmailRequest
-import net.wiringbits.config.{JwtConfig, WebAppConfig}
+import net.wiringbits.config.{JwtConfig, UserTokensConfig, WebAppConfig}
 import net.wiringbits.api.models.{CreateUser, GetCurrentUser, Login, UpdateUser, VerifyEmail}
 import net.wiringbits.repositories
-import net.wiringbits.repositories.models.{TokenType, User}
-import net.wiringbits.repositories.{TokensRepository, UserLogsRepository, UsersRepository}
+import net.wiringbits.repositories.models.{User, UserToken, UserTokenType}
+import net.wiringbits.repositories.{UserLogsRepository, UserTokensRepository, UsersRepository}
 import net.wiringbits.util.{EmailMessage, JwtUtils}
 import net.wiringbits.apis.ReCaptchaApi
 import net.wiringbits.common.models.Captcha
 import net.wiringbits.common.models.Email
 import org.mindrot.jbcrypt.BCrypt
 
-import java.time.Clock
+import java.time.{Clock, Instant}
+import java.time.temporal.ChronoUnit
 import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -22,8 +23,9 @@ class UsersService @Inject() (
     jwtConfig: JwtConfig,
     repository: UsersRepository,
     userLogsRepository: UserLogsRepository,
-    tokensRepository: TokensRepository,
+    userTokensRepository: UserTokensRepository,
     webAppConfig: WebAppConfig,
+    userTokensConfig: UserTokensConfig,
     emailApi: EmailApiAWSImpl,
     captchaApi: ReCaptchaApi,
     clock: Clock
@@ -50,14 +52,16 @@ class UsersService @Inject() (
         createUser.id,
         s"Account created, name = ${request.name}, email = ${request.email}"
       )
-      createToken = repositories.models.Token
-        .CreateToken(
+      createToken = UserToken
+        .Create(
           id = UUID.randomUUID(),
           token = UUID.randomUUID(),
-          tokenType = TokenType.VerificationToken,
-          userId = createUser.id
+          tokenType = UserTokenType.EmailVerification,
+          createdAt = Instant.now(clock),
+          userId = createUser.id,
+          expiresAt = Instant.now(clock).plus(userTokensConfig.emailVerificationExp.toHours, ChronoUnit.HOURS)
         )
-      _ <- tokensRepository.create(createToken)
+      _ <- userTokensRepository.create(createToken)
       emailRequest = EmailMessage.registration(
         name = createUser.name,
         url = webAppConfig.host,
@@ -73,14 +77,14 @@ class UsersService @Inject() (
     user = userMaybe.getOrElse(throw new RuntimeException(s"User wasn't found"))
     _ = if (user.verifiedOn.isDefined)
       throw new RuntimeException(s"User $userId email is already verified")
-    tokenMaybe <- tokensRepository.find(userId, token)
+    tokenMaybe <- userTokensRepository.find(userId, token)
     token = tokenMaybe.getOrElse(throw new RuntimeException(s"Token for user $userId wasn't found"))
     tokenExpiresAt = token.expiresAt
     _ = if (tokenExpiresAt.isBefore(clock.instant()))
       throw new RuntimeException("Token is expired")
     _ <- repository.verify(userId)
     _ <- userLogsRepository.create(userId, "Email was verified")
-    _ <- tokensRepository.delete(token.id)
+    _ <- userTokensRepository.delete(token.id, userId)
     _ = emailApi.sendEmail(EmailRequest(user.email, EmailMessage.confirm(user.name)))
   } yield VerifyEmail.Response()
 
