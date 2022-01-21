@@ -5,7 +5,7 @@ import java.util.UUID
 
 case class UserToken(
     id: UUID,
-    token: UUID,
+    token: String,
     tokenType: UserTokenType,
     createdAt: Instant,
     expiresAt: Instant,
@@ -16,7 +16,7 @@ object UserToken {
 
   case class Create(
       id: UUID,
-      token: UUID,
+      token: String,
       tokenType: UserTokenType,
       createdAt: Instant,
       expiresAt: Instant,

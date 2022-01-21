@@ -52,10 +52,11 @@ class UsersService @Inject() (
         createUser.id,
         s"Account created, name = ${request.name}, email = ${request.email}"
       )
+      token = s"${createUser.id}_${UUID.randomUUID()}"
       createToken = UserToken
         .Create(
           id = UUID.randomUUID(),
-          token = UUID.randomUUID(),
+          token = token,
           tokenType = UserTokenType.EmailVerification,
           createdAt = Instant.now(clock),
           userId = createUser.id,
@@ -65,7 +66,7 @@ class UsersService @Inject() (
       emailRequest = EmailMessage.registration(
         name = createUser.name,
         url = webAppConfig.host,
-        emailEndpoint = s"${createUser.id}_${createToken.token}"
+        emailEndpoint = token
       )
       _ = emailApi.sendEmail(EmailRequest(request.email, emailRequest))
     } yield CreateUser.Response(id = createUser.id, email = createUser.email, name = createUser.name)

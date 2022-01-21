@@ -51,6 +51,6 @@ package object daos {
   )
 
   implicit val tokenParser: RowParser[UserToken] = {
-    Macro.parser[UserToken]("token_id", "token", "token_type", "created_at", "expires_at", "user_id")
+    Macro.parser[UserToken]("user_token_id", "token", "token_type", "created_at", "expires_at", "user_id")
   }
 }
