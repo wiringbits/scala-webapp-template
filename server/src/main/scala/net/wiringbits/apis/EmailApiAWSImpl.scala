@@ -1,9 +1,10 @@
 package net.wiringbits.apis
 
+import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailServiceClientBuilder
 import com.amazonaws.services.simpleemail.model.*
 import net.wiringbits.apis.models.EmailRequest
-import net.wiringbits.config.EmailConfig
+import net.wiringbits.config.{AWSConfig, EmailConfig}
 import org.slf4j.LoggerFactory
 
 import javax.inject.Inject
@@ -11,7 +12,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Future, blocking}
 
 class EmailApiAWSImpl @Inject() (
-    emailConfig: EmailConfig
+    emailConfig: EmailConfig,
+    awsConfig: AWSConfig
 ) extends EmailApi {
   private val logger = LoggerFactory.getLogger(this.getClass)
 
@@ -23,8 +25,14 @@ class EmailApiAWSImpl @Inject() (
       s"""<p>${emailRequest.message.body}</p>""".stripMargin
 
     def unsafe(): Unit = try {
+      val credentials = new BasicAWSCredentials(awsConfig.accessKeyId.string, awsConfig.secretAccessKey.string)
+      val credentialsProvider = new AWSStaticCredentialsProvider(credentials)
+
       val client =
-        AmazonSimpleEmailServiceClientBuilder.standard.build()
+        AmazonSimpleEmailServiceClientBuilder.standard
+          .withCredentials(credentialsProvider)
+          .withRegion(awsConfig.region)
+          .build()
       val destination = new Destination().withToAddresses(emailRequest.destination.string)
       val body = new Body()
         .withHtml(new Content().withCharset("UTF-8").withData(htmlBody))
@@ -36,11 +44,13 @@ class EmailApiAWSImpl @Inject() (
         .withMessage(message)
         .withSource(from)
       client.sendEmail(request)
-      logger.info(s"Sent email to: $from, with subject: ${emailRequest.message.subject}")
-      ()
+      logger.info(s"Email sent, to: ${emailRequest.destination}, subject = ${emailRequest.message.subject}")
     } catch {
       case ex: Exception =>
-        throw new RuntimeException(s"Email was not sent to: $from, with subject: ${emailRequest.message.subject}", ex);
+        throw new RuntimeException(
+          s"Email was not sent, to: ${emailRequest.destination}, subject = ${emailRequest.message.subject}",
+          ex
+        )
     }
 
     Future {
