@@ -2,18 +2,19 @@ package net.wiringbits.services
 
 import net.wiringbits.apis.EmailApiAWSImpl
 import net.wiringbits.apis.models.EmailRequest
-import net.wiringbits.config.{JwtConfig, WebAppConfig}
+import net.wiringbits.config.{JwtConfig, UserTokensConfig, WebAppConfig}
 import net.wiringbits.api.models.{CreateUser, GetCurrentUser, Login, UpdateUser, VerifyEmail}
 import net.wiringbits.repositories
-import net.wiringbits.repositories.models.User
-import net.wiringbits.repositories.{UserLogsRepository, UsersRepository}
+import net.wiringbits.repositories.models.{User, UserToken, UserTokenType}
+import net.wiringbits.repositories.{UserLogsRepository, UserTokensRepository, UsersRepository}
 import net.wiringbits.util.{EmailMessage, JwtUtils}
 import net.wiringbits.apis.ReCaptchaApi
 import net.wiringbits.common.models.Captcha
 import net.wiringbits.common.models.Email
 import org.mindrot.jbcrypt.BCrypt
 
-import java.time.Clock
+import java.time.{Clock, Instant}
+import java.time.temporal.ChronoUnit
 import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -22,13 +23,15 @@ class UsersService @Inject() (
     jwtConfig: JwtConfig,
     repository: UsersRepository,
     userLogsRepository: UserLogsRepository,
+    userTokensRepository: UserTokensRepository,
     webAppConfig: WebAppConfig,
+    userTokensConfig: UserTokensConfig,
     emailApi: EmailApiAWSImpl,
-    captchaApi: ReCaptchaApi
+    captchaApi: ReCaptchaApi,
+    clock: Clock
 )(implicit
     ec: ExecutionContext
 ) {
-  private implicit val clock: Clock = Clock.systemUTC
 
   // returns the login token
   def create(request: CreateUser.Request): Future[CreateUser.Response] = {
@@ -49,22 +52,39 @@ class UsersService @Inject() (
         createUser.id,
         s"Account created, name = ${request.name}, email = ${request.email}"
       )
+      createToken = UserToken
+        .Create(
+          id = UUID.randomUUID(),
+          token = UUID.randomUUID.toString,
+          tokenType = UserTokenType.EmailVerification,
+          createdAt = Instant.now(clock),
+          userId = createUser.id,
+          expiresAt = Instant.now(clock).plus(userTokensConfig.emailVerificationExp.toHours, ChronoUnit.HOURS)
+        )
+      _ <- userTokensRepository.create(createToken)
+      emailParameter = s"${createUser.id}_${createToken.token}"
       emailRequest = EmailMessage.registration(
         name = createUser.name,
         url = webAppConfig.host,
-        emailEndpoint = s"${createUser.id}"
+        emailParameter = emailParameter
       )
       _ = emailApi.sendEmail(EmailRequest(request.email, emailRequest))
     } yield CreateUser.Response(id = createUser.id, email = createUser.email, name = createUser.name)
   }
 
-  def verifyEmail(userId: UUID): Future[VerifyEmail.Response] = for {
+  def verifyEmail(userId: UUID, token: UUID): Future[VerifyEmail.Response] = for {
     userMaybe <- repository.find(userId)
     user = userMaybe.getOrElse(throw new RuntimeException(s"User wasn't found"))
     _ = if (user.verifiedOn.isDefined)
       throw new RuntimeException(s"User $userId email is already verified")
+    tokenMaybe <- userTokensRepository.find(userId, token)
+    token = tokenMaybe.getOrElse(throw new RuntimeException(s"Token for user $userId wasn't found"))
+    tokenExpiresAt = token.expiresAt
+    _ = if (tokenExpiresAt.isBefore(clock.instant()))
+      throw new RuntimeException("Token is expired")
     _ <- repository.verify(userId)
     _ <- userLogsRepository.create(userId, "Email was verified")
+    _ <- userTokensRepository.delete(token.id, userId)
     _ = emailApi.sendEmail(EmailRequest(user.email, EmailMessage.confirm(user.name)))
   } yield VerifyEmail.Response()
 
@@ -79,7 +99,7 @@ class UsersService @Inject() (
         .filter(user => BCrypt.checkpw(request.password.string, user.hashedPassword))
         .getOrElse(throw new RuntimeException("The given email/password doesn't match"))
       _ <- userLogsRepository.create(user.id, "Logged in successfully")
-      token = JwtUtils.createToken(jwtConfig, user.id)
+      token = JwtUtils.createToken(jwtConfig, user.id)(clock)
     } yield Login.Response(user.id, user.name, user.email, token)
   }
 
