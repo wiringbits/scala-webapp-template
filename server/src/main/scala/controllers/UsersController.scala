@@ -29,7 +29,7 @@ class UsersController @Inject() (
     val token = request.body.token
     logger.info(s"Verify user's email: ${token.userId}")
     for {
-      response <- usersService.verifyEmail(token.userId)
+      response <- usersService.verifyEmail(token.userId, token.token)
     } yield Ok(Json.toJson(response))
   }
 

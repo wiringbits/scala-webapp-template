@@ -6,13 +6,13 @@ case class EmailMessage(subject: String, body: String)
 
 object EmailMessage {
 
-  def registration(name: Name, url: String, emailEndpoint: String): EmailMessage = {
+  def registration(name: Name, url: String, emailParameter: String): EmailMessage = {
     val subject = "Registration Confirmation"
     val body =
       s"""Hi ${name.string},
          |Thanks for creating an account.
          |To continue, please confirm your email address by clicking the button below.
-         |<a href="$url/verify-email/$emailEndpoint">Confirm email address</a>
+         |<a href="$url/verify-email/$emailParameter">Confirm email address</a>
          |""".stripMargin
 
     EmailMessage(subject, body)
