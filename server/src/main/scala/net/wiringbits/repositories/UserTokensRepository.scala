@@ -21,9 +21,9 @@ class UserTokensRepository @Inject() (
     }
   }
 
-  def find(token: UUID, userId: UUID): Future[Option[UserToken]] = Future {
+  def find(userId: UUID, token: UUID): Future[Option[UserToken]] = Future {
     database.withConnection { implicit conn =>
-      UserTokensDAO.find(token, userId)
+      UserTokensDAO.find(userId, token)
     }
   }
 

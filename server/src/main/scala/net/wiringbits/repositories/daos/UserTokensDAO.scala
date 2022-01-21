@@ -26,7 +26,7 @@ object UserTokensDAO {
       .execute()
   }
 
-  def find(token: UUID, userId: UUID)(implicit conn: Connection): Option[UserToken] = {
+  def find(userId: UUID, token: UUID)(implicit conn: Connection): Option[UserToken] = {
     SQL"""
         SELECT user_token_id, token, token_type, created_at, expires_at, user_id
         FROM user_tokens

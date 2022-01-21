@@ -4,8 +4,8 @@ import net.wiringbits.api.ApiClient
 import net.wiringbits.api.models.{CreateUser, Login, VerifyEmail}
 import net.wiringbits.common.models.{Captcha, Password, UserToken}
 import net.wiringbits.repositories.UserTokensRepository
-import org.scalatest.OptionValues.convertOptionToValuable
 
+import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
 trait LoginUtils {
@@ -20,7 +20,7 @@ trait LoginUtils {
     tokenMaybe <- userTokensRepository.find(user.id).map(_.headOption)
     token = tokenMaybe.map(_.token).getOrElse(throw new RuntimeException("Could not find the token"))
 
-    _ <- client.verifyEmail(VerifyEmail.Request(UserToken.validate(token).value))
+    _ <- client.verifyEmail(VerifyEmail.Request(UserToken(user.id, UUID.fromString(token))))
 
     loginRequest = Login.Request(
       email = user.email,
