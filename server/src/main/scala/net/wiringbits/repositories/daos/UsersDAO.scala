@@ -64,6 +64,14 @@ object UsersDAO {
     """.execute()
   }
 
+  def resetPassword(userId: UUID, password: String)(implicit conn: Connection): Unit = {
+    val _ = SQL"""
+      UPDATE users
+      SET password = $password
+      WHERE user_id = ${userId.toString}::UUID
+    """.execute()
+  }
+
   def findUserForUpdate(userId: UUID)(implicit conn: Connection): Option[User] = {
     SQL"""
         SELECT user_id, name, email, password, created_at, verified_on

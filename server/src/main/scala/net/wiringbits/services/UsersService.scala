@@ -1,16 +1,22 @@
 package net.wiringbits.services
 
-import net.wiringbits.apis.EmailApiAWSImpl
+import net.wiringbits.api.models.{
+  CreateUser,
+  ForgotPassword,
+  GetCurrentUser,
+  Login,
+  ResetPassword,
+  UpdateUser,
+  VerifyEmail
+}
+import net.wiringbits.apis.{EmailApiAWSImpl, ReCaptchaApi}
 import net.wiringbits.apis.models.EmailRequest
+import net.wiringbits.common.models.{Captcha, Email, Password}
 import net.wiringbits.config.{JwtConfig, UserTokensConfig, WebAppConfig}
-import net.wiringbits.api.models.{CreateUser, GetCurrentUser, Login, UpdateUser, VerifyEmail}
 import net.wiringbits.repositories
 import net.wiringbits.repositories.models.{User, UserToken, UserTokenType}
 import net.wiringbits.repositories.{UserLogsRepository, UserTokensRepository, UsersRepository}
 import net.wiringbits.util.{EmailMessage, JwtUtils}
-import net.wiringbits.apis.ReCaptchaApi
-import net.wiringbits.common.models.Captcha
-import net.wiringbits.common.models.Email
 import org.mindrot.jbcrypt.BCrypt
 
 import java.time.{Clock, Instant}
@@ -79,9 +85,7 @@ class UsersService @Inject() (
       throw new RuntimeException(s"User $userId email is already verified")
     tokenMaybe <- userTokensRepository.find(userId, token)
     token = tokenMaybe.getOrElse(throw new RuntimeException(s"Token for user $userId wasn't found"))
-    tokenExpiresAt = token.expiresAt
-    _ = if (tokenExpiresAt.isBefore(clock.instant()))
-      throw new RuntimeException("Token is expired")
+    _ = enforceValidToken(token)
     _ <- repository.verify(userId)
     _ <- userLogsRepository.create(userId, "Email was verified")
     _ <- userTokensRepository.delete(token.id, userId)
@@ -101,6 +105,56 @@ class UsersService @Inject() (
       _ <- userLogsRepository.create(user.id, "Logged in successfully")
       token = JwtUtils.createToken(jwtConfig, user.id)(clock)
     } yield Login.Response(user.id, user.name, user.email, token)
+  }
+
+  def forgotPassword(request: ForgotPassword.Request): Future[ForgotPassword.Response] = {
+
+    def whenExists(user: User) = {
+      val createToken = UserToken
+        .Create(
+          id = UUID.randomUUID(),
+          token = UUID.randomUUID.toString,
+          tokenType = UserTokenType.ResetPassword,
+          createdAt = Instant.now(clock),
+          userId = user.id,
+          expiresAt = Instant.now(clock).plus(userTokensConfig.resetPasswordExp.toHours, ChronoUnit.HOURS)
+        )
+      enforceVerifiedUser(user)
+      val emailMessage = EmailMessage.forgotPassword(user.name, webAppConfig.host, s"${user.id}_${createToken.id}")
+      for {
+        _ <- userTokensRepository.create(createToken)
+        _ = emailApi.sendEmail(EmailRequest(user.email, emailMessage))
+      } yield ()
+    }
+
+    for {
+      _ <- validateCaptcha(request.captcha)
+      userMaybe <- repository.find(request.email)
+      _ <- userMaybe.map(whenExists).getOrElse(Future.unit)
+    } yield ForgotPassword.Response()
+  }
+
+  def resetPassword(userId: UUID, token: UUID, password: Password): Future[ResetPassword.Response] = {
+    val hashedPassword = BCrypt.hashpw(password.string, BCrypt.gensalt())
+    for {
+      tokenMaybe <- userTokensRepository.find(userId, token)
+      token = tokenMaybe.getOrElse(throw new RuntimeException(s"Token for user $userId wasn't found"))
+      _ = enforceValidToken(token)
+      userMaybe <- repository.find(userId)
+      user = userMaybe.getOrElse(throw new RuntimeException(s"User with id $userId wasn't found"))
+      _ <- repository.resetPassword(userId, hashedPassword)
+      emailMessage = EmailMessage.resetPassword(user.name)
+      _ = emailApi.sendEmail(EmailRequest(user.email, emailMessage))
+      token = JwtUtils.createToken(jwtConfig, user.id)(clock)
+    } yield ResetPassword.Response(token)
+  }
+
+  private def enforceVerifiedUser(user: User): Unit = {
+    if (user.verifiedOn.isEmpty) throw new RuntimeException(s"User's ${user.email} hasn't been verified yet")
+  }
+
+  private def enforceValidToken(token: UserToken): Unit = {
+    if (token.expiresAt.isBefore(clock.instant())) throw new RuntimeException("Token is expired")
   }
 
   def update(userId: UUID, request: UpdateUser.Request): Future[Unit] = {

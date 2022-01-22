@@ -41,6 +41,22 @@ class UsersController @Inject() (
     } yield Ok(Json.toJson(response))
   }
 
+  def forgotPassword() = handleJsonBody[ForgotPassword.Request] { request =>
+    val body = request.body
+    logger.info(s"Send a link to reset password for user with email: ${body.email}")
+    for {
+      response <- usersService.forgotPassword(body)
+    } yield Ok(Json.toJson(response))
+  }
+
+  def resetPassword() = handleJsonBody[ResetPassword.Request] { request =>
+    val body = request.body
+    logger.info(s"Reset user's password: ${body.token.userId}")
+    for {
+      response <- usersService.resetPassword(body.token.userId, body.token.token, body.password)
+    } yield Ok(Json.toJson(response))
+  }
+
   def update() = handleJsonBody[UpdateUser.Request] { request =>
     val body = request.body
     logger.info(s"Update user: $body")

@@ -2,13 +2,13 @@ package controllers
 
 import com.dimafeng.testcontainers.PostgreSQLContainer
 import controllers.common.PlayPostgresSpec
-import net.wiringbits.api.models.{CreateUser, Login, VerifyEmail}
-import net.wiringbits.apis.{EmailApi, ReCaptchaApi}
+import net.wiringbits.api.models.{CreateUser, ForgotPassword, Login, ResetPassword, VerifyEmail}
 import net.wiringbits.apis.models.EmailRequest
+import net.wiringbits.apis.{EmailApi, ReCaptchaApi}
+import org.mockito.ArgumentMatchers.any
 import net.wiringbits.common.models.{Captcha, Email, Name, Password, UserToken}
 import net.wiringbits.repositories.UserTokensRepository
 import net.wiringbits.repositories.models.UserTokenType
-import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoSugar.{mock, when}
 import play.api.inject
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -366,5 +366,187 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
       error must be("The email is not verified, check your spam folder if you don't see the email.")
     }
 
+  }
+
+  "POST /forgot-password" should {
+    "create the reset password token after the user's request to reset their password" in withApiClient { client =>
+      val name = Name.trusted("wiringbits")
+      val email = Email.trusted("test1@email.com")
+      val request = CreateUser.Request(
+        name = name,
+        email = email,
+        password = Password.trusted("test123..."),
+        captcha = Captcha.trusted("test")
+      )
+
+      createVerifyLoginUser(request, client, userTokensRepository).futureValue
+
+      val forgotPasswordRequest = ForgotPassword.Request(email, Captcha.trusted("test"))
+      val response = client.forgotPassword(forgotPasswordRequest).futureValue
+
+      response must be(ForgotPassword.Response())
+    }
+
+    "ignore the request when the user tries to reset a password for nonexistent email" in withApiClient { client =>
+      val email = Email.trusted("test@email.com")
+      val forgotPasswordRequest = ForgotPassword.Request(email, Captcha.trusted("test"))
+
+      val response = client.forgotPassword(forgotPasswordRequest).futureValue
+
+      response must be(ForgotPassword.Response())
+    }
+
+    "fail when the user tries to reset a password without their email verification step" in withApiClient { client =>
+      val name = Name.trusted("wiringbits")
+      val email = Email.trusted("test1@email.com")
+      val request = CreateUser.Request(
+        name = name,
+        email = email,
+        password = Password.trusted("test123..."),
+        captcha = Captcha.trusted("test")
+      )
+
+      client.createUser(request).futureValue
+
+      val forgotPasswordRequest = ForgotPassword.Request(email, Captcha.trusted("test"))
+
+      val error = client
+        .forgotPassword(forgotPasswordRequest)
+        .map(_ => "Success when failure expected")
+        .recover { case NonFatal(ex) =>
+          ex.getMessage
+        }
+        .futureValue
+
+      error must be(s"User's $email hasn't been verified yet")
+    }
+
+    "fail when the captcha isn't valid" in withApiClient { client =>
+      val name = Name.trusted("wiringbits")
+      val email = Email.trusted("test1@email.com")
+      val request = CreateUser.Request(
+        name = name,
+        email = email,
+        password = Password.trusted("test123..."),
+        captcha = Captcha.trusted("test")
+      )
+
+      createVerifyLoginUser(request, client, userTokensRepository).futureValue
+
+      val forgotPasswordRequest = ForgotPassword.Request(email, Captcha.trusted("test"))
+      when(captchaApi.verify(any[Captcha]())).thenReturn(Future.successful(false))
+
+      val error = client
+        .forgotPassword(forgotPasswordRequest)
+        .map(_ => "Success when failure expected")
+        .recover { case NonFatal(ex) =>
+          ex.getMessage
+        }
+        .futureValue
+
+      error must be("Invalid captcha, try again")
+
+      when(captchaApi.verify(any[Captcha]())).thenReturn(Future.successful(true))
+    }
+  }
+
+  "POST /reset-password" should {
+    "reset a password for a given user" in withApiClient { client =>
+      val name = Name.trusted("wiringbits")
+      val email = Email.trusted("test1@email.com")
+      val request = CreateUser.Request(
+        name = name,
+        email = email,
+        password = Password.trusted("test123..."),
+        captcha = Captcha.trusted("test")
+      )
+
+      val user = createVerifyLoginUser(request, client, userTokensRepository).futureValue
+
+      val forgotPasswordRequest = ForgotPassword.Request(email, Captcha.trusted("test"))
+      client.forgotPassword(forgotPasswordRequest).futureValue
+
+      val token = userTokensRepository.find(user.id).futureValue.headOption.value.token
+
+      val resetPasswordRequest =
+        ResetPassword.Request(UserToken(user.id, UUID.fromString(token)), Password.trusted("test456..."))
+      client.resetPassword(resetPasswordRequest).futureValue
+
+      val loginRequest = Login.Request(
+        email = request.email,
+        password = Password.trusted("test456..."),
+        captcha = Captcha.trusted("test")
+      )
+      val loginResponse = client.login(loginRequest).futureValue
+
+      loginResponse.name must be(request.name)
+      loginResponse.email must be(request.email)
+    }
+
+    "return a token when a user tries to reset a password" in withApiClient { client =>
+      val name = Name.trusted("wiringbits")
+      val email = Email.trusted("test1@email.com")
+      val request = CreateUser.Request(
+        name = name,
+        email = email,
+        password = Password.trusted("test123..."),
+        captcha = Captcha.trusted("test")
+      )
+
+      val userId = createVerifyLoginUser(request, client, userTokensRepository).futureValue.id
+
+      val forgotPasswordRequest = ForgotPassword.Request(email, Captcha.trusted("test"))
+      client.forgotPassword(forgotPasswordRequest).futureValue
+
+      val token = userTokensRepository.find(userId).futureValue.headOption.value.token
+
+      val resetPasswordRequest =
+        ResetPassword.Request(UserToken(userId, UUID.fromString(token)), Password.trusted("test456..."))
+
+      val response = client
+        .resetPassword(resetPasswordRequest)
+        .futureValue
+
+      response.token mustNot be(empty)
+    }
+
+    "fail when the user tries to login with their old password after the password resetting" in withApiClient {
+      client =>
+        val name = Name.trusted("wiringbits")
+        val email = Email.trusted("test1@email.com")
+        val request = CreateUser.Request(
+          name = name,
+          email = email,
+          password = Password.trusted("test123..."),
+          captcha = Captcha.trusted("test")
+        )
+
+        val user = createVerifyLoginUser(request, client, userTokensRepository).futureValue
+
+        val forgotPasswordRequest = ForgotPassword.Request(email, Captcha.trusted("test"))
+        client.forgotPassword(forgotPasswordRequest).futureValue
+
+        val token = userTokensRepository.find(user.id).futureValue.headOption.value.token
+
+        val resetPasswordRequest =
+          ResetPassword.Request(UserToken(user.id, UUID.fromString(token)), Password.trusted("test456..."))
+        client.resetPassword(resetPasswordRequest).futureValue
+
+        val loginRequest = Login.Request(
+          email = request.email,
+          password = Password.trusted("test123..."),
+          captcha = Captcha.trusted("test")
+        )
+
+        val error = client
+          .login(loginRequest)
+          .map(_ => "Success when failure expected")
+          .recover { case NonFatal(ex) =>
+            ex.getMessage
+          }
+          .futureValue
+
+        error must be("The given email/password doesn't match")
+    }
   }
 }
