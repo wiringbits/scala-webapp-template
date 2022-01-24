@@ -12,9 +12,9 @@ import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
 }
 import net.wiringbits.api.models.GetUserLogs
 import net.wiringbits.models.User
-import net.wiringbits.ui.components.core.RemoteDataLoader
-import net.wiringbits.ui.components.core.widgets._
-import net.wiringbits.ui.core.GenericHooks
+import net.wiringbits.webapp.utils.slinkyUtils.components.core.AsyncComponent
+import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container}
+import net.wiringbits.webapp.utils.slinkyUtils.core.GenericHooks
 import net.wiringbits.{API, AppStrings}
 import org.scalablytyped.runtime.StringDictionary
 import slinky.core.FunctionalComponent
@@ -37,8 +37,8 @@ import slinky.core.facade.Fragment
     val classes = useStyles(())
     val (timesRefreshingData, forceRefresh) = GenericHooks.useForceRefresh
 
-    RemoteDataLoader.component[GetUserLogs.Response](
-      RemoteDataLoader.Props(
+    AsyncComponent.component[GetUserLogs.Response](
+      AsyncComponent.Props(
         fetch = () => props.api.client.getUserLogs(props.user.jwt),
         render = response => LogList.component(LogList.Props(response, () => forceRefresh())),
         progressIndicator = () => loader,

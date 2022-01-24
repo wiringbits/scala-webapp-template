@@ -6,9 +6,9 @@ import com.alexitc.materialui.facade.materialUiStyles.makeStylesMod.StylesHook
 import com.alexitc.materialui.facade.materialUiStyles.mod.makeStyles
 import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{StyleRulesCallback, Styles, WithStylesOptions}
 import net.wiringbits.api.models.AdminGetUsers
-import net.wiringbits.ui.components.core.RemoteDataLoader
-import net.wiringbits.ui.components.core.widgets.{CircularLoader, Container}
-import net.wiringbits.ui.core.GenericHooks
+import net.wiringbits.webapp.utils.slinkyUtils.components.core.AsyncComponent
+import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container}
+import net.wiringbits.webapp.utils.slinkyUtils.core.GenericHooks
 import net.wiringbits.{API, AppStrings}
 import org.scalablytyped.runtime.StringDictionary
 import slinky.core.FunctionalComponent
@@ -27,14 +27,13 @@ import slinky.core.facade.Fragment
     val classes = useStyles(())
     val (timesRefreshingData, forceRefresh) = GenericHooks.useForceRefresh
 
-    RemoteDataLoader.component[AdminGetUsers.Response](
-      RemoteDataLoader
-        .Props(
-          fetch = () => props.api.client.adminGetUsers(),
-          render = response => UserList.component(UserList.Props(response, forceRefresh)),
-          progressIndicator = () => loader,
-          watchedObjects = List(timesRefreshingData)
-        )
+    AsyncComponent.component[AdminGetUsers.Response](
+      AsyncComponent.Props(
+        fetch = () => props.api.client.adminGetUsers(),
+        render = response => UserList.component(UserList.Props(response, forceRefresh)),
+        progressIndicator = () => loader,
+        watchedObjects = List(timesRefreshingData)
+      )
     )
   }
 

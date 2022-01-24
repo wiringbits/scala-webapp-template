@@ -2,7 +2,7 @@ package net.wiringbits.components.pages
 
 import net.wiringbits.components.widgets._
 import net.wiringbits.models.User
-import net.wiringbits.ui.components.core.widgets._
+import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{Container, Subtitle, Title}
 import net.wiringbits.{API, AppStrings}
 import slinky.core.FunctionalComponent
 import slinky.core.annotations.react
