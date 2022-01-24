@@ -5,8 +5,8 @@ ThisBuild / scalaVersion := "2.13.8"
 ThisBuild / organization := "net.wiringbits"
 
 val playJson = "2.9.2"
-val sttp = "3.3.18"
-val webappUtils = "0.3.3"
+val sttp = "3.4.0"
+val webappUtils = "0.4.3"
 
 val consoleDisabledOptions = Seq("-Xfatal-warnings", "-Ywarn-unused", "-Ywarn-unused-import")
 
@@ -81,7 +81,8 @@ lazy val baseLibSettings: Project => Project =
         "-unchecked" // Enable additional warnings where generated code depends on assumptions.
       ),
       libraryDependencies ++= Seq(
-        "org.scalatest" %%% "scalatest" % "3.2.10" % Test
+        "org.scalatest" %%% "scalatest" % "3.2.11" % Test,
+        "com.beachape" %%% "enumeratum" % "1.7.0"
       )
     )
 
@@ -195,8 +196,8 @@ lazy val playSettings: Project => Project = {
       // test
       libraryDependencies ++= Seq(
         "org.scalatestplus.play" %% "scalatestplus-play" % "5.1.0" % Test,
-        "org.mockito" %% "mockito-scala" % "1.16.49" % Test,
-        "org.mockito" %% "mockito-scala-scalatest" % "1.16.49" % Test
+        "org.mockito" %% "mockito-scala" % "1.17.0" % Test,
+        "org.mockito" %% "mockito-scala-scalatest" % "1.17.0" % Test
       )
     )
 }
@@ -294,7 +295,10 @@ lazy val server = (project in file("server"))
       "com.dimafeng" %% "testcontainers-scala-postgresql" % "0.39.12" % "test",
       "com.softwaremill.sttp.client3" %% "core" % sttp % "test",
       "com.softwaremill.sttp.client3" %% "async-http-client-backend-future" % sttp % "test",
-      "net.wiringbits" %% "admin-data-explorer-play-server" % webappUtils
+      "net.wiringbits" %% "admin-data-explorer-play-server" % webappUtils,
+      "com.amazonaws" % "aws-java-sdk-ses" % "1.12.145",
+      // aws-java-sdk-ses requires this to work
+      "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.13.1"
     )
   )
 
@@ -303,8 +307,10 @@ lazy val webBuildInfoSettings: Project => Project = _.enablePlugins(BuildInfoPlu
     buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
     buildInfoKeys ++= {
       val apiUrl = sys.env.get("API_URL")
+      val recaptchaKey = sys.env.get("RECAPTCHA_KEY")
       val values = Seq(
-        "apiUrl" -> apiUrl
+        "apiUrl" -> apiUrl,
+        "recaptchaKey" -> recaptchaKey
       )
       // Logging these values is useful to make sure that the necessary settings
       // are being overriden when packaging the app.
@@ -337,7 +343,9 @@ lazy val web = (project in file("web"))
       "react-router" -> "5.1.2",
       "@types/react-router" -> "5.1.2",
       "react-router-dom" -> "5.1.2",
-      "@types/react-router-dom" -> "5.1.2"
+      "@types/react-router-dom" -> "5.1.2",
+      "react-google-recaptcha" -> "2.1.0",
+      "@types/react-google-recaptcha" -> "2.1.0"
     ),
     libraryDependencies ++= Seq(
       "com.typesafe.play" %%% "play-json" % playJson,
@@ -347,7 +355,7 @@ lazy val web = (project in file("web"))
       "net.wiringbits" %%% "admin-data-explorer-slinky" % webappUtils
     ),
     libraryDependencies ++= Seq(
-      "org.scalatest" %%% "scalatest" % "3.2.10" % Test
+      "org.scalatest" %%% "scalatest" % "3.2.11" % Test
     )
   )
 
@@ -400,7 +408,7 @@ lazy val admin = (project in file("admin"))
       "net.wiringbits" %%% "admin-data-explorer-slinky" % webappUtils
     ),
     libraryDependencies ++= Seq(
-      "org.scalatest" %%% "scalatest" % "3.2.10" % Test
+      "org.scalatest" %%% "scalatest" % "3.2.11" % Test
     )
   )
 

@@ -5,7 +5,7 @@ import com.alexitc.materialui.facade.materialUiCore.{components => mui, material
 import com.alexitc.materialui.facade.materialUiStyles.makeStylesMod.StylesHook
 import com.alexitc.materialui.facade.materialUiStyles.mod.makeStyles
 import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{StyleRulesCallback, Styles, WithStylesOptions}
-import net.wiringbits.api.models.AdminGetUsersResponse
+import net.wiringbits.api.models.AdminGetUsers
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.AsyncComponent
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container}
 import net.wiringbits.webapp.utils.slinkyUtils.core.GenericHooks
@@ -27,7 +27,7 @@ import slinky.core.facade.Fragment
     val classes = useStyles(())
     val (timesRefreshingData, forceRefresh) = GenericHooks.useForceRefresh
 
-    AsyncComponent.component[AdminGetUsersResponse](
+    AsyncComponent.component[AdminGetUsers.Response](
       AsyncComponent.Props(
         fetch = () => props.api.client.adminGetUsers(),
         render = response => UserList.component(UserList.Props(response, forceRefresh)),

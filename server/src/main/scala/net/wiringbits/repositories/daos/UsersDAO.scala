@@ -1,5 +1,6 @@
 package net.wiringbits.repositories.daos
 
+import net.wiringbits.common.models.Email
 import net.wiringbits.repositories.models.User
 
 import java.sql.Connection
@@ -15,8 +16,8 @@ object UsersDAO {
           (user_id, name, email, password, created_at)
         VALUES (
           ${request.id.toString}::UUID,
-          ${request.name},
-          ${request.email},
+          ${request.name.string},
+          ${request.email.string},
           ${request.hashedPassword},
           NOW()
         )
@@ -26,38 +27,54 @@ object UsersDAO {
 
   def all()(implicit conn: Connection): List[User] = {
     SQL"""
-        SELECT user_id, name, email, password, created_at
+        SELECT user_id, name, email, password, created_at, verified_on
         FROM users
         """.as(userParser.*)
   }
 
-  def find(email: String)(implicit conn: Connection): Option[User] = {
+  def find(email: Email)(implicit conn: Connection): Option[User] = {
     SQL"""
-        SELECT user_id, name, email, password, created_at
+        SELECT user_id, name, email, password, created_at, verified_on
         FROM users
-        WHERE email = $email
+        WHERE email = ${email.string}
         """.as(userParser.singleOpt)
   }
 
   def find(userId: UUID)(implicit conn: Connection): Option[User] = {
     SQL"""
-        SELECT user_id, name, email, password, created_at
+        SELECT user_id, name, email, password, created_at, verified_on
         FROM users
         WHERE user_id = ${userId.toString}::UUID
         """.as(userParser.singleOpt)
   }
 
-  def update(userId: UUID, name: String)(implicit conn: Connection): Unit = {
+  def updateName(userId: UUID, name: String)(implicit conn: Connection): Unit = {
     val _ = SQL"""
       UPDATE users
-      SET name = ${name}
+      SET name = $name
+      WHERE user_id = ${userId.toString}::UUID
+    """.execute()
+  }
+
+  def verify(userId: UUID)(implicit conn: Connection): Unit = {
+    val _ = SQL"""
+      UPDATE users
+      SET verified_on = NOW()
+      WHERE user_id = ${userId.toString}::UUID
+    """.execute()
+  }
+
+  def resetPassword(userId: UUID, password: String)(implicit conn: Connection): Unit = {
+    val _ = SQL"""
+      UPDATE users
+      SET password = $password
       WHERE user_id = ${userId.toString}::UUID
     """.execute()
   }
 
   def findUserForUpdate(userId: UUID)(implicit conn: Connection): Option[User] = {
     SQL"""
-        SELECT user_id, email, password, created_at, name
+        SELECT user_id, name, email, password, created_at, verified_on
         FROM users
         WHERE user_id = ${userId.toString}::UUID
         FOR UPDATE NOWAIT

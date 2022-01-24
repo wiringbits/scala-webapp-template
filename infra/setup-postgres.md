@@ -20,6 +20,9 @@ sudo apt-get -y install postgresql-13
 
 Then, connect to the database (`sudo -u postgres psql`) and create the necessary user/database:
 - `CREATE DATABASE server_db;`
+- `CREATE EXTENSION IF NOT EXISTS CITEXT;`
+- `ALTER DATABASE server_db SET statement_timeout = '60s';`
+- `ALTER DATABASE server_db SET idle_in_transaction_session_timeout TO '5min';`
 - `CREATE USER db_user WITH SUPERUSER PASSWORD 'useYourOwnPasswordInstead';`
 - `GRANT ALL PRIVILEGES ON DATABASE "server_db" to db_user;`
 

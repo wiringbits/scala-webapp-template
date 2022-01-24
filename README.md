@@ -82,9 +82,11 @@ The code format is checked by [scalafmt](https://scalameta.org/scalafmt) when th
 
 This is the server side for the project.
 
-Run it with `sbt server/run`, you are expected to have updated the [application.conf](server/src/main/resources/application.conf) to reach your postgres instance.
+Run it with `sbt server/run`, you are expected to have updated the [application.conf](server/src/main/resources/application.conf) to define the settings to reach your postgres instance.
 
-NOTE: The server doesn't really start until you send the first request, like `curl localhost:9000/health`
+Notes:
+- The server doesn't really start until you send the first request, like `curl localhost:9000/health`
+- Make sure to follow the [Postgres setup](./docs/postgres.md) because the project depends on Postgres Extensions that are created there.
 
 ## web
 

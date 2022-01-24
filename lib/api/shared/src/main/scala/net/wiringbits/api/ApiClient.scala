@@ -10,16 +10,19 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
 
 trait ApiClient {
+  def createUser(request: CreateUser.Request): Future[CreateUser.Response]
+  def login(request: Login.Request): Future[Login.Response]
 
-  def createUser(request: CreateUserRequest): Future[CreateUserResponse]
-  def login(request: LoginRequest): Future[LoginResponse]
+  def verifyEmail(request: VerifyEmail.Request): Future[VerifyEmail.Response]
+  def forgotPassword(request: ForgotPassword.Request): Future[ForgotPassword.Response]
+  def resetPassword(request: ResetPassword.Request): Future[ResetPassword.Response]
 
-  def currentUser(jwt: String): Future[GetCurrentUserResponse]
-  def updateUser(jwt: String, request: UpdateUserRequest): Future[UpdateUserResponse]
-  def getUserLogs(jwt: String): Future[GetUserLogsResponse]
+  def currentUser(jwt: String): Future[GetCurrentUser.Response]
+  def updateUser(jwt: String, request: UpdateUser.Request): Future[UpdateUser.Response]
+  def getUserLogs(jwt: String): Future[GetUserLogs.Response]
 
-  def adminGetUserLogs(userId: UUID): Future[AdminGetUserLogsResponse]
-  def adminGetUsers(): Future[AdminGetUsersResponse]
+  def adminGetUserLogs(userId: UUID): Future[AdminGetUserLogs.Response]
+  def adminGetUsers(): Future[AdminGetUsers.Response]
 }
 
 object ApiClient {
@@ -75,11 +78,11 @@ object ApiClient {
         .response(asJson[R])
     }
 
-    override def createUser(request: CreateUserRequest): Future[CreateUserResponse] = {
+    override def createUser(request: CreateUser.Request): Future[CreateUser.Response] = {
       val path = ServerAPI.path :+ "users"
       val uri = ServerAPI.withPath(path)
 
-      prepareRequest[CreateUserResponse]
+      prepareRequest[CreateUser.Response]
         .post(uri)
         .body(Json.toJson(request).toString())
         .send(backend)
@@ -87,11 +90,47 @@ object ApiClient {
         .flatMap(Future.fromTry)
     }
 
-    override def login(request: LoginRequest): Future[LoginResponse] = {
+    override def verifyEmail(request: VerifyEmail.Request): Future[VerifyEmail.Response] = {
+      val path = ServerAPI.path :+ "users" :+ "verify-email"
+      val uri = ServerAPI.withPath(path)
+
+      prepareRequest[VerifyEmail.Response]
+        .post(uri)
+        .body(Json.toJson(request).toString())
+        .send(backend)
+        .map(_.body)
+        .flatMap(Future.fromTry)
+    }
+
+    override def forgotPassword(request: ForgotPassword.Request): Future[ForgotPassword.Response] = {
+      val path = ServerAPI.path :+ "users" :+ "forgot-password"
+      val uri = ServerAPI.withPath(path)
+
+      prepareRequest[ForgotPassword.Response]
+        .post(uri)
+        .body(Json.toJson(request).toString())
+        .send(backend)
+        .map(_.body)
+        .flatMap(Future.fromTry)
+    }
+
+    override def resetPassword(request: ResetPassword.Request): Future[ResetPassword.Response] = {
+      val path = ServerAPI.path :+ "users" :+ "reset-password"
+      val uri = ServerAPI.withPath(path)
+
+      prepareRequest[ResetPassword.Response]
+        .post(uri)
+        .body(Json.toJson(request).toString())
+        .send(backend)
+        .map(_.body)
+        .flatMap(Future.fromTry)
+    }
+
+    override def login(request: Login.Request): Future[Login.Response] = {
       val path = ServerAPI.path :+ "users" :+ "login"
       val uri = ServerAPI.withPath(path)
 
-      prepareRequest[LoginResponse]
+      prepareRequest[Login.Response]
         .post(uri)
         .body(Json.toJson(request).toString())
         .send(backend)
@@ -99,11 +138,11 @@ object ApiClient {
         .flatMap(Future.fromTry)
     }
 
-    override def currentUser(jwt: String): Future[GetCurrentUserResponse] = {
+    override def currentUser(jwt: String): Future[GetCurrentUser.Response] = {
       val path = ServerAPI.path :+ "users" :+ "me"
       val uri = ServerAPI.withPath(path)
 
-      prepareRequest[GetCurrentUserResponse]
+      prepareRequest[GetCurrentUser.Response]
         .get(uri)
         .header("X-Authorization", s"Bearer $jwt")
         .send(backend)
@@ -111,11 +150,11 @@ object ApiClient {
         .flatMap(Future.fromTry)
     }
 
-    override def updateUser(jwt: String, request: UpdateUserRequest): Future[UpdateUserResponse] = {
+    override def updateUser(jwt: String, request: UpdateUser.Request): Future[UpdateUser.Response] = {
       val path = ServerAPI.path :+ "users"
       val uri = ServerAPI.withPath(path)
 
-      prepareRequest[UpdateUserResponse]
+      prepareRequest[UpdateUser.Response]
         .put(uri)
         .header("X-Authorization", s"Bearer $jwt")
         .body(Json.toJson(request).toString())
@@ -124,11 +163,11 @@ object ApiClient {
         .flatMap(Future.fromTry)
     }
 
-    override def getUserLogs(jwt: String): Future[GetUserLogsResponse] = {
+    override def getUserLogs(jwt: String): Future[GetUserLogs.Response] = {
       val path = ServerAPI.path :+ "users" :+ "me" :+ "logs"
       val uri = ServerAPI.withPath(path)
 
-      prepareRequest[GetUserLogsResponse]
+      prepareRequest[GetUserLogs.Response]
         .get(uri)
         .header("X-Authorization", s"Bearer $jwt")
         .send(backend)
@@ -136,26 +175,27 @@ object ApiClient {
         .flatMap(Future.fromTry)
     }
 
-    override def adminGetUserLogs(userId: UUID): Future[AdminGetUserLogsResponse] = {
+    override def adminGetUserLogs(userId: UUID): Future[AdminGetUserLogs.Response] = {
       val path = ServerAPI.path :+ "admin" :+ "users" :+ userId.toString :+ "logs"
       val uri = ServerAPI.withPath(path)
 
-      prepareRequest[AdminGetUserLogsResponse]
+      prepareRequest[AdminGetUserLogs.Response]
         .get(uri)
         .send(backend)
         .map(_.body)
         .flatMap(Future.fromTry)
     }
 
-    override def adminGetUsers(): Future[AdminGetUsersResponse] = {
+    override def adminGetUsers(): Future[AdminGetUsers.Response] = {
       val path = ServerAPI.path :+ "admin" :+ "users"
       val uri = ServerAPI.withPath(path)
 
-      prepareRequest[AdminGetUsersResponse]
+      prepareRequest[AdminGetUsers.Response]
         .get(uri)
         .send(backend)
         .map(_.body)
         .flatMap(Future.fromTry)
     }
+
   }
 }

@@ -12,7 +12,7 @@ import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
   WithStylesOptions
 }
 import net.wiringbits.AppStrings
-import net.wiringbits.api.models.GetUserLogsResponse
+import net.wiringbits.api.models.GetUserLogs
 import net.wiringbits.api.utils.Formatter
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{Container, Subtitle}
 import org.scalablytyped.runtime.StringDictionary
@@ -20,7 +20,7 @@ import slinky.core.FunctionalComponent
 import slinky.core.facade.Fragment
 
 object LogList {
-  case class Props(response: GetUserLogsResponse, forceRefresh: () => Unit)
+  case class Props(response: GetUserLogs.Response, forceRefresh: () => Unit)
 
   private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {
     val stylesCallback: StyleRulesCallback[Theme, Unit, String] = theme =>

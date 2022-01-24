@@ -1,16 +1,19 @@
 package net.wiringbits.repositories.models
 
+import net.wiringbits.common.models.{Email, Name}
+
 import java.time.Instant
 import java.util.UUID
 
 case class User(
     id: UUID,
-    name: String,
-    email: String,
+    name: Name,
+    email: Email,
     hashedPassword: String,
-    createdAt: Instant
+    createdAt: Instant,
+    verifiedOn: Option[Instant]
 )
 
 object User {
-  case class CreateUser(id: UUID, name: String, email: String, hashedPassword: String)
+  case class CreateUser(id: UUID, name: Name, email: Email, hashedPassword: String)
 }

@@ -9,6 +9,12 @@ GET /health controllers.HealthController.check()
 POST /users controllers.UsersController.create()
 # login user (public)
 POST /users/login controllers.UsersController.login()
+# verify new user's email
+POST /users/verify-email controllers.UsersController.verifyEmail()
+# send a link to reset user's password
+POST /users/forgot-password controllers.UsersController.forgotPassword()
+# reset existing user's password
+POST /users/reset-password controllers.UsersController.resetPassword()
 
 # get the current user details
 GET /users/me controllers.UsersController.getCurrentUser()
