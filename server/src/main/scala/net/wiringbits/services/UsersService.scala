@@ -33,6 +33,7 @@ class UsersService @Inject() (
     userTokensConfig: UserTokensConfig,
     emailApi: EmailApiAWSImpl,
     captchaApi: ReCaptchaApi,
+    tokenGenerator: TokenGenerator,
     clock: Clock
 )(implicit
     ec: ExecutionContext
@@ -59,7 +60,7 @@ class UsersService @Inject() (
       )
       token = UUID.randomUUID()
       hmacToken = createHMACToken(token)
-      createToken = TokenGenerator.create(
+      createToken = tokenGenerator.create(
         userId = createUser.id,
         token = hmacToken,
         tokenType = UserTokenType.EmailVerification,
@@ -111,7 +112,7 @@ class UsersService @Inject() (
     def whenExists(user: User) = {
       val token = UUID.randomUUID()
       val hmacToken = createHMACToken(token)
-      val createToken = TokenGenerator.create(
+      val createToken = tokenGenerator.create(
         userId = user.id,
         token = hmacToken,
         tokenType = UserTokenType.ResetPassword,

@@ -7,9 +7,9 @@ import net.wiringbits.apis.models.EmailRequest
 import net.wiringbits.apis.{EmailApi, ReCaptchaApi}
 import net.wiringbits.common.models.*
 import net.wiringbits.repositories.UserTokensRepository
-import net.wiringbits.util.TokenGenerator
+import net.wiringbits.util.{TokenGenerator, TokensHelper}
 import net.wiringbits.repositories.models.UserTokenType
-import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.{any, anyString}
 import org.mockito.MockitoSugar.{mock, when}
 import play.api.inject
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -19,14 +19,29 @@ import java.time.temporal.ChronoUnit
 import java.time.{Clock, Instant}
 import java.util.UUID
 import scala.concurrent.Future
+import scala.concurrent.duration.FiniteDuration
 import scala.util.control.NonFatal
 
 class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
 
   def userTokensRepository: UserTokensRepository = app.injector.instanceOf(classOf[UserTokensRepository])
 
+  private val clock = mock[Clock]
+  when(clock.instant()).thenReturn(Instant.now())
+
+  import net.wiringbits.repositories.models.UserToken as Token
+
+  private val userToken = Token.Create(
+    id = UUID.randomUUID(),
+    token = TokensHelper.doHMACSHA1(UUID.randomUUID.toString.getBytes, "test"),
+    tokenType = UserTokenType.EmailVerification,
+    createdAt = Instant.now(),
+    expiresAt = Instant.now.plus(2, ChronoUnit.DAYS),
+    userId = UUID.randomUUID()
+  )
+
   private val tokenGenerator = mock[TokenGenerator]
-  when(tokenGenerator.create())
+  when(tokenGenerator.create(any[UUID](), anyString(), any[UserTokenType](), any[FiniteDuration]())(any[Clock]())).thenReturn(userToken)
 
   private val emailApi = mock[EmailApi]
   when(emailApi.sendEmail(any[EmailRequest]())).thenReturn(Future.unit)
@@ -34,16 +49,14 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
   private val captchaApi = mock[ReCaptchaApi]
   when(captchaApi.verify(any[Captcha]())).thenReturn(Future.successful(true))
 
-  private val clock = mock[Clock]
-  when(clock.instant()).thenReturn(Instant.now())
-
   override def guiceApplicationBuilder(container: PostgreSQLContainer): GuiceApplicationBuilder =
     super
       .guiceApplicationBuilder(container)
       .overrides(
         inject.bind[EmailApi].to(emailApi),
         inject.bind[ReCaptchaApi].to(captchaApi),
-        inject.bind[Clock].to(clock)
+        inject.bind[Clock].to(clock),
+        inject.bind[TokenGenerator].to(tokenGenerator)
       )
 
   "POST /users" should {

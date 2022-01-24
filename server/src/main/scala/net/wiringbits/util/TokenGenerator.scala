@@ -5,9 +5,10 @@ import net.wiringbits.repositories.models.{UserToken, UserTokenType}
 import java.time.{Clock, Instant}
 import java.time.temporal.ChronoUnit
 import java.util.UUID
+import javax.inject.Inject
 import scala.concurrent.duration.FiniteDuration
 
-object TokenGenerator {
+class TokenGenerator @Inject() () {
   def create(userId: UUID, token: String, tokenType: UserTokenType, expirationTime: FiniteDuration)(implicit
       clock: Clock
   ): UserToken.Create = {
