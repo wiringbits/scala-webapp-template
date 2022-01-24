@@ -10,6 +10,7 @@ import org.testcontainers.utility.DockerImageName
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.{Application, Configuration, Environment, Mode}
 
+import java.sql.DriverManager
 import scala.concurrent.ExecutionContext
 
 trait PlayPostgresSpec extends PlayAPISpec with TestContainerForEach with GuiceOneServerPerTest {
@@ -39,6 +40,14 @@ trait PlayPostgresSpec extends PlayAPISpec with TestContainerForEach with GuiceO
 
   override def newAppForTest(testData: TestData): Application = {
     withContainers { postgres =>
+      val conn = DriverManager.getConnection(
+        postgres.container.getJdbcUrl,
+        postgres.container.getUsername,
+        postgres.container.getPassword
+      )
+      conn.createStatement().execute("CREATE EXTENSION CITEXT;")
+      conn.close()
+
       guiceApplicationBuilder(postgres).build()
     }
   }
