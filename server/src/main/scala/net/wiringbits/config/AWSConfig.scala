@@ -1,10 +1,10 @@
 package net.wiringbits.config
 
-import com.amazonaws.regions.Regions
 import net.wiringbits.models.{AWSAccessKeyId, AWSSecretAccessKey}
 import play.api.Configuration
+import software.amazon.awssdk.regions.Region
 
-case class AWSConfig(accessKeyId: AWSAccessKeyId, secretAccessKey: AWSSecretAccessKey, region: Regions)
+case class AWSConfig(accessKeyId: AWSAccessKeyId, secretAccessKey: AWSSecretAccessKey, region: Region)
 
 object AWSConfig {
   def apply(config: Configuration): AWSConfig = {
@@ -12,6 +12,6 @@ object AWSConfig {
     val secretAccessKey = config.get[String]("secretAccessKey")
     val region = config.get[String]("region")
 
-    AWSConfig(AWSAccessKeyId(accessKeyId), AWSSecretAccessKey(secretAccessKey), Regions.fromName(region))
+    AWSConfig(AWSAccessKeyId(accessKeyId), AWSSecretAccessKey(secretAccessKey), Region.of(region))
   }
 }
