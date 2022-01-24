@@ -13,7 +13,7 @@ import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
 }
 import net.wiringbits.api.models.VerifyEmail
 import net.wiringbits.common.models.UserToken
-import net.wiringbits.ui.components.core.widgets.{CircularLoader, Container}
+import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container}
 import net.wiringbits.{API, AppStrings}
 import org.scalablytyped.runtime.StringDictionary
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
