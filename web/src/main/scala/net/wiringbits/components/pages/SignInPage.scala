@@ -2,7 +2,7 @@ package net.wiringbits.components.pages
 
 import com.alexitc.materialui.facade.csstype.mod.FlexDirectionProperty
 import com.alexitc.materialui.facade.materialUiCore.createMuiThemeMod.Theme
-import com.alexitc.materialui.facade.materialUiCore.{components => mui}
+import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
 import com.alexitc.materialui.facade.materialUiStyles.makeStylesMod.StylesHook
 import com.alexitc.materialui.facade.materialUiStyles.mod.makeStyles
 import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
@@ -21,6 +21,7 @@ import slinky.core.FunctionalComponent
 import slinky.core.annotations.react
 import slinky.core.facade.Fragment
 import slinky.web.html.{className, div}
+import typings.reactRouterDom.mod.useHistory
 
 @react object SignInPage {
   case class Props(api: API, loggedIn: User => Unit, captchaKey: String)
@@ -45,6 +46,7 @@ import slinky.web.html.{className, div}
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val classes = useStyles(())
+    val history = useHistory()
 
     div(className := classes("signInPage"))(
       div(className := classes("signInPageFormContainer"))(
@@ -63,6 +65,33 @@ import slinky.web.html.{className, div}
                   justifyContent = Alignment.center,
                   padding = EdgeInsets.top(16),
                   child = SignInForm(props.api, props.loggedIn, props.captchaKey)
+                ),
+                Container(
+                  margin = Container.EdgeInsets.top(8),
+                  flexDirection = Container.FlexDirection.row,
+                  alignItems = Container.Alignment.center,
+                  justifyContent = Container.Alignment.center,
+                  child = Fragment(
+                    mui.Typography(AppStrings.dontHaveAccountYet),
+                    mui
+                      .Button(AppStrings.signUp)
+                      .variant(muiStrings.text)
+                      .color(muiStrings.primary)
+                      .onClick(_ => history.push("/signUp"))
+                  )
+                ),
+                Container(
+                  flexDirection = Container.FlexDirection.row,
+                  alignItems = Container.Alignment.center,
+                  justifyContent = Container.Alignment.center,
+                  child = Fragment(
+                    mui.Typography(AppStrings.forgotYourPassword),
+                    mui
+                      .Button(AppStrings.recoverIt)
+                      .variant(muiStrings.text)
+                      .color(muiStrings.primary)
+                      .onClick(_ => history.push("/verify-email"))
+                  )
                 )
               )
             )

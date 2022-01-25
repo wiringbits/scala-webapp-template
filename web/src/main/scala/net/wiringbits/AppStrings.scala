@@ -9,6 +9,10 @@ object AppStrings {
   val about = "About"
   val signIn = "Sign in"
   val signUp = "Sign up"
+  val dontHaveAccountYet = "You don't have an account yet?"
+  val forgotYourPassword = "Forgot your password?"
+  val recoverIt = "Recover it"
+  val recover = "Recover"
   val signOut = "Sign out"
   val logs = "Logs"
 
