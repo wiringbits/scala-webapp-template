@@ -20,7 +20,6 @@ import java.time.temporal.ChronoUnit
 import java.time.{Clock, Instant}
 import java.util.UUID
 import scala.concurrent.Future
-import scala.util.control.NonFatal
 
 class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
 
@@ -91,11 +90,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
       // then, it fails
       val error = client
         .createUser(request)
-        .map(_ => "Success when failure expected")
-        .recover { case NonFatal(ex) =>
-          ex.getMessage
-        }
-        .futureValue
+        .expectError
       error must be("The email is not available")
     }
 
@@ -111,11 +106,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
 
       val error = client
         .createUser(request)
-        .map(_ => "Success when failure expected")
-        .recover { case NonFatal(ex) =>
-          ex.getMessage
-        }
-        .futureValue
+        .expectError
 
       error must be("Invalid captcha, try again")
 
@@ -169,11 +160,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
 
       val error = client
         .verifyEmail(VerifyEmail.Request(UserToken(user.id, token)))
-        .map(_ => "Success when failure expected")
-        .recover { case NonFatal(ex) =>
-          ex.getMessage
-        }
-        .futureValue
+        .expectError
 
       error must be(s"User email is already verified")
     }
@@ -221,11 +208,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
 
       val error = client
         .login(loginRequest)
-        .map(_ => "Success when failure expected")
-        .recover { case NonFatal(ex) =>
-          ex.getMessage
-        }
-        .futureValue
+        .expectError
 
       error must be("The email is not verified, check your spam folder if you don't see the email.")
     }
@@ -244,11 +227,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
 
       val error = client
         .verifyEmail(VerifyEmail.Request(UserToken(user.id, verificationToken)))
-        .map(_ => "Success when failure expected")
-        .recover { case NonFatal(ex) =>
-          ex.getMessage
-        }
-        .futureValue
+        .expectError
 
       error must be(s"Token for user ${user.id} wasn't found")
     }
@@ -270,11 +249,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
 
       val error = client
         .verifyEmail(VerifyEmail.Request(UserToken(user.id, verificationToken)))
-        .map(_ => "Success when failure expected")
-        .recover { case NonFatal(ex) =>
-          ex.getMessage
-        }
-        .futureValue
+        .expectError
 
       error must be("Token is expired")
     }
@@ -323,11 +298,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
 
       val error = client
         .login(loginRequest)
-        .map(_ => "Success when failure expected")
-        .recover { case NonFatal(ex) =>
-          ex.getMessage
-        }
-        .futureValue
+        .expectError
 
       error must be("The given email/password doesn't match")
     }
@@ -351,11 +322,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
 
       val error = client
         .login(loginRequest)
-        .map(_ => "Success when failure expected")
-        .recover { case NonFatal(ex) =>
-          ex.getMessage
-        }
-        .futureValue
+        .expectError
 
       error must be("Invalid captcha, try again")
 
@@ -380,11 +347,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
 
       val error = client
         .login(loginRequest)
-        .map(_ => "Success when failure expected")
-        .recover { case NonFatal(ex) =>
-          ex.getMessage
-        }
-        .futureValue
+        .expectError
 
       error must be("The email is not verified, check your spam folder if you don't see the email.")
     }
@@ -435,11 +398,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
 
       val error = client
         .forgotPassword(forgotPasswordRequest)
-        .map(_ => "Success when failure expected")
-        .recover { case NonFatal(ex) =>
-          ex.getMessage
-        }
-        .futureValue
+        .expectError
 
       error must be(s"The email is not verified, check your spam folder if you don't see the email.")
     }
@@ -461,11 +420,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
 
       val error = client
         .forgotPassword(forgotPasswordRequest)
-        .map(_ => "Success when failure expected")
-        .recover { case NonFatal(ex) =>
-          ex.getMessage
-        }
-        .futureValue
+        .expectError
 
       error must be("Invalid captcha, try again")
 
@@ -566,11 +521,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
 
         val error = client
           .login(loginRequest)
-          .map(_ => "Success when failure expected")
-          .recover { case NonFatal(ex) =>
-            ex.getMessage
-          }
-          .futureValue
+          .expectError
 
         error must be("The given email/password doesn't match")
     }
