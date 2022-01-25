@@ -175,7 +175,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
         }
         .futureValue
 
-      error must be(s"User ${user.id} email is already verified")
+      error must be(s"User email is already verified")
     }
   }
 
