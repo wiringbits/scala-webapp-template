@@ -1,7 +1,7 @@
 package net.wiringbits.common.models
 
-import net.wiringbits.common.core.ValidationResult
-import net.wiringbits.common.models.core.WrappedString
+import net.wiringbits.webapp.common.models.WrappedString
+import net.wiringbits.webapp.common.validators.ValidationResult
 
 class Captcha private (val string: String) extends WrappedString
 
