@@ -1,6 +1,6 @@
 package controllers
 
-import net.wiringbits.api.models.*
+import net.wiringbits.api.models._
 import net.wiringbits.config.JwtConfig
 import net.wiringbits.services.{UserLogsService, UsersService}
 import org.slf4j.LoggerFactory

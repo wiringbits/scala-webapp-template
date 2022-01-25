@@ -6,3 +6,4 @@ target/
 logs/
 admin/build/
 web/build/
+local.env

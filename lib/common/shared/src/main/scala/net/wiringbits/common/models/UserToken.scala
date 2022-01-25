@@ -6,7 +6,6 @@ import scala.util.Try
 case class UserToken(userId: UUID, token: UUID)
 
 object UserToken {
-  // TODO: Add tests to this method
   def validate(tokenStr: String): Option[UserToken] = {
     val splittedToken = tokenStr.split("_")
     val isValid = splittedToken.length == 2

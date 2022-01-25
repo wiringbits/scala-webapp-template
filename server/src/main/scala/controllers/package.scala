@@ -4,7 +4,7 @@ import net.wiringbits.util.JwtUtils
 import org.slf4j.LoggerFactory
 import play.api.http.HeaderNames
 import play.api.libs.json.{JsValue, Json, Reads}
-import play.api.mvc.*
+import play.api.mvc._
 import play.api.mvc.Results.InternalServerError
 
 import java.time.Clock

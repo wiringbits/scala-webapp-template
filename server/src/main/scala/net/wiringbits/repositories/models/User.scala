@@ -15,5 +15,5 @@ case class User(
 )
 
 object User {
-  case class CreateUser(id: UUID, name: Name, email: Email, hashedPassword: String)
+  case class CreateUser(id: UUID, name: Name, email: Email, hashedPassword: String, verifyEmailToken: String)
 }
