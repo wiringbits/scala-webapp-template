@@ -1,6 +1,6 @@
 package controllers
 
-import net.wiringbits.actions.CreateUserAction
+import net.wiringbits.actions.{CreateUserAction, VerifyUserEmailAction}
 import net.wiringbits.api.models._
 import net.wiringbits.config.JwtConfig
 import net.wiringbits.services.{UserLogsService, UsersService}
@@ -14,6 +14,7 @@ import scala.concurrent.ExecutionContext
 class UsersController @Inject() (
     usersService: UsersService,
     createUserAction: CreateUserAction,
+    verifyUserEmailAction: VerifyUserEmailAction,
     loggerService: UserLogsService
 )(implicit cc: ControllerComponents, ec: ExecutionContext, jwtConfig: JwtConfig)
     extends AbstractController(cc) {
@@ -31,7 +32,7 @@ class UsersController @Inject() (
     val token = request.body.token
     logger.info(s"Verify user's email: ${token.userId}")
     for {
-      response <- usersService.verifyEmail(token.userId, token.token)
+      response <- verifyUserEmailAction(token.userId, token.token)
     } yield Ok(Json.toJson(response))
   }
 

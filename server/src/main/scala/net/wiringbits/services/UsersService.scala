@@ -1,6 +1,6 @@
 package net.wiringbits.services
 
-import net.wiringbits.api.models.{ForgotPassword, GetCurrentUser, Login, ResetPassword, UpdateUser, VerifyEmail}
+import net.wiringbits.api.models.{ForgotPassword, GetCurrentUser, Login, ResetPassword, UpdateUser}
 import net.wiringbits.apis.models.EmailRequest
 import net.wiringbits.apis.{EmailApiAWSImpl, ReCaptchaApi}
 import net.wiringbits.common.models.Password
@@ -8,7 +8,7 @@ import net.wiringbits.config.{JwtConfig, UserTokensConfig, WebAppConfig}
 import net.wiringbits.repositories.models.{User, UserToken, UserTokenType}
 import net.wiringbits.repositories.{UserLogsRepository, UserTokensRepository, UsersRepository}
 import net.wiringbits.util.{EmailMessage, JwtUtils, TokenGenerator, TokensHelper}
-import net.wiringbits.validations.ValidateCaptcha
+import net.wiringbits.validations.{ValidateCaptcha, ValidateUserToken}
 import org.mindrot.jbcrypt.BCrypt
 
 import java.time.temporal.ChronoUnit
@@ -31,21 +31,6 @@ class UsersService @Inject() (
 )(implicit
     ec: ExecutionContext
 ) {
-
-  def verifyEmail(userId: UUID, token: UUID): Future[VerifyEmail.Response] = for {
-    userMaybe <- repository.find(userId)
-    user = userMaybe.getOrElse(throw new RuntimeException(s"User wasn't found"))
-    _ = if (user.verifiedOn.isDefined)
-      throw new RuntimeException(s"User $userId email is already verified")
-    hmacToken = createHMACToken(token)
-    tokenMaybe <- userTokensRepository.find(userId, hmacToken)
-    userToken = tokenMaybe.getOrElse(throw new RuntimeException(s"Token for user $userId wasn't found"))
-    _ = enforceValidToken(userToken)
-    _ <- repository.verify(userId)
-    _ <- userLogsRepository.create(userId, "Email was verified")
-    _ <- userTokensRepository.delete(userToken.id, userId)
-    _ = emailApi.sendEmail(EmailRequest(user.email, EmailMessage.confirm(user.name)))
-  } yield VerifyEmail.Response()
 
   // returns the token to use for authenticating requests
   def login(request: Login.Request): Future[Login.Response] = {
@@ -115,7 +100,7 @@ class UsersService @Inject() (
   }
 
   private def enforceValidToken(token: UserToken): Unit = {
-    if (token.expiresAt.isBefore(clock.instant())) throw new RuntimeException("Token is expired")
+    ValidateUserToken(token)(clock)
   }
 
   def update(userId: UUID, request: UpdateUser.Request): Future[Unit] = {

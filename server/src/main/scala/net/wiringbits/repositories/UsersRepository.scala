@@ -65,9 +65,17 @@ class UsersRepository @Inject() (database: Database, userTokensConfig: UserToken
     }
   }
 
-  def verify(userId: UUID): Future[Unit] = Future {
-    database.withConnection { implicit conn =>
+  def verify(userId: UUID, tokenId: UUID): Future[Unit] = Future {
+    database.withTransaction { implicit conn =>
       UsersDAO.verify(userId)
+      UserLogsDAO.create(
+        UserLog.CreateUserLog(
+          UUID.randomUUID(),
+          userId = userId,
+          "Email verified"
+        )
+      )
+      UserTokensDAO.delete(tokenId = tokenId, userId = userId)
     }
   }
 
