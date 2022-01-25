@@ -10,25 +10,27 @@ import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
   Styles,
   WithStylesOptions
 }
-import net.wiringbits.components.widgets._
+import net.wiringbits.common.models.UserToken
+import net.wiringbits.components.widgets.{AppCard, ResetPasswordForm}
 import net.wiringbits.models.User
-import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.{Alignment, EdgeInsets}
-import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{Container, Title}
+import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container
 import net.wiringbits.{API, AppStrings}
 import org.scalablytyped.runtime.StringDictionary
 import slinky.core.FunctionalComponent
 import slinky.core.annotations.react
 import slinky.core.facade.Fragment
 import slinky.web.html.{className, div}
-import typings.reactRouterDom.mod.useHistory
+import typings.reactRouter.mod.{useHistory, useParams}
 
-@react object SignInPage {
-  case class Props(api: API, loggedIn: User => Unit, captchaKey: String)
+import scala.scalajs.js
+
+@react object ResetPasswordPage {
+  case class Props(api: API, loggedIn: User => Unit)
 
   private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {
     val stylesCallback: StyleRulesCallback[Theme, Unit, String] = theme =>
       StringDictionary(
-        "signInPageFormContainer" -> CSSProperties()
+        "resetPasswordFormContainer" -> CSSProperties()
           .setMaxWidth(350)
           .setWidth("100%")
       )
@@ -38,51 +40,35 @@ import typings.reactRouterDom.mod.useHistory
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val classes = useStyles(())
     val history = useHistory()
+    val params = useParams()
+    val resetPasswordCode = params.asInstanceOf[js.Dynamic].resetPasswordCode.toString
+    val userToken = UserToken.validate(resetPasswordCode)
 
     Container(
       flex = Some(1),
-      justifyContent = Alignment.center,
-      alignItems = Alignment.center,
-      child = div(className := classes("signInPageFormContainer"))(
+      justifyContent = Container.Alignment.center,
+      alignItems = Container.Alignment.center,
+      child = div(className := classes("resetPasswordFormContainer"))(
         AppCard(
           Fragment(
             Container(
-              justifyContent = Alignment.center,
-              alignItems = Alignment.center,
-              child = Title(AppStrings.signIn)
+              alignItems = Container.Alignment.center,
+              justifyContent = Container.Alignment.center,
+              child = mui.Typography(AppStrings.enterNewPassword).variant(muiStrings.h5)
             ),
-            Container(
-              flex = Some(1),
-              alignItems = Alignment.center,
-              justifyContent = Alignment.center,
-              padding = EdgeInsets.top(16),
-              child = SignInForm(props.api, props.loggedIn, props.captchaKey)
-            ),
+            ResetPasswordForm(props.api, props.loggedIn, userToken),
             Container(
               margin = Container.EdgeInsets.top(8),
               flexDirection = Container.FlexDirection.row,
               alignItems = Container.Alignment.center,
               justifyContent = Container.Alignment.center,
               child = Fragment(
-                mui.Typography(AppStrings.dontHaveAccountYet),
+                mui.Typography(AppStrings.alreadyHaveAccount),
                 mui
-                  .Button(AppStrings.signUp)
+                  .Button(AppStrings.signIn)
                   .variant(muiStrings.text)
                   .color(muiStrings.primary)
-                  .onClick(_ => history.push("/signUp"))
-              )
-            ),
-            Container(
-              flexDirection = Container.FlexDirection.row,
-              alignItems = Container.Alignment.center,
-              justifyContent = Container.Alignment.center,
-              child = Fragment(
-                mui.Typography(AppStrings.forgotYourPassword),
-                mui
-                  .Button(AppStrings.recoverIt)
-                  .variant(muiStrings.text)
-                  .color(muiStrings.primary)
-                  .onClick(_ => history.push("/forgot-password"))
+                  .onClick(_ => history.push("/signin"))
               )
             )
           )

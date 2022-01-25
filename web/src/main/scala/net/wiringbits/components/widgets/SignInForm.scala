@@ -3,12 +3,12 @@ package net.wiringbits.components.widgets
 import com.alexitc.materialui.facade.materialUiCore.mod.PropTypes.Color
 import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
 import net.wiringbits.forms.SignInFormData
+import net.wiringbits.webapp.utils.slinkyUtils.forms.StatefulFormData
 import net.wiringbits.models.User
 import net.wiringbits.ui.components.inputs.{EmailInput, PasswordInput}
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.ErrorLabel
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.{Alignment, EdgeInsets}
-import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container, Title}
-import net.wiringbits.webapp.utils.slinkyUtils.forms.StatefulFormData
+import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container}
 import net.wiringbits.{API, AppStrings}
 import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
@@ -124,32 +124,25 @@ import scala.util.{Failure, Success}
         .`type`(muiStrings.submit)
     }
 
-    // TODO: Use a form to get the enter key submitting the form
     form(
       onSubmit := (handleSubmit(_))
     )(
-      mui
-        .Paper()
-        .elevation(1)(
+      Container(
+        alignItems = Alignment.center,
+        justifyContent = Alignment.center,
+        child = Fragment(
+          emailInput,
+          passwordInput,
+          recaptcha,
+          error,
           Container(
-            minWidth = Some("300px"),
+            minWidth = Some("100%"),
+            margin = EdgeInsets.top(16),
             alignItems = Alignment.center,
-            padding = EdgeInsets.all(16),
-            child = Fragment(
-              Title(AppStrings.signIn),
-              emailInput,
-              passwordInput,
-              recaptcha,
-              error,
-              Container(
-                minWidth = Some("100%"),
-                margin = EdgeInsets.top(16),
-                alignItems = Alignment.center,
-                child = loginButton
-              )
-            )
+            child = loginButton
           )
         )
+      )
     )
   }
 }

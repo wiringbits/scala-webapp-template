@@ -10,10 +10,9 @@ import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
   Styles,
   WithStylesOptions
 }
-import net.wiringbits.components.widgets._
-import net.wiringbits.models.User
-import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.{Alignment, EdgeInsets}
-import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{Container, Title}
+import net.wiringbits.components.widgets.{AppCard, ForgotPasswordForm}
+import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container
+import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.Alignment
 import net.wiringbits.{API, AppStrings}
 import org.scalablytyped.runtime.StringDictionary
 import slinky.core.FunctionalComponent
@@ -22,13 +21,13 @@ import slinky.core.facade.Fragment
 import slinky.web.html.{className, div}
 import typings.reactRouterDom.mod.useHistory
 
-@react object SignInPage {
-  case class Props(api: API, loggedIn: User => Unit, captchaKey: String)
+@react object ForgotPasswordPage {
+  case class Props(api: API, captchaKey: String)
 
   private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {
     val stylesCallback: StyleRulesCallback[Theme, Unit, String] = theme =>
       StringDictionary(
-        "signInPageFormContainer" -> CSSProperties()
+        "forgotPasswordFormContainer" -> CSSProperties()
           .setMaxWidth(350)
           .setWidth("100%")
       )
@@ -43,21 +42,14 @@ import typings.reactRouterDom.mod.useHistory
       flex = Some(1),
       justifyContent = Alignment.center,
       alignItems = Alignment.center,
-      child = div(className := classes("signInPageFormContainer"))(
+      child = div(className := classes("forgotPasswordFormContainer"))(
         AppCard(
           Fragment(
             Container(
-              justifyContent = Alignment.center,
               alignItems = Alignment.center,
-              child = Title(AppStrings.signIn)
+              child = mui.Typography(AppStrings.recoverYourPassword).variant(muiStrings.h5)
             ),
-            Container(
-              flex = Some(1),
-              alignItems = Alignment.center,
-              justifyContent = Alignment.center,
-              padding = EdgeInsets.top(16),
-              child = SignInForm(props.api, props.loggedIn, props.captchaKey)
-            ),
+            ForgotPasswordForm(props.api, props.captchaKey),
             Container(
               margin = Container.EdgeInsets.top(8),
               flexDirection = Container.FlexDirection.row,
@@ -71,23 +63,11 @@ import typings.reactRouterDom.mod.useHistory
                   .color(muiStrings.primary)
                   .onClick(_ => history.push("/signUp"))
               )
-            ),
-            Container(
-              flexDirection = Container.FlexDirection.row,
-              alignItems = Container.Alignment.center,
-              justifyContent = Container.Alignment.center,
-              child = Fragment(
-                mui.Typography(AppStrings.forgotYourPassword),
-                mui
-                  .Button(AppStrings.recoverIt)
-                  .variant(muiStrings.text)
-                  .color(muiStrings.primary)
-                  .onClick(_ => history.push("/forgot-password"))
-              )
             )
           )
         )
       )
     )
   }
+
 }

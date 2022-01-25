@@ -45,7 +45,7 @@ class ResetPasswordAction @Inject() (
       _ = emailApi.sendEmail(EmailRequest(user.email, emailMessage))
 
       // And, returning the auth token
-      token = JwtUtils.createToken(jwtConfig, user.id)(clock)
-    } yield ResetPassword.Response(token)
+      jwt = JwtUtils.createToken(jwtConfig, user.id)(clock)
+    } yield ResetPassword.Response(name = user.name, email = user.email, token = jwt)
   }
 }
