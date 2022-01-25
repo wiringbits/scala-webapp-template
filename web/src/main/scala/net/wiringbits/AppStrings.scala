@@ -5,12 +5,14 @@ object AppStrings {
   val appMotto = "be the best"
 
   val home = "Home"
+  val me = "Me"
   val dashboard = "Dashboard"
   val about = "About"
   val signIn = "Sign in"
   val signUp = "Sign up"
   val signOut = "Sign out"
   val logs = "Logs"
+  val user = "User"
 
   val name = "Nombre"
   val email = "Email"
