@@ -9,18 +9,18 @@ import net.wiringbits.api.models.{
   UpdateUser,
   VerifyEmail
 }
-import net.wiringbits.apis.{EmailApiAWSImpl, ReCaptchaApi}
 import net.wiringbits.apis.models.EmailRequest
+import net.wiringbits.apis.{EmailApiAWSImpl, ReCaptchaApi}
 import net.wiringbits.common.models.{Captcha, Email, Password}
 import net.wiringbits.config.{JwtConfig, UserTokensConfig, WebAppConfig}
 import net.wiringbits.repositories
 import net.wiringbits.repositories.models.{User, UserToken, UserTokenType}
 import net.wiringbits.repositories.{UserLogsRepository, UserTokensRepository, UsersRepository}
-import net.wiringbits.util.{EmailMessage, JwtUtils}
+import net.wiringbits.util.{EmailMessage, JwtUtils, TokenGenerator, TokensHelper}
 import org.mindrot.jbcrypt.BCrypt
 
-import java.time.{Clock, Instant}
 import java.time.temporal.ChronoUnit
+import java.time.{Clock, Instant}
 import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -34,6 +34,7 @@ class UsersService @Inject() (
     userTokensConfig: UserTokensConfig,
     emailApi: EmailApiAWSImpl,
     captchaApi: ReCaptchaApi,
+    tokenGenerator: TokenGenerator,
     clock: Clock
 )(implicit
     ec: ExecutionContext
@@ -51,24 +52,18 @@ class UsersService @Inject() (
     for {
       _ <- validations
       hashedPassword = BCrypt.hashpw(request.password.string, BCrypt.gensalt())
+      token = tokenGenerator.next()
+      hmacToken = createHMACToken(token)
       createUser = repositories.models.User
-        .CreateUser(id = UUID.randomUUID(), name = request.name, email = request.email, hashedPassword = hashedPassword)
-      _ <- repository.create(createUser)
-      _ <- userLogsRepository.create(
-        createUser.id,
-        s"Account created, name = ${request.name}, email = ${request.email}"
-      )
-      createToken = UserToken
-        .Create(
+        .CreateUser(
           id = UUID.randomUUID(),
-          token = UUID.randomUUID.toString,
-          tokenType = UserTokenType.EmailVerification,
-          createdAt = Instant.now(clock),
-          userId = createUser.id,
-          expiresAt = Instant.now(clock).plus(userTokensConfig.emailVerificationExp.toHours, ChronoUnit.HOURS)
+          name = request.name,
+          email = request.email,
+          hashedPassword = hashedPassword,
+          verifyEmailToken = hmacToken
         )
-      _ <- userTokensRepository.create(createToken)
-      emailParameter = s"${createUser.id}_${createToken.token}"
+      _ <- repository.create(createUser)
+      emailParameter = s"${createUser.id}_$token"
       emailRequest = EmailMessage.registration(
         name = createUser.name,
         url = webAppConfig.host,
@@ -83,12 +78,13 @@ class UsersService @Inject() (
     user = userMaybe.getOrElse(throw new RuntimeException(s"User wasn't found"))
     _ = if (user.verifiedOn.isDefined)
       throw new RuntimeException(s"User $userId email is already verified")
-    tokenMaybe <- userTokensRepository.find(userId, token)
-    token = tokenMaybe.getOrElse(throw new RuntimeException(s"Token for user $userId wasn't found"))
-    _ = enforceValidToken(token)
+    hmacToken = createHMACToken(token)
+    tokenMaybe <- userTokensRepository.find(userId, hmacToken)
+    userToken = tokenMaybe.getOrElse(throw new RuntimeException(s"Token for user $userId wasn't found"))
+    _ = enforceValidToken(userToken)
     _ <- repository.verify(userId)
     _ <- userLogsRepository.create(userId, "Email was verified")
-    _ <- userTokensRepository.delete(token.id, userId)
+    _ <- userTokensRepository.delete(userToken.id, userId)
     _ = emailApi.sendEmail(EmailRequest(user.email, EmailMessage.confirm(user.name)))
   } yield VerifyEmail.Response()
 
@@ -110,23 +106,24 @@ class UsersService @Inject() (
   def forgotPassword(request: ForgotPassword.Request): Future[ForgotPassword.Response] = {
 
     def whenExists(user: User) = {
+      val token = tokenGenerator.next()
+      val hmacToken = createHMACToken(token)
       val createToken = UserToken
         .Create(
           id = UUID.randomUUID(),
-          token = UUID.randomUUID.toString,
+          token = hmacToken,
           tokenType = UserTokenType.ResetPassword,
           createdAt = Instant.now(clock),
           userId = user.id,
           expiresAt = Instant.now(clock).plus(userTokensConfig.resetPasswordExp.toHours, ChronoUnit.HOURS)
         )
       enforceVerifiedUser(user)
-      val emailMessage = EmailMessage.forgotPassword(user.name, webAppConfig.host, s"${user.id}_${createToken.id}")
+      val emailMessage = EmailMessage.forgotPassword(user.name, webAppConfig.host, s"${user.id}_$token")
       for {
         _ <- userTokensRepository.create(createToken)
         _ = emailApi.sendEmail(EmailRequest(user.email, emailMessage))
       } yield ()
     }
-
     for {
       _ <- validateCaptcha(request.captcha)
       userMaybe <- repository.find(request.email)
@@ -136,8 +133,9 @@ class UsersService @Inject() (
 
   def resetPassword(userId: UUID, token: UUID, password: Password): Future[ResetPassword.Response] = {
     val hashedPassword = BCrypt.hashpw(password.string, BCrypt.gensalt())
+    val hmacToken = createHMACToken(token)
     for {
-      tokenMaybe <- userTokensRepository.find(userId, token)
+      tokenMaybe <- userTokensRepository.find(userId, hmacToken)
       token = tokenMaybe.getOrElse(throw new RuntimeException(s"Token for user $userId wasn't found"))
       _ = enforceValidToken(token)
       userMaybe <- repository.find(userId)
@@ -147,6 +145,10 @@ class UsersService @Inject() (
       _ = emailApi.sendEmail(EmailRequest(user.email, emailMessage))
       token = JwtUtils.createToken(jwtConfig, user.id)(clock)
     } yield ResetPassword.Response(token)
+  }
+
+  private def createHMACToken(token: UUID): String = {
+    TokensHelper.doHMACSHA1(token.toString.getBytes, userTokensConfig.hmacSecret)
   }
 
   private def enforceVerifiedUser(user: User): Unit = {
