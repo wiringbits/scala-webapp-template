@@ -296,7 +296,8 @@ lazy val server = (project in file("server"))
       "com.softwaremill.sttp.client3" %% "core" % sttp % "test",
       "com.softwaremill.sttp.client3" %% "async-http-client-backend-future" % sttp % "test",
       "net.wiringbits" %% "admin-data-explorer-play-server" % webappUtils,
-      "software.amazon.awssdk" % "ses" % "2.17.117"
+      "software.amazon.awssdk" % "ses" % "2.17.117",
+      "jakarta.xml.bind" % "jakarta.xml.bind-api" % "3.0.1"
     )
   )
 

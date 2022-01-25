@@ -1,6 +1,6 @@
 package net.wiringbits.util
 
-import javax.xml.bind.DatatypeConverter
+import jakarta.xml.bind.DatatypeConverter
 
 object TokensHelper {
 
@@ -11,8 +11,6 @@ object TokensHelper {
     val mac = Mac.getInstance("HmacSHA1")
     mac.init(signingKey)
     val rawHmac = mac.doFinal(value)
-    // TODO: Use a compatible converter
-    // https://stackoverflow.com/a/67127499/14738484
     DatatypeConverter.printHexBinary(rawHmac)
   }
 
