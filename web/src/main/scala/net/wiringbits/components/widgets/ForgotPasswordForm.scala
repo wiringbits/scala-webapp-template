@@ -118,9 +118,7 @@ import scala.util.{Failure, Success}
       ),
       Container(
         alignItems = Container.Alignment.center,
-        child = Fragment(
-          forgotPasswordButton
-        )
+        child = forgotPasswordButton
       )
     )
   }

@@ -1,6 +1,5 @@
 package net.wiringbits.components.pages
 
-import com.alexitc.materialui.facade.csstype.mod.FlexDirectionProperty
 import com.alexitc.materialui.facade.materialUiCore.createMuiThemeMod.Theme
 import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
 import com.alexitc.materialui.facade.materialUiStyles.makeStylesMod.StylesHook
@@ -12,7 +11,7 @@ import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
   WithStylesOptions
 }
 import net.wiringbits.common.models.UserToken
-import net.wiringbits.components.widgets.ResetPasswordForm
+import net.wiringbits.components.widgets.{AppCard, ResetPasswordForm}
 import net.wiringbits.models.User
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container
 import net.wiringbits.{API, AppStrings}
@@ -31,15 +30,8 @@ import scala.scalajs.js
   private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {
     val stylesCallback: StyleRulesCallback[Theme, Unit, String] = theme =>
       StringDictionary(
-        "resetPasswordPage" -> CSSProperties()
-          .setFlex(1)
-          .setDisplay("flex")
-          .setFlexDirection(FlexDirectionProperty.column)
-          .setAlignItems("center")
-          .setJustifyContent("center")
-          .setBackgroundColor("#ebeff2"),
         "resetPasswordFormContainer" -> CSSProperties()
-          .setMaxWidth(400)
+          .setMaxWidth(350)
           .setWidth("100%")
       )
     makeStyles(stylesCallback, WithStylesOptions())
@@ -52,13 +44,16 @@ import scala.scalajs.js
     val resetPasswordCode = params.asInstanceOf[js.Dynamic].resetPasswordCode.toString
     val userToken = UserToken.validate(resetPasswordCode)
 
-    div(className := classes("resetPasswordPage"))(
-      div(className := classes("resetPasswordFormContainer"))(
-        mui.Paper()(
+    Container(
+      flex = Some(1),
+      justifyContent = Container.Alignment.center,
+      alignItems = Container.Alignment.center,
+      child = div(className := classes("resetPasswordFormContainer"))(
+        AppCard(
           Fragment(
             Container(
-              flexDirection = Container.FlexDirection.row,
               alignItems = Container.Alignment.center,
+              justifyContent = Container.Alignment.center,
               child = mui.Typography(AppStrings.enterNewPassword).variant(muiStrings.h5)
             ),
             ResetPasswordForm(props.api, props.loggedIn, userToken),

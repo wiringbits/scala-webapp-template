@@ -14,6 +14,7 @@ object AppStrings {
   val resetPassword = "Reset your password"
   val enterNewPassword = "Enter your new password"
   val alreadyHaveAccount = "Do you already have an account?"
+  val recoverYourPassword = "Recover your password"
   val recoverIt = "Recover it"
   val recover = "Recover"
   val signOut = "Sign out"
