@@ -1,6 +1,6 @@
 package net.wiringbits
 
-import net.wiringbits.ui.components.core.{ErrorBoundaryComponent, ErrorBoundaryInfo}
+import net.wiringbits.webapp.utils.slinkyUtils.components.core.{ErrorBoundaryComponent, ErrorBoundaryInfo}
 import org.scalajs.dom
 import slinky.hot
 import slinky.web.ReactDOM

@@ -5,7 +5,8 @@ ThisBuild / scalaVersion := "2.13.8"
 ThisBuild / organization := "net.wiringbits"
 
 val playJson = "2.9.2"
-val sttp = "3.3.18"
+val sttp = "3.4.0"
+val webappUtils = "0.4.3"
 
 val consoleDisabledOptions = Seq("-Xfatal-warnings", "-Ywarn-unused", "-Ywarn-unused-import")
 
@@ -80,7 +81,7 @@ lazy val baseLibSettings: Project => Project =
         "-unchecked" // Enable additional warnings where generated code depends on assumptions.
       ),
       libraryDependencies ++= Seq(
-        "org.scalatest" %%% "scalatest" % "3.2.10" % Test,
+        "org.scalatest" %%% "scalatest" % "3.2.11" % Test,
         "com.beachape" %%% "enumeratum" % "1.7.0"
       )
     )
@@ -294,9 +295,8 @@ lazy val server = (project in file("server"))
       "com.dimafeng" %% "testcontainers-scala-postgresql" % "0.39.12" % "test",
       "com.softwaremill.sttp.client3" %% "core" % sttp % "test",
       "com.softwaremill.sttp.client3" %% "async-http-client-backend-future" % sttp % "test",
-      "com.amazonaws" % "aws-java-sdk-ses" % "1.12.144",
-      // aws-java-sdk-ses requires this to work
-      "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.13.1"
+      "net.wiringbits" %% "admin-data-explorer-play-server" % webappUtils,
+      "software.amazon.awssdk" % "ses" % "2.17.117"
     )
   )
 
@@ -349,10 +349,11 @@ lazy val web = (project in file("web"))
       "com.typesafe.play" %%% "play-json" % playJson,
       "com.softwaremill.sttp.client3" %%% "core" % sttp,
       "org.scala-js" %%% "scala-js-macrotask-executor" % "1.0.0",
-      "com.alexitc" %%% "sjs-material-ui-facade" % "0.2.0"
+      "com.alexitc" %%% "sjs-material-ui-facade" % "0.2.0",
+      "net.wiringbits" %%% "admin-data-explorer-slinky" % webappUtils
     ),
     libraryDependencies ++= Seq(
-      "org.scalatest" %%% "scalatest" % "3.2.10" % Test
+      "org.scalatest" %%% "scalatest" % "3.2.11" % Test
     )
   )
 
@@ -401,10 +402,11 @@ lazy val admin = (project in file("admin"))
       "com.typesafe.play" %%% "play-json" % playJson,
       "com.softwaremill.sttp.client3" %%% "core" % sttp,
       "org.scala-js" %%% "scala-js-macrotask-executor" % "1.0.0",
-      "com.alexitc" %%% "sjs-material-ui-facade" % "0.2.0"
+      "com.alexitc" %%% "sjs-material-ui-facade" % "0.2.0",
+      "net.wiringbits" %%% "admin-data-explorer-slinky" % webappUtils
     ),
     libraryDependencies ++= Seq(
-      "org.scalatest" %%% "scalatest" % "3.2.10" % Test
+      "org.scalatest" %%% "scalatest" % "3.2.11" % Test
     )
   )
 

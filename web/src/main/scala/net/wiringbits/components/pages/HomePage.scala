@@ -9,7 +9,7 @@ import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
   Styles,
   WithStylesOptions
 }
-import net.wiringbits.ui.components.core.widgets._
+import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets._
 import org.scalablytyped.runtime.StringDictionary
 import slinky.core.FunctionalComponent
 import slinky.core.annotations.react

@@ -92,9 +92,11 @@ psql -U postgres -h 127.0.0.1
 on the postgres CLI then create the `wiringbits_db` by
 
 ```sql
-create database wiringbits_db;
+CREATE DATABASE wiringbits_db;
+
+CREATE EXTENSION IF NOT EXISTS CITEXT;
 ```
 
 ---
 
-[Potsgre linux instalation](https://www.postgresql.org/download/linux/ubuntu/)
+[Potsgres linux instalation](https://www.postgresql.org/download/linux/ubuntu/)

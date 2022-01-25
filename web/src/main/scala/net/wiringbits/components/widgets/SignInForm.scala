@@ -2,14 +2,13 @@ package net.wiringbits.components.widgets
 
 import com.alexitc.materialui.facade.materialUiCore.mod.PropTypes.Color
 import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
-import net.wiringbits.common.models.Captcha
 import net.wiringbits.api.forms.StatefulFormData
 import net.wiringbits.forms.SignInFormData
 import net.wiringbits.models.User
-import net.wiringbits.ui.components.core.ErrorLabel
-import net.wiringbits.ui.components.core.widgets.Container.{Alignment, EdgeInsets}
-import net.wiringbits.ui.components.core.widgets.{CircularLoader, Container, Title}
 import net.wiringbits.ui.components.inputs.{EmailInput, PasswordInput}
+import net.wiringbits.webapp.utils.slinkyUtils.components.core.ErrorLabel
+import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.{Alignment, EdgeInsets}
+import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container, Title}
 import net.wiringbits.{API, AppStrings}
 import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._

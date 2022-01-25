@@ -1,11 +1,11 @@
 package net.wiringbits.apis
 
-import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
-import com.amazonaws.services.simpleemail.AmazonSimpleEmailServiceClientBuilder
-import com.amazonaws.services.simpleemail.model.*
 import net.wiringbits.apis.models.EmailRequest
 import net.wiringbits.config.{AWSConfig, EmailConfig}
 import org.slf4j.LoggerFactory
+import software.amazon.awssdk.auth.credentials.{AwsBasicCredentials, StaticCredentialsProvider}
+import software.amazon.awssdk.services.ses.SesAsyncClient
+import software.amazon.awssdk.services.ses.model.*
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -25,24 +25,23 @@ class EmailApiAWSImpl @Inject() (
       s"""<p>${emailRequest.message.body}</p>""".stripMargin
 
     def unsafe(): Unit = try {
-      val credentials = new BasicAWSCredentials(awsConfig.accessKeyId.string, awsConfig.secretAccessKey.string)
-      val credentialsProvider = new AWSStaticCredentialsProvider(credentials)
+      val credentials = AwsBasicCredentials.create(awsConfig.accessKeyId.string, awsConfig.secretAccessKey.string)
+      val credentialsProvider = StaticCredentialsProvider.create(credentials)
 
-      val client =
-        AmazonSimpleEmailServiceClientBuilder.standard
-          .withCredentials(credentialsProvider)
-          .withRegion(awsConfig.region)
-          .build()
-      val destination = new Destination().withToAddresses(emailRequest.destination.string)
-      val body = new Body()
-        .withHtml(new Content().withCharset("UTF-8").withData(htmlBody))
-        .withText(new Content().withCharset("UTF-8").withData(emailRequest.message.body))
-      val subject = new Content().withCharset("UTF-8").withData(emailRequest.message.subject)
-      val message = new Message().withBody(body).withSubject(subject)
-      val request = new SendEmailRequest()
-        .withDestination(destination)
-        .withMessage(message)
-        .withSource(from)
+      val client = SesAsyncClient.builder.region(awsConfig.region).credentialsProvider(credentialsProvider).build()
+
+      val destination = Destination.builder.toAddresses(emailRequest.destination.string).build()
+      val body = Body.builder
+        .html(Content.builder.charset("UTF-8").data(htmlBody).build())
+        .text(Content.builder.charset("UTF-8").data(emailRequest.message.body).build())
+        .build()
+      val subject = Content.builder.charset("UTF-8").data(emailRequest.message.subject).build
+      val message = Message.builder.body(body).subject(subject).build()
+      val request = SendEmailRequest.builder
+        .source(from)
+        .destination(destination)
+        .message(message)
+        .build()
       client.sendEmail(request)
       logger.info(s"Email sent, to: ${emailRequest.destination}, subject = ${emailRequest.message.subject}")
     } catch {
