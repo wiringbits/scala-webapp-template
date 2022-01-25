@@ -25,7 +25,7 @@ class TokensHelperSpec extends AnyWordSpec {
       val hmac = TokensHelper.doHMACSHA1(value = uuid.toString.getBytes, secretKey = secretKey)
 
       TokensHelper.isSignatureValid(tokensSecret = secretKey, digest = hmac, data = uuid.toString.getBytes) must be(
-        false
+        true
       )
     }
 
