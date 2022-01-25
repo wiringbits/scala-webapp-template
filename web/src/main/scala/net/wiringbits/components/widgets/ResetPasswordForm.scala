@@ -2,6 +2,7 @@ package net.wiringbits.components.widgets
 
 import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
 import net.wiringbits.forms.ResetPasswordFormData
+import net.wiringbits.models.User
 import net.wiringbits.ui.components.inputs.PasswordInput
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.ErrorLabel
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container}
@@ -18,7 +19,7 @@ import typings.reactRouter.mod.useHistory
 import scala.util.{Failure, Success}
 
 @react object ResetPasswordForm {
-  case class Props(api: API, token: Option[String])
+  case class Props(api: API, loggedIn: User => Unit, token: Option[String])
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val history = useHistory()
@@ -53,9 +54,10 @@ import scala.util.{Failure, Success}
         } yield props.api.client
           .resetPassword(request)
           .onComplete {
-            case Success(_) =>
+            case Success(res) =>
+              props.loggedIn(User(name = res.name, email = res.email, jwt = res.token))
               setFormData(_.submitted)
-              history.push("/signin")
+              history.push("/dashboard")
             case Failure(ex) =>
               setFormData(_.submissionFailed(ex.getMessage))
           }

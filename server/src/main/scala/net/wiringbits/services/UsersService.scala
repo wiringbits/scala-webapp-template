@@ -146,7 +146,7 @@ class UsersService @Inject() (
       emailMessage = EmailMessage.resetPassword(user.name)
       _ = emailApi.sendEmail(EmailRequest(user.email, emailMessage))
       token = JwtUtils.createToken(jwtConfig, user.id)(clock)
-    } yield ResetPassword.Response(token)
+    } yield ResetPassword.Response(name = user.name, email = user.email, token = token)
   }
 
   private def enforceVerifiedUser(user: User): Unit = {

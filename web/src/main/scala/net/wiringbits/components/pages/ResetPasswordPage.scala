@@ -13,6 +13,7 @@ import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
   WithStylesOptions
 }
 import net.wiringbits.components.widgets.ResetPasswordForm
+import net.wiringbits.models.User
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container
 import net.wiringbits.{API, AppStrings}
 import org.scalablytyped.runtime.StringDictionary
@@ -25,7 +26,7 @@ import typings.reactRouter.mod.{useHistory, useParams}
 import scala.scalajs.js
 
 @react object ResetPasswordPage {
-  case class Props(api: API)
+  case class Props(api: API, loggedIn: User => Unit)
 
   private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {
     val stylesCallback: StyleRulesCallback[Theme, Unit, String] = theme =>
@@ -57,14 +58,9 @@ import scala.scalajs.js
             Container(
               flexDirection = Container.FlexDirection.row,
               alignItems = Container.Alignment.center,
-              child = Fragment(
-                mui
-                  .IconButton(muiIcons.ChevronLeft().fontSize(muiStrings.large))
-                  .onClick(_ => history.push("/")),
-                mui.Typography(AppStrings.enterNewPassword).variant(muiStrings.h5)
-              )
+              child = mui.Typography(AppStrings.enterNewPassword).variant(muiStrings.h5)
             ),
-            ResetPasswordForm(props.api, resetPasswordCode),
+            ResetPasswordForm(props.api, props.loggedIn, resetPasswordCode),
             Container(
               margin = Container.EdgeInsets.top(8),
               flexDirection = Container.FlexDirection.row,

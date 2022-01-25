@@ -36,6 +36,9 @@ import typings.reactRouterDom.{components => router}
     val signUp = route("/signup", props.auth)(SignUpPage(props.api, props.captchaKey))
     val email = route("/verify-email", props.auth)(VerifyEmailPage())
     val emailCode = route("/verify-email/:emailCode", props.auth)(VerifyEmailWithTokenPage(props.api))
+    val forgotPassword = route("/forgot-password", props.auth)(ForgotPasswordPage(props.api, props.captchaKey))
+    val resetPassword =
+      route("/reset-password/:resetPasswordCode", props.auth)(ResetPasswordPage(props.api, props.loggedIn))
 
     def dashboard(user: User) = route("/dashboard", props.auth)(DashboardPage(props.api, user))
     val signOut = route("/signout", props.auth) {
@@ -51,7 +54,7 @@ import typings.reactRouterDom.{components => router}
 
     props.auth match {
       case AuthState.Unauthenticated =>
-        router.Switch(home, about, signIn, signUp, email, emailCode, catchAllRoute)
+        router.Switch(home, about, signIn, signUp, email, emailCode, forgotPassword, resetPassword, catchAllRoute)
 
       case AuthState.Authenticated(user) =>
         router.Switch(home, dashboard(user), about, signOut, catchAllRoute)
