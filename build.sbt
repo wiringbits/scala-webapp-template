@@ -222,7 +222,8 @@ lazy val common = (crossProject(JSPlatform, JVMPlatform) in file("lib/common"))
   .jvmSettings(
     libraryDependencies ++= Seq(
       "com.typesafe.play" %% "play-json" % playJson,
-      "com.typesafe.play" %%% "play-json" % playJson // for a weird reason, jvm tests fail without this
+      "com.typesafe.play" %%% "play-json" % playJson, // for a weird reason, jvm tests fail without this
+      "net.wiringbits" %%% "webapp-common" % webappUtils
     )
   )
   .jsSettings(
@@ -230,7 +231,8 @@ lazy val common = (crossProject(JSPlatform, JVMPlatform) in file("lib/common"))
     Compile / stMinimize := Selection.All,
     libraryDependencies ++= Seq(
       "io.github.cquiroz" %%% "scala-java-time" % "2.3.0",
-      "com.typesafe.play" %%% "play-json" % playJson
+      "com.typesafe.play" %%% "play-json" % playJson,
+      "net.wiringbits" %%% "webapp-common" % webappUtils
     )
   )
 
@@ -284,7 +286,8 @@ lazy val ui = (project in file("lib/ui"))
     libraryDependencies ++= Seq(
       "io.github.cquiroz" %%% "scala-java-time" % "2.0.0",
       "org.scala-js" %%% "scala-js-macrotask-executor" % "1.0.0",
-      "com.alexitc" %%% "sjs-material-ui-facade" % "0.2.0"
+      "com.alexitc" %%% "sjs-material-ui-facade" % "0.2.0",
+      "net.wiringbits" %%% "slinky-utils" % webappUtils
     )
   )
 

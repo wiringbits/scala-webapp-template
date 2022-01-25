@@ -1,8 +1,8 @@
 package net.wiringbits.forms
 
-import net.wiringbits.api.forms.{FormData, FormField}
 import net.wiringbits.api.models.Login
 import net.wiringbits.common.models.{Captcha, Email, Password}
+import net.wiringbits.webapp.utils.slinkyUtils.forms.{FormData, FormField}
 
 case class SignInFormData(
     email: FormField[Email],
