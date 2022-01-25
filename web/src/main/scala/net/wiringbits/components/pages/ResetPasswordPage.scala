@@ -3,7 +3,6 @@ package net.wiringbits.components.pages
 import com.alexitc.materialui.facade.csstype.mod.FlexDirectionProperty
 import com.alexitc.materialui.facade.materialUiCore.createMuiThemeMod.Theme
 import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
-import com.alexitc.materialui.facade.materialUiIcons.{components => muiIcons}
 import com.alexitc.materialui.facade.materialUiStyles.makeStylesMod.StylesHook
 import com.alexitc.materialui.facade.materialUiStyles.mod.makeStyles
 import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
@@ -12,6 +11,7 @@ import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
   Styles,
   WithStylesOptions
 }
+import net.wiringbits.common.models.UserToken
 import net.wiringbits.components.widgets.ResetPasswordForm
 import net.wiringbits.models.User
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container
@@ -49,7 +49,8 @@ import scala.scalajs.js
     val classes = useStyles(())
     val history = useHistory()
     val params = useParams()
-    val resetPasswordCode = Option(params.asInstanceOf[js.Dynamic].resetPasswordCode.toString)
+    val resetPasswordCode = params.asInstanceOf[js.Dynamic].resetPasswordCode.toString
+    val userToken = UserToken.validate(resetPasswordCode)
 
     div(className := classes("resetPasswordPage"))(
       div(className := classes("resetPasswordFormContainer"))(
@@ -60,7 +61,7 @@ import scala.scalajs.js
               alignItems = Container.Alignment.center,
               child = mui.Typography(AppStrings.enterNewPassword).variant(muiStrings.h5)
             ),
-            ResetPasswordForm(props.api, props.loggedIn, resetPasswordCode),
+            ResetPasswordForm(props.api, props.loggedIn, userToken),
             Container(
               margin = Container.EdgeInsets.top(8),
               flexDirection = Container.FlexDirection.row,

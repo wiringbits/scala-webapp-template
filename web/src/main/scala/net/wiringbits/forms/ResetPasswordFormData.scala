@@ -1,19 +1,19 @@
 package net.wiringbits.forms
 
 import net.wiringbits.api.models.ResetPassword
-import net.wiringbits.common.models.Password
+import net.wiringbits.common.models.{Password, UserToken}
 import net.wiringbits.webapp.utils.slinkyUtils.forms.{FormData, FormField}
 
 case class ResetPasswordFormData(
     password: FormField[Password],
     repeatPassword: FormField[Password],
-    token: Option[String]
+    token: Option[UserToken]
 ) extends FormData[ResetPassword.Request] {
   override def fields: List[FormField[_]] = List(password, repeatPassword)
 
   override def formValidationErrors: List[String] = {
     val isTokenDefined =
-      Option.when(token.contains(""))("The token doesn't exists")
+      Option.when(token.isEmpty)("The token doesn't exists")
 
     // the error is rendered only when both fields are provided
     val passwordMatchesError = (for {
@@ -47,7 +47,7 @@ object ResetPasswordFormData {
   def initial(
       passwordLabel: String,
       repeatPasswordLabel: String,
-      token: Option[String]
+      token: Option[UserToken]
   ): ResetPasswordFormData = ResetPasswordFormData(
     password = new FormField(label = passwordLabel, name = "password", required = true, `type` = "password"),
     repeatPassword =

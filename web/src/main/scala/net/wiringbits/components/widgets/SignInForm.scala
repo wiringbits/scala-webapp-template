@@ -2,8 +2,8 @@ package net.wiringbits.components.widgets
 
 import com.alexitc.materialui.facade.materialUiCore.mod.PropTypes.Color
 import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
-import net.wiringbits.webapp.utils.slinkyUtils.forms.StatefulFormData
 import net.wiringbits.forms.SignInFormData
+import net.wiringbits.webapp.utils.slinkyUtils.forms.StatefulFormData
 import net.wiringbits.models.User
 import net.wiringbits.ui.components.inputs.{EmailInput, PasswordInput}
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.ErrorLabel

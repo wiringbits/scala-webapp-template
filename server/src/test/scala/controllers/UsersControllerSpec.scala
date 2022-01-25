@@ -5,10 +5,12 @@ import controllers.common.PlayPostgresSpec
 import net.wiringbits.api.models.{CreateUser, ForgotPassword, Login, ResetPassword, VerifyEmail}
 import net.wiringbits.apis.models.EmailRequest
 import net.wiringbits.apis.{EmailApi, ReCaptchaApi}
-import org.mockito.ArgumentMatchers.any
-import net.wiringbits.common.models.{Captcha, Email, Name, Password, UserToken}
+import net.wiringbits.common.models._
+import net.wiringbits.config.UserTokensConfig
 import net.wiringbits.repositories.UserTokensRepository
 import net.wiringbits.repositories.models.UserTokenType
+import net.wiringbits.util.{TokenGenerator, TokensHelper}
+import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoSugar.{mock, when}
 import play.api.inject
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -18,11 +20,15 @@ import java.time.temporal.ChronoUnit
 import java.time.{Clock, Instant}
 import java.util.UUID
 import scala.concurrent.Future
-import scala.util.control.NonFatal
 
 class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
 
   def userTokensRepository: UserTokensRepository = app.injector.instanceOf(classOf[UserTokensRepository])
+
+  private val clock = mock[Clock]
+  when(clock.instant()).thenReturn(Instant.now())
+
+  private val tokenGenerator = mock[TokenGenerator]
 
   private val emailApi = mock[EmailApi]
   when(emailApi.sendEmail(any[EmailRequest]())).thenReturn(Future.unit)
@@ -30,17 +36,19 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
   private val captchaApi = mock[ReCaptchaApi]
   when(captchaApi.verify(any[Captcha]())).thenReturn(Future.successful(true))
 
-  private val clock = mock[Clock]
-  when(clock.instant()).thenReturn(Instant.now())
-
   override def guiceApplicationBuilder(container: PostgreSQLContainer): GuiceApplicationBuilder =
     super
       .guiceApplicationBuilder(container)
       .overrides(
         inject.bind[EmailApi].to(emailApi),
         inject.bind[ReCaptchaApi].to(captchaApi),
-        inject.bind[Clock].to(clock)
+        inject.bind[Clock].to(clock),
+        inject.bind[TokenGenerator].to(tokenGenerator)
       )
+
+  private def createHMACToken(token: UUID): String = {
+    TokensHelper.doHMACSHA1(token.toString.getBytes, app.injector.instanceOf[UserTokensConfig].hmacSecret)
+  }
 
   "POST /users" should {
     "return the email verification token after creating a user" in withApiClient { client =>
@@ -53,13 +61,19 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
         captcha = Captcha.trusted("test")
       )
 
+      val verificationToken = UUID.randomUUID()
+      when(tokenGenerator.next()).thenReturn(verificationToken)
+
       val response = client.createUser(request).futureValue
-      val token = userTokensRepository.find(response.id).futureValue.headOption
+      val token = userTokensRepository
+        .find(response.id)
+        .futureValue
+        .find(_.tokenType == UserTokenType.EmailVerification)
+        .value
 
       response.name must be(name)
       response.email must be(email)
-      token mustNot be(empty)
-      token.value.tokenType must be(UserTokenType.EmailVerification)
+      token.token must be(createHMACToken(verificationToken))
     }
 
     "fail when the email is already taken" in withApiClient { client =>
@@ -76,12 +90,8 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
       // then, it fails
       val error = client
         .createUser(request)
-        .map(_ => "Success when failure expected")
-        .recover { case NonFatal(ex) =>
-          ex.getMessage
-        }
-        .futureValue
-      error must be("Email already in use, pick another one")
+        .expectError
+      error must be("The email is not available")
     }
 
     "fail when the captcha isn't valid" in withApiClient { client =>
@@ -96,11 +106,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
 
       val error = client
         .createUser(request)
-        .map(_ => "Success when failure expected")
-        .recover { case NonFatal(ex) =>
-          ex.getMessage
-        }
-        .futureValue
+        .expectError
 
       error must be("Invalid captcha, try again")
 
@@ -118,7 +124,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
         password = Password.trusted("test123..."),
         captcha = Captcha.trusted("test")
       )
-      val response = createVerifyLoginUser(request, client, userTokensRepository).futureValue
+      val response = createVerifyLoginUser(request, client, tokenGenerator).futureValue
 
       response.name must be(name)
       response.email must be(email)
@@ -131,11 +137,12 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
         password = Password.trusted("test123..."),
         captcha = Captcha.trusted("test")
       )
+      val verificationToken = UUID.randomUUID()
+      when(tokenGenerator.next()).thenReturn(verificationToken)
+
       val user = client.createUser(request).futureValue
 
-      val token = userTokensRepository.find(user.id).futureValue.headOption.value.token
-
-      client.verifyEmail(VerifyEmail.Request(UserToken(userId = user.id, token = UUID.fromString(token)))).futureValue
+      client.verifyEmail(VerifyEmail.Request(UserToken(userId = user.id, token = verificationToken))).futureValue
 
       userTokensRepository.find(user.id).futureValue must be(empty)
     }
@@ -147,19 +154,15 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
         password = Password.trusted("test123..."),
         captcha = Captcha.trusted("test")
       )
-      val user = createVerifyLoginUser(request, client, userTokensRepository).futureValue
+      val user = createVerifyLoginUser(request, client, tokenGenerator).futureValue
 
       val token = UUID.randomUUID()
 
       val error = client
         .verifyEmail(VerifyEmail.Request(UserToken(user.id, token)))
-        .map(_ => "Success when failure expected")
-        .recover { case NonFatal(ex) =>
-          ex.getMessage
-        }
-        .futureValue
+        .expectError
 
-      error must be(s"User ${user.id} email is already verified")
+      error must be(s"User email is already verified")
     }
   }
 
@@ -171,11 +174,12 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
         password = Password.trusted("test123..."),
         captcha = Captcha.trusted("test")
       )
+      val verificationToken = UUID.randomUUID()
+      when(tokenGenerator.next()).thenReturn(verificationToken)
+
       val user = client.createUser(request).futureValue
 
-      val token = userTokensRepository.find(user.id).futureValue.headOption.value.token
-
-      client.verifyEmail(VerifyEmail.Request(UserToken(user.id, UUID.fromString(token)))).futureValue
+      client.verifyEmail(VerifyEmail.Request(UserToken(user.id, verificationToken))).futureValue
 
       val loginRequest = Login.Request(
         email = user.email,
@@ -204,11 +208,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
 
       val error = client
         .login(loginRequest)
-        .map(_ => "Success when failure expected")
-        .recover { case NonFatal(ex) =>
-          ex.getMessage
-        }
-        .futureValue
+        .expectError
 
       error must be("The email is not verified, check your spam folder if you don't see the email.")
     }
@@ -222,15 +222,12 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
       )
       val user = client.createUser(request).futureValue
 
-      val token = UUID.randomUUID()
+      val verificationToken = UUID.randomUUID()
+      when(tokenGenerator.next()).thenReturn(verificationToken)
 
       val error = client
-        .verifyEmail(VerifyEmail.Request(UserToken(user.id, token)))
-        .map(_ => "Success when failure expected")
-        .recover { case NonFatal(ex) =>
-          ex.getMessage
-        }
-        .futureValue
+        .verifyEmail(VerifyEmail.Request(UserToken(user.id, verificationToken)))
+        .expectError
 
       error must be(s"Token for user ${user.id} wasn't found")
     }
@@ -243,19 +240,16 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
         password = Password.trusted("test123..."),
         captcha = Captcha.trusted("test")
       )
-      val user = client.createUser(request).futureValue
+      val verificationToken = UUID.randomUUID()
+      when(tokenGenerator.next()).thenReturn(verificationToken)
 
-      val token = userTokensRepository.find(user.id).futureValue.headOption.value.token
+      val user = client.createUser(request).futureValue
 
       when(clock.instant()).thenAnswer(Instant.now().plus(2, ChronoUnit.DAYS))
 
       val error = client
-        .verifyEmail(VerifyEmail.Request(UserToken(user.id, UUID.fromString(token))))
-        .map(_ => "Success when failure expected")
-        .recover { case NonFatal(ex) =>
-          ex.getMessage
-        }
-        .futureValue
+        .verifyEmail(VerifyEmail.Request(UserToken(user.id, verificationToken)))
+        .expectError
 
       error must be("Token is expired")
     }
@@ -269,10 +263,12 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
         password = password,
         captcha = Captcha.trusted("test")
       )
-      val user = client.createUser(request).futureValue
-      val token = userTokensRepository.find(user.id).futureValue.headOption.value.token
+      val verificationToken = UUID.randomUUID()
+      when(tokenGenerator.next()).thenReturn(verificationToken)
 
-      client.verifyEmail(VerifyEmail.Request(UserToken(user.id, UUID.fromString(token)))).futureValue
+      val user = client.createUser(request).futureValue
+
+      client.verifyEmail(VerifyEmail.Request(UserToken(user.id, verificationToken))).futureValue
 
       val response =
         client.login(Login.Request(email = email, password = password, captcha = Captcha.trusted("test"))).futureValue
@@ -287,10 +283,12 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
         password = Password.trusted("test123..."),
         captcha = Captcha.trusted("test")
       )
-      val user = client.createUser(request).futureValue
-      val token = userTokensRepository.find(user.id).futureValue.headOption.value.token
+      val verificationToken = UUID.randomUUID()
+      when(tokenGenerator.next()).thenReturn(verificationToken)
 
-      client.verifyEmail(VerifyEmail.Request(UserToken(user.id, UUID.fromString(token)))).futureValue
+      val user = client.createUser(request).futureValue
+
+      client.verifyEmail(VerifyEmail.Request(UserToken(user.id, verificationToken))).futureValue
 
       val loginRequest = Login.Request(
         email = user.email,
@@ -300,11 +298,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
 
       val error = client
         .login(loginRequest)
-        .map(_ => "Success when failure expected")
-        .recover { case NonFatal(ex) =>
-          ex.getMessage
-        }
-        .futureValue
+        .expectError
 
       error must be("The given email/password doesn't match")
     }
@@ -328,11 +322,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
 
       val error = client
         .login(loginRequest)
-        .map(_ => "Success when failure expected")
-        .recover { case NonFatal(ex) =>
-          ex.getMessage
-        }
-        .futureValue
+        .expectError
 
       error must be("Invalid captcha, try again")
 
@@ -357,11 +347,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
 
       val error = client
         .login(loginRequest)
-        .map(_ => "Success when failure expected")
-        .recover { case NonFatal(ex) =>
-          ex.getMessage
-        }
-        .futureValue
+        .expectError
 
       error must be("The email is not verified, check your spam folder if you don't see the email.")
     }
@@ -379,7 +365,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
         captcha = Captcha.trusted("test")
       )
 
-      createVerifyLoginUser(request, client, userTokensRepository).futureValue
+      createVerifyLoginUser(request, client, tokenGenerator).futureValue
 
       val forgotPasswordRequest = ForgotPassword.Request(email, Captcha.trusted("test"))
       val response = client.forgotPassword(forgotPasswordRequest).futureValue
@@ -412,13 +398,9 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
 
       val error = client
         .forgotPassword(forgotPasswordRequest)
-        .map(_ => "Success when failure expected")
-        .recover { case NonFatal(ex) =>
-          ex.getMessage
-        }
-        .futureValue
+        .expectError
 
-      error must be(s"User's $email hasn't been verified yet")
+      error must be(s"The email is not verified, check your spam folder if you don't see the email.")
     }
 
     "fail when the captcha isn't valid" in withApiClient { client =>
@@ -431,18 +413,14 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
         captcha = Captcha.trusted("test")
       )
 
-      createVerifyLoginUser(request, client, userTokensRepository).futureValue
+      createVerifyLoginUser(request, client, tokenGenerator).futureValue
 
       val forgotPasswordRequest = ForgotPassword.Request(email, Captcha.trusted("test"))
       when(captchaApi.verify(any[Captcha]())).thenReturn(Future.successful(false))
 
       val error = client
         .forgotPassword(forgotPasswordRequest)
-        .map(_ => "Success when failure expected")
-        .recover { case NonFatal(ex) =>
-          ex.getMessage
-        }
-        .futureValue
+        .expectError
 
       error must be("Invalid captcha, try again")
 
@@ -461,15 +439,16 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
         captcha = Captcha.trusted("test")
       )
 
-      val user = createVerifyLoginUser(request, client, userTokensRepository).futureValue
+      val user = createVerifyLoginUser(request, client, tokenGenerator).futureValue
+
+      val verificationToken = UUID.randomUUID()
+      when(tokenGenerator.next()).thenReturn(verificationToken)
 
       val forgotPasswordRequest = ForgotPassword.Request(email, Captcha.trusted("test"))
       client.forgotPassword(forgotPasswordRequest).futureValue
 
-      val token = userTokensRepository.find(user.id).futureValue.headOption.value.token
-
       val resetPasswordRequest =
-        ResetPassword.Request(UserToken(user.id, UUID.fromString(token)), Password.trusted("test456..."))
+        ResetPassword.Request(UserToken(user.id, verificationToken), Password.trusted("test456..."))
       client.resetPassword(resetPasswordRequest).futureValue
 
       val loginRequest = Login.Request(
@@ -493,15 +472,16 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
         captcha = Captcha.trusted("test")
       )
 
-      val userId = createVerifyLoginUser(request, client, userTokensRepository).futureValue.id
+      val userId = createVerifyLoginUser(request, client, tokenGenerator).futureValue.id
+
+      val verificationToken = UUID.randomUUID()
+      when(tokenGenerator.next()).thenReturn(verificationToken)
 
       val forgotPasswordRequest = ForgotPassword.Request(email, Captcha.trusted("test"))
       client.forgotPassword(forgotPasswordRequest).futureValue
 
-      val token = userTokensRepository.find(userId).futureValue.headOption.value.token
-
       val resetPasswordRequest =
-        ResetPassword.Request(UserToken(userId, UUID.fromString(token)), Password.trusted("test456..."))
+        ResetPassword.Request(UserToken(userId, verificationToken), Password.trusted("test456..."))
 
       val response = client
         .resetPassword(resetPasswordRequest)
@@ -521,15 +501,16 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
           captcha = Captcha.trusted("test")
         )
 
-        val user = createVerifyLoginUser(request, client, userTokensRepository).futureValue
+        val user = createVerifyLoginUser(request, client, tokenGenerator).futureValue
+
+        val verificationToken = UUID.randomUUID()
+        when(tokenGenerator.next()).thenReturn(verificationToken)
 
         val forgotPasswordRequest = ForgotPassword.Request(email, Captcha.trusted("test"))
         client.forgotPassword(forgotPasswordRequest).futureValue
 
-        val token = userTokensRepository.find(user.id).futureValue.headOption.value.token
-
         val resetPasswordRequest =
-          ResetPassword.Request(UserToken(user.id, UUID.fromString(token)), Password.trusted("test456..."))
+          ResetPassword.Request(UserToken(user.id, verificationToken), Password.trusted("test456..."))
         client.resetPassword(resetPasswordRequest).futureValue
 
         val loginRequest = Login.Request(
@@ -540,11 +521,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
 
         val error = client
           .login(loginRequest)
-          .map(_ => "Success when failure expected")
-          .recover { case NonFatal(ex) =>
-            ex.getMessage
-          }
-          .futureValue
+          .expectError
 
         error must be("The given email/password doesn't match")
     }
