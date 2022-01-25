@@ -96,7 +96,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
           ex.getMessage
         }
         .futureValue
-      error must be("Email already in use, pick another one")
+      error must be("The email is not available")
     }
 
     "fail when the captcha isn't valid" in withApiClient { client =>
