@@ -2,7 +2,7 @@ package net.wiringbits.actions
 
 import net.wiringbits.api.models.ForgotPassword
 import net.wiringbits.apis.models.EmailRequest
-import net.wiringbits.apis.{EmailApiAWSImpl, ReCaptchaApi}
+import net.wiringbits.apis.{EmailApi, ReCaptchaApi}
 import net.wiringbits.config.{UserTokensConfig, WebAppConfig}
 import net.wiringbits.repositories.models.{User, UserToken, UserTokenType}
 import net.wiringbits.repositories.{UserTokensRepository, UsersRepository}
@@ -20,7 +20,7 @@ class ForgotPasswordAction @Inject() (
     webAppConfig: WebAppConfig,
     captchaApi: ReCaptchaApi,
     usersRepository: UsersRepository,
-    emailApi: EmailApiAWSImpl,
+    emailApi: EmailApi,
     userTokensRepository: UserTokensRepository,
     tokenGenerator: TokenGenerator
 )(implicit

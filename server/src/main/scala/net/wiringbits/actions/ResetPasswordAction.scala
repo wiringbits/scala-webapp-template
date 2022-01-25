@@ -1,7 +1,7 @@
 package net.wiringbits.actions
 
 import net.wiringbits.api.models.ResetPassword
-import net.wiringbits.apis.EmailApiAWSImpl
+import net.wiringbits.apis.EmailApi
 import net.wiringbits.apis.models.EmailRequest
 import net.wiringbits.common.models.Password
 import net.wiringbits.config.{JwtConfig, UserTokensConfig}
@@ -19,7 +19,7 @@ class ResetPasswordAction @Inject() (
     userTokensConfig: UserTokensConfig,
     jwtConfig: JwtConfig,
     usersRepository: UsersRepository,
-    emailApi: EmailApiAWSImpl,
+    emailApi: EmailApi,
     userTokensRepository: UserTokensRepository
 )(implicit
     ec: ExecutionContext,

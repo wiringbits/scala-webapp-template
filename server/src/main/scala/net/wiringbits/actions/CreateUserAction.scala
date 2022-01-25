@@ -2,7 +2,7 @@ package net.wiringbits.actions
 
 import net.wiringbits.api.models.CreateUser
 import net.wiringbits.apis.models.EmailRequest
-import net.wiringbits.apis.{EmailApiAWSImpl, ReCaptchaApi}
+import net.wiringbits.apis.{EmailApi, ReCaptchaApi}
 import net.wiringbits.config.{UserTokensConfig, WebAppConfig}
 import net.wiringbits.repositories
 import net.wiringbits.repositories.UsersRepository
@@ -20,7 +20,7 @@ class CreateUserAction @Inject() (
     tokenGenerator: TokenGenerator,
     userTokensConfig: UserTokensConfig,
     webAppConfig: WebAppConfig,
-    emailApi: EmailApiAWSImpl
+    emailApi: EmailApi
 )(implicit
     ec: ExecutionContext
 ) {
