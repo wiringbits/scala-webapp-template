@@ -36,6 +36,7 @@ import scala.util.{Failure, Success}
       user: Option[GetCurrentUser.Response],
       hasChanges: Boolean,
       password: Option[Password],
+      hasPasswordChanges: Boolean,
       error: Option[String]
   )
 
@@ -65,6 +66,7 @@ import scala.util.{Failure, Success}
     Option.empty,
     hasChanges = false,
     Option.empty,
+    hasPasswordChanges = false,
     Option.empty
   )
 
@@ -84,12 +86,12 @@ import scala.util.{Failure, Success}
 
     def onPasswordChange(updatedPassword: String): Unit = {
       val password = Password.validate(updatedPassword).toOption
-      setState(_.copy(password = password, hasChanges = password.isDefined))
+      setState(_.copy(password = password, hasPasswordChanges = password.isDefined))
     }
 
     def onUserValueChange(userUpdated: GetCurrentUser.Response): Unit = {
       val initialValue = state.initialValue.get
-      val hasChanges = initialValue.name != userUpdated.name || state.password.isDefined
+      val hasChanges = initialValue.name != userUpdated.name
 
       setState(
         _.copy(
@@ -102,7 +104,6 @@ import scala.util.{Failure, Success}
     def onSaveClick(): Unit = {
       setState(_.copy(loading = true))
 
-      state.password.foreach(passwordSave)
       state.user.foreach { userUpdated =>
         val request = UpdateUser.Request(userUpdated.name)
 
@@ -115,14 +116,16 @@ import scala.util.{Failure, Success}
       }
     }
 
-    def passwordSave(password: Password): Unit = {
-      val request = UpdatePassword.Request(password)
+    def onPasswordSave(): Unit = {
+      state.password.foreach { password =>
+        val request = UpdatePassword.Request(password)
 
-      props.api.client.updatePassword(props.user.jwt, request).onComplete {
-        case Success(_) =>
-          setState(_.copy(loading = false, hasChanges = false, password = None))
-        case Failure(ex) =>
-          setState(_.copy(loading = false, error = Some(ex.toString), password = None))
+        props.api.client.updatePassword(props.user.jwt, request).onComplete {
+          case Success(_) =>
+            setState(_.copy(loading = false, hasChanges = false, password = None))
+          case Failure(ex) =>
+            setState(_.copy(loading = false, error = Some(ex.toString), password = None))
+        }
       }
     }
 
@@ -161,12 +164,22 @@ import scala.util.{Failure, Success}
       )
 
       val actions = mui.CardActions(className := classes("actions"))(
-        mui
-          .Button()("Save")
-          .variant(muiStrings.contained)
-          .color(muiStrings.primary)
-          .disabled(!state.hasChanges)
-          .onClick(_ => onSaveClick())
+        state.menuOption match {
+          case EditSummary =>
+            mui
+              .Button()("Save")
+              .variant(muiStrings.contained)
+              .color(muiStrings.primary)
+              .disabled(!state.hasChanges)
+              .onClick(_ => onSaveClick())
+          case EditPassword =>
+            mui
+              .Button()("Save password")
+              .variant(muiStrings.contained)
+              .color(muiStrings.primary)
+              .disabled(!state.hasPasswordChanges)
+              .onClick(_ => onPasswordSave())
+        }
       )
 
       mui.Card()(
