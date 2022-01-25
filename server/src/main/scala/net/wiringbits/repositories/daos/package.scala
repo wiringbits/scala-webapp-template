@@ -1,6 +1,6 @@
 package net.wiringbits.repositories
 
-import anorm.*
+import anorm._
 import net.wiringbits.common.models.{Email, Name}
 import net.wiringbits.repositories.models.{User, UserLog, UserToken, UserTokenType}
 

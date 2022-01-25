@@ -5,8 +5,8 @@ import net.wiringbits.config.ReCaptchaConfig
 import net.wiringbits.models.ReCaptchaSecret
 import org.mockito.ArgumentMatchers
 import org.mockito.MockitoSugar.{mock, when}
-import org.scalatest.concurrent.ScalaFutures.*
-import org.scalatest.matchers.must.Matchers.*
+import org.scalatest.concurrent.ScalaFutures._
+import org.scalatest.matchers.must.Matchers._
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.{BodyWritable, WSClient, WSRequest, WSResponse}

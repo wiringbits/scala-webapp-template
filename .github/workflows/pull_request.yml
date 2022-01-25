@@ -22,10 +22,10 @@ jobs:
         run: sbt scalafmtCheckAll
 
       - name: Compile
-        run: sbt compile
+        run: CI=true sbt compile
 
       - name: Run tests
-        run: sbt test
+        run: CI=true sbt test
 
       - name: Prepare admin build
         run: sbt admin/build

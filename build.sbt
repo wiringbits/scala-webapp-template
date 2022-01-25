@@ -8,25 +8,36 @@ val playJson = "2.9.2"
 val sttp = "3.4.0"
 val webappUtils = "0.4.3"
 
-val consoleDisabledOptions = Seq("-Xfatal-warnings", "-Ywarn-unused", "-Ywarn-unused-import")
+val consoleDisabledOptions = Seq("-Werror", "-Ywarn-unused", "-Ywarn-unused-import")
 
 /** Say just `build` or `sbt build` to make a production bundle in `build`
   */
 lazy val build = TaskKey[File]("build")
+
+lazy val commonSettings: Project => Project = {
+  _.settings(
+    // Enable fatal warnings only when running in the CI
+    scalacOptions ++= {
+      sys.env
+        .get("CI")
+        .filter(_.nonEmpty)
+        .map(_ => Seq("-Werror"))
+        .getOrElse(Seq.empty[String])
+    }
+  )
+}
 
 // Used only by the server
 // TODO: Reuse it in all projects
 lazy val baseServerSettings: Project => Project = {
   _.settings(
     scalacOptions ++= Seq(
-      "-Werror",
       "-unchecked",
       "-deprecation",
       "-feature",
       "-target:jvm-1.8",
       "-encoding",
       "UTF-8",
-      "-Xsource:3",
       "-Wconf:src=src_managed/.*:silent",
       "-Xlint:missing-interpolator",
       "-Xlint:adapted-args",
@@ -203,7 +214,7 @@ lazy val playSettings: Project => Project = {
 }
 
 lazy val common = (crossProject(JSPlatform, JVMPlatform) in file("lib/common"))
-  .configure(baseLibSettings)
+  .configure(baseLibSettings, commonSettings)
   .jsConfigure(_.enablePlugins(ScalaJSBundlerPlugin, ScalablyTypedConverterPlugin))
   .settings(
     libraryDependencies ++= Seq()
@@ -226,7 +237,7 @@ lazy val common = (crossProject(JSPlatform, JVMPlatform) in file("lib/common"))
 // shared apis
 lazy val api = (crossProject(JSPlatform, JVMPlatform) in file("lib/api"))
   .dependsOn(common)
-  .configure(baseLibSettings)
+  .configure(baseLibSettings, commonSettings)
   .jsConfigure(_.enablePlugins(ScalaJSBundlerPlugin, ScalablyTypedConverterPlugin))
   .jvmSettings(
     libraryDependencies ++= Seq(
@@ -245,7 +256,7 @@ lazy val api = (crossProject(JSPlatform, JVMPlatform) in file("lib/api"))
 
 // shared on the ui only
 lazy val ui = (project in file("lib/ui"))
-  .configure(baseLibSettings)
+  .configure(baseLibSettings, commonSettings)
   .configure(_.enablePlugins(ScalaJSBundlerPlugin, ScalablyTypedConverterPlugin))
   .dependsOn(api.js, common.js)
   .settings(
@@ -279,7 +290,7 @@ lazy val ui = (project in file("lib/ui"))
 
 lazy val server = (project in file("server"))
   .dependsOn(common.jvm, api.jvm)
-  .configure(baseServerSettings, playSettings)
+  .configure(baseServerSettings, commonSettings, playSettings)
   .settings(
     name := "wiringbits-server",
     fork := true,
@@ -322,7 +333,15 @@ lazy val webBuildInfoSettings: Project => Project = _.enablePlugins(BuildInfoPlu
 lazy val web = (project in file("web"))
   .dependsOn(common.js, api.js, ui)
   .enablePlugins(ScalablyTypedConverterPlugin)
-  .configure(baseWebSettings, browserProject, reactNpmDeps, withCssLoading, bundlerSettings, webBuildInfoSettings)
+  .configure(
+    baseWebSettings,
+    browserProject,
+    commonSettings,
+    reactNpmDeps,
+    withCssLoading,
+    bundlerSettings,
+    webBuildInfoSettings
+  )
   .settings(
     name := "wiringbits-web",
     useYarn := true,
@@ -377,7 +396,15 @@ lazy val adminBuildInfoSettings: Project => Project = _.enablePlugins(BuildInfoP
 lazy val admin = (project in file("admin"))
   .dependsOn(common.js, api.js, ui)
   .enablePlugins(ScalablyTypedConverterPlugin)
-  .configure(baseWebSettings, browserProject, reactNpmDeps, withCssLoading, bundlerSettings, adminBuildInfoSettings)
+  .configure(
+    baseWebSettings,
+    browserProject,
+    commonSettings,
+    reactNpmDeps,
+    withCssLoading,
+    bundlerSettings,
+    adminBuildInfoSettings
+  )
   .settings(
     name := "wiringbits-admin",
     useYarn := true,

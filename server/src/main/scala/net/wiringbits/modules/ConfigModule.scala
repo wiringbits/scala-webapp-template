@@ -1,7 +1,7 @@
 package net.wiringbits.modules
 
 import com.google.inject.{AbstractModule, Provides}
-import net.wiringbits.config.*
+import net.wiringbits.config._
 import org.slf4j.LoggerFactory
 import play.api.Configuration
 
