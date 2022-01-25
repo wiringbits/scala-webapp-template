@@ -1,5 +1,6 @@
 package controllers
 
+import net.wiringbits.actions.CreateUserAction
 import net.wiringbits.api.models._
 import net.wiringbits.config.JwtConfig
 import net.wiringbits.services.{UserLogsService, UsersService}
@@ -12,6 +13,7 @@ import scala.concurrent.ExecutionContext
 
 class UsersController @Inject() (
     usersService: UsersService,
+    createUserAction: CreateUserAction,
     loggerService: UserLogsService
 )(implicit cc: ControllerComponents, ec: ExecutionContext, jwtConfig: JwtConfig)
     extends AbstractController(cc) {
@@ -21,7 +23,7 @@ class UsersController @Inject() (
     val body = request.body
     logger.info(s"Create user: $body")
     for {
-      response <- usersService.create(body)
+      response <- createUserAction(body)
     } yield Ok(Json.toJson(response))
   }
 
