@@ -18,7 +18,8 @@ class GetUserAction @Inject() (
     } yield GetCurrentUser.Response(
       id = user.id,
       email = user.email,
-      name = user.name
+      name = user.name,
+      createdAt = user.createdAt
     )
   }
 

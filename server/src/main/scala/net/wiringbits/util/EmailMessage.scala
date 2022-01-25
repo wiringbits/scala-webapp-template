@@ -38,6 +38,7 @@ object EmailMessage {
 
     EmailMessage(subject, body)
   }
+
   def resetPassword(name: Name): EmailMessage = {
     val subject = "Your password has been reset"
     val body =
@@ -48,4 +49,16 @@ object EmailMessage {
 
     EmailMessage(subject, body)
   }
+
+  def updatePassword(name: Name): EmailMessage = {
+    val subject = "Your password has been updated"
+    val body =
+      s"""Hi ${name.string},
+         |<h2>Your password has been changed.</h2>
+         |If this was not you, click the 'Forgot password' link on the sign in page and follow the steps to reset your password.
+         |""".stripMargin
+
+    EmailMessage(subject, body)
+  }
+
 }

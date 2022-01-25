@@ -1,7 +1,7 @@
 package net.wiringbits.actions
 
 import net.wiringbits.api.models.VerifyEmail
-import net.wiringbits.apis.EmailApi
+import net.wiringbits.apis.EmailApiAWSImpl
 import net.wiringbits.apis.models.EmailRequest
 import net.wiringbits.config.UserTokensConfig
 import net.wiringbits.repositories.{UserTokensRepository, UsersRepository}
@@ -17,7 +17,7 @@ class VerifyUserEmailAction @Inject() (
     usersRepository: UsersRepository,
     userTokensRepository: UserTokensRepository,
     userTokensConfig: UserTokensConfig,
-    emailApi: EmailApi
+    emailApi: EmailApiAWSImpl
 )(implicit
     ec: ExecutionContext,
     clock: Clock

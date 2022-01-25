@@ -20,6 +20,8 @@ POST /users/reset-password controllers.UsersController.resetPassword()
 GET /users/me controllers.UsersController.getCurrentUser()
 # update the current user details
 PUT /users/me controllers.UsersController.update()
+# update the current user password
+PUT /users/me/password controllers.UsersController.updatePassword()
 
 # get the current user logs
 GET /users/me/logs controllers.UsersController.getLogs()

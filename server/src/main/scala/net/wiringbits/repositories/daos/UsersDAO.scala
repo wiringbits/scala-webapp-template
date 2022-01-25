@@ -1,6 +1,6 @@
 package net.wiringbits.repositories.daos
 
-import net.wiringbits.common.models.Email
+import net.wiringbits.common.models.{Email, Name}
 import net.wiringbits.repositories.models.User
 
 import java.sql.Connection
@@ -48,10 +48,10 @@ object UsersDAO {
         """.as(userParser.singleOpt)
   }
 
-  def updateName(userId: UUID, name: String)(implicit conn: Connection): Unit = {
+  def updateName(userId: UUID, name: Name)(implicit conn: Connection): Unit = {
     val _ = SQL"""
       UPDATE users
-      SET name = $name
+      SET name = ${name.string}
       WHERE user_id = ${userId.toString}::UUID
     """.execute()
   }
