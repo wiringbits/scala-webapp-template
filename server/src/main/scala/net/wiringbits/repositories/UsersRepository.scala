@@ -60,8 +60,15 @@ class UsersRepository @Inject() (database: Database, userTokensConfig: UserToken
   }
 
   def update(userId: UUID, name: String): Future[Unit] = Future {
-    database.withConnection { implicit conn =>
+    database.withTransaction { implicit conn =>
       UsersDAO.updateName(userId, name)
+      UserLogsDAO.create(
+        UserLog.CreateUserLog(
+          UUID.randomUUID(),
+          userId = userId,
+          "Profile updated"
+        )
+      )
     }
   }
 

@@ -441,7 +441,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
         }
         .futureValue
 
-      error must be(s"User's $email hasn't been verified yet")
+      error must be(s"The email is not verified, check your spam folder if you don't see the email.")
     }
 
     "fail when the captcha isn't valid" in withApiClient { client =>

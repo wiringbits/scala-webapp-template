@@ -1,4 +1,4 @@
-package net.wiringbits.services
+package net.wiringbits.actions
 
 import net.wiringbits.api.models.GetUserLogs
 import net.wiringbits.repositories.UserLogsRepository
@@ -7,11 +7,11 @@ import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class UserLogsService @Inject() (userLogsRepository: UserLogsRepository)(implicit
-    ec: ExecutionContext
-) {
+class GetUserLogsAction @Inject() (
+    userLogsRepository: UserLogsRepository
+)(implicit ec: ExecutionContext) {
 
-  def logs(userId: UUID): Future[GetUserLogs.Response] = {
+  def apply(userId: UUID): Future[GetUserLogs.Response] = {
     for {
       logs <- userLogsRepository.logs(userId)
       items = logs.map { x =>

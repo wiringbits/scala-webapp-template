@@ -1,9 +1,8 @@
 package controllers
 
-import net.wiringbits.actions.{CreateUserAction, VerifyUserEmailAction}
+import net.wiringbits.actions._
 import net.wiringbits.api.models._
 import net.wiringbits.config.JwtConfig
-import net.wiringbits.services.{UserLogsService, UsersService}
 import org.slf4j.LoggerFactory
 import play.api.libs.json.Json
 import play.api.mvc.{AbstractController, ControllerComponents}
@@ -12,10 +11,14 @@ import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
 class UsersController @Inject() (
-    usersService: UsersService,
     createUserAction: CreateUserAction,
     verifyUserEmailAction: VerifyUserEmailAction,
-    loggerService: UserLogsService
+    loginAction: LoginAction,
+    forgotPasswordAction: ForgotPasswordAction,
+    resetPasswordAction: ResetPasswordAction,
+    updateUserAction: UpdateUserAction,
+    getUserAction: GetUserAction,
+    getUserLogsAction: GetUserLogsAction
 )(implicit cc: ControllerComponents, ec: ExecutionContext, jwtConfig: JwtConfig)
     extends AbstractController(cc) {
   private val logger = LoggerFactory.getLogger(this.getClass)
@@ -40,7 +43,7 @@ class UsersController @Inject() (
     val body = request.body
     logger.info(s"Login: ${body.email}")
     for {
-      response <- usersService.login(body)
+      response <- loginAction(body)
     } yield Ok(Json.toJson(response))
   }
 
@@ -48,7 +51,7 @@ class UsersController @Inject() (
     val body = request.body
     logger.info(s"Send a link to reset password for user with email: ${body.email}")
     for {
-      response <- usersService.forgotPassword(body)
+      response <- forgotPasswordAction(body)
     } yield Ok(Json.toJson(response))
   }
 
@@ -56,7 +59,7 @@ class UsersController @Inject() (
     val body = request.body
     logger.info(s"Reset user's password: ${body.token.userId}")
     for {
-      response <- usersService.resetPassword(body.token.userId, body.token.token, body.password)
+      response <- resetPasswordAction(body.token.userId, body.token.token, body.password)
     } yield Ok(Json.toJson(response))
   }
 
@@ -65,7 +68,7 @@ class UsersController @Inject() (
     logger.info(s"Update user: $body")
     for {
       userId <- authenticate(request)
-      _ <- usersService.update(userId, body)
+      _ <- updateUserAction(userId, body)
       response = UpdateUser.Response()
     } yield Ok(Json.toJson(response))
   }
@@ -74,7 +77,7 @@ class UsersController @Inject() (
     for {
       userId <- authenticate(request)
       _ = logger.info(s"Get user info: $userId")
-      response <- usersService.getCurrentUser(userId)
+      response <- getUserAction(userId)
     } yield Ok(Json.toJson(response))
   }
 
@@ -82,7 +85,7 @@ class UsersController @Inject() (
     for {
       userId <- authenticate(request)
       _ = logger.info(s"Get user logs: $userId")
-      response <- loggerService.logs(userId)
+      response <- getUserLogsAction(userId)
     } yield Ok(Json.toJson(response))
   }
 }
