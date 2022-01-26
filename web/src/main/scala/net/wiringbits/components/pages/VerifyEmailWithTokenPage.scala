@@ -14,7 +14,7 @@ import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
 import net.wiringbits.api.models.VerifyEmail
 import net.wiringbits.common.models.UserToken
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container}
-import net.wiringbits.{API, AppStrings}
+import net.wiringbits.{AppContext, AppStrings}
 import org.scalablytyped.runtime.StringDictionary
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 import slinky.core.FunctionalComponent
@@ -28,7 +28,7 @@ import scala.scalajs.js.timers.setTimeout
 import scala.util.{Failure, Success}
 
 @react object VerifyEmailWithTokenPage {
-  case class Props(api: API)
+  case class Props(ctx: AppContext)
 
   private case class State(
       loading: Boolean,
@@ -74,7 +74,7 @@ import scala.util.{Failure, Success}
       setState(_.copy(loading = true))
       emailCodeOpt match {
         case Some(emailCode) =>
-          props.api.client.verifyEmail(VerifyEmail.Request(emailCode)).onComplete {
+          props.ctx.api.client.verifyEmail(VerifyEmail.Request(emailCode)).onComplete {
             case Success(_) =>
               val title = AppStrings.successfulEmailVerification
               val message = AppStrings.goingToBeRedirected

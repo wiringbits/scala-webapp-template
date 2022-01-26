@@ -13,7 +13,7 @@ import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
 import net.wiringbits.components.widgets.{AppCard, ForgotPasswordForm}
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.Alignment
-import net.wiringbits.{API, AppStrings}
+import net.wiringbits.{AppContext, AppStrings}
 import org.scalablytyped.runtime.StringDictionary
 import slinky.core.FunctionalComponent
 import slinky.core.annotations.react
@@ -22,7 +22,7 @@ import slinky.web.html.{className, div}
 import typings.reactRouterDom.mod.useHistory
 
 @react object ForgotPasswordPage {
-  case class Props(api: API, captchaKey: String)
+  case class Props(ctx: AppContext)
 
   private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {
     val stylesCallback: StyleRulesCallback[Theme, Unit, String] = theme =>
@@ -49,7 +49,7 @@ import typings.reactRouterDom.mod.useHistory
               alignItems = Alignment.center,
               child = mui.Typography(AppStrings.recoverYourPassword).variant(muiStrings.h5)
             ),
-            ForgotPasswordForm(props.api, props.captchaKey),
+            ForgotPasswordForm(props.ctx.api, props.ctx.recaptchaKey),
             Container(
               margin = Container.EdgeInsets.top(8),
               flexDirection = Container.FlexDirection.row,
@@ -69,5 +69,4 @@ import typings.reactRouterDom.mod.useHistory
       )
     )
   }
-
 }

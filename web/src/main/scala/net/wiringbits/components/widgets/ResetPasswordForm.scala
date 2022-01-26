@@ -8,7 +8,7 @@ import net.wiringbits.ui.components.inputs.PasswordInput
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.ErrorLabel
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container}
 import net.wiringbits.webapp.utils.slinkyUtils.forms.StatefulFormData
-import net.wiringbits.{API, AppStrings}
+import net.wiringbits.{AppContext, AppStrings}
 import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 import slinky.core.annotations.react
@@ -20,7 +20,7 @@ import typings.reactRouter.mod.useHistory
 import scala.util.{Failure, Success}
 
 @react object ResetPasswordForm {
-  case class Props(api: API, loggedIn: User => Unit, token: Option[UserToken])
+  case class Props(ctx: AppContext, token: Option[UserToken])
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val history = useHistory()
@@ -52,11 +52,11 @@ import scala.util.{Failure, Success}
               setFormData(_.submissionFailed("Complete the necessary data"))
               None
             }
-        } yield props.api.client
+        } yield props.ctx.api.client
           .resetPassword(request)
           .onComplete {
             case Success(res) =>
-              props.loggedIn(User(name = res.name, email = res.email, jwt = res.token))
+              props.ctx.loggedIn(User(name = res.name, email = res.email, jwt = res.token))
               setFormData(_.submitted)
               history.push("/dashboard")
             case Failure(ex) =>

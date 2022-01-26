@@ -8,7 +8,7 @@ import net.wiringbits.webapp.utils.slinkyUtils.components.core.ErrorLabel
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.{Alignment, EdgeInsets}
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container, Title}
 import net.wiringbits.webapp.utils.slinkyUtils.forms.StatefulFormData
-import net.wiringbits.{API, AppStrings}
+import net.wiringbits.{AppContext, AppStrings}
 import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 import slinky.core.annotations.react
@@ -20,7 +20,7 @@ import typings.reactRouterDom.{mod => reactRouterDom}
 import scala.util.{Failure, Success}
 
 @react object SignUpForm {
-  case class Props(api: API, captchaKey: String)
+  case class Props(ctx: AppContext)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val history = reactRouterDom.useHistory()
@@ -52,10 +52,10 @@ import scala.util.{Failure, Success}
               setFormData(_.submissionFailed("Complete the necessary data"))
               None
             }
-        } yield props.api.client
+        } yield props.ctx.api.client
           .createUser(request)
           .onComplete {
-            case Success(res) =>
+            case Success(_) =>
               setFormData(_.submitted)
               history.push("/verify-email") // redirects to email page
 
@@ -125,7 +125,7 @@ import scala.util.{Failure, Success}
     }
 
     val recaptcha =
-      ReCaptcha(onChange = captchaOpt => onDataChanged(x => x.copy(captcha = captchaOpt)), props.captchaKey)
+      ReCaptcha(onChange = captchaOpt => onDataChanged(x => x.copy(captcha = captchaOpt)), props.ctx.recaptchaKey)
 
     val signUpButton = {
       val text =

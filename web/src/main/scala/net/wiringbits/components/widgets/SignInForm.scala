@@ -3,13 +3,13 @@ package net.wiringbits.components.widgets
 import com.alexitc.materialui.facade.materialUiCore.mod.PropTypes.Color
 import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
 import net.wiringbits.forms.SignInFormData
-import net.wiringbits.webapp.utils.slinkyUtils.forms.StatefulFormData
 import net.wiringbits.models.User
 import net.wiringbits.ui.components.inputs.{EmailInput, PasswordInput}
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.ErrorLabel
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.{Alignment, EdgeInsets}
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container}
-import net.wiringbits.{API, AppStrings}
+import net.wiringbits.webapp.utils.slinkyUtils.forms.StatefulFormData
+import net.wiringbits.{AppContext, AppStrings}
 import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 import slinky.core.annotations.react
@@ -21,7 +21,7 @@ import typings.reactRouterDom.{mod => reactRouterDom}
 import scala.util.{Failure, Success}
 
 @react object SignInForm {
-  case class Props(api: API, loggedIn: User => Unit, captchaKey: String)
+  case class Props(ctx: AppContext)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val history = reactRouterDom.useHistory()
@@ -51,12 +51,12 @@ import scala.util.{Failure, Success}
               setFormData(_.submissionFailed("Complete the necessary data"))
               None
             }
-        } yield props.api.client
+        } yield props.ctx.api.client
           .login(request)
           .onComplete {
             case Success(res) =>
               setFormData(_.submitted)
-              props.loggedIn(User(res.name, res.email, res.token))
+              props.ctx.loggedIn(User(res.name, res.email, res.token))
               history.push("/dashboard") // redirects to the dashboard
 
             case Failure(ex) =>
@@ -102,7 +102,7 @@ import scala.util.{Failure, Success}
 
     val recaptcha = ReCaptcha(
       onChange = captchaOpt => onDataChanged(x => x.copy(captcha = captchaOpt)),
-      props.captchaKey
+      props.ctx.recaptchaKey
     )
 
     val loginButton = {

@@ -3,13 +3,13 @@ package net.wiringbits.components.pages
 import net.wiringbits.components.widgets._
 import net.wiringbits.models.User
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{Container, Subtitle, Title}
-import net.wiringbits.{API, AppStrings}
+import net.wiringbits.{AppContext, AppStrings}
 import slinky.core.FunctionalComponent
 import slinky.core.annotations.react
 import slinky.core.facade.Fragment
 
 @react object DashboardPage {
-  case class Props(api: API, user: User)
+  case class Props(ctx: AppContext, user: User)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     Fragment(
@@ -20,7 +20,7 @@ import slinky.core.facade.Fragment
           Subtitle(s"${AppStrings.welcome} ${props.user.name}")
         )
       ),
-      Logs(props.api, props.user)
+      Logs(props.ctx.api, props.user)
     )
   }
 }

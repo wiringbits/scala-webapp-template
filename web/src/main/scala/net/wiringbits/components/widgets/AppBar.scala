@@ -13,11 +13,12 @@ import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
   Styles,
   WithStylesOptions
 }
-import net.wiringbits.AppStrings
+import net.wiringbits.core.ReactiveHooks
 import net.wiringbits.models.AuthState
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.{Alignment, EdgeInsets}
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{Container, NavLinkButton, Subtitle, Title}
 import net.wiringbits.webapp.utils.slinkyUtils.core.MediaQueryHooks
+import net.wiringbits.{AppContext, AppStrings}
 import org.scalablytyped.runtime.StringDictionary
 import slinky.core.FunctionalComponent
 import slinky.core.annotations.react
@@ -25,7 +26,7 @@ import slinky.core.facade.{Fragment, Hooks}
 import slinky.web.html._
 
 @react object AppBar {
-  case class Props(auth: AuthState)
+  case class Props(ctx: AppContext)
 
   private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {
     val stylesCallback: StyleRulesCallback[Theme, Unit, String] = theme =>
@@ -51,6 +52,7 @@ import slinky.web.html._
   }
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
+    val auth = ReactiveHooks.useDistinctValue(props.ctx.auth)
     val classes = useStyles(())
     val isMobileOrTablet = MediaQueryHooks.useIsMobileOrTablet()
     val (visibleDrawer, setVisibleDrawer) = Hooks.useState(false)
@@ -61,7 +63,7 @@ import slinky.web.html._
       }
     }
 
-    val menu = props.auth match {
+    val menu = auth match {
       case AuthState.Authenticated(_) =>
         Fragment(
           NavLinkButton("/", AppStrings.home, onButtonClick),

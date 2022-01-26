@@ -1,29 +1,29 @@
 package net.wiringbits.components
 
 import net.wiringbits.models.User
-import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{Container, Subtitle, Title}
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.Alignment
-import net.wiringbits.{API, AppStrings}
+import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{Container, Subtitle, Title}
+import net.wiringbits.{AppContext, AppStrings}
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 import slinky.core.FunctionalComponent
 import slinky.core.annotations.react
 import slinky.core.facade.{Fragment, Hooks, ReactElement}
-import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 
 import scala.util.{Failure, Success}
 
 @react object AppSplash {
-  case class Props(api: API, loggedIn: User => Unit, child: ReactElement)
+  case class Props(ctx: AppContext, child: ReactElement)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val (initialized, setInitialized) = Hooks.useState(false)
 
     Hooks.useEffect(
       () =>
-        props.api.storage.findJwt.filter(_.nonEmpty) match {
+        props.ctx.api.storage.findJwt.filter(_.nonEmpty) match {
           case Some(jwt) =>
-            props.api.client.currentUser(jwt).onComplete {
+            props.ctx.api.client.currentUser(jwt).onComplete {
               case Success(res) =>
-                props.loggedIn(User(name = res.name, email = res.email, jwt = jwt))
+                props.ctx.loggedIn(User(name = res.name, email = res.email, jwt = jwt))
                 setInitialized(true)
 
               case Failure(ex) =>

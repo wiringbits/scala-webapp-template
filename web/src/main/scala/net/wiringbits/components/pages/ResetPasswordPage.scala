@@ -12,9 +12,8 @@ import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
 }
 import net.wiringbits.common.models.UserToken
 import net.wiringbits.components.widgets.{AppCard, ResetPasswordForm}
-import net.wiringbits.models.User
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container
-import net.wiringbits.{API, AppStrings}
+import net.wiringbits.{AppContext, AppStrings}
 import org.scalablytyped.runtime.StringDictionary
 import slinky.core.FunctionalComponent
 import slinky.core.annotations.react
@@ -25,7 +24,7 @@ import typings.reactRouter.mod.{useHistory, useParams}
 import scala.scalajs.js
 
 @react object ResetPasswordPage {
-  case class Props(api: API, loggedIn: User => Unit)
+  case class Props(ctx: AppContext)
 
   private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {
     val stylesCallback: StyleRulesCallback[Theme, Unit, String] = theme =>
@@ -56,7 +55,7 @@ import scala.scalajs.js
               justifyContent = Container.Alignment.center,
               child = mui.Typography(AppStrings.enterNewPassword).variant(muiStrings.h5)
             ),
-            ResetPasswordForm(props.api, props.loggedIn, userToken),
+            ResetPasswordForm(props.ctx, userToken),
             Container(
               margin = Container.EdgeInsets.top(8),
               flexDirection = Container.FlexDirection.row,

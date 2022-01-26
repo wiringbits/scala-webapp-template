@@ -11,10 +11,9 @@ import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
   WithStylesOptions
 }
 import net.wiringbits.components.widgets._
-import net.wiringbits.models.User
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.{Alignment, EdgeInsets}
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{Container, Title}
-import net.wiringbits.{API, AppStrings}
+import net.wiringbits.{AppContext, AppStrings}
 import org.scalablytyped.runtime.StringDictionary
 import slinky.core.FunctionalComponent
 import slinky.core.annotations.react
@@ -23,7 +22,7 @@ import slinky.web.html.{className, div}
 import typings.reactRouterDom.mod.useHistory
 
 @react object SignInPage {
-  case class Props(api: API, loggedIn: User => Unit, captchaKey: String)
+  case class Props(ctx: AppContext)
 
   private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {
     val stylesCallback: StyleRulesCallback[Theme, Unit, String] = theme =>
@@ -56,7 +55,7 @@ import typings.reactRouterDom.mod.useHistory
               alignItems = Alignment.center,
               justifyContent = Alignment.center,
               padding = EdgeInsets.top(16),
-              child = SignInForm(props.api, props.loggedIn, props.captchaKey)
+              child = SignInForm(props.ctx)
             ),
             Container(
               margin = Container.EdgeInsets.top(8),
