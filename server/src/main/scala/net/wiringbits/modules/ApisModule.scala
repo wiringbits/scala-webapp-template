@@ -5,6 +5,6 @@ import net.wiringbits.apis.{EmailApi, EmailApiAWSImpl}
 
 class ApisModule extends AbstractModule {
   override def configure(): Unit = {
-    bind(classOf[EmailApi]).to(classOf[EmailApiAWSImpl])
+    val _ = bind(classOf[EmailApi]).to(classOf[EmailApiAWSImpl])
   }
 }
