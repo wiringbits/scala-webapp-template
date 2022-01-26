@@ -2,6 +2,7 @@ package net.wiringbits
 
 import net.wiringbits.components.pages._
 import net.wiringbits.components.widgets.{AppBar, Footer}
+import net.wiringbits.core.ReactiveHooks
 import net.wiringbits.models.{AuthState, User}
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Scaffold
 import slinky.core.FunctionalComponent
@@ -12,16 +13,16 @@ import typings.reactRouterDom.components.Route
 import typings.reactRouterDom.{components => router}
 
 @react object AppRouter {
-  case class Props(api: API, auth: AuthState, loggedIn: User => Unit, logout: () => Unit, captchaKey: String)
+  case class Props(ctx: AppContext)
 
-  private def route(path: String, auth: AuthState)(child: => ReactElement): Route.Builder[RouteProps] = {
+  private def route(path: String, ctx: AppContext)(child: => ReactElement): Route.Builder[RouteProps] = {
     router.Route(
       RouteProps()
         .setExact(true)
         .setPath(path)
         .setRender { route =>
           Scaffold(
-            appbar = Some(AppBar(auth)),
+            appbar = Some(AppBar(ctx)),
             body = child,
             footer = Some(Footer())
           )
@@ -30,18 +31,20 @@ import typings.reactRouterDom.{components => router}
   }
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
-    val home = route("/", props.auth)(HomePage())
+    val auth = ReactiveHooks.useDistinctValue(props.ctx.$auth)
+    val home = route("/", props.ctx)(HomePage())
+    val about = route("/about", props.ctx)(AboutPage())
+    val signIn = route("/signin", props.ctx)(SignInPage(props.ctx))
+    val signUp = route("/signup", props.ctx)(SignUpPage(props.ctx))
+    val email = route("/verify-email", props.ctx)(VerifyEmailPage())
+    val emailCode = route("/verify-email/:emailCode", props.ctx)(VerifyEmailWithTokenPage(props.ctx))
+    val forgotPassword = route("/forgot-password", props.ctx)(ForgotPasswordPage(props.ctx))
+    val resetPassword = route("/reset-password/:resetPasswordCode", props.ctx)(ResetPasswordPage(props.ctx))
 
-    val about = route("/about", props.auth)(AboutPage())
-    val signIn = route("/signin", props.auth)(SignInPage(props.api, props.loggedIn, props.captchaKey))
-    val signUp = route("/signup", props.auth)(SignUpPage(props.api, props.captchaKey))
-    val email = route("/verify-email", props.auth)(VerifyEmailPage())
-    val emailCode = route("/verify-email/:emailCode", props.auth)(VerifyEmailWithTokenPage(props.api))
-
-    def me(user: User) = route("/me", props.auth)(UserEditPage(props.api, user))
-    def dashboard(user: User) = route("/dashboard", props.auth)(DashboardPage(props.api, user))
-    val signOut = route("/signout", props.auth) {
-      props.logout()
+    def dashboard(user: User) = route("/dashboard", props.ctx)(DashboardPage(props.ctx, user))
+    def me(user: User) = route("/me", props.ctx)(UserEditPage(props.ctx, user))
+    val signOut = route("/signout", props.ctx) {
+      props.ctx.loggedOut()
       router.Redirect("/")
     }
 
@@ -51,9 +54,9 @@ import typings.reactRouterDom.{components => router}
       }
     )
 
-    props.auth match {
+    auth match {
       case AuthState.Unauthenticated =>
-        router.Switch(home, about, signIn, signUp, email, emailCode, catchAllRoute)
+        router.Switch(home, about, signIn, signUp, email, emailCode, forgotPassword, resetPassword, catchAllRoute)
 
       case AuthState.Authenticated(user) =>
         router.Switch(home, me(user), dashboard(user), about, signOut, catchAllRoute)

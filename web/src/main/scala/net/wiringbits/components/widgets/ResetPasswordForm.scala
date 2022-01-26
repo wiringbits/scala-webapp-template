@@ -1,11 +1,11 @@
 package net.wiringbits.components.widgets
 
 import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
-import net.wiringbits.forms.UpdatePasswordFormData
+import net.wiringbits.common.models.UserToken
+import net.wiringbits.forms.ResetPasswordFormData
 import net.wiringbits.models.User
 import net.wiringbits.ui.components.inputs.PasswordInput
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.ErrorLabel
-import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.Alignment
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container}
 import net.wiringbits.webapp.utils.slinkyUtils.forms.StatefulFormData
 import net.wiringbits.{AppContext, AppStrings}
@@ -15,24 +15,27 @@ import slinky.core.annotations.react
 import slinky.core.facade.{Fragment, Hooks}
 import slinky.core.{FunctionalComponent, SyntheticEvent}
 import slinky.web.html.{form, onSubmit}
+import typings.reactRouter.mod.useHistory
 
 import scala.util.{Failure, Success}
 
-@react object EditPasswordForm {
-  case class Props(ctx: AppContext, user: User)
+@react object ResetPasswordForm {
+  case class Props(ctx: AppContext, token: Option[UserToken])
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
+    val history = useHistory()
+
     val (formData, setFormData) = Hooks.useState(
       StatefulFormData(
-        UpdatePasswordFormData.initial(
-          oldPasswordLabel = AppStrings.oldPassword,
+        ResetPasswordFormData.initial(
           passwordLabel = AppStrings.password,
-          repeatPasswordLabel = AppStrings.repeatPassword
+          repeatPasswordLabel = AppStrings.repeatPassword,
+          token = props.token
         )
       )
     )
 
-    def onDataChanged(f: UpdatePasswordFormData => UpdatePasswordFormData): Unit = {
+    def onDataChanged(f: ResetPasswordFormData => ResetPasswordFormData): Unit = {
       setFormData { current =>
         current.filling.copy(data = f(current.data))
       }
@@ -50,12 +53,12 @@ import scala.util.{Failure, Success}
               None
             }
         } yield props.ctx.api.client
-          .updatePassword(props.user.jwt, request)
+          .resetPassword(request)
           .onComplete {
-            case Success(_) =>
-              // TODO: Show dialog?
+            case Success(res) =>
+              props.ctx.loggedIn(User(name = res.name, email = res.email, jwt = res.token))
               setFormData(_.submitted)
-
+              history.push("/dashboard")
             case Failure(ex) =>
               setFormData(_.submissionFailed(ex.getMessage))
           }
@@ -63,15 +66,6 @@ import scala.util.{Failure, Success}
         println("Submit fired when it is not available")
       }
     }
-
-    val oldPasswordInput = PasswordInput
-      .component(
-        PasswordInput.Props(
-          formData.data.oldPassword,
-          disabled = formData.isInputDisabled,
-          onChange = value => onDataChanged(x => x.copy(oldPassword = x.oldPassword.updated(value)))
-        )
-      )
 
     val passwordInput = PasswordInput
       .component(
@@ -91,14 +85,14 @@ import scala.util.{Failure, Success}
         )
       )
 
-    val saveButton = {
+    val resetPasswordButton = {
       val text = if (formData.isSubmitting) {
         Fragment(
           CircularLoader(),
           Container(margin = Container.EdgeInsets.left(8), child = AppStrings.loading)
         )
       } else {
-        Fragment(AppStrings.savePassword)
+        Fragment(AppStrings.resetPassword)
       }
 
       mui
@@ -111,24 +105,27 @@ import scala.util.{Failure, Success}
         .`type`(muiStrings.submit)
     }
 
-    val error =
-      formData.firstValidationError.map { text =>
-        Container(
-          margin = Container.EdgeInsets.vertical(16),
-          child = ErrorLabel(text)
-        )
-      }
-
     form(onSubmit := (handleSubmit(_)))(
-      oldPasswordInput,
-      passwordInput,
-      repeatPasswordInput,
       Container(
-        alignItems = Alignment.center,
-        justifyContent = Alignment.center,
-        child = error
+        margin = Container.EdgeInsets.all(16),
+        alignItems = Container.Alignment.center,
+        child = Fragment(
+          passwordInput,
+          repeatPasswordInput,
+          formData.firstValidationError.map { text =>
+            Container(
+              margin = Container.EdgeInsets.top(16),
+              child = ErrorLabel(text)
+            )
+          }
+        )
       ),
-      saveButton
+      Container(
+        alignItems = Container.Alignment.center,
+        child = Fragment(
+          resetPasswordButton
+        )
+      )
     )
   }
 }

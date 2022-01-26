@@ -5,13 +5,13 @@ import net.wiringbits.components.widgets.{EditPasswordForm, UserInfo}
 import net.wiringbits.models.UserMenuOption.{EditPassword, EditSummary}
 import net.wiringbits.models.{User, UserMenuOption}
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{Container, Title}
-import net.wiringbits.{API, AppStrings}
+import net.wiringbits.{AppContext, AppStrings}
 import slinky.core.FunctionalComponent
 import slinky.core.annotations.react
 import slinky.core.facade.{Fragment, Hooks}
 
 @react object UserEditPage {
-  case class Props(api: API, user: User)
+  case class Props(ctx: AppContext, user: User)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val (menuOption, setMenuOption) = Hooks.useState[UserMenuOption](UserMenuOption.EditSummary)
@@ -31,9 +31,9 @@ import slinky.core.facade.{Fragment, Hooks}
 
     val body = mui.CardContent()(
       menuOption match {
-        case EditSummary => UserInfo(props.api, props.user)
+        case EditSummary => UserInfo(props.ctx, props.user)
         case EditPassword =>
-          EditPasswordForm(props.api, props.user)
+          EditPasswordForm(props.ctx, props.user)
       }
     )
 

@@ -7,7 +7,7 @@ import net.wiringbits.ui.components.inputs.{EmailInput, NameInput}
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.ErrorLabel
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container}
 import net.wiringbits.webapp.utils.slinkyUtils.forms.StatefulFormData
-import net.wiringbits.{API, AppStrings}
+import net.wiringbits.{AppContext, AppStrings}
 import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 import slinky.core.annotations.react
@@ -18,7 +18,7 @@ import slinky.web.html._
 import scala.util.{Failure, Success}
 
 @react object EditUserForm {
-  case class Props(api: API, jwt: String, user: GetCurrentUser.Response, onSave: () => Unit)
+  case class Props(ctx: AppContext, jwt: String, user: GetCurrentUser.Response, onSave: () => Unit)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val (hasChanges, setHasChanges) = Hooks.useState(false)
@@ -50,7 +50,7 @@ import scala.util.{Failure, Success}
               setFormData(_.submissionFailed("Complete the necessary data"))
               None
             }
-        } yield props.api.client
+        } yield props.ctx.api.client
           .updateUser(props.jwt, request)
           .onComplete {
             case Success(_) =>

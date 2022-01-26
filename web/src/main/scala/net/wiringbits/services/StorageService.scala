@@ -1,15 +1,22 @@
 package net.wiringbits.services
 
+import net.wiringbits.core.I18nLang
 import org.scalajs.dom
 
 class StorageService {
 
-  def saveJwt(jwt: String): Unit = {
-    dom.window.localStorage.setItem("jwt", jwt)
+  def saveJwt(jwt: String): Unit = save("jwt", jwt)
+  def findJwt(): Option[String] = find("jwt")
+
+  def saveLang(lang: I18nLang): Unit = save("lang", lang.toString)
+  def findLang(): Option[I18nLang] = find("lang").flatMap(I18nLang.from)
+
+  private def save(key: String, value: String): Unit = {
+    dom.window.localStorage.setItem(key, value)
   }
 
-  def findJwt: Option[String] = {
-    Option(dom.window.localStorage.getItem("jwt"))
+  private def find(key: String): Option[String] = {
+    Option(dom.window.localStorage.getItem(key))
       .filter(_.nonEmpty)
   }
 }

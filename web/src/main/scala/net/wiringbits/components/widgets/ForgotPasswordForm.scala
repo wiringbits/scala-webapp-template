@@ -1,38 +1,37 @@
 package net.wiringbits.components.widgets
 
 import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
-import net.wiringbits.forms.UpdatePasswordFormData
-import net.wiringbits.models.User
-import net.wiringbits.ui.components.inputs.PasswordInput
+import net.wiringbits.forms.ForgotPasswordFormData
+import net.wiringbits.ui.components.inputs.EmailInput
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.ErrorLabel
-import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.Alignment
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container}
 import net.wiringbits.webapp.utils.slinkyUtils.forms.StatefulFormData
-import net.wiringbits.{AppContext, AppStrings}
+import net.wiringbits.{API, AppStrings}
 import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 import slinky.core.annotations.react
 import slinky.core.facade.{Fragment, Hooks}
 import slinky.core.{FunctionalComponent, SyntheticEvent}
 import slinky.web.html.{form, onSubmit}
+import typings.reactRouter.mod.useHistory
 
 import scala.util.{Failure, Success}
 
-@react object EditPasswordForm {
-  case class Props(ctx: AppContext, user: User)
+@react object ForgotPasswordForm {
+  case class Props(api: API, captchaKey: String)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
+    val history = useHistory()
+
     val (formData, setFormData) = Hooks.useState(
       StatefulFormData(
-        UpdatePasswordFormData.initial(
-          oldPasswordLabel = AppStrings.oldPassword,
-          passwordLabel = AppStrings.password,
-          repeatPasswordLabel = AppStrings.repeatPassword
+        ForgotPasswordFormData.initial(
+          emailLabel = AppStrings.email
         )
       )
     )
 
-    def onDataChanged(f: UpdatePasswordFormData => UpdatePasswordFormData): Unit = {
+    def onDataChanged(f: ForgotPasswordFormData => ForgotPasswordFormData): Unit = {
       setFormData { current =>
         current.filling.copy(data = f(current.data))
       }
@@ -49,12 +48,12 @@ import scala.util.{Failure, Success}
               setFormData(_.submissionFailed("Complete the necessary data"))
               None
             }
-        } yield props.ctx.api.client
-          .updatePassword(props.user.jwt, request)
+        } yield props.api.client
+          .forgotPassword(request)
           .onComplete {
             case Success(_) =>
-              // TODO: Show dialog?
               setFormData(_.submitted)
+              history.push("/signin") // redirects to sign in page
 
             case Failure(ex) =>
               setFormData(_.submissionFailed(ex.getMessage))
@@ -64,41 +63,14 @@ import scala.util.{Failure, Success}
       }
     }
 
-    val oldPasswordInput = PasswordInput
-      .component(
-        PasswordInput.Props(
-          formData.data.oldPassword,
-          disabled = formData.isInputDisabled,
-          onChange = value => onDataChanged(x => x.copy(oldPassword = x.oldPassword.updated(value)))
-        )
-      )
-
-    val passwordInput = PasswordInput
-      .component(
-        PasswordInput.Props(
-          formData.data.password,
-          disabled = formData.isInputDisabled,
-          onChange = value => onDataChanged(x => x.copy(password = x.password.updated(value)))
-        )
-      )
-
-    val repeatPasswordInput = PasswordInput
-      .component(
-        PasswordInput.Props(
-          formData.data.repeatPassword,
-          disabled = formData.isInputDisabled,
-          onChange = value => onDataChanged(x => x.copy(repeatPassword = x.repeatPassword.updated(value)))
-        )
-      )
-
-    val saveButton = {
+    val forgotPasswordButton = {
       val text = if (formData.isSubmitting) {
         Fragment(
           CircularLoader(),
           Container(margin = Container.EdgeInsets.left(8), child = AppStrings.loading)
         )
       } else {
-        Fragment(AppStrings.savePassword)
+        Fragment(AppStrings.recover)
       }
 
       mui
@@ -111,24 +83,43 @@ import scala.util.{Failure, Success}
         .`type`(muiStrings.submit)
     }
 
-    val error =
-      formData.firstValidationError.map { text =>
-        Container(
-          margin = Container.EdgeInsets.vertical(16),
-          child = ErrorLabel(text)
+    val emailInput = EmailInput
+      .component(
+        EmailInput.Props(
+          formData.data.email,
+          disabled = formData.isInputDisabled,
+          onChange = value => onDataChanged(x => x.copy(email = x.email.updated(value)))
         )
-      }
+      )
+
+    val recaptcha =
+      ReCaptcha(
+        onChange = captchaOpt => onDataChanged(x => x.copy(captcha = captchaOpt)),
+        captchaKey = props.captchaKey
+      )
 
     form(onSubmit := (handleSubmit(_)))(
-      oldPasswordInput,
-      passwordInput,
-      repeatPasswordInput,
       Container(
-        alignItems = Alignment.center,
-        justifyContent = Alignment.center,
-        child = error
+        margin = Container.EdgeInsets.all(16),
+        alignItems = Container.Alignment.center,
+        child = Fragment(
+          emailInput,
+          Container(
+            margin = Container.EdgeInsets.top(8),
+            child = recaptcha
+          ),
+          formData.firstValidationError.map { text =>
+            Container(
+              margin = Container.EdgeInsets.top(16),
+              child = ErrorLabel(text)
+            )
+          }
+        )
       ),
-      saveButton
+      Container(
+        alignItems = Container.Alignment.center,
+        child = forgotPasswordButton
+      )
     )
   }
 }

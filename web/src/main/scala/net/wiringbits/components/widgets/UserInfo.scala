@@ -14,7 +14,7 @@ import net.wiringbits.api.models.GetCurrentUser
 import net.wiringbits.api.utils.Formatter
 import net.wiringbits.models.User
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container}
-import net.wiringbits.{API, AppStrings}
+import net.wiringbits.{AppContext, AppStrings}
 import org.scalablytyped.runtime.StringDictionary
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 import slinky.core.FunctionalComponent
@@ -25,7 +25,7 @@ import slinky.web.html._
 import scala.util.{Failure, Success}
 
 @react object UserInfo {
-  case class Props(api: API, user: User)
+  case class Props(ctx: AppContext, user: User)
 
   private case class State(
       loading: Boolean,
@@ -64,7 +64,7 @@ import scala.util.{Failure, Success}
 
     def fetchUserData(): Unit = {
       setState(_.copy(loading = true))
-      props.api.client.currentUser(props.user.jwt).onComplete {
+      props.ctx.api.client.currentUser(props.user.jwt).onComplete {
         case Success(res) =>
           setState(_.copy(loading = false, user = Some(res), initialValue = Some(res)))
         case Failure(ex) =>
@@ -93,7 +93,7 @@ import scala.util.{Failure, Success}
 
     def renderBody(user: GetCurrentUser.Response) = {
       div(className := classes("userEditSummaryView"))(
-        div(className := classes("section"))(EditUserForm(props.api, props.user.jwt, user, onSaveClick)),
+        div(className := classes("section"))(EditUserForm(props.ctx, props.user.jwt, user, onSaveClick)),
         div(className := classes("section"))(
           div()(
             mui.Typography("Created at").variant(muiStrings.subtitle2),

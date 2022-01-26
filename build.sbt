@@ -310,7 +310,7 @@ lazy val server = (project in file("server"))
       "com.softwaremill.sttp.client3" %% "core" % sttp % "test",
       "com.softwaremill.sttp.client3" %% "async-http-client-backend-future" % sttp % "test",
       "net.wiringbits" %% "admin-data-explorer-play-server" % webappUtils,
-      "software.amazon.awssdk" % "ses" % "2.17.117",
+      "software.amazon.awssdk" % "ses" % "2.17.118",
       "jakarta.xml.bind" % "jakarta.xml.bind-api" % "3.0.1"
     )
   )
@@ -373,7 +373,8 @@ lazy val web = (project in file("web"))
       "com.softwaremill.sttp.client3" %%% "core" % sttp,
       "org.scala-js" %%% "scala-js-macrotask-executor" % "1.0.0",
       "com.alexitc" %%% "sjs-material-ui-facade" % "0.2.0",
-      "net.wiringbits" %%% "admin-data-explorer-slinky" % webappUtils
+      "net.wiringbits" %%% "admin-data-explorer-slinky" % webappUtils,
+      "io.monix" %%% "monix-reactive" % "3.4.0"
     ),
     libraryDependencies ++= Seq(
       "org.scalatest" %%% "scalatest" % "3.2.11" % Test

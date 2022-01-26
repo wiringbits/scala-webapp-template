@@ -5,4 +5,6 @@ sealed trait AuthState extends Product with Serializable
 object AuthState {
   final case object Unauthenticated extends AuthState
   final case class Authenticated(user: User) extends AuthState
+
+  implicit val authStateEq: cats.Eq[AuthState] = cats.Eq.fromUniversalEquals
 }
