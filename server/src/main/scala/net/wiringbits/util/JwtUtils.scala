@@ -16,13 +16,13 @@ object JwtUtils {
     val claim = JwtClaim(json).issuedNow
       .expiresIn(30.days.toSeconds)
 
-    val token = Jwt.encode(claim, config.secret.string, JwtAlgorithm.HS384)
+    val token = Jwt.encode(claim, config.secret, JwtAlgorithm.HS384)
     token
   }
 
   def decodeToken(config: JwtConfig, token: String)(implicit clock: Clock): Try[UUID] = {
     Jwt
-      .decode(token, config.secret.string, Seq(JwtAlgorithm.HS384))
+      .decode(token, config.secret, Seq(JwtAlgorithm.HS384))
       .filter(_.isValid)
       .map(_.content)
       .map { decodedClaim =>

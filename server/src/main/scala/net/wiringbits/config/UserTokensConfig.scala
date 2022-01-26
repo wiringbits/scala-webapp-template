@@ -4,7 +4,17 @@ import play.api.Configuration
 
 import scala.concurrent.duration.FiniteDuration
 
-case class UserTokensConfig(emailVerificationExp: FiniteDuration, resetPasswordExp: FiniteDuration, hmacSecret: String)
+case class UserTokensConfig(
+    emailVerificationExp: FiniteDuration,
+    resetPasswordExp: FiniteDuration,
+    hmacSecret: String
+) {
+  override def toString: String = {
+    import net.wiringbits.util.StringUtils.Implicits._
+
+    s"UserTokensConfig(emailVerificationExp = $emailVerificationExp, resetPasswordExp = $resetPasswordExp, hmacSecret = ${hmacSecret.mask()})"
+  }
+}
 
 object UserTokensConfig {
 
