@@ -18,8 +18,15 @@ import scala.util.{Failure, Success}
     val (initialized, setInitialized) = Hooks.useState(false)
 
     Hooks.useEffect(
-      () =>
-        props.ctx.api.storage.findJwt.filter(_.nonEmpty) match {
+      () => {
+        // load language
+        // TODO: It is ideal to detect the browser language when there is no language stored
+        props.ctx.api.storage
+          .findLang()
+          .foreach(lang => props.ctx.$lang := lang)
+
+        // load authenticated user
+        props.ctx.api.storage.findJwt().filter(_.nonEmpty) match {
           case Some(jwt) =>
             props.ctx.api.client.currentUser(jwt).onComplete {
               case Success(res) =>
@@ -32,7 +39,8 @@ import scala.util.{Failure, Success}
             }
           case None =>
             setInitialized(true)
-        },
+        }
+      },
       ""
     )
 

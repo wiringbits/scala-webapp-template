@@ -1,6 +1,7 @@
 package net.wiringbits
 
 import monix.reactive.subjects.Var
+import net.wiringbits.core.I18nLang
 import net.wiringbits.models.AuthState
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.{ErrorBoundaryComponent, ErrorBoundaryInfo}
 import org.scalajs.dom
@@ -27,8 +28,9 @@ object Main {
     }
 
     val scheduler = monix.execution.Scheduler.global
-    val authState = Var[AuthState](AuthState.Unauthenticated)(scheduler)
-    val ctx = AppContext(API(), recaptchaKey = captchaKey, authState)
+    val $authState = Var[AuthState](AuthState.Unauthenticated)(scheduler)
+    val $lang = Var[I18nLang](I18nLang.English)(scheduler)
+    val ctx = AppContext(API(), recaptchaKey = captchaKey, $authState, $lang)
     val app = ErrorBoundaryComponent(
       ErrorBoundaryComponent.Props(
         child = App(ctx),

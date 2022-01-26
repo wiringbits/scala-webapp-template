@@ -31,7 +31,7 @@ import typings.reactRouterDom.{components => router}
   }
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
-    val auth = ReactiveHooks.useDistinctValue(props.ctx.auth)
+    val auth = ReactiveHooks.useDistinctValue(props.ctx.$auth)
     val home = route("/", props.ctx)(HomePage())
     val about = route("/about", props.ctx)(AboutPage())
     val signIn = route("/signin", props.ctx)(SignInPage(props.ctx))

@@ -52,7 +52,7 @@ import slinky.web.html._
   }
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
-    val auth = ReactiveHooks.useDistinctValue(props.ctx.auth)
+    val auth = ReactiveHooks.useDistinctValue(props.ctx.$auth)
     val classes = useStyles(())
     val isMobileOrTablet = MediaQueryHooks.useIsMobileOrTablet()
     val (visibleDrawer, setVisibleDrawer) = Hooks.useState(false)
