@@ -26,9 +26,9 @@ import scala.util.{Failure, Success}
       StatefulFormData(
         UpdateInfoFormData.initial(
           nameLabel = AppStrings.name,
-          nameInitialValue = props.user.name,
+          nameInitialValue = Some(props.user.name),
           emailLabel = AppStrings.email,
-          emailValue = props.user.email
+          emailValue = Some(props.user.email)
         )
       )
     )

@@ -31,20 +31,20 @@ object UpdateInfoFormData {
 
   def initial(
       nameLabel: String,
-      nameInitialValue: Name,
+      nameInitialValue: Option[Name] = None,
       emailLabel: String,
-      emailValue: Email
+      emailValue: Option[Email] = None
   ): UpdateInfoFormData = UpdateInfoFormData(
     name = new FormField(
       label = nameLabel,
       name = "name",
-      value = Some(ValidationResult.Valid(nameInitialValue.string, nameInitialValue))
+      value = nameInitialValue.map(x => ValidationResult.Valid(x.string, x))
     ),
     email = new FormField(
       label = emailLabel,
       name = "email",
       `type` = "email",
-      value = Some(ValidationResult.Valid(emailValue.string, emailValue))
+      value = emailValue.map(x => ValidationResult.Valid(x.string, x))
     )
   )
 }
