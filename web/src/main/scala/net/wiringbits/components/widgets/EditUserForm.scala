@@ -3,6 +3,7 @@ package net.wiringbits.components.widgets
 import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
 import net.wiringbits.api.models.GetCurrentUser
 import net.wiringbits.forms.UpdateInfoFormData
+import net.wiringbits.models.User
 import net.wiringbits.ui.components.inputs.{EmailInput, NameInput}
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.ErrorLabel
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container}
@@ -18,7 +19,7 @@ import slinky.web.html._
 import scala.util.{Failure, Success}
 
 @react object EditUserForm {
-  case class Props(ctx: AppContext, jwt: String, user: GetCurrentUser.Response, onSave: () => Unit)
+  case class Props(ctx: AppContext, user: User, response: GetCurrentUser.Response, onSave: () => Unit)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val (hasChanges, setHasChanges) = Hooks.useState(false)
@@ -26,9 +27,9 @@ import scala.util.{Failure, Success}
       StatefulFormData(
         UpdateInfoFormData.initial(
           nameLabel = AppStrings.name,
-          nameInitialValue = Some(props.user.name),
+          nameInitialValue = Some(props.response.name),
           emailLabel = AppStrings.email,
-          emailValue = Some(props.user.email)
+          emailValue = Some(props.response.email)
         )
       )
     )
@@ -51,7 +52,7 @@ import scala.util.{Failure, Success}
               None
             }
         } yield props.ctx.api.client
-          .updateUser(props.jwt, request)
+          .updateUser(props.user.jwt, request)
           .onComplete {
             case Success(_) =>
               setFormData(_.submitted)
@@ -71,7 +72,7 @@ import scala.util.{Failure, Success}
           formData.data.name,
           disabled = formData.isInputDisabled,
           onChange = value => {
-            setHasChanges(value.input != props.user.name.string)
+            setHasChanges(value.input != props.response.name.string)
             onDataChanged(x => x.copy(name = x.name.updated(value)))
           }
         )

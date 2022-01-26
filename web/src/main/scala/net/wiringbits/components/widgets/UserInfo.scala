@@ -93,7 +93,7 @@ import scala.util.{Failure, Success}
 
     def renderBody(user: GetCurrentUser.Response) = {
       div(className := classes("userEditSummaryView"))(
-        div(className := classes("section"))(EditUserForm(props.ctx, props.user.jwt, user, onSaveClick)),
+        div(className := classes("section"))(EditUserForm(props.ctx, props.user, user, onSaveClick)),
         div(className := classes("section"))(
           div()(
             mui.Typography("Created at").variant(muiStrings.subtitle2),
