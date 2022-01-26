@@ -18,15 +18,17 @@ class UpdatePasswordAction @Inject() (
 
   def apply(userId: UUID, request: UpdatePassword.Request): Future[Unit] = {
     val validate = Future {
-      if (request.password.string.isEmpty) new RuntimeException(s"The password is required")
+      if (request.newPassword.string.isEmpty) new RuntimeException(s"The password is required")
       else ()
     }
 
-    val hashedPassword = BCrypt.hashpw(request.password.string, BCrypt.gensalt())
     for {
       _ <- validate
       userMaybe <- usersRepository.find(userId)
-      user = userMaybe.getOrElse(throw new RuntimeException(s"User with id $userId wasn't found"))
+      user = userMaybe
+        .filter(user => BCrypt.checkpw(request.oldPassword.string, user.hashedPassword))
+        .getOrElse(throw new RuntimeException("The given email/password doesn't match"))
+      hashedPassword = BCrypt.hashpw(request.newPassword.string, BCrypt.gensalt())
       _ <- usersRepository.updatePassword(userId, hashedPassword)
       emailMessage = EmailMessage.updatePassword(user.name)
       _ = emailApi.sendEmail(EmailRequest(user.email, emailMessage))
