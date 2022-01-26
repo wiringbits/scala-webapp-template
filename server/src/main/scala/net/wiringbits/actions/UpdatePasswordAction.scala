@@ -5,6 +5,7 @@ import net.wiringbits.apis.EmailApi
 import net.wiringbits.apis.models.EmailRequest
 import net.wiringbits.repositories.UsersRepository
 import net.wiringbits.util.EmailMessage
+import net.wiringbits.validations.ValidatePassword
 import org.mindrot.jbcrypt.BCrypt
 
 import java.util.UUID
@@ -17,17 +18,9 @@ class UpdatePasswordAction @Inject() (
 )(implicit ec: ExecutionContext) {
 
   def apply(userId: UUID, request: UpdatePassword.Request): Future[Unit] = {
-    val validate = Future {
-      if (request.newPassword.string.isEmpty) new RuntimeException(s"The password is required")
-      else ()
-    }
-
     for {
-      _ <- validate
-      userMaybe <- usersRepository.find(userId)
-      user = userMaybe
-        .filter(user => BCrypt.checkpw(request.oldPassword.string, user.hashedPassword))
-        .getOrElse(throw new RuntimeException("The given email/password doesn't match"))
+      maybe <- usersRepository.find(userId)
+      user = ValidatePassword(maybe, request.oldPassword)
       hashedPassword = BCrypt.hashpw(request.newPassword.string, BCrypt.gensalt())
       _ <- usersRepository.updatePassword(userId, hashedPassword)
       emailMessage = EmailMessage.updatePassword(user.name)
