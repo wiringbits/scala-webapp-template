@@ -25,7 +25,7 @@ class EmailApiAWSImpl @Inject() (
       s"""<p>${emailRequest.message.body}</p>""".stripMargin
 
     def unsafe(): Unit = try {
-      val credentials = AwsBasicCredentials.create(awsConfig.accessKeyId, awsConfig.secretAccessKey)
+      val credentials = AwsBasicCredentials.create(awsConfig.accessKeyId.string, awsConfig.secretAccessKey.string)
       val credentialsProvider = StaticCredentialsProvider.create(credentials)
 
       val client = SesAsyncClient.builder.region(awsConfig.region).credentialsProvider(credentialsProvider).build()

@@ -6,7 +6,7 @@ import play.api.Configuration
 case class JwtConfig(secret: JwtSecret) {
   override def toString: String = {
 
-    s"JwtConfig(secret = ${secret.string})"
+    s"JwtConfig(secret = ${secret.toString})"
   }
 }
 

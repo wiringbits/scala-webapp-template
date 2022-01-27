@@ -7,7 +7,7 @@ import software.amazon.awssdk.regions.Region
 case class AWSConfig(accessKeyId: AWSAccessKeyId, secretAccessKey: AWSSecretAccessKey, region: Region) {
   override def toString: String = {
 
-    s"AwsConfig(region = $region, accessKeyId = ${accessKeyId.string}, secretAccessKey = ${secretAccessKey.string})"
+    s"AwsConfig(region = $region, accessKeyId = ${accessKeyId.toString}, secretAccessKey = ${secretAccessKey.toString})"
   }
 }
 
