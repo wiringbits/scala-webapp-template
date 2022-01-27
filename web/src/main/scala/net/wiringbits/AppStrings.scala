@@ -5,6 +5,7 @@ object AppStrings {
   val appMotto = "be the best"
 
   val home = "Home"
+  val me = "Me"
   val dashboard = "Dashboard"
   val about = "About"
   val signIn = "Sign in"
@@ -19,10 +20,14 @@ object AppStrings {
   val recover = "Recover"
   val signOut = "Sign out"
   val logs = "Logs"
+  val user = "User"
 
   val name = "Nombre"
   val email = "Email"
+  val save = "Save"
   val password = "Password"
+  val oldPassword = "Old password"
+  val savePassword = "Save password"
   val repeatPassword = "Repeat the password"
   val login = "Login"
 

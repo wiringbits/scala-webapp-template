@@ -69,6 +69,7 @@ import slinky.web.html._
           NavLinkButton("/", AppStrings.home, onButtonClick),
           NavLinkButton("/dashboard", AppStrings.dashboard, onButtonClick),
           NavLinkButton("/about", AppStrings.about, onButtonClick),
+          NavLinkButton("/me", AppStrings.me, onButtonClick),
           NavLinkButton("/signout", AppStrings.signOut, onButtonClick)
         )
 

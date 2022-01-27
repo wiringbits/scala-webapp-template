@@ -19,6 +19,7 @@ trait ApiClient {
 
   def currentUser(jwt: String): Future[GetCurrentUser.Response]
   def updateUser(jwt: String, request: UpdateUser.Request): Future[UpdateUser.Response]
+  def updatePassword(jwt: String, request: UpdatePassword.Request): Future[UpdatePassword.Response]
   def getUserLogs(jwt: String): Future[GetUserLogs.Response]
 
   def adminGetUserLogs(userId: UUID): Future[AdminGetUserLogs.Response]
@@ -151,10 +152,23 @@ object ApiClient {
     }
 
     override def updateUser(jwt: String, request: UpdateUser.Request): Future[UpdateUser.Response] = {
-      val path = ServerAPI.path :+ "users"
+      val path = ServerAPI.path :+ "users" :+ "me"
       val uri = ServerAPI.withPath(path)
 
       prepareRequest[UpdateUser.Response]
+        .put(uri)
+        .header("X-Authorization", s"Bearer $jwt")
+        .body(Json.toJson(request).toString())
+        .send(backend)
+        .map(_.body)
+        .flatMap(Future.fromTry)
+    }
+
+    override def updatePassword(jwt: String, request: UpdatePassword.Request): Future[UpdatePassword.Response] = {
+      val path = ServerAPI.path :+ "users" :+ "me" :+ "password"
+      val uri = ServerAPI.withPath(path)
+
+      prepareRequest[UpdatePassword.Response]
         .put(uri)
         .header("X-Authorization", s"Bearer $jwt")
         .body(Json.toJson(request).toString())

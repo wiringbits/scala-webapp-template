@@ -42,6 +42,7 @@ import typings.reactRouterDom.{components => router}
     val resetPassword = route("/reset-password/:resetPasswordCode", props.ctx)(ResetPasswordPage(props.ctx))
 
     def dashboard(user: User) = route("/dashboard", props.ctx)(DashboardPage(props.ctx, user))
+    def me(user: User) = route("/me", props.ctx)(UserEditPage(props.ctx, user))
     val signOut = route("/signout", props.ctx) {
       props.ctx.loggedOut()
       router.Redirect("/")
@@ -58,7 +59,7 @@ import typings.reactRouterDom.{components => router}
         router.Switch(home, about, signIn, signUp, email, emailCode, forgotPassword, resetPassword, catchAllRoute)
 
       case AuthState.Authenticated(user) =>
-        router.Switch(home, dashboard(user), about, signOut, catchAllRoute)
+        router.Switch(home, me(user), dashboard(user), about, signOut, catchAllRoute)
     }
   }
 }

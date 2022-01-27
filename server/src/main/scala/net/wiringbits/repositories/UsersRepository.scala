@@ -1,6 +1,6 @@
 package net.wiringbits.repositories
 
-import net.wiringbits.common.models.Email
+import net.wiringbits.common.models.{Email, Name}
 import net.wiringbits.config.UserTokensConfig
 import net.wiringbits.executors.DatabaseExecutionContext
 import net.wiringbits.repositories.daos.{UserLogsDAO, UserTokensDAO, UsersDAO}
@@ -59,7 +59,7 @@ class UsersRepository @Inject() (database: Database, userTokensConfig: UserToken
     }
   }
 
-  def update(userId: UUID, name: String): Future[Unit] = Future {
+  def update(userId: UUID, name: Name): Future[Unit] = Future {
     database.withTransaction { implicit conn =>
       UsersDAO.updateName(userId, name)
       UserLogsDAO.create(
@@ -69,6 +69,14 @@ class UsersRepository @Inject() (database: Database, userTokensConfig: UserToken
           "Profile updated"
         )
       )
+    }
+  }
+
+  def updatePassword(userId: UUID, password: String): Future[Unit] = Future {
+    database.withTransaction { implicit conn =>
+      UsersDAO.resetPassword(userId, password)
+      val request = UserLog.CreateUserLog(UUID.randomUUID(), userId, "Password was updated")
+      UserLogsDAO.create(request)
     }
   }
 

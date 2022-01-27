@@ -17,6 +17,7 @@ class UsersController @Inject() (
     forgotPasswordAction: ForgotPasswordAction,
     resetPasswordAction: ResetPasswordAction,
     updateUserAction: UpdateUserAction,
+    updatePasswordAction: UpdatePasswordAction,
     getUserAction: GetUserAction,
     getUserLogsAction: GetUserLogsAction
 )(implicit cc: ControllerComponents, ec: ExecutionContext, jwtConfig: JwtConfig)
@@ -73,6 +74,15 @@ class UsersController @Inject() (
     } yield Ok(Json.toJson(response))
   }
 
+  def updatePassword() = handleJsonBody[UpdatePassword.Request] { request =>
+    val body = request.body
+    for {
+      userId <- authenticate(request)
+      _ = logger.info(s"Update password for: $userId")
+      _ <- updatePasswordAction(userId, body)
+      response = UpdateUser.Response()
+    } yield Ok(Json.toJson(response))
+  }
   def getCurrentUser() = handleGET { request =>
     for {
       userId <- authenticate(request)

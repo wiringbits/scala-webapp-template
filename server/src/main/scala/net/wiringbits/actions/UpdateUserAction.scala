@@ -13,7 +13,7 @@ class UpdateUserAction @Inject() (
 
   def apply(userId: UUID, request: UpdateUser.Request): Future[Unit] = {
     val validate = Future {
-      if (request.name.isEmpty) new RuntimeException(s"The name is required")
+      if (request.name.string.isEmpty) new RuntimeException(s"The name is required")
       else ()
     }
 
