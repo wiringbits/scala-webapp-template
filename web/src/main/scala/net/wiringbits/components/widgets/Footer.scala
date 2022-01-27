@@ -69,7 +69,7 @@ import slinky.core.facade.Fragment
     val copyright = Container(
       margin = Container.EdgeInsets.vertical(margin),
       alignItems = Container.Alignment.center,
-      child = mui.Typography(s"${texts.appName} 2021").color(Color.inherit)
+      child = mui.Typography(texts.appNameCopyright).color(Color.inherit)
     )
 
     val projects = Container(
@@ -93,14 +93,14 @@ import slinky.core.facade.Fragment
         Container(
           child = Fragment(
             subtitle(texts.contact),
-            link("hello@wiringbits.net", "mailto:hello@wiringbits.net")
+            link(props.ctx.contactEmail.string, s"mailto:${props.ctx.contactEmail.string}")
           )
         ),
         Container(
           margin = Container.EdgeInsets.top(margin / 2),
           child = Fragment(
             subtitle(texts.phone),
-            mui.Typography("+52 (999) 9999 999").variant(typographyTypographyMod.Style.body2).color(Color.inherit)
+            mui.Typography(props.ctx.contactPhone).variant(typographyTypographyMod.Style.body2).color(Color.inherit)
           )
         )
       )

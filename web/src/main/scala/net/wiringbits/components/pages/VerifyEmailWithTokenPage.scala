@@ -93,7 +93,7 @@ import scala.util.{Failure, Success}
           }
         case None =>
           val title = texts.failedEmailVerification
-          val message = "Invalid verification token"
+          val message = texts.invalidVerificationToken
           setState(_.copy(loading = false, title = title, message = message, error = Some(message)))
       }
     }

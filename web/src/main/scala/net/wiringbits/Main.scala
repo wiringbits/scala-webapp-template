@@ -1,6 +1,7 @@
 package net.wiringbits
 
 import monix.reactive.subjects.Var
+import net.wiringbits.common.models.Email
 import net.wiringbits.core.I18nLang
 import net.wiringbits.models.AuthState
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.{ErrorBoundaryComponent, ErrorBoundaryInfo}
@@ -30,7 +31,14 @@ object Main {
     val scheduler = monix.execution.Scheduler.global
     val $authState = Var[AuthState](AuthState.Unauthenticated)(scheduler)
     val $lang = Var[I18nLang](I18nLang.English)(scheduler)
-    val ctx = AppContext(API(), recaptchaKey = captchaKey, $authState, $lang)
+    val ctx = AppContext(
+      API(),
+      recaptchaKey = captchaKey,
+      $authState,
+      $lang,
+      Email.trusted("hello@wiringbits.net"),
+      "+52 (999) 9999 999"
+    )
     val app = ErrorBoundaryComponent(
       ErrorBoundaryComponent.Props(
         child = App(ctx),

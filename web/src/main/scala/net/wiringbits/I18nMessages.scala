@@ -1,5 +1,6 @@
 package net.wiringbits
 
+import net.wiringbits.common.models.Name
 import net.wiringbits.core.I18nLang
 import net.wiringbits.models.UserMenuOption
 
@@ -7,6 +8,7 @@ import net.wiringbits.models.UserMenuOption
 class I18nMessages(_lang: I18nLang) {
 
   def appName = "Wiringbits Web App Template"
+  def appNameCopyright = s"$appName ${java.time.ZonedDateTime.now.getYear}"
   def description =
     "While wiringbits is a company based in Culiacan, Mexico, there is no office, everyone works remotely. We strive for great quality on the software we built, and try to open source everything we can."
   def profile = "Profile"
@@ -56,11 +58,16 @@ class I18nMessages(_lang: I18nLang) {
   def verifyYourEmailAddress = "Verify your email address"
   def successfulEmailVerification = "Successful email verification"
   def failedEmailVerification = "Failed email verification"
+  def invalidVerificationToken = "Invalid verification token"
   def goingToBeRedirected = "You're going to be redirected"
   def emailHasBeenSent = "An email has been sent to your email with a URL to verify your account."
   def emailNotReceived = "If you haven't received the email after a few minutes, please check your spam folder"
   def verifyingEmail = "We're verifing your email"
   def waitAMomentPlease = "Wait a moment, please"
+
+  def welcome(name: Name): String = {
+    s"Welcome ${name.string}"
+  }
 
   def userMenuOption(menuOption: UserMenuOption): String = {
     menuOption match {

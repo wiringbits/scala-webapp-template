@@ -19,7 +19,7 @@ import slinky.core.facade.Fragment
         margin = Container.EdgeInsets.bottom(16),
         child = Fragment(
           Title(texts.dashboardPage),
-          Subtitle(s"${texts.welcome} ${props.user.name}")
+          Subtitle(texts.welcome(props.user.name))
         )
       ),
       Logs(props.ctx, props.user)
