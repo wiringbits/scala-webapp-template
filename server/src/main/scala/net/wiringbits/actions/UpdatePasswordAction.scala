@@ -5,7 +5,7 @@ import net.wiringbits.apis.EmailApi
 import net.wiringbits.apis.models.EmailRequest
 import net.wiringbits.repositories.UsersRepository
 import net.wiringbits.util.EmailMessage
-import net.wiringbits.validations.ValidateUser
+import net.wiringbits.validations.ValidatePasswordMatches
 import org.mindrot.jbcrypt.BCrypt
 
 import java.util.UUID
@@ -20,7 +20,7 @@ class UpdatePasswordAction @Inject() (
   def apply(userId: UUID, request: UpdatePassword.Request): Future[Unit] = {
     for {
       maybe <- usersRepository.find(userId)
-      user = ValidateUser(maybe, request.oldPassword)
+      user = ValidatePasswordMatches(maybe, request.oldPassword)
       hashedPassword = BCrypt.hashpw(request.newPassword.string, BCrypt.gensalt())
       _ <- usersRepository.updatePassword(userId, hashedPassword)
       emailMessage = EmailMessage.updatePassword(user.name)
