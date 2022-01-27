@@ -26,7 +26,7 @@ import slinky.core.facade.{Fragment, Hooks}
     val tabs = mui.CardContent()(
       mui
         .Tabs(UserMenuOption.values.indexOf(menuOption))(
-          UserMenuOption.values.map(x => mui.Tab().label(texts.userMenuOption(x)).withKey(texts.userMenuOption(x)))
+          UserMenuOption.values.map(x => mui.Tab().label(texts.userMenuOption(x)).withKey(x.toString))
         )
         .onChange((_, index) => setMenuOption(UserMenuOption.values(index.toString.toInt)))
     )
