@@ -10,4 +10,6 @@ object I18nLang {
   def from(string: String): Option[I18nLang] = {
     values.find(_.toString.toLowerCase == string.toLowerCase)
   }
+
+  implicit val catsEq: cats.Eq[I18nLang] = cats.Eq.fromUniversalEquals
 }

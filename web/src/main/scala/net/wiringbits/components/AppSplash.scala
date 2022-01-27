@@ -1,9 +1,10 @@
 package net.wiringbits.components
 
+import net.wiringbits.AppContext
+import net.wiringbits.core.I18nHooks
 import net.wiringbits.models.User
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.Alignment
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{Container, Subtitle, Title}
-import net.wiringbits.{AppContext, AppStrings}
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 import slinky.core.FunctionalComponent
 import slinky.core.annotations.react
@@ -12,9 +13,11 @@ import slinky.core.facade.{Fragment, Hooks, ReactElement}
 import scala.util.{Failure, Success}
 
 @react object AppSplash {
+
   case class Props(ctx: AppContext, child: ReactElement)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
+    val texts = I18nHooks.useMessages(props.ctx.$lang)
     val (initialized, setInitialized) = Hooks.useState(false)
 
     Hooks.useEffect(
@@ -52,8 +55,8 @@ import scala.util.{Failure, Success}
         alignItems = Alignment.center,
         justifyContent = Alignment.center,
         child = Fragment(
-          Title(AppStrings.appName),
-          Subtitle(AppStrings.loading)
+          Title(texts.appName),
+          Subtitle(texts.loading)
         )
       )
     }

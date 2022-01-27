@@ -13,12 +13,12 @@ import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
   Styles,
   WithStylesOptions
 }
-import net.wiringbits.core.ReactiveHooks
+import net.wiringbits.AppContext
+import net.wiringbits.core.{I18nHooks, ReactiveHooks}
 import net.wiringbits.models.AuthState
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.{Alignment, EdgeInsets}
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{Container, NavLinkButton, Subtitle, Title}
 import net.wiringbits.webapp.utils.slinkyUtils.core.MediaQueryHooks
-import net.wiringbits.{AppContext, AppStrings}
 import org.scalablytyped.runtime.StringDictionary
 import slinky.core.FunctionalComponent
 import slinky.core.annotations.react
@@ -52,6 +52,7 @@ import slinky.web.html._
   }
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
+    val texts = I18nHooks.useMessages(props.ctx.$lang)
     val auth = ReactiveHooks.useDistinctValue(props.ctx.$auth)
     val classes = useStyles(())
     val isMobileOrTablet = MediaQueryHooks.useIsMobileOrTablet()
@@ -66,19 +67,19 @@ import slinky.web.html._
     val menu = auth match {
       case AuthState.Authenticated(_) =>
         Fragment(
-          NavLinkButton("/", AppStrings.home, onButtonClick),
-          NavLinkButton("/dashboard", AppStrings.dashboard, onButtonClick),
-          NavLinkButton("/about", AppStrings.about, onButtonClick),
-          NavLinkButton("/me", AppStrings.me, onButtonClick),
-          NavLinkButton("/signout", AppStrings.signOut, onButtonClick)
+          NavLinkButton("/", texts.home, onButtonClick),
+          NavLinkButton("/dashboard", texts.dashboard, onButtonClick),
+          NavLinkButton("/about", texts.about, onButtonClick),
+          NavLinkButton("/me", texts.profile, onButtonClick),
+          NavLinkButton("/signout", texts.signOut, onButtonClick)
         )
 
       case AuthState.Unauthenticated =>
         Fragment(
-          NavLinkButton("/", AppStrings.home, onButtonClick),
-          NavLinkButton("/about", AppStrings.about, onButtonClick),
-          NavLinkButton("/signup", AppStrings.signUp, onButtonClick),
-          NavLinkButton("/signin", AppStrings.signIn, onButtonClick)
+          NavLinkButton("/", texts.home, onButtonClick),
+          NavLinkButton("/about", texts.about, onButtonClick),
+          NavLinkButton("/signup", texts.signUp, onButtonClick),
+          NavLinkButton("/signin", texts.signIn, onButtonClick)
         )
     }
 
@@ -94,7 +95,7 @@ import slinky.web.html._
             .AppBar(className := classes("appbar"))
             .position(muiStrings.relative)(
               mui.Toolbar(className := classes("toolbar-mobile"))(
-                Subtitle(AppStrings.appName)
+                Subtitle(texts.appName)
               )
             ),
           Container(
@@ -116,7 +117,7 @@ import slinky.web.html._
           .IconButton(mui.Icon(muiIcons.Menu()))
           .color(Color.inherit)
           .onClick(_ => setVisibleDrawer(true)),
-        Subtitle(AppStrings.appName)
+        Subtitle(texts.appName)
       )
 
       mui
@@ -127,7 +128,7 @@ import slinky.web.html._
         .AppBar(className := classes("appbar"))
         .position(muiStrings.relative)(
           mui.Toolbar(className := classes("toolbar"))(
-            Title(AppStrings.appName),
+            Title(texts.appName),
             div(className := classes("menu"))(menu)
           )
         )
