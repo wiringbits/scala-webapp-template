@@ -15,7 +15,7 @@ class ReCaptchaApi @Inject() (reCaptchaConfig: ReCaptchaConfig, ws: WSClient)(im
 
   def verify(captcha: Captcha): Future[Boolean] = {
     ws.url(url)
-      .addQueryStringParameters("secret" -> reCaptchaConfig.secret, "response" -> captcha.string)
+      .addQueryStringParameters("secret" -> reCaptchaConfig.secret.string, "response" -> captcha.string)
       .post("{}")
       .map { response =>
         (response.json \ "success")

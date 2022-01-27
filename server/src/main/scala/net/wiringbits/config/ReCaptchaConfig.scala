@@ -1,18 +1,18 @@
 package net.wiringbits.config
 
+import net.wiringbits.models.ReCaptchaSecret
 import play.api.Configuration
 
-case class ReCaptchaConfig(secret: String) {
+case class ReCaptchaConfig(secret: ReCaptchaSecret) {
   override def toString: String = {
-    import net.wiringbits.util.StringUtils.Implicits._
 
-    s"ReCaptchaConfig(secret = ${secret.mask()})"
+    s"ReCaptchaConfig(secret = ${secret.string})"
   }
 }
 
 object ReCaptchaConfig {
   def apply(config: Configuration): ReCaptchaConfig = {
     val secret = config.get[String]("secretKey")
-    ReCaptchaConfig(secret)
+    ReCaptchaConfig(ReCaptchaSecret(secret))
   }
 }

@@ -1,12 +1,12 @@
 package net.wiringbits.config
 
+import net.wiringbits.models.JwtSecret
 import play.api.Configuration
 
-case class JwtConfig(secret: String) {
+case class JwtConfig(secret: JwtSecret) {
   override def toString: String = {
-    import net.wiringbits.util.StringUtils.Implicits._
 
-    s"JwtConfig(secret = ${secret.mask()})"
+    s"JwtConfig(secret = ${secret.string})"
   }
 }
 
@@ -14,6 +14,6 @@ object JwtConfig {
 
   def apply(config: Configuration): JwtConfig = {
     val secret = config.get[String]("secret")
-    JwtConfig(secret)
+    JwtConfig(JwtSecret(secret))
   }
 }

@@ -1,13 +1,13 @@
 package net.wiringbits.config
 
+import net.wiringbits.models.{AWSAccessKeyId, AWSSecretAccessKey}
 import play.api.Configuration
 import software.amazon.awssdk.regions.Region
 
-case class AWSConfig(accessKeyId: String, secretAccessKey: String, region: Region) {
+case class AWSConfig(accessKeyId: AWSAccessKeyId, secretAccessKey: AWSSecretAccessKey, region: Region) {
   override def toString: String = {
-    import net.wiringbits.util.StringUtils.Implicits._
 
-    s"AwsConfig(region = $region, accessKeyId = ${accessKeyId.mask()}, secretAccessKey = ${secretAccessKey.mask()})"
+    s"AwsConfig(region = $region, accessKeyId = ${accessKeyId.string}, secretAccessKey = ${secretAccessKey.string})"
   }
 }
 
@@ -17,6 +17,6 @@ object AWSConfig {
     val secretAccessKey = config.get[String]("secretAccessKey")
     val region = config.get[String]("region")
 
-    AWSConfig(accessKeyId, secretAccessKey, Region.of(region))
+    AWSConfig(AWSAccessKeyId(accessKeyId), AWSSecretAccessKey(secretAccessKey), Region.of(region))
   }
 }
