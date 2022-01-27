@@ -1,7 +1,6 @@
 package net.wiringbits.models
 
 import com.typesafe.config.Config
-
 import play.api.ConfigLoader
 
 case class ReCaptchaSecret(string: String) extends SecretValue(string)
