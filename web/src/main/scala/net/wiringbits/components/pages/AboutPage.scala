@@ -1,37 +1,21 @@
 package net.wiringbits.components.pages
 
-import com.alexitc.materialui.facade.materialUiCore.createMuiThemeMod.Theme
-import com.alexitc.materialui.facade.materialUiStyles.makeStylesMod.StylesHook
-import com.alexitc.materialui.facade.materialUiStyles.mod.makeStyles
-import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
-  CSSProperties,
-  StyleRulesCallback,
-  Styles,
-  WithStylesOptions
-}
+import net.wiringbits.AppContext
+import net.wiringbits.core.I18nHooks
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{Subtitle, Title}
-import org.scalablytyped.runtime.StringDictionary
 import slinky.core.FunctionalComponent
 import slinky.core.annotations.react
 import slinky.core.facade.Fragment
 
 @react object AboutPage {
-  case class Props()
-
-  private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {
-    val stylesCallback: StyleRulesCallback[Theme, Unit, String] = theme =>
-      StringDictionary(
-        "aboutPage" -> CSSProperties()
-      )
-    makeStyles(stylesCallback, WithStylesOptions())
-  }
+  case class Props(ctx: AppContext)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
-    val classes = useStyles(())
+    val texts = I18nHooks.useMessages(props.ctx.$lang)
 
     Fragment(
-      Title("About Page"),
-      Subtitle("Add details about the project")
+      Title(texts.aboutPage),
+      Subtitle(texts.projectDetails)
     )
   }
 }

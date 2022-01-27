@@ -2,6 +2,7 @@ package net.wiringbits.components.widgets
 
 import com.alexitc.materialui.facade.materialUiCore.mod.PropTypes.Color
 import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
+import net.wiringbits.core.I18nHooks
 import net.wiringbits.forms.SignInFormData
 import net.wiringbits.models.User
 import net.wiringbits.ui.components.inputs.{EmailInput, PasswordInput}
@@ -9,7 +10,7 @@ import net.wiringbits.webapp.utils.slinkyUtils.components.core.ErrorLabel
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.{Alignment, EdgeInsets}
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container}
 import net.wiringbits.webapp.utils.slinkyUtils.forms.StatefulFormData
-import net.wiringbits.{AppContext, AppStrings}
+import net.wiringbits.AppContext
 import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 import slinky.core.annotations.react
@@ -24,12 +25,13 @@ import scala.util.{Failure, Success}
   case class Props(ctx: AppContext)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
+    val texts = I18nHooks.useMessages(props.ctx.$lang)
     val history = reactRouterDom.useHistory()
     val (formData, setFormData) = Hooks.useState(
       StatefulFormData(
         SignInFormData.initial(
-          emailLabel = AppStrings.email,
-          passwordLabel = AppStrings.password
+          emailLabel = texts.email,
+          passwordLabel = texts.password
         )
       )
     )
@@ -48,7 +50,7 @@ import scala.util.{Failure, Success}
         for {
           request <- formData.data.submitRequest
             .orElse {
-              setFormData(_.submissionFailed("Complete the necessary data"))
+              setFormData(_.submissionFailed(texts.completeData))
               None
             }
         } yield props.ctx.api.client
@@ -110,10 +112,10 @@ import scala.util.{Failure, Success}
         if (formData.isSubmitting)
           Fragment(
             CircularLoader(),
-            Container(margin = EdgeInsets.left(8), child = AppStrings.loading)
+            Container(margin = EdgeInsets.left(8), child = texts.loading)
           )
         else
-          Fragment(AppStrings.login)
+          Fragment(texts.login)
 
       mui
         .Button(text)

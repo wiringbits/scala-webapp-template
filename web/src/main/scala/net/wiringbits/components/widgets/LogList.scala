@@ -11,16 +11,17 @@ import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
   Styles,
   WithStylesOptions
 }
-import net.wiringbits.AppStrings
+import net.wiringbits.AppContext
 import net.wiringbits.api.models.GetUserLogs
 import net.wiringbits.api.utils.Formatter
+import net.wiringbits.core.I18nHooks
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{Container, Subtitle}
 import org.scalablytyped.runtime.StringDictionary
 import slinky.core.FunctionalComponent
 import slinky.core.facade.Fragment
 
 object LogList {
-  case class Props(response: GetUserLogs.Response, forceRefresh: () => Unit)
+  case class Props(ctx: AppContext, response: GetUserLogs.Response, forceRefresh: () => Unit)
 
   private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {
     val stylesCallback: StyleRulesCallback[Theme, Unit, String] = theme =>
@@ -32,6 +33,7 @@ object LogList {
   }
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
+    val texts = I18nHooks.useMessages(props.ctx.$lang)
     val classes = useStyles(())
     val items = props.response.data.map { item =>
       mui
@@ -54,9 +56,9 @@ object LogList {
           alignItems = Container.Alignment.center,
           justifyContent = Container.Alignment.spaceBetween,
           child = Fragment(
-            Subtitle(AppStrings.logs),
+            Subtitle(texts.logs),
             mui
-              .Button("Reload")
+              .Button(texts.reload)
               .color(Color.primary)
               .onClick(_ => props.forceRefresh())
           )

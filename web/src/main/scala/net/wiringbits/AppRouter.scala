@@ -24,7 +24,7 @@ import typings.reactRouterDom.{components => router}
           Scaffold(
             appbar = Some(AppBar(ctx)),
             body = child,
-            footer = Some(Footer())
+            footer = Some(Footer(ctx))
           )
         }
     )
@@ -32,11 +32,11 @@ import typings.reactRouterDom.{components => router}
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val auth = ReactiveHooks.useDistinctValue(props.ctx.$auth)
-    val home = route("/", props.ctx)(HomePage())
-    val about = route("/about", props.ctx)(AboutPage())
+    val home = route("/", props.ctx)(HomePage(props.ctx))
+    val about = route("/about", props.ctx)(AboutPage(props.ctx))
     val signIn = route("/signin", props.ctx)(SignInPage(props.ctx))
     val signUp = route("/signup", props.ctx)(SignUpPage(props.ctx))
-    val email = route("/verify-email", props.ctx)(VerifyEmailPage())
+    val email = route("/verify-email", props.ctx)(VerifyEmailPage(props.ctx))
     val emailCode = route("/verify-email/:emailCode", props.ctx)(VerifyEmailWithTokenPage(props.ctx))
     val forgotPassword = route("/forgot-password", props.ctx)(ForgotPasswordPage(props.ctx))
     val resetPassword = route("/reset-password/:resetPasswordCode", props.ctx)(ResetPasswordPage(props.ctx))

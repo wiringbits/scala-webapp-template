@@ -11,7 +11,8 @@ import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
   Styles,
   WithStylesOptions
 }
-import net.wiringbits.AppStrings
+import net.wiringbits.AppContext
+import net.wiringbits.core.I18nHooks
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.EdgeInsets
 import net.wiringbits.webapp.utils.slinkyUtils.core.MediaQueryHooks
@@ -21,7 +22,7 @@ import slinky.core.annotations.react
 import slinky.core.facade.Fragment
 
 @react object Footer {
-  type Props = Unit
+  case class Props(ctx: AppContext)
 
   private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {
     val stylesCallback: StyleRulesCallback[Theme, Unit, String] = theme =>
@@ -36,18 +37,17 @@ import slinky.core.facade.Fragment
 
   private val margin = 16
 
-  private val description =
-    "While wiringbits is a company based in Culiacan, Mexico, there is no office, everyone works remotely. We strive for great quality on the software we built, and try to open source everything we can."
-
-  val component: FunctionalComponent[Unit] = FunctionalComponent[Unit] { props =>
+  val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
+    val texts = I18nHooks.useMessages(props.ctx.$lang)
     val classes = useStyles(())
     val isMobileOrTablet = MediaQueryHooks.useIsMobileOrTablet()
 
     val appName = Container(
       margin = EdgeInsets.bottom(margin),
-      child = mui.Typography(AppStrings.appName).variant(typographyTypographyMod.Style.h4).color(Color.inherit)
+      child = mui.Typography(texts.appName).variant(typographyTypographyMod.Style.h4).color(Color.inherit)
     )
-    val appDescription = mui.Typography(description).variant(typographyTypographyMod.Style.body2).color(Color.inherit)
+    val appDescription =
+      mui.Typography(texts.description).variant(typographyTypographyMod.Style.body2).color(Color.inherit)
 
     def title(text: String) =
       Container(
@@ -69,7 +69,7 @@ import slinky.core.facade.Fragment
     val copyright = Container(
       margin = Container.EdgeInsets.vertical(margin),
       alignItems = Container.Alignment.center,
-      child = mui.Typography(s"${AppStrings.appName} 2021").color(Color.inherit)
+      child = mui.Typography(s"${texts.appName} 2021").color(Color.inherit)
     )
 
     val projects = Container(
@@ -89,17 +89,17 @@ import slinky.core.facade.Fragment
     val contact = Container(
       flex = Some(1),
       child = Fragment(
-        title("Contact"),
+        title(texts.contact),
         Container(
           child = Fragment(
-            subtitle("Email"),
+            subtitle(texts.contact),
             link("hello@wiringbits.net", "mailto:hello@wiringbits.net")
           )
         ),
         Container(
           margin = Container.EdgeInsets.top(margin / 2),
           child = Fragment(
-            subtitle("Phone"),
+            subtitle(texts.phone),
             mui.Typography("+52 (999) 9999 999").variant(typographyTypographyMod.Style.body2).color(Color.inherit)
           )
         )

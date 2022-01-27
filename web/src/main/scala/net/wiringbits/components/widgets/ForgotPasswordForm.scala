@@ -1,12 +1,13 @@
 package net.wiringbits.components.widgets
 
 import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
+import net.wiringbits.AppContext
+import net.wiringbits.core.I18nHooks
 import net.wiringbits.forms.ForgotPasswordFormData
 import net.wiringbits.ui.components.inputs.EmailInput
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.ErrorLabel
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container}
 import net.wiringbits.webapp.utils.slinkyUtils.forms.StatefulFormData
-import net.wiringbits.{API, AppStrings}
 import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 import slinky.core.annotations.react
@@ -18,15 +19,16 @@ import typings.reactRouter.mod.useHistory
 import scala.util.{Failure, Success}
 
 @react object ForgotPasswordForm {
-  case class Props(api: API, captchaKey: String)
+  case class Props(ctx: AppContext)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
+    val texts = I18nHooks.useMessages(props.ctx.$lang)
     val history = useHistory()
 
     val (formData, setFormData) = Hooks.useState(
       StatefulFormData(
         ForgotPasswordFormData.initial(
-          emailLabel = AppStrings.email
+          emailLabel = texts.email
         )
       )
     )
@@ -45,10 +47,10 @@ import scala.util.{Failure, Success}
         for {
           request <- formData.data.submitRequest
             .orElse {
-              setFormData(_.submissionFailed("Complete the necessary data"))
+              setFormData(_.submissionFailed(texts.completeData))
               None
             }
-        } yield props.api.client
+        } yield props.ctx.api.client
           .forgotPassword(request)
           .onComplete {
             case Success(_) =>
@@ -67,10 +69,10 @@ import scala.util.{Failure, Success}
       val text = if (formData.isSubmitting) {
         Fragment(
           CircularLoader(),
-          Container(margin = Container.EdgeInsets.left(8), child = AppStrings.loading)
+          Container(margin = Container.EdgeInsets.left(8), child = texts.loading)
         )
       } else {
-        Fragment(AppStrings.recover)
+        Fragment(texts.recover)
       }
 
       mui
@@ -95,7 +97,7 @@ import scala.util.{Failure, Success}
     val recaptcha =
       ReCaptcha(
         onChange = captchaOpt => onDataChanged(x => x.copy(captcha = captchaOpt)),
-        captchaKey = props.captchaKey
+        captchaKey = props.ctx.recaptchaKey
       )
 
     form(onSubmit := (handleSubmit(_)))(

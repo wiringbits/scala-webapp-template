@@ -11,7 +11,8 @@ import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
   Styles,
   WithStylesOptions
 }
-import net.wiringbits.AppStrings
+import net.wiringbits.AppContext
+import net.wiringbits.core.I18nHooks
 import org.scalablytyped.runtime.StringDictionary
 import slinky.core.FunctionalComponent
 import slinky.core.annotations.react
@@ -19,7 +20,7 @@ import slinky.core.facade.Fragment
 import slinky.web.html.{br, className, div}
 
 @react object VerifyEmailPage {
-  type Props = Unit
+  case class Props(ctx: AppContext)
 
   private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {
     val stylesCallback: StyleRulesCallback[Theme, Unit, String] = _ =>
@@ -41,24 +42,25 @@ import slinky.web.html.{br, className, div}
   }
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
+    val texts = I18nHooks.useMessages(props.ctx.$lang)
     val classes = useStyles(())
 
     Fragment(
       div(className := classes("emailPage"))(
         Fragment(
           mui
-            .Typography(AppStrings.verifyYourEmailAddress)
+            .Typography(texts.verifyYourEmailAddress)
             .variant(muiStrings.h5)
             .className(classes("emailTitle")),
           br(),
           mui
             .Typography(
-              AppStrings.emailHasBeenSent
+              texts.emailHasBeenSent
             )
             .variant(muiStrings.h6),
           mui
             .Typography(
-              AppStrings.emailNotReceived
+              texts.emailNotReceived
             )
             .variant(muiStrings.h6)
         )

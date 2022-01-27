@@ -2,13 +2,14 @@ package net.wiringbits.components.widgets
 
 import com.alexitc.materialui.facade.materialUiCore.mod.PropTypes.Color
 import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
+import net.wiringbits.core.I18nHooks
 import net.wiringbits.forms.SignUpFormData
 import net.wiringbits.ui.components.inputs.{EmailInput, NameInput, PasswordInput}
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.ErrorLabel
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.{Alignment, EdgeInsets}
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container, Title}
 import net.wiringbits.webapp.utils.slinkyUtils.forms.StatefulFormData
-import net.wiringbits.{AppContext, AppStrings}
+import net.wiringbits.AppContext
 import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 import slinky.core.annotations.react
@@ -23,14 +24,15 @@ import scala.util.{Failure, Success}
   case class Props(ctx: AppContext)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
+    val texts = I18nHooks.useMessages(props.ctx.$lang)
     val history = reactRouterDom.useHistory()
     val (formData, setFormData) = Hooks.useState(
       StatefulFormData(
         SignUpFormData.initial(
-          nameLabel = AppStrings.name,
-          emailLabel = AppStrings.email,
-          passwordLabel = AppStrings.password,
-          repeatPasswordLabel = AppStrings.repeatPassword
+          nameLabel = texts.name,
+          emailLabel = texts.email,
+          passwordLabel = texts.password,
+          repeatPasswordLabel = texts.repeatPassword
         )
       )
     )
@@ -49,7 +51,7 @@ import scala.util.{Failure, Success}
         for {
           request <- formData.data.submitRequest
             .orElse {
-              setFormData(_.submissionFailed("Complete the necessary data"))
+              setFormData(_.submissionFailed(texts.completeData))
               None
             }
         } yield props.ctx.api.client
@@ -132,9 +134,9 @@ import scala.util.{Failure, Success}
         if (formData.isSubmitting) {
           Fragment(
             CircularLoader(),
-            Container(margin = EdgeInsets.left(8), child = AppStrings.loading)
+            Container(margin = EdgeInsets.left(8), child = texts.loading)
           )
-        } else Fragment(AppStrings.createAccount)
+        } else Fragment(texts.createAccount)
 
       mui
         .Button(text)
@@ -155,7 +157,7 @@ import scala.util.{Failure, Success}
             alignItems = Alignment.center,
             padding = EdgeInsets.all(16),
             child = Fragment(
-              Title(AppStrings.signUp),
+              Title(texts.signUp),
               nameInput,
               emailInput,
               passwordInput,
