@@ -5,8 +5,7 @@ import net.wiringbits.apis.ReCaptchaApi
 import net.wiringbits.config.JwtConfig
 import net.wiringbits.repositories.{UserLogsRepository, UsersRepository}
 import net.wiringbits.util.JwtUtils
-import net.wiringbits.validations.{ValidateCaptcha, ValidatePassword, ValidateVerifiedUser}
-import org.mindrot.jbcrypt.BCrypt
+import net.wiringbits.validations.{ValidateCaptcha, ValidateUser, ValidateVerifiedUser}
 
 import java.time.Clock
 import javax.inject.Inject
@@ -30,7 +29,7 @@ class LoginAction @Inject() (
       _ = maybe.foreach(ValidateVerifiedUser.apply)
 
       // The password matches
-      user = ValidatePassword(maybe, request.password)
+      user = ValidateUser(maybe, request.password)
 
       // A login token is created
       _ <- userLogsRepository.create(user.id, "Logged in successfully")
