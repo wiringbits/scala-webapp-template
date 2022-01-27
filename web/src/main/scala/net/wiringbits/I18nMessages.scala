@@ -1,6 +1,7 @@
 package net.wiringbits
 
 import net.wiringbits.core.I18nLang
+import net.wiringbits.models.UserMenuOption
 
 // TODO: conditionaly render messages when we support more than 1 language
 class I18nMessages(_lang: I18nLang) {
@@ -60,4 +61,11 @@ class I18nMessages(_lang: I18nLang) {
   def emailNotReceived = "If you haven't received the email after a few minutes, please check your spam folder"
   def verifyingEmail = "We're verifing your email"
   def waitAMomentPlease = "Wait a moment, please"
+
+  def userMenuOption(menuOption: UserMenuOption): String = {
+    menuOption match {
+      case UserMenuOption.EditSummary => "Summary"
+      case UserMenuOption.EditPassword => "Change password"
+    }
+  }
 }
