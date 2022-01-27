@@ -5,7 +5,8 @@ import net.wiringbits.api.models.GetCurrentUser
 import net.wiringbits.models.User
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.AsyncComponent
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container}
-import net.wiringbits.{AppContext, AppStrings}
+import net.wiringbits.AppContext
+import net.wiringbits.core.I18nHooks
 import slinky.core.FunctionalComponent
 import slinky.core.annotations.react
 import slinky.core.facade.Fragment
@@ -14,13 +15,14 @@ import slinky.core.facade.Fragment
   case class Props(ctx: AppContext, user: User)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
+    val texts = I18nHooks.useMessages(props.ctx.$lang)
     def loader = Container(
       flex = Some(1),
       alignItems = Container.Alignment.center,
       justifyContent = Container.Alignment.center,
       child = Fragment(
         CircularLoader(48),
-        mui.Typography(AppStrings.loading).variant(muiStrings.h4).color(muiStrings.primary)
+        mui.Typography(texts.loading).variant(muiStrings.h4).color(muiStrings.primary)
       )
     )
 

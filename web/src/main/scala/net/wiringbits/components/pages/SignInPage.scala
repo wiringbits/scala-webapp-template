@@ -13,7 +13,8 @@ import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
 import net.wiringbits.components.widgets._
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.{Alignment, EdgeInsets}
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{Container, Title}
-import net.wiringbits.{AppContext, AppStrings}
+import net.wiringbits.AppContext
+import net.wiringbits.core.I18nHooks
 import org.scalablytyped.runtime.StringDictionary
 import slinky.core.FunctionalComponent
 import slinky.core.annotations.react
@@ -35,6 +36,7 @@ import typings.reactRouterDom.mod.useHistory
   }
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
+    val texts = I18nHooks.useMessages(props.ctx.$lang)
     val classes = useStyles(())
     val history = useHistory()
 
@@ -48,7 +50,7 @@ import typings.reactRouterDom.mod.useHistory
             Container(
               justifyContent = Alignment.center,
               alignItems = Alignment.center,
-              child = Title(AppStrings.signIn)
+              child = Title(texts.signIn)
             ),
             Container(
               flex = Some(1),
@@ -63,9 +65,9 @@ import typings.reactRouterDom.mod.useHistory
               alignItems = Container.Alignment.center,
               justifyContent = Container.Alignment.center,
               child = Fragment(
-                mui.Typography(AppStrings.dontHaveAccountYet),
+                mui.Typography(texts.dontHaveAccountYet),
                 mui
-                  .Button(AppStrings.signUp)
+                  .Button(texts.signUp)
                   .variant(muiStrings.text)
                   .color(muiStrings.primary)
                   .onClick(_ => history.push("/signUp"))
@@ -76,9 +78,9 @@ import typings.reactRouterDom.mod.useHistory
               alignItems = Container.Alignment.center,
               justifyContent = Container.Alignment.center,
               child = Fragment(
-                mui.Typography(AppStrings.forgotYourPassword),
+                mui.Typography(texts.forgotYourPassword),
                 mui
-                  .Button(AppStrings.recoverIt)
+                  .Button(texts.recoverIt)
                   .variant(muiStrings.text)
                   .color(muiStrings.primary)
                   .onClick(_ => history.push("/forgot-password"))

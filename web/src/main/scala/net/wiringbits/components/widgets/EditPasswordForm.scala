@@ -1,6 +1,7 @@
 package net.wiringbits.components.widgets
 
 import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
+import net.wiringbits.core.I18nHooks
 import net.wiringbits.forms.UpdatePasswordFormData
 import net.wiringbits.models.User
 import net.wiringbits.ui.components.inputs.PasswordInput
@@ -8,7 +9,7 @@ import net.wiringbits.webapp.utils.slinkyUtils.components.core.ErrorLabel
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.Alignment
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container}
 import net.wiringbits.webapp.utils.slinkyUtils.forms.StatefulFormData
-import net.wiringbits.{AppContext, AppStrings}
+import net.wiringbits.AppContext
 import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 import slinky.core.annotations.react
@@ -22,12 +23,13 @@ import scala.util.{Failure, Success}
   case class Props(ctx: AppContext, user: User)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
+    val texts = I18nHooks.useMessages(props.ctx.$lang)
     val (formData, setFormData) = Hooks.useState(
       StatefulFormData(
         UpdatePasswordFormData.initial(
-          oldPasswordLabel = AppStrings.oldPassword,
-          passwordLabel = AppStrings.password,
-          repeatPasswordLabel = AppStrings.repeatPassword
+          oldPasswordLabel = texts.oldPassword,
+          passwordLabel = texts.password,
+          repeatPasswordLabel = texts.repeatPassword
         )
       )
     )
@@ -46,7 +48,7 @@ import scala.util.{Failure, Success}
         for {
           request <- formData.data.submitRequest
             .orElse {
-              setFormData(_.submissionFailed("Complete the necessary data"))
+              setFormData(_.submissionFailed(texts.completeData))
               None
             }
         } yield props.ctx.api.client
@@ -95,10 +97,10 @@ import scala.util.{Failure, Success}
       val text = if (formData.isSubmitting) {
         Fragment(
           CircularLoader(),
-          Container(margin = Container.EdgeInsets.left(8), child = AppStrings.loading)
+          Container(margin = Container.EdgeInsets.left(8), child = texts.loading)
         )
       } else {
-        Fragment(AppStrings.savePassword)
+        Fragment(texts.savePassword)
       }
 
       mui

@@ -13,7 +13,8 @@ import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
 import net.wiringbits.common.models.UserToken
 import net.wiringbits.components.widgets.{AppCard, ResetPasswordForm}
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container
-import net.wiringbits.{AppContext, AppStrings}
+import net.wiringbits.AppContext
+import net.wiringbits.core.I18nHooks
 import org.scalablytyped.runtime.StringDictionary
 import slinky.core.FunctionalComponent
 import slinky.core.annotations.react
@@ -38,6 +39,7 @@ import scala.scalajs.js
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val classes = useStyles(())
+    val texts = I18nHooks.useMessages(props.ctx.$lang)
     val history = useHistory()
     val params = useParams()
     val resetPasswordCode = params.asInstanceOf[js.Dynamic].resetPasswordCode.toString
@@ -53,7 +55,7 @@ import scala.scalajs.js
             Container(
               alignItems = Container.Alignment.center,
               justifyContent = Container.Alignment.center,
-              child = mui.Typography(AppStrings.enterNewPassword).variant(muiStrings.h5)
+              child = mui.Typography(texts.enterNewPassword).variant(muiStrings.h5)
             ),
             ResetPasswordForm(props.ctx, userToken),
             Container(
@@ -62,9 +64,9 @@ import scala.scalajs.js
               alignItems = Container.Alignment.center,
               justifyContent = Container.Alignment.center,
               child = Fragment(
-                mui.Typography(AppStrings.alreadyHaveAccount),
+                mui.Typography(texts.alreadyHaveAccount),
                 mui
-                  .Button(AppStrings.signIn)
+                  .Button(texts.signIn)
                   .variant(muiStrings.text)
                   .color(muiStrings.primary)
                   .onClick(_ => history.push("/signin"))

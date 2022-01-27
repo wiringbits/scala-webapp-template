@@ -13,8 +13,9 @@ import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
 }
 import net.wiringbits.api.models.VerifyEmail
 import net.wiringbits.common.models.UserToken
+import net.wiringbits.core.I18nHooks
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container}
-import net.wiringbits.{AppContext, AppStrings}
+import net.wiringbits.AppContext
 import org.scalablytyped.runtime.StringDictionary
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 import slinky.core.FunctionalComponent
@@ -56,14 +57,16 @@ import scala.util.{Failure, Success}
     makeStyles(stylesCallback, WithStylesOptions())
   }
 
-  private val initialState = State(
-    loading = false,
-    error = None,
-    title = AppStrings.verifyingEmail,
-    message = AppStrings.waitAMomentPlease
-  )
-
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
+    val texts = I18nHooks.useMessages(props.ctx.$lang)
+
+    val initialState = State(
+      loading = false,
+      error = None,
+      title = texts.verifyingEmail,
+      message = texts.waitAMomentPlease
+    )
+
     val classes = useStyles(())
     val history = useHistory()
     val params = useParams()
@@ -76,21 +79,21 @@ import scala.util.{Failure, Success}
         case Some(emailCode) =>
           props.ctx.api.client.verifyEmail(VerifyEmail.Request(emailCode)).onComplete {
             case Success(_) =>
-              val title = AppStrings.successfulEmailVerification
-              val message = AppStrings.goingToBeRedirected
+              val title = texts.successfulEmailVerification
+              val message = texts.goingToBeRedirected
               setState(_.copy(loading = false, title = title, message = message))
               setTimeout(2000) {
                 history.push("/signin")
               }
 
             case Failure(ex) =>
-              val title = AppStrings.failedEmailVerification
+              val title = texts.failedEmailVerification
               val message = ex.getMessage
               setState(_.copy(loading = false, title = title, message = message, error = Some(message)))
           }
         case None =>
-          val title = AppStrings.failedEmailVerification
-          val message = "Invalid verification token"
+          val title = texts.failedEmailVerification
+          val message = texts.invalidVerificationToken
           setState(_.copy(loading = false, title = title, message = message, error = Some(message)))
       }
     }

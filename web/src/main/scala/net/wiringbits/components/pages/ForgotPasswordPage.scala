@@ -13,7 +13,8 @@ import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
 import net.wiringbits.components.widgets.{AppCard, ForgotPasswordForm}
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.Alignment
-import net.wiringbits.{AppContext, AppStrings}
+import net.wiringbits.AppContext
+import net.wiringbits.core.I18nHooks
 import org.scalablytyped.runtime.StringDictionary
 import slinky.core.FunctionalComponent
 import slinky.core.annotations.react
@@ -35,6 +36,7 @@ import typings.reactRouterDom.mod.useHistory
   }
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
+    val texts = I18nHooks.useMessages(props.ctx.$lang)
     val classes = useStyles(())
     val history = useHistory()
 
@@ -47,18 +49,18 @@ import typings.reactRouterDom.mod.useHistory
           Fragment(
             Container(
               alignItems = Alignment.center,
-              child = mui.Typography(AppStrings.recoverYourPassword).variant(muiStrings.h5)
+              child = mui.Typography(texts.recoverYourPassword).variant(muiStrings.h5)
             ),
-            ForgotPasswordForm(props.ctx.api, props.ctx.recaptchaKey),
+            ForgotPasswordForm(props.ctx),
             Container(
               margin = Container.EdgeInsets.top(8),
               flexDirection = Container.FlexDirection.row,
               alignItems = Container.Alignment.center,
               justifyContent = Container.Alignment.center,
               child = Fragment(
-                mui.Typography(AppStrings.dontHaveAccountYet),
+                mui.Typography(texts.dontHaveAccountYet),
                 mui
-                  .Button(AppStrings.signUp)
+                  .Button(texts.signUp)
                   .variant(muiStrings.text)
                   .color(muiStrings.primary)
                   .onClick(_ => history.push("/signUp"))

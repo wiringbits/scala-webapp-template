@@ -2,12 +2,12 @@ package net.wiringbits.models
 
 import enumeratum.{Enum, EnumEntry}
 
-sealed abstract class UserMenuOption(val label: String) extends EnumEntry with Product with Serializable
+sealed abstract class UserMenuOption extends EnumEntry with Product with Serializable
 
 object UserMenuOption extends Enum[UserMenuOption] {
 
-  final case object EditSummary extends UserMenuOption("Summary")
-  final case object EditPassword extends UserMenuOption("Change password")
+  final case object EditSummary extends UserMenuOption
+  final case object EditPassword extends UserMenuOption
 
   val values = findValues
 }
