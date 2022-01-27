@@ -15,7 +15,7 @@ class ConfigModule extends AbstractModule {
   @Singleton
   def jwtConfig(global: Configuration): JwtConfig = {
     val config = JwtConfig(global.get[Configuration]("jwt"))
-    logger.info(s"Loading jwtConfig, secret = ${config.secret}")
+    logger.info(s"Config loaded: $config")
     config
   }
 
@@ -23,7 +23,7 @@ class ConfigModule extends AbstractModule {
   @Singleton
   def recaptchaConfig(global: Configuration): ReCaptchaConfig = {
     val config = ReCaptchaConfig(global.get[Configuration]("recaptcha"))
-    logger.info(s"Loading reCaptchaConfig, secret = ${config.secret}")
+    logger.info(s"Config loaded: $config")
     config
   }
 
@@ -31,7 +31,7 @@ class ConfigModule extends AbstractModule {
   @Singleton
   def emailConfig(global: Configuration): EmailConfig = {
     val config = EmailConfig(global.get[Configuration]("email"))
-    logger.info(s"Loading emailConfig, senderAddress = ${config.senderAddress}")
+    logger.info(s"Config loaded: $config")
     config
   }
 
@@ -39,7 +39,7 @@ class ConfigModule extends AbstractModule {
   @Singleton
   def webAppConfig(global: Configuration): WebAppConfig = {
     val config = WebAppConfig(global.get[Configuration]("webapp"))
-    logger.info(s"Loading webAppConfig, host = ${config.host}")
+    logger.info(s"Config loaded: $config")
     config
   }
 
@@ -47,9 +47,7 @@ class ConfigModule extends AbstractModule {
   @Singleton
   def userTokensConfig(global: Configuration): UserTokensConfig = {
     val config = UserTokensConfig(global.get[Configuration]("userTokens"))
-    logger.info(
-      s"Loading userTokensConfig, emailVerificationExp = ${config.emailVerificationExp}, resetPasswordExp = ${config.resetPasswordExp}"
-    )
+    logger.info(s"Config loaded: $config")
     config
   }
 
@@ -57,9 +55,7 @@ class ConfigModule extends AbstractModule {
   @Singleton
   def awsConfig(global: Configuration): AWSConfig = {
     val config = AWSConfig(global.get[Configuration]("aws"))
-    logger.info(
-      s"Loading AWSConfig, accessKeyId = ${config.accessKeyId}, secretAccessKey = ${config.secretAccessKey}, region = ${config.region}"
-    )
+    logger.info(s"Config loaded: $config")
     config
   }
 }

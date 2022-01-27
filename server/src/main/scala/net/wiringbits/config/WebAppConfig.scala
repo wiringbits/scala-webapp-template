@@ -2,7 +2,11 @@ package net.wiringbits.config
 
 import play.api.Configuration
 
-case class WebAppConfig(host: String)
+case class WebAppConfig(host: String) {
+  override def toString: String = {
+    s"WebAppConfig(host = $host)"
+  }
+}
 
 object WebAppConfig {
   def apply(config: Configuration): WebAppConfig = {

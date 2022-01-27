@@ -2,13 +2,13 @@ package net.wiringbits.util
 
 object StringUtils {
 
-  def mask(value: String, prefixSize: Int, suffixSize: Int): String =
+  def mask(value: String, prefixSize: Int, suffixSize: Int): String = {
     if (value.length <= prefixSize + suffixSize + 4) {
-      // if is not secure to display this string, hide everything
       "..."
     } else {
       s"${value.take(prefixSize)}...${value.takeRight(suffixSize)}"
     }
+  }
 
   object Implicits {
 
