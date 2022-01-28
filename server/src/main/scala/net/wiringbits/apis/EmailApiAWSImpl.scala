@@ -43,11 +43,12 @@ class EmailApiAWSImpl @Inject() (
         .destination(destination)
         .message(message)
         .build()
-      val response = client.sendEmail(request).toScala
-      logger.info(
-        s"Email sent, to: ${emailRequest.destination}, subject = ${emailRequest.message.subject}, messageId = ${response
-          .map(_.messageId())}"
-      )
+      for {
+        response <- client.sendEmail(request).toScala
+        _ = logger.info(
+          s"Email sent, to: ${emailRequest.destination}, subject = ${emailRequest.message.subject}, messageId = ${response.messageId()}"
+        )
+      } yield ()
     } catch {
       case ex: Exception =>
         throw new RuntimeException(
