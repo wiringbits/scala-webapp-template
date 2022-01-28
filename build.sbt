@@ -305,12 +305,12 @@ lazy val server = (project in file("server"))
       "com.github.jwt-scala" %% "jwt-core" % "9.0.3",
       "de.svenkubiak" % "jBCrypt" % "0.4.3",
       "commons-validator" % "commons-validator" % "1.7",
-      "com.dimafeng" %% "testcontainers-scala-scalatest" % "0.39.12" % "test",
-      "com.dimafeng" %% "testcontainers-scala-postgresql" % "0.39.12" % "test",
+      "com.dimafeng" %% "testcontainers-scala-scalatest" % "0.40.0" % "test",
+      "com.dimafeng" %% "testcontainers-scala-postgresql" % "0.40.0" % "test",
       "com.softwaremill.sttp.client3" %% "core" % sttp % "test",
       "com.softwaremill.sttp.client3" %% "async-http-client-backend-future" % sttp % "test",
       "net.wiringbits" %% "admin-data-explorer-play-server" % webappUtils,
-      "software.amazon.awssdk" % "ses" % "2.17.119",
+      "software.amazon.awssdk" % "ses" % "2.17.120",
       "jakarta.xml.bind" % "jakarta.xml.bind-api" % "3.0.1"
     )
   )
