@@ -37,7 +37,7 @@ class SendNotificationAction @Inject() (
     user = userMaybe.getOrElse(throw new RuntimeException(s"User with id ${notification.userId} wasn't found"))
     emailMessage = EmailMessage(subject = notification.subject, body = notification.message)
     emailRequest = EmailRequest(user.email, emailMessage)
-    _ = emailApi.sendEmail(emailRequest)
+    _ <- emailApi.sendEmail(emailRequest)
     _ <- userNotificationsRepository.setStatusToSuccess(notification.id)
   } yield ()
 }

@@ -13,7 +13,7 @@ import scala.concurrent.Future
 class UserNotificationsRepository @Inject() (database: Database)(implicit ec: DatabaseExecutionContext) {
   def getPendingNotifications: Future[List[UserNotification]] = Future {
     database.withConnection { implicit conn =>
-      UserNotificationsDAO.getPendingNotifications
+      UserNotificationsDAO.getPendingNotifications()
     }
   }
 

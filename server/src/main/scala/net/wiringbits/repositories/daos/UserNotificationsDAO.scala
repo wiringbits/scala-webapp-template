@@ -27,11 +27,11 @@ object UserNotificationsDAO {
       .execute()
   }
 
-  def getPendingNotifications(implicit conn: Connection): List[UserNotification] = {
+  def getPendingNotifications()(implicit conn: Connection): List[UserNotification] = {
     SQL"""
-      SELECT user_notification_id, user_id, subject, message, notification_type, status, status_details, error_count, execute_at, created_at, updated_at
+      SELECT user_notification_id, user_id, notification_type, subject, message, status, status_details, error_count, execute_at, created_at, updated_at
       FROM user_notifications
-      WHERE status != ${NotificationStatus.Success.toString}::TEXT
+      WHERE status != ${NotificationStatus.Success.toString}
         AND execute_at <= NOW()
       ORDER BY created_at, user_notification_id
       """.as(userNotificationParser.*)
