@@ -1,8 +1,6 @@
 package net.wiringbits.actions
 
 import net.wiringbits.api.models.VerifyEmail
-import net.wiringbits.apis.EmailApi
-import net.wiringbits.apis.models.EmailRequest
 import net.wiringbits.config.UserTokensConfig
 import net.wiringbits.repositories.{UserTokensRepository, UsersRepository}
 import net.wiringbits.util.{EmailMessage, TokensHelper}
@@ -16,8 +14,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class VerifyUserEmailAction @Inject() (
     usersRepository: UsersRepository,
     userTokensRepository: UserTokensRepository,
-    userTokensConfig: UserTokensConfig,
-    emailApi: EmailApi
+    userTokensConfig: UserTokensConfig
 )(implicit
     ec: ExecutionContext,
     clock: Clock
@@ -35,7 +32,7 @@ class VerifyUserEmailAction @Inject() (
     _ = ValidateUserToken(userToken)
 
     // then, the user is marked as verified
-    _ <- usersRepository.verify(userId = userId, tokenId = userToken.id)
-    _ = emailApi.sendEmail(EmailRequest(user.email, EmailMessage.confirm(user.name)))
+    emailMessage = EmailMessage.confirm(user.name)
+    _ <- usersRepository.verify(userId = userId, tokenId = userToken.id, emailMessage)
   } yield VerifyEmail.Response()
 }

@@ -1,8 +1,7 @@
 package net.wiringbits.actions
 
 import net.wiringbits.api.models.CreateUser
-import net.wiringbits.apis.models.EmailRequest
-import net.wiringbits.apis.{EmailApi, ReCaptchaApi}
+import net.wiringbits.apis.ReCaptchaApi
 import net.wiringbits.config.{UserTokensConfig, WebAppConfig}
 import net.wiringbits.repositories
 import net.wiringbits.repositories.UsersRepository
@@ -19,8 +18,7 @@ class CreateUserAction @Inject() (
     reCaptchaApi: ReCaptchaApi,
     tokenGenerator: TokenGenerator,
     userTokensConfig: UserTokensConfig,
-    webAppConfig: WebAppConfig,
-    emailApi: EmailApi
+    webAppConfig: WebAppConfig
 )(implicit
     ec: ExecutionContext
 ) {
@@ -41,16 +39,13 @@ class CreateUserAction @Inject() (
           hashedPassword = hashedPassword,
           verifyEmailToken = hmacToken
         )
-      _ <- usersRepository.create(createUser)
-
-      // then, send the verification email
       emailParameter = s"${createUser.id}_$token"
-      emailRequest = EmailMessage.registration(
+      emailMessage = EmailMessage.registration(
         name = createUser.name,
         url = webAppConfig.host,
         emailParameter = emailParameter
       )
-      _ = emailApi.sendEmail(EmailRequest(request.email, emailRequest))
+      _ <- usersRepository.create(createUser, emailMessage)
     } yield CreateUser.Response(id = createUser.id, email = createUser.email, name = createUser.name)
   }
 
