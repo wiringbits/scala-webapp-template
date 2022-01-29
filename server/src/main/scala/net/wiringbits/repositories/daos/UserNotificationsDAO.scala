@@ -23,7 +23,7 @@ object UserNotificationsDAO {
         ${request.status.toString}::TEXT,
         ${request.executeAt}::TIMESTAMPTZ,
         ${request.createdAt}::TIMESTAMPTZ,
-        ${request.updatedAt}::TIMESTAMPTZ,
+        ${request.updatedAt}::TIMESTAMPTZ
       )
       """
       .execute()
@@ -49,7 +49,7 @@ object UserNotificationsDAO {
         status_details = $failReason,
         error_count = error_count + 1,
         execute_at = $executeAt::TIMESTAMPTZ,
-        updated_at = ${Instant.now()}
+        updated_at = ${Instant.now()}::TIMESTAMPTZ
       WHERE user_notification_id = ${notificationId.toString}::UUID
       """
       .execute()
