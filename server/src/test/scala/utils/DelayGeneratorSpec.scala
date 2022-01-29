@@ -4,8 +4,6 @@ import net.wiringbits.util.DelayGenerator
 import org.scalatest.matchers.must.Matchers.{be, convertToAnyMustWrapper}
 import org.scalatest.wordspec.AnyWordSpec
 
-import scala.collection.mutable.ListBuffer
-
 class DelayGeneratorSpec extends AnyWordSpec {
 
   "createDelay" should {
