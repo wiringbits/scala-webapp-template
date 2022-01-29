@@ -38,7 +38,7 @@ object UserNotificationsDAO {
       WHERE status != ${NotificationStatus.Success.toString}
         AND execute_at <= ${clock.instant()}
         AND error_count < $allowedErrors 
-      ORDER BY created_at, user_notification_id
+      ORDER BY execute_at, user_notification_id
       """.as(userNotificationParser.*)
   }
 
