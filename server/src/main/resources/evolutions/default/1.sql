@@ -60,3 +60,4 @@ CREATE TABLE user_notifications (
 );
 
 CREATE INDEX user_notifications_user_id_index ON user_notifications USING BTREE (user_id);
+CREATE INDEX user_notifications_execute_at_index ON user_notifications USING BTREE (execute_at);

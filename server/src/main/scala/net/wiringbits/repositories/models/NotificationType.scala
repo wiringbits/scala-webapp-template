@@ -6,11 +6,9 @@ import enumeratum.{Enum, EnumEntry}
 sealed trait NotificationType extends EnumEntry with Uppercase
 
 object NotificationType extends Enum[NotificationType] {
-  final case object EmailRegistration extends NotificationType
-  final case object VerifyAccount extends NotificationType
-  final case object ForgotPassword extends NotificationType
-  final case object ResetPassword extends NotificationType
-  final case object UpdatePassword extends NotificationType
+  final case object EmailVerified extends NotificationType
+  final case object PasswordReset extends NotificationType
+  final case object PasswordUpdated extends NotificationType
 
   val values = findValues
 }

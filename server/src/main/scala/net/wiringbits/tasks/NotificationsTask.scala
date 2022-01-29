@@ -2,11 +2,12 @@ package net.wiringbits.tasks
 
 import akka.actor.ActorSystem
 import com.google.inject.Inject
-import net.wiringbits.actions.{GetPendingNotificationsAction, SendNotificationAction}
+import net.wiringbits.actions.internal.{GetPendingNotificationsAction, SendNotificationAction}
 import net.wiringbits.config.NotificationsConfig
 import org.slf4j.LoggerFactory
 
 import scala.concurrent.ExecutionContext
+import scala.util.{Failure, Success}
 
 class NotificationsTask @Inject() (
     notificationsConfig: NotificationsConfig,
@@ -19,17 +20,31 @@ class NotificationsTask @Inject() (
   val logger = LoggerFactory.getLogger(this.getClass)
 
   logger.info("Starting the notifications task")
-  actorSystem.scheduler.scheduleAtFixedRate(
-    notificationsConfig.delayedInit,
+  actorSystem.scheduler.scheduleOnce(
     notificationsConfig.interval
-  ) { () =>
+  ) {
     run()
   }
 
   def run(): Unit = {
-    getPendingNotifications.apply.foreach { notifications =>
-      logger.info(s"There's ${notifications.size} pending notifications")
-      notifications.foreach(notification => sendNotificationAction(notification))
-    }
+    logger.info("Looking for notifications")
+    getPendingNotifications()
+      .onComplete {
+        case Failure(exception) => logger.error("Failed to get notifications", exception)
+        case Success(notifications) =>
+          logger.info(s"There's ${notifications.size} pending notifications")
+          notifications.foreach { notification =>
+            {
+              sendNotificationAction(notification).onComplete {
+                case Failure(ex) =>
+                  logger.info(s"There was an error trying to send notification with id = ${notification.id}", ex)
+                case Success(_) => ()
+              }
+            }
+          }
+      }
+
+    actorSystem.scheduler.scheduleOnce(notificationsConfig.interval) { run() }
+    ()
   }
 }

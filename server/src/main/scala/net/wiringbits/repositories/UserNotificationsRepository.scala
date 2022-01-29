@@ -5,12 +5,12 @@ import net.wiringbits.repositories.daos.UserNotificationsDAO
 import net.wiringbits.repositories.models.UserNotification
 import play.api.db.Database
 
-import java.time.Instant
+import java.time.{Clock, Instant}
 import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class UserNotificationsRepository @Inject() (database: Database)(implicit ec: DatabaseExecutionContext) {
+class UserNotificationsRepository @Inject() (database: Database)(implicit ec: DatabaseExecutionContext, clock: Clock) {
   def getPendingNotifications: Future[List[UserNotification]] = Future {
     database.withConnection { implicit conn =>
       UserNotificationsDAO.getPendingNotifications()

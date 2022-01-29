@@ -9,7 +9,6 @@ import software.amazon.awssdk.services.ses.model._
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.compat.java8.FutureConverters._
 import scala.concurrent.{Future, blocking}
 
 class EmailApiAWSImpl @Inject() (
@@ -43,12 +42,8 @@ class EmailApiAWSImpl @Inject() (
         .destination(destination)
         .message(message)
         .build()
-      for {
-        response <- client.sendEmail(request).toScala
-        _ = logger.info(
-          s"Email sent, to: ${emailRequest.destination}, subject = ${emailRequest.message.subject}, messageId = ${response.messageId()}"
-        )
-      } yield ()
+      client.sendEmail(request)
+      logger.info(s"Email sent, to: ${emailRequest.destination}, subject = ${emailRequest.message.subject}")
     } catch {
       case ex: Exception =>
         throw new RuntimeException(

@@ -22,7 +22,7 @@ class UsersRepository @Inject() (
     clock: Clock
 ) {
 
-  def create(request: User.CreateUser, emailMessage: EmailMessage): Future[Unit] = Future {
+  def create(request: User.CreateUser): Future[Unit] = Future {
     val createToken = UserToken.Create(
       id = UUID.randomUUID(),
       token = request.verifyEmailToken,
@@ -30,16 +30,6 @@ class UsersRepository @Inject() (
       createdAt = clock.instant(),
       expiresAt = clock.instant().plus(userTokensConfig.emailVerificationExp.toHours, ChronoUnit.HOURS),
       userId = request.id
-    )
-
-    val createNotification = UserNotification.Create(
-      id = UUID.randomUUID(),
-      userId = request.id,
-      notificationType = NotificationType.EmailRegistration,
-      subject = emailMessage.subject,
-      message = emailMessage.body,
-      status = NotificationStatus.Pending,
-      executeAt = clock.instant()
     )
 
     database.withTransaction { implicit conn =>
@@ -52,7 +42,6 @@ class UsersRepository @Inject() (
           s"Account created, name = ${request.name}, email = ${request.email}"
         )
       )
-      UserNotificationsDAO.create(createNotification)
     }
   }
 
@@ -91,11 +80,13 @@ class UsersRepository @Inject() (
     val createNotification = UserNotification.Create(
       id = UUID.randomUUID(),
       userId = userId,
-      notificationType = NotificationType.UpdatePassword,
+      notificationType = NotificationType.PasswordUpdated,
       subject = emailMessage.subject,
       message = emailMessage.body,
       status = NotificationStatus.Pending,
-      executeAt = clock.instant()
+      executeAt = clock.instant(),
+      createdAt = clock.instant(),
+      updatedAt = clock.instant()
     )
 
     database.withTransaction { implicit conn =>
@@ -110,11 +101,13 @@ class UsersRepository @Inject() (
     val createNotification = UserNotification.Create(
       id = UUID.randomUUID(),
       userId = userId,
-      notificationType = NotificationType.VerifyAccount,
+      notificationType = NotificationType.EmailVerified,
       subject = emailMessage.subject,
       message = emailMessage.body,
       status = NotificationStatus.Pending,
-      executeAt = clock.instant()
+      executeAt = clock.instant(),
+      createdAt = clock.instant(),
+      updatedAt = clock.instant()
     )
 
     database.withTransaction { implicit conn =>
@@ -135,11 +128,13 @@ class UsersRepository @Inject() (
     val createNotification = UserNotification.Create(
       id = UUID.randomUUID(),
       userId = userId,
-      notificationType = NotificationType.ResetPassword,
+      notificationType = NotificationType.PasswordReset,
       subject = emailMessage.subject,
       message = emailMessage.body,
       status = NotificationStatus.Pending,
-      executeAt = clock.instant()
+      executeAt = clock.instant(),
+      createdAt = clock.instant(),
+      updatedAt = clock.instant()
     )
 
     database.withTransaction { implicit conn =>

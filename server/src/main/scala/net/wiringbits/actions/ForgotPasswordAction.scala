@@ -1,7 +1,8 @@
 package net.wiringbits.actions
 
 import net.wiringbits.api.models.ForgotPassword
-import net.wiringbits.apis.ReCaptchaApi
+import net.wiringbits.apis.{EmailApi, ReCaptchaApi}
+import net.wiringbits.apis.models.EmailRequest
 import net.wiringbits.config.{UserTokensConfig, WebAppConfig}
 import net.wiringbits.repositories.models.{User, UserToken, UserTokenType}
 import net.wiringbits.repositories.{UserTokensRepository, UsersRepository}
@@ -19,6 +20,7 @@ class ForgotPasswordAction @Inject() (
     webAppConfig: WebAppConfig,
     captchaApi: ReCaptchaApi,
     usersRepository: UsersRepository,
+    emailApi: EmailApi,
     userTokensRepository: UserTokensRepository,
     tokenGenerator: TokenGenerator
 )(implicit
@@ -51,7 +53,8 @@ class ForgotPasswordAction @Inject() (
     ValidateVerifiedUser(user)
     val emailMessage = EmailMessage.forgotPassword(user.name, webAppConfig.host, s"${user.id}_$token")
     for {
-      _ <- userTokensRepository.create(createToken, emailMessage)
+      _ <- userTokensRepository.create(createToken)
+      _ <- emailApi.sendEmail(EmailRequest(user.email, emailMessage))
     } yield ()
   }
 }

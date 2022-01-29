@@ -10,7 +10,7 @@ case class UserNotification(
     subject: String,
     message: String,
     status: NotificationStatus,
-    statusDetails: String,
+    statusDetails: Option[String],
     errorCount: Int,
     executeAt: Instant,
     createdAt: Instant,
@@ -25,6 +25,8 @@ object UserNotification {
       subject: String,
       message: String,
       status: NotificationStatus,
-      executeAt: Instant
+      executeAt: Instant,
+      createdAt: Instant,
+      updatedAt: Instant
   )
 }
