@@ -5,7 +5,6 @@ import net.wiringbits.repositories.daos.UserTokensDAO
 import net.wiringbits.repositories.models.UserToken
 import play.api.db.Database
 
-import java.time.Clock
 import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.Future
@@ -13,8 +12,7 @@ import scala.concurrent.Future
 class UserTokensRepository @Inject() (
     database: Database
 )(implicit
-    ec: DatabaseExecutionContext,
-    clock: Clock
+    ec: DatabaseExecutionContext
 ) {
 
   def create(request: UserToken.Create): Future[Unit] = Future {
