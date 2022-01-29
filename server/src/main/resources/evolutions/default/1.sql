@@ -42,7 +42,7 @@ CREATE TABLE user_tokens (
 
 CREATE INDEX user_tokens_user_id_index ON user_tokens USING BTREE (user_id);
 
---contains the status for notifications
+-- Stores the notifications we are sending to the user from a background job
 CREATE TABLE user_notifications (
     user_notification_id UUID NOT NULL,
     user_id UUID NOT NULL,
@@ -52,7 +52,7 @@ CREATE TABLE user_notifications (
     status TEXT NOT NULL, -- pending/success/failed,
     status_details TEXT NULL, -- if failed, what was the reason
     error_count INT DEFAULT 0,
-    execute_at TIMESTAMPTZ NOT NULL,
+    execute_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     CONSTRAINT user_notifications_user_notification_id_pk PRIMARY KEY (user_notification_id),

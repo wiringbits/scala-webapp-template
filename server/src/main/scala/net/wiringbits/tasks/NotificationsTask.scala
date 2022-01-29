@@ -27,19 +27,18 @@ class NotificationsTask @Inject() (
   }
 
   def run(): Unit = {
-    logger.info("Looking for notifications")
     getPendingNotifications()
       .onComplete {
         case Failure(exception) => logger.error("Failed to get notifications", exception)
         case Success(notifications) =>
-          logger.info(s"There's ${notifications.size} pending notifications")
+          val message = s"There's ${notifications.size} pending notifications"
+          if (notifications.isEmpty) logger.trace(message)
+          else logger.info(message)
           notifications.foreach { notification =>
-            {
-              sendNotificationAction(notification).onComplete {
-                case Failure(ex) =>
-                  logger.info(s"There was an error trying to send notification with id = ${notification.id}", ex)
-                case Success(_) => ()
-              }
+            sendNotificationAction(notification).onComplete {
+              case Failure(ex) =>
+                logger.info(s"There was an error trying to send notification with id = ${notification.id}", ex)
+              case Success(_) => ()
             }
           }
       }

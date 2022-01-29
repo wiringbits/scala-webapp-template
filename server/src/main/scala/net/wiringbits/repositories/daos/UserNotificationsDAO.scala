@@ -29,13 +29,15 @@ object UserNotificationsDAO {
       .execute()
   }
 
-  def getPendingNotifications()(implicit conn: Connection, clock: Clock): List[UserNotification] = {
+  def getPendingNotifications(
+      allowedErrors: Int = 10
+  )(implicit conn: Connection, clock: Clock): List[UserNotification] = {
     SQL"""
       SELECT user_notification_id, user_id, notification_type, subject, message, status, status_details, error_count, execute_at, created_at, updated_at
       FROM user_notifications
       WHERE status != ${NotificationStatus.Success.toString}
         AND execute_at <= ${clock.instant()}
-        AND error_count < 10 
+        AND error_count < $allowedErrors 
       ORDER BY created_at, user_notification_id
       """.as(userNotificationParser.*)
   }
