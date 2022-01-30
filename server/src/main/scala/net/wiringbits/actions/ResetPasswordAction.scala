@@ -1,8 +1,6 @@
 package net.wiringbits.actions
 
 import net.wiringbits.api.models.ResetPassword
-import net.wiringbits.apis.EmailApi
-import net.wiringbits.apis.models.EmailRequest
 import net.wiringbits.common.models.Password
 import net.wiringbits.config.{JwtConfig, UserTokensConfig}
 import net.wiringbits.repositories.{UserTokensRepository, UsersRepository}
@@ -19,7 +17,6 @@ class ResetPasswordAction @Inject() (
     userTokensConfig: UserTokensConfig,
     jwtConfig: JwtConfig,
     usersRepository: UsersRepository,
-    emailApi: EmailApi,
     userTokensRepository: UserTokensRepository
 )(implicit
     ec: ExecutionContext,
@@ -38,11 +35,8 @@ class ResetPasswordAction @Inject() (
       // We trigger the reset password flow
       userMaybe <- usersRepository.find(userId)
       user = userMaybe.getOrElse(throw new RuntimeException(s"User with id $userId wasn't found"))
-      _ <- usersRepository.resetPassword(userId, hashedPassword)
-
-      // Sending a confirmation email
       emailMessage = EmailMessage.resetPassword(user.name)
-      _ = emailApi.sendEmail(EmailRequest(user.email, emailMessage))
+      _ <- usersRepository.resetPassword(userId, hashedPassword, emailMessage)
 
       // And, returning the auth token
       jwt = JwtUtils.createToken(jwtConfig, user.id)(clock)

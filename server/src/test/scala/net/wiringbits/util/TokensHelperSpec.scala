@@ -1,6 +1,5 @@
-package utils
+package net.wiringbits.util
 
-import net.wiringbits.util.TokensHelper
 import org.scalatest.matchers.must.Matchers.{be, convertToAnyMustWrapper, empty}
 import org.scalatest.wordspec.AnyWordSpec
 

@@ -3,8 +3,9 @@ package net.wiringbits.repositories
 import net.wiringbits.common.models.{Email, Name}
 import net.wiringbits.config.UserTokensConfig
 import net.wiringbits.executors.DatabaseExecutionContext
-import net.wiringbits.repositories.daos.{UserLogsDAO, UserTokensDAO, UsersDAO}
-import net.wiringbits.repositories.models.{User, UserLog, UserToken, UserTokenType}
+import net.wiringbits.repositories.daos.{UserLogsDAO, UserNotificationsDAO, UserTokensDAO, UsersDAO}
+import net.wiringbits.repositories.models._
+import net.wiringbits.util.EmailMessage
 import play.api.db.Database
 
 import java.time.Clock
@@ -13,7 +14,10 @@ import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class UsersRepository @Inject() (database: Database, userTokensConfig: UserTokensConfig)(implicit
+class UsersRepository @Inject() (
+    database: Database,
+    userTokensConfig: UserTokensConfig
+)(implicit
     ec: DatabaseExecutionContext,
     clock: Clock
 ) {
@@ -72,15 +76,40 @@ class UsersRepository @Inject() (database: Database, userTokensConfig: UserToken
     }
   }
 
-  def updatePassword(userId: UUID, password: String): Future[Unit] = Future {
+  def updatePassword(userId: UUID, password: String, emailMessage: EmailMessage): Future[Unit] = Future {
+    val createNotification = UserNotification.Create(
+      id = UUID.randomUUID(),
+      userId = userId,
+      notificationType = NotificationType.PasswordUpdated,
+      subject = emailMessage.subject,
+      message = emailMessage.body,
+      status = NotificationStatus.Pending,
+      executeAt = clock.instant(),
+      createdAt = clock.instant(),
+      updatedAt = clock.instant()
+    )
+
     database.withTransaction { implicit conn =>
       UsersDAO.resetPassword(userId, password)
       val request = UserLog.CreateUserLog(UUID.randomUUID(), userId, "Password was updated")
       UserLogsDAO.create(request)
+      UserNotificationsDAO.create(createNotification)
     }
   }
 
-  def verify(userId: UUID, tokenId: UUID): Future[Unit] = Future {
+  def verify(userId: UUID, tokenId: UUID, emailMessage: EmailMessage): Future[Unit] = Future {
+    val createNotification = UserNotification.Create(
+      id = UUID.randomUUID(),
+      userId = userId,
+      notificationType = NotificationType.EmailVerified,
+      subject = emailMessage.subject,
+      message = emailMessage.body,
+      status = NotificationStatus.Pending,
+      executeAt = clock.instant(),
+      createdAt = clock.instant(),
+      updatedAt = clock.instant()
+    )
+
     database.withTransaction { implicit conn =>
       UsersDAO.verify(userId)
       UserLogsDAO.create(
@@ -91,14 +120,28 @@ class UsersRepository @Inject() (database: Database, userTokensConfig: UserToken
         )
       )
       UserTokensDAO.delete(tokenId = tokenId, userId = userId)
+      UserNotificationsDAO.create(createNotification)
     }
   }
 
-  def resetPassword(userId: UUID, password: String): Future[Unit] = Future {
+  def resetPassword(userId: UUID, password: String, emailMessage: EmailMessage): Future[Unit] = Future {
+    val createNotification = UserNotification.Create(
+      id = UUID.randomUUID(),
+      userId = userId,
+      notificationType = NotificationType.PasswordReset,
+      subject = emailMessage.subject,
+      message = emailMessage.body,
+      status = NotificationStatus.Pending,
+      executeAt = clock.instant(),
+      createdAt = clock.instant(),
+      updatedAt = clock.instant()
+    )
+
     database.withTransaction { implicit conn =>
       UsersDAO.resetPassword(userId, password)
       val request = UserLog.CreateUserLog(UUID.randomUUID(), userId, "Password was reset")
       UserLogsDAO.create(request)
+      UserNotificationsDAO.create(createNotification)
     }
   }
 }

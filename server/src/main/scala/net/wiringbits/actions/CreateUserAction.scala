@@ -45,12 +45,12 @@ class CreateUserAction @Inject() (
 
       // then, send the verification email
       emailParameter = s"${createUser.id}_$token"
-      emailRequest = EmailMessage.registration(
+      emailMessage = EmailMessage.registration(
         name = createUser.name,
         url = webAppConfig.host,
         emailParameter = emailParameter
       )
-      _ = emailApi.sendEmail(EmailRequest(request.email, emailRequest))
+      _ <- emailApi.sendEmail(EmailRequest(request.email, emailMessage))
     } yield CreateUser.Response(id = createUser.id, email = createUser.email, name = createUser.name)
   }
 
