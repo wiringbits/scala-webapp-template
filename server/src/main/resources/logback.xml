@@ -37,6 +37,7 @@
     </appender>
 
     <logger name="play" level="INFO" />
+    <logger name="akka" level="DEBUG" />
     <logger name="net.wiringbits" level="DEBUG" />
     <logger name="controllers" level="DEBUG" />
 

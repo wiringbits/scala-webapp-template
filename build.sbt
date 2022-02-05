@@ -311,7 +311,8 @@ lazy val server = (project in file("server"))
       "com.softwaremill.sttp.client3" %% "async-http-client-backend-future" % sttp % "test",
       "net.wiringbits" %% "admin-data-explorer-play-server" % webappUtils,
       "software.amazon.awssdk" % "ses" % "2.17.126",
-      "jakarta.xml.bind" % "jakarta.xml.bind-api" % "3.0.1"
+      "jakarta.xml.bind" % "jakarta.xml.bind-api" % "3.0.1",
+      "com.typesafe.akka" %% "akka-cluster-typed" % "2.6.18"
     )
   )
 
