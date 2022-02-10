@@ -1,6 +1,7 @@
 
 -- !Ups
 
+CREATE EXTENSION IF NOT EXISTS CITEXT;
 
 -- The users table has the minimum necessary data
 CREATE TABLE users(
