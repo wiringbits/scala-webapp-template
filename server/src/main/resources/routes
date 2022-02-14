@@ -5,6 +5,9 @@
 
 GET /health controllers.HealthController.check()
 
+
+GET /ws controllers.HealthController.getWs()
+
 # create new user (public)
 POST /users controllers.UsersController.create()
 # login user (public)

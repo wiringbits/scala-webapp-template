@@ -55,7 +55,7 @@ class EchoActorModule extends AbstractModule with AkkaGuiceSupport {
 
   private def actor: Behavior[String] = Behaviors.setup { context =>
     Behaviors.receiveMessage { msg =>
-      context.log.info(s"Got msg: ${msg}")
+      context.log.info(s"Got message: ${msg}")
       Behaviors.same
     }
   }
