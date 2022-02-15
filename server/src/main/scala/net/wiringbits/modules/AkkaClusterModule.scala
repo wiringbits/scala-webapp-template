@@ -7,6 +7,8 @@ import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.scaladsl.adapter._
 import akka.cluster.typed.Cluster
 import com.google.inject.{AbstractModule, Provides}
+import net.wiringbits.actors.{ClusterSubscriberActor, ConnectionManagerActor}
+import net.wiringbits.models.{UserMessage, UserPointsChangedEvent}
 import play.api.libs.concurrent.AkkaGuiceSupport
 
 import javax.inject.{Inject, Provider, Singleton}
@@ -19,30 +21,22 @@ import javax.inject.{Inject, Provider, Singleton}
 class AkkaClusterModule extends AbstractModule with AkkaGuiceSupport {
   override def configure(): Unit = {
     // It is important to create the cluster when the application start, otherwise, the application
-    // won't use the clustered mode.
     bind(classOf[Cluster])
       .toProvider(classOf[AkkaClusterModule.CustomProvider])
       .asEagerSingleton()
-
-//    val x: Topic.Command[String] = ???
-//    topic ! Topic.Subscribe(context)
-//    topic ! Topic.Publish("Hello Subscribers!")
-
-//    bindTypedActor(Topic[String]("my-topic"), "topic-actor")
-    println("Binding sample actor")
     bindTypedActor(actor, "sample-actor")
   }
 
   @Provides
   @Singleton
   def topicActor(system: ActorSystem): TopicActor = {
-    val ref = system.toTyped.systemActorOf(Topic[String]("my-topic"), "topic-actor")
+    val ref = system.toTyped.systemActorOf(Topic[UserMessage]("my-topic"), "topic-actor")
     TopicActor(ref)
   }
 
-  def actor: Behavior[String] = Behaviors.setup { context =>
-    Behaviors.receiveMessage { msg =>
-      context.log.info(s"Got msg: ${msg}")
+  def actor: Behavior[UserMessage] = Behaviors.setup { context =>
+    Behaviors.receiveMessage { case x: UserPointsChangedEvent =>
+      context.log.info(s"Got msg: $x")
       Behaviors.same
     }
   }
@@ -53,7 +47,7 @@ class EchoActorModule extends AbstractModule with AkkaGuiceSupport {
     bindTypedActor(actor, "sample-echo-actor")
   }
 
-  private def actor: Behavior[String] = Behaviors.setup { context =>
+  private def actor: Behavior[UserMessage] = Behaviors.setup { context =>
     Behaviors.receiveMessage { msg =>
       context.log.info(s"Got message: ${msg}")
       Behaviors.same
@@ -61,11 +55,31 @@ class EchoActorModule extends AbstractModule with AkkaGuiceSupport {
   }
 }
 
-case class TopicActor(ref: ActorRef[Topic.Command[String]])
+case class TopicActor(ref: ActorRef[Topic.Command[UserMessage]])
 
 object AkkaClusterModule {
   @Singleton
   class CustomProvider @Inject() (actorSystem: ActorSystem) extends Provider[Cluster] {
     val get: Cluster = Cluster(actorSystem.toTyped)
+  }
+
+  @Provides
+  @Singleton
+  def connectionManager()(implicit actorSystem: ActorSystem): ConnectionManagerActor.Ref = {
+    ConnectionManagerActor.Ref.apply()
+  }
+
+  @Provides
+  @Singleton
+  def topicActor(system: ActorSystem): TopicActor = {
+    val ref = system.toTyped.systemActorOf(Topic[UserMessage]("my-topic"), "topic-actor")
+    TopicActor(ref)
+  }
+
+  @Provides
+  @Singleton
+  def clusterSubscriberActor(system: ActorSystem: ClusterSubscriberActor = {
+    val ref = system.toTyped.systemActorOf(ClusterSubscriberActor("clusterSubscriber"), "topic-actor")
+    TopicActor(ref)
   }
 }

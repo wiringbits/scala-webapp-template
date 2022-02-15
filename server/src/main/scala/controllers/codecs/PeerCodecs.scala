@@ -15,10 +15,12 @@ trait PeerCodecs extends CommonCodecs {
 
   private implicit val pongWrites: Writes[Event.Pong] = Json.writes[Event.Pong]
   private implicit val unknownCommandWrites: Writes[Event.UnknownCommand] = Json.writes[Event.UnknownCommand]
+  private implicit val userPointUpdated: Writes[Event.UserPointsChanged] = Json.writes[Event.UserPointsChanged]
 
   implicit val eventWrites: Writes[Event] = writesADT[Event] {
     case obj: Event.Pong =>
       "Pong" -> Json.toJson(obj)(pongWrites)
     case obj: Event.UnknownCommand => "UnknownCommand" -> Json.toJson(obj)(unknownCommandWrites)
+    case obj: Event.UserPointsChanged => "UserPointsUpdated" -> Json.toJson(obj)(userPointUpdated)
   }
 }

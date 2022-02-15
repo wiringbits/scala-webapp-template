@@ -1,13 +1,20 @@
 package net.wiringbits.actors
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
-import net.wiringbits.actors.PeerActor.Command
+import net.wiringbits.actors.PeerActor.{Command, Event}
+import net.wiringbits.models.UserDescriptor
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Reads}
 
-class PeerActor(client: ActorRef)(implicit reads: Reads[PeerActor.Command]) extends Actor with ActorLogging {
+class PeerActor(client: ActorRef, connectionManager: ConnectionManagerActor.Ref, userDescriptor: UserDescriptor)(
+    implicit reads: Reads[PeerActor.Command]
+) extends Actor
+    with ActorLogging {
+
+  private val peerUser = PeerUser(userDescriptor, client)
 
   override def preStart(): Unit = {
     log.info(s"Peer connected: $self")
+    connectionManager.ref ! ConnectionManagerActor.Command.Connect(peerUser)
     context become handleMessagesReceived
   }
 
@@ -15,10 +22,12 @@ class PeerActor(client: ActorRef)(implicit reads: Reads[PeerActor.Command]) exte
     onClientDisconnected()
   }
 
-  private def onClientDisconnected(): Unit = {}
+  private def onClientDisconnected(): Unit = {
+    connectionManager.ref ! ConnectionManagerActor.Command.Disconnect(peerUser)
+  }
 
   override def receive: Receive = { case x =>
-    println(s"unexpected message $x")
+    log.info(s"Unexpected message $x")
   }
 
   private def handleMessagesReceived: Receive = {
@@ -33,13 +42,17 @@ class PeerActor(client: ActorRef)(implicit reads: Reads[PeerActor.Command]) exte
           self ! command
 
         case JsError(errors) =>
-          // TODO: Return errors
-          log.debug(s"Failed to decode command: ${errors.mkString(", ")}")
+          val msj = s"Failed to decode command: ${errors.mkString(", ")}"
+          log.debug(msj)
+          client ! PeerActor.Event.UnknownCommand(msj)
       }
 
     case Command.Ping(_) =>
-      client ! PeerActor.Event.Pong
+      log.info("PING RECEIVED")
+      client ! PeerActor.Event.Pong()
 
+    case Event.UserPointsChanged(points) =>
+      client ! Event.UserPointsChanged(points)
     case x =>
       val msj = s"withState - Unexpected message: $x"
       log.warning(msj)
@@ -49,9 +62,11 @@ class PeerActor(client: ActorRef)(implicit reads: Reads[PeerActor.Command]) exte
 
 object PeerActor {
 
-  def props(client: ActorRef)(implicit reads: Reads[Command]): Props = {
+  def props(client: ActorRef, connectionManager: ConnectionManagerActor.Ref, userDescriptor: UserDescriptor)(implicit
+      reads: Reads[Command]
+  ): Props = {
 
-    Props(new PeerActor(client))
+    Props(new PeerActor(client, connectionManager, userDescriptor))
   }
 
   sealed trait Command extends Product with Serializable
@@ -63,5 +78,6 @@ object PeerActor {
   object Event {
     final case class Pong(noData: String = "") extends Event
     final case class UnknownCommand(error: String) extends Event
+    final case class UserPointsChanged(points: Int) extends Event
   }
 }

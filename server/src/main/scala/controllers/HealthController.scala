@@ -1,10 +1,11 @@
 package controllers
 
 import akka.actor.ActorSystem
-import akka.actor.typed.ActorRef
+import akka.actor.typed.pubsub.Topic
 import akka.stream.Materializer
 import controllers.codecs.PeerCodecs
-import net.wiringbits.actors.PeerActor
+import net.wiringbits.actors.{ClusterSubscriberActor, ConnectionManagerActor, PeerActor}
+import net.wiringbits.models.{UserDescriptor, UserPointsChangedEvent}
 import net.wiringbits.modules.TopicActor
 import play.api.libs.json.JsValue
 import play.api.libs.streams.ActorFlow
@@ -15,23 +16,23 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class HealthController @Inject() (
     cc: ControllerComponents,
-    actor: ActorRef[String],
-    topic: TopicActor
+    clusterSubscriber: ClusterSubscriberActor,
+    topic: TopicActor,
+    connectionManager: ConnectionManagerActor.Ref
 )(implicit system: ActorSystem, mat: Materializer, ec: ExecutionContext)
     extends AbstractController(cc) {
   import HealthController._
-  import akka.actor.typed.pubsub.Topic
 
   def check() = Action { _ =>
-    actor ! "Sample msg"
-    topic.ref ! Topic.Subscribe(actor)
-    topic.ref ! Topic.Publish("Hello Subscribers!")
+    topic.ref ! Topic.Subscribe(clusterSubscriber.ref)
+    topic.ref ! Topic.Publish(UserPointsChangedEvent(1, 500))
     Ok("")
   }
 
   def getWs(): WebSocket = WebSocket.acceptOrResult[JsValue, PeerActor.Event] { _ =>
     def flow = ActorFlow.actorRef { client =>
-      PeerActor.props(client)
+      val userDescriptor = UserDescriptor(1)
+      PeerActor.props(client, connectionManager, userDescriptor)
     }
 
     Future.successful(Right(flow))
