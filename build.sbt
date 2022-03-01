@@ -23,7 +23,29 @@ lazy val commonSettings: Project => Project = {
         .filter(_.nonEmpty)
         .map(_ => Seq("-Werror"))
         .getOrElse(Seq.empty[String])
-    }
+    },
+    Compile / compile / wartremoverErrors ++= List(
+      Wart.ArrayEquals,
+//      Wart.Any,
+//      Wart.AsInstanceOf,
+//      Wart.ExplicitImplicitTypes,
+      Wart.IsInstanceOf,
+      Wart.JavaConversions,
+//      Wart.JavaSerializable,
+      Wart.MutableDataStructures,
+//      Wart.NonUnitStatements,
+//      Wart.Nothing,
+      Wart.Null,
+      Wart.OptionPartial,
+//      Wart.Overloading,
+//      Wart.Product,
+//      Wart.PublicInference,
+      Wart.Return,
+//      Wart.Serializable,
+//      Wart.StringPlusAny,
+//      Wart.ToString,
+      Wart.TryPartial
+    )
   )
 }
 
