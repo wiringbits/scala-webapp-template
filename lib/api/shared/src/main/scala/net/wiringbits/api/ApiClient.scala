@@ -24,6 +24,8 @@ trait ApiClient {
 
   def adminGetUserLogs(userId: UUID): Future[AdminGetUserLogs.Response]
   def adminGetUsers(): Future[AdminGetUsers.Response]
+
+  def resendEmail(request: SendVerifyEmail.Request): Future[SendVerifyEmail.Response]
 }
 
 object ApiClient {
@@ -211,5 +213,16 @@ object ApiClient {
         .flatMap(Future.fromTry)
     }
 
+    override def resendEmail(request: SendVerifyEmail.Request): Future[SendVerifyEmail.Response] = {
+      val path = ServerAPI.path :+ "users" :+ "re-send-email"
+      val uri = ServerAPI.withPath(path)
+
+      prepareRequest[SendVerifyEmail.Response]
+        .post(uri)
+        .body(Json.toJson(request).toString())
+        .send(backend)
+        .map(_.body)
+        .flatMap(Future.fromTry)
+    }
   }
 }

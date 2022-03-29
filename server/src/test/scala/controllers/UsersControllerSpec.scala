@@ -2,7 +2,7 @@ package controllers
 
 import com.dimafeng.testcontainers.PostgreSQLContainer
 import controllers.common.PlayPostgresSpec
-import net.wiringbits.api.models.{CreateUser, ForgotPassword, Login, ResetPassword, VerifyEmail}
+import net.wiringbits.api.models.{CreateUser, ForgotPassword, Login, ResetPassword, VerifyEmail, SendVerifyEmail}
 import net.wiringbits.apis.models.EmailRequest
 import net.wiringbits.apis.{EmailApi, ReCaptchaApi}
 import net.wiringbits.common.models._
@@ -526,4 +526,38 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
         error must be("The given email/password doesn't match")
     }
   }
+
+  "POST /users/re-send-email" should {
+    "success on re send verifying user's email" in withApiClient { client =>
+      val name = Name.trusted("wiringbits")
+      val email = Email.trusted("test1@email.com")
+      val request = SendVerifyEmail.Request(
+        email = email
+      )
+
+      val userRequest = CreateUser.Request(
+        name = name,
+        email = email,
+        password = Password.trusted("test123..."),
+        captcha = Captcha.trusted("test")
+      )
+
+      client.createUser(userRequest).futureValue
+
+      val response = client.resendEmail(request).futureValue
+
+      response.message must be(s"Email sent to verify.")
+    }
+
+    "fail when user's email is not registered" in withApiClient { client =>
+      val email = Email.trusted("test1@email.com")
+      val request = SendVerifyEmail.Request(
+        email = email
+      )
+      val error = client.resendEmail(request).expectError
+
+      error must be(s"The email is not registered")
+    }
+  }
+
 }
