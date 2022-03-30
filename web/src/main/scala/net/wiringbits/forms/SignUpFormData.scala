@@ -22,9 +22,12 @@ case class SignUpFormData(
       .filter(identity)
       .map(_ => "The passwords does not match")
 
+    val emptyCaptcha = Option.when(captcha.isEmpty)("Complete the captcha")
+
     List(
       fieldsError,
-      passwordMatchesError
+      passwordMatchesError,
+      emptyCaptcha
     ).flatten
   }
 

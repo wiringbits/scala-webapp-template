@@ -12,8 +12,11 @@ case class SignInFormData(
   override def fields: List[FormField[_]] = List(email, password)
 
   override def formValidationErrors: List[String] = {
+    val emptyCaptcha = Option.when(captcha.isEmpty)("Complete the captcha")
+
     List(
-      fieldsError
+      fieldsError,
+      emptyCaptcha
     ).flatten
   }
 
