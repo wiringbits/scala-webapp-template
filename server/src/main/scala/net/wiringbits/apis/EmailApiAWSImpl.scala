@@ -59,6 +59,8 @@ class EmailApiAWSImpl @Inject() (
         )
     }
 
-    Future(unsafe).flatten
+    Future {
+      blocking(unsafe)
+    }.flatten
   }
 }
