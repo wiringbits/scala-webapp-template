@@ -8,6 +8,7 @@ import software.amazon.awssdk.services.ses.SesAsyncClient
 import software.amazon.awssdk.services.ses.model._
 
 import javax.inject.Inject
+import scala.compat.java8.FutureConverters.CompletionStageOps
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Future, blocking}
 
@@ -24,7 +25,7 @@ class EmailApiAWSImpl @Inject() (
     val htmlBody =
       s"""<p>${emailRequest.message.body}</p>""".stripMargin
 
-    def unsafe(): Unit = try {
+    def unsafe: Future[Unit] = try {
       val credentials = AwsBasicCredentials.create(awsConfig.accessKeyId.string, awsConfig.secretAccessKey.string)
       val credentialsProvider = StaticCredentialsProvider.create(credentials)
 
@@ -42,8 +43,14 @@ class EmailApiAWSImpl @Inject() (
         .destination(destination)
         .message(message)
         .build()
-      client.sendEmail(request)
-      logger.info(s"Email sent, to: ${emailRequest.destination}, subject = ${emailRequest.message.subject}")
+      for {
+        response <- blocking {
+          client.sendEmail(request)
+        }.toScala
+        _ = logger.info(
+          s"Email sent, to: ${emailRequest.destination}, subject = ${emailRequest.message.subject}, messageId = ${response.messageId()}"
+        )
+      } yield ()
     } catch {
       case ex: Exception =>
         throw new RuntimeException(
@@ -53,7 +60,7 @@ class EmailApiAWSImpl @Inject() (
     }
 
     Future {
-      blocking(unsafe())
-    }
+      blocking(unsafe)
+    }.flatten
   }
 }
