@@ -11,19 +11,28 @@ import scala.util.{Failure, Success, Try}
 
 trait ApiClient {
   def createUser(request: CreateUser.Request): Future[CreateUser.Response]
+
   def login(request: Login.Request): Future[Login.Response]
 
   def verifyEmail(request: VerifyEmail.Request): Future[VerifyEmail.Response]
+
   def forgotPassword(request: ForgotPassword.Request): Future[ForgotPassword.Response]
+
   def resetPassword(request: ResetPassword.Request): Future[ResetPassword.Response]
 
   def currentUser(jwt: String): Future[GetCurrentUser.Response]
+
   def updateUser(jwt: String, request: UpdateUser.Request): Future[UpdateUser.Response]
+
   def updatePassword(jwt: String, request: UpdatePassword.Request): Future[UpdatePassword.Response]
+
   def getUserLogs(jwt: String): Future[GetUserLogs.Response]
 
   def adminGetUserLogs(userId: UUID): Future[AdminGetUserLogs.Response]
+
   def adminGetUsers(): Future[AdminGetUsers.Response]
+
+  def getConfig(): Future[Config.Response]
 }
 
 object ApiClient {
@@ -205,6 +214,17 @@ object ApiClient {
       val uri = ServerAPI.withPath(path)
 
       prepareRequest[AdminGetUsers.Response]
+        .get(uri)
+        .send(backend)
+        .map(_.body)
+        .flatMap(Future.fromTry)
+    }
+
+    override def getConfig(): Future[net.wiringbits.api.models.Config.Response] = {
+      val path = ServerAPI.path :+ "config"
+      val uri = ServerAPI.withPath(path)
+
+      prepareRequest[net.wiringbits.api.models.Config.Response]
         .get(uri)
         .send(backend)
         .map(_.body)
