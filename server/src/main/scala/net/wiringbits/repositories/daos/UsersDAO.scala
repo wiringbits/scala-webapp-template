@@ -36,7 +36,7 @@ object UsersDAO {
     SQL"""
         SELECT user_id, name, email, password, created_at, verified_on
         FROM users
-        WHERE email = ${email.string}
+        WHERE email = ${email.string}::CITEXT
         """.as(userParser.singleOpt)
   }
 
