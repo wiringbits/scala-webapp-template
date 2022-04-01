@@ -180,6 +180,42 @@ class UserTokensRepositorySpec extends RepositorySpec {
     }
   }
 
+  "getExpiredTokens" should {
+    "return expired tokens" in withRepositories() { repositories =>
+      val request = User.CreateUser(
+        id = UUID.randomUUID(),
+        email = Email.trusted("hello@wiringbits.net"),
+        name = Name.trusted("Sample"),
+        hashedPassword = "password",
+        verifyEmailToken = "token"
+      )
+      repositories.users.create(request).futureValue
+
+      val tokenRequest =
+        UserToken.Create(
+          id = UUID.randomUUID(),
+          token = "test",
+          tokenType = UserTokenType.ResetPassword,
+          createdAt = Instant.now(),
+          expiresAt = Instant.now.plus(1, ChronoUnit.HOURS),
+          userId = request.id
+        )
+      repositories.userTokens.create(tokenRequest).futureValue
+
+      when(clock.instant()).thenAnswer(Instant.now().plus(2, ChronoUnit.HOURS))
+
+      val expiredUserTokens = repositories.userTokens.getExpiredTokens.futureValue
+
+      // two tokens: creating an account and token created using tokenRequest
+      expiredUserTokens.length must be(2)
+    }
+
+    "return no results" in withRepositories() { repositories =>
+      val response = repositories.userTokens.getExpiredTokens.futureValue
+      response.isEmpty must be(true)
+    }
+  }
+
   "delete" should {
     "work" in withRepositories() { repositories =>
       val request = User.CreateUser(

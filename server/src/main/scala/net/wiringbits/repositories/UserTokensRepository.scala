@@ -35,6 +35,12 @@ class UserTokensRepository @Inject() (
     }
   }
 
+  def getExpiredTokens: Future[List[UserToken]] = Future {
+    database.withConnection { implicit conn =>
+      UserTokensDAO.getExpiredTokens()
+    }
+  }
+
   def delete(tokenId: UUID, userId: UUID): Future[Unit] = Future {
     database.withConnection { implicit conn =>
       UserTokensDAO.delete(tokenId, userId: UUID)

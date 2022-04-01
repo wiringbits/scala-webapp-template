@@ -33,7 +33,6 @@ object UserTokensDAO {
         FROM user_tokens
         WHERE user_id = ${userId.toString}::UUID
           AND token = $token::TEXT
-          AND expires_at > ${clock.instant()}
         """.as(tokenParser.singleOpt)
   }
 
@@ -42,9 +41,17 @@ object UserTokensDAO {
         SELECT user_token_id, token, token_type, created_at, expires_at, user_id
         FROM user_tokens
         WHERE user_id = ${userId.toString}::UUID
-          AND expires_at > ${clock.instant()}
         ORDER BY created_at DESC, user_token_id
        """.as(tokenParser.*)
+  }
+
+  def getExpiredTokens()(implicit conn: Connection, clock: Clock): List[UserToken] = {
+    SQL"""
+        SELECT user_token_id, token, token_type, created_at, expires_at, user_id
+        FROM user_tokens
+        WHERE expires_at > ${clock.instant()} 
+        ORDER BY created_at DESC, user_token_id
+        """.as(tokenParser.*)
   }
 
   def delete(tokenId: UUID, userId: UUID)(implicit conn: Connection): Unit = {
