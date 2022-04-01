@@ -5,7 +5,6 @@ import net.wiringbits.common.models.Password
 import net.wiringbits.config.{JwtConfig, UserTokensConfig}
 import net.wiringbits.repositories.{UserTokensRepository, UsersRepository}
 import net.wiringbits.util.{EmailMessage, JwtUtils, TokensHelper}
-import net.wiringbits.validations.ValidateUserToken
 import org.mindrot.jbcrypt.BCrypt
 
 import java.time.Clock
@@ -30,7 +29,6 @@ class ResetPasswordAction @Inject() (
       // When the token valid
       tokenMaybe <- userTokensRepository.find(userId, hmacToken)
       token = tokenMaybe.getOrElse(throw new RuntimeException(s"Token for user $userId wasn't found"))
-      _ = ValidateUserToken(token)
 
       // We trigger the reset password flow
       userMaybe <- usersRepository.find(userId)

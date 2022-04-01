@@ -4,6 +4,7 @@ import anorm.SqlStringInterpolation
 import net.wiringbits.repositories.models.UserToken
 
 import java.sql.Connection
+import java.time.Clock
 import java.util.UUID
 
 object UserTokensDAO {
@@ -26,20 +27,22 @@ object UserTokensDAO {
       .execute()
   }
 
-  def find(userId: UUID, token: String)(implicit conn: Connection): Option[UserToken] = {
+  def find(userId: UUID, token: String)(implicit conn: Connection, clock: Clock): Option[UserToken] = {
     SQL"""
         SELECT user_token_id, token, token_type, created_at, expires_at, user_id
         FROM user_tokens
         WHERE user_id = ${userId.toString}::UUID
           AND token = $token::TEXT
+          AND expires_at > ${clock.instant()}
         """.as(tokenParser.singleOpt)
   }
 
-  def find(userId: UUID)(implicit conn: Connection): List[UserToken] = {
+  def find(userId: UUID)(implicit conn: Connection, clock: Clock): List[UserToken] = {
     SQL"""
         SELECT user_token_id, token, token_type, created_at, expires_at, user_id
         FROM user_tokens
         WHERE user_id = ${userId.toString}::UUID
+          AND expires_at > ${clock.instant()}
         ORDER BY created_at DESC, user_token_id
        """.as(tokenParser.*)
   }

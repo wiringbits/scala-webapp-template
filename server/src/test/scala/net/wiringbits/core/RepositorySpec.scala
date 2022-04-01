@@ -19,7 +19,7 @@ trait RepositorySpec extends AnyWordSpec with PostgresSpec {
 
   def withRepositories[T](clock: Clock = Clock.systemUTC)(runTest: RepositoryComponents => T): T = withDatabase { db =>
     val users = new UsersRepository(db, UserTokensConfig(1.hour, 1.hour, "secret"))(Executors.databaseEC, clock)
-    val userTokens = new UserTokensRepository(db)(Executors.databaseEC)
+    val userTokens = new UserTokensRepository(db)(Executors.databaseEC, clock)
     val userNotifications = new UserNotificationsRepository(db)(Executors.databaseEC, clock)
     val userLogs = new UserLogsRepository(db)(Executors.databaseEC)
     val components =
