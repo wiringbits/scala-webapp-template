@@ -32,5 +32,5 @@ GET /admin/users controllers.AdminController.getUsers()
 # get user logs
 GET /admin/users/:userId/logs controllers.AdminController.getUserLogs(userId)
 
-# get database tables for admin
+# routes for admin tables (GET, POST, PUT and DELETE)
 -> / api.AdminDataExplorerRouter
