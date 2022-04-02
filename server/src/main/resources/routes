@@ -33,4 +33,4 @@ GET /admin/users controllers.AdminController.getUsers()
 GET /admin/users/:userId/logs controllers.AdminController.getUserLogs(userId)
 
 # routes for admin tables (GET, POST, PUT and DELETE)
--> / api.AdminDataExplorerRouter
+-> / net.wiringbits.webapp.utils.admin.AppRouter
