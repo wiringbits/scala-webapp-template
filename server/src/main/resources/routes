@@ -3,6 +3,8 @@
 # https://www.playframework.com/documentation/latest/ScalaRouting
 # ~~~~
 
+GET     /swagger.json           controllers.ApiHelpController.getResources
+
 GET /health controllers.HealthController.check()
 
 # create new user (public)
@@ -50,3 +52,5 @@ PUT /admin/tables/:tableName/:ID net.wiringbits.webapp.utils.admin.controllers.A
 
 # delete table resource
 DELETE /admin/tables/:tableName/:ID net.wiringbits.webapp.utils.admin.controllers.AdminController.delete(tableName, ID)
+
+GET  /*file        controllers.Assets.at(path="/public", file)

@@ -335,6 +335,13 @@ lazy val server = (project in file("server"))
       "software.amazon.awssdk" % "ses" % "2.17.141",
       "jakarta.xml.bind" % "jakarta.xml.bind-api" % "3.0.1",
       "org.apache.commons" % "commons-text" % "1.9"
+    ),
+    libraryDependencies ++= Seq(
+      "com.github.dwickern" %% "swagger-play2.8" % "3.1.0",
+      "io.swagger" % "swagger-core" % "1.6.2",
+      "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.11.1",
+      "jakarta.xml.bind" % "jakarta.xml.bind-api" % "2.3.3",
+      "javax.xml.bind" % "jaxb-api" % "2.3.1"
     )
   )
 
