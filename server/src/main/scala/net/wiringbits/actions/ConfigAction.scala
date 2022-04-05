@@ -1,6 +1,6 @@
 package net.wiringbits.actions
 
-import net.wiringbits.api.models.Config
+import net.wiringbits.api.models.GetEnvironmentConfig
 import net.wiringbits.config.ReCaptchaConfig
 
 import java.time.Clock
@@ -13,7 +13,7 @@ class ConfigAction @Inject() (
     ec: ExecutionContext,
     clock: Clock
 ) {
-  def apply(): Future[Config.Response] = Future {
-    Config.Response(reCaptchaConfig.siteKey.string)
+  def apply(): Future[GetEnvironmentConfig.Response] = Future.successful {
+    GetEnvironmentConfig.Response(reCaptchaConfig.siteKey.string)
   }
 }

@@ -51,5 +51,5 @@ PUT /admin/tables/:tableName/:ID net.wiringbits.webapp.utils.admin.controllers.A
 # delete table resource
 DELETE /admin/tables/:tableName/:ID net.wiringbits.webapp.utils.admin.controllers.AdminController.delete(tableName, ID)
 
-# get configs
-GET /config controllers.ConfigController.getConfig()
+# get frontend configs
+GET /environment-config controllers.EnvironmentConfigController.getEnvironmentConfig()

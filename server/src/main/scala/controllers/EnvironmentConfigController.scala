@@ -8,16 +8,17 @@ import play.api.mvc.{AbstractController, ControllerComponents}
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class ConfigController @Inject() (
+class EnvironmentConfigController @Inject() (
     configAction: ConfigAction
 )(implicit cc: ControllerComponents, ec: ExecutionContext)
     extends AbstractController(cc) {
   private val logger = LoggerFactory.getLogger(this.getClass)
 
-  def getConfig() = handleGET { _ =>
-    logger.info("get configs")
+  def getEnvironmentConfig() = handleGET { _ =>
+    logger.info("get frontend config")
     for {
-      response <- configAction.apply()
+      response <- configAction()
+      _ = logger.info(response.toString)
     } yield Ok(Json.toJson(response))
   }
 }

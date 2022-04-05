@@ -6,7 +6,7 @@ import play.api.Configuration
 case class ReCaptchaConfig(secret: ReCaptchaSecret, siteKey: SiteKey) {
   override def toString: String = {
 
-    s"ReCaptchaConfig(secret = ${secret.toString}, siteKey = ${siteKey.toString})"
+    s"ReCaptchaConfig(secret = ${secret.toString}, siteKey = ${siteKey})"
   }
 }
 
