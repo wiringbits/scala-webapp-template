@@ -1,44 +1,46 @@
 package net.wiringbits.actions
 
 import net.wiringbits.apis.models.EmailRequest
-import net.wiringbits.apis.{EmailApi}
+import net.wiringbits.apis.{EmailApi,ReCaptchaApi}
 import net.wiringbits.config.{UserTokensConfig, WebAppConfig}
 import net.wiringbits.repositories.UsersRepository
 import net.wiringbits.util.{EmailMessage, TokenGenerator, TokensHelper}
-import net.wiringbits.validations.{ValidateEmailIsRegistered}
+import net.wiringbits.validations.{ValidateCaptcha, ValidateEmailIsRegistered, ValidateUserIsNotVerified}
 import net.wiringbits.repositories.models.{UserToken, UserTokenType}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
-import net.wiringbits.api.models.SendVerifyEmail
+import net.wiringbits.api.models.SendEmailVerificationToken
 import net.wiringbits.repositories.UserTokensRepository
 import java.time.temporal.ChronoUnit
 import java.time.{Clock, Instant}
 import java.util.UUID
 
-class SendVerifyEmailAction @Inject() (
+
+class SendEmailVerificationTokenAction  @Inject() (
     usersRepository: UsersRepository,
     tokenGenerator: TokenGenerator,
     userTokensConfig: UserTokensConfig,
     userTokensRepository: UserTokensRepository,
     webAppConfig: WebAppConfig,
-    emailApi: EmailApi
+    emailApi: EmailApi,
+    reCaptchaApi: ReCaptchaApi,
 )(implicit
     ec: ExecutionContext,
     clock: Clock
 ) {
 
-  def apply(request: SendVerifyEmail.Request): Future[SendVerifyEmail.Response] = {
+  def apply(request: SendEmailVerificationToken.Request): Future[SendEmailVerificationToken.Response] = {
     for {
       _ <- validations(request)
-
       userMaybe <- usersRepository.find(request.email)
       user = userMaybe.getOrElse(throw new RuntimeException(s"User with email ${request.email} wasn't found"))
+      _ = ValidateUserIsNotVerified(user)
 
+      
       token = tokenGenerator.next()
       hmacToken = TokensHelper.doHMACSHA1(token.toString.getBytes(), userTokensConfig.hmacSecret)
-      userTokens <- userTokensRepository.find(user.id)
-      _ = userTokens.foreach { tokenRegistered => userTokensRepository.delete(tokenRegistered.id, user.id) }
+
       createToken = UserToken
       .Create(
         id = UUID.randomUUID(),
@@ -57,11 +59,12 @@ class SendVerifyEmailAction @Inject() (
         emailParameter = emailParameter
       )
       _ <- emailApi.sendEmail(EmailRequest(request.email, emailMessage))
-    } yield SendVerifyEmail.Response(message = "Email sent to verify.")
+    } yield SendEmailVerificationToken.Response(expiresAt = createToken.expiresAt)
   }
 
-  private def validations(request: SendVerifyEmail.Request) = {
+  private def validations(request: SendEmailVerificationToken.Request) = {
     for {
+      _ <-ValidateCaptcha(reCaptchaApi, request.captcha)
       _ <- ValidateEmailIsRegistered(usersRepository, request.email)
     } yield ()
   }

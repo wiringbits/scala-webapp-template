@@ -10,7 +10,7 @@ object ValidateEmailIsRegistered {
     for {
       maybe <- repository.find(email)
     } yield {
-      if (!maybe.isDefined) throw new RuntimeException(s"The email is not registered")
+      if (maybe.isEmpty) throw new RuntimeException(s"The email is not registered")
       else ()
     }
   }
