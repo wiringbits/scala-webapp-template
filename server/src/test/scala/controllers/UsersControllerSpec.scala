@@ -50,7 +50,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
     TokensHelper.doHMACSHA1(token.toString.getBytes, app.injector.instanceOf[UserTokensConfig].hmacSecret)
   }
 
-  "POST /users/email-verification-token" should {
+    "POST /users/email-verification-token" should {
     "success on re send verifying user's email" in withApiClient { client =>
       val name = Name.trusted("wiringbits")
       val email = Email.trusted("test1@email.com")
