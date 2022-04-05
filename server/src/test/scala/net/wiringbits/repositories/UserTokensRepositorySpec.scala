@@ -3,15 +3,20 @@ package net.wiringbits.repositories
 import net.wiringbits.common.models.{Email, Name}
 import net.wiringbits.core.RepositorySpec
 import net.wiringbits.repositories.models.{User, UserToken, UserTokenType}
+import org.mockito.MockitoSugar.{mock, when}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.matchers.must.Matchers._
 
-import java.time.Instant
+import java.time.{Clock, Instant}
 import java.time.temporal.ChronoUnit
 import java.util.UUID
 
 class UserTokensRepositorySpec extends RepositorySpec {
+
+  private val clock = mock[Clock]
+  when(clock.instant()).thenAnswer(Instant.now())
+
   "create" should {
     "work" in withRepositories() { repositories =>
       val request = User.CreateUser(
@@ -87,6 +92,33 @@ class UserTokensRepositorySpec extends RepositorySpec {
       val response = repositories.userTokens.find(UUID.randomUUID()).futureValue
       response.isEmpty must be(true)
     }
+
+    "return no results if tokens are expired" in withRepositories(clock) { repositories =>
+      val request = User.CreateUser(
+        id = UUID.randomUUID(),
+        email = Email.trusted("hello@wiringbits.net"),
+        name = Name.trusted("Sample"),
+        hashedPassword = "password",
+        verifyEmailToken = "token"
+      )
+      repositories.users.create(request).futureValue
+
+      val tokenRequest =
+        UserToken.Create(
+          id = UUID.randomUUID(),
+          token = "test",
+          tokenType = UserTokenType.ResetPassword,
+          createdAt = Instant.now(),
+          expiresAt = Instant.now.plus(1, ChronoUnit.HOURS),
+          userId = request.id
+        )
+      repositories.userTokens.create(tokenRequest).futureValue
+
+      when(clock.instant()).thenAnswer(Instant.now().plus(2, ChronoUnit.HOURS))
+
+      val response = repositories.userTokens.find(request.id).futureValue
+      response.isEmpty must be(true)
+    }
   }
 
   "find(userId, token)" should {
@@ -117,6 +149,69 @@ class UserTokensRepositorySpec extends RepositorySpec {
 
     "return no results when the user doesn't exists" in withRepositories() { repositories =>
       val response = repositories.userTokens.find(UUID.randomUUID(), "test").futureValue
+      response.isEmpty must be(true)
+    }
+
+    "return no results if tokens are expired" in withRepositories(clock) { repositories =>
+      val request = User.CreateUser(
+        id = UUID.randomUUID(),
+        email = Email.trusted("hello@wiringbits.net"),
+        name = Name.trusted("Sample"),
+        hashedPassword = "password",
+        verifyEmailToken = "token"
+      )
+      repositories.users.create(request).futureValue
+
+      val tokenRequest =
+        UserToken.Create(
+          id = UUID.randomUUID(),
+          token = "test",
+          tokenType = UserTokenType.ResetPassword,
+          createdAt = Instant.now(),
+          expiresAt = Instant.now.plus(1, ChronoUnit.HOURS),
+          userId = request.id
+        )
+      repositories.userTokens.create(tokenRequest).futureValue
+
+      when(clock.instant()).thenAnswer(Instant.now().plus(2, ChronoUnit.HOURS))
+
+      val response = repositories.userTokens.find(request.id, tokenRequest.token).futureValue
+      response.isEmpty must be(true)
+    }
+  }
+
+  "getExpiredTokens" should {
+    "return expired tokens" in withRepositories() { repositories =>
+      val request = User.CreateUser(
+        id = UUID.randomUUID(),
+        email = Email.trusted("hello@wiringbits.net"),
+        name = Name.trusted("Sample"),
+        hashedPassword = "password",
+        verifyEmailToken = "token"
+      )
+      repositories.users.create(request).futureValue
+
+      val tokenRequest =
+        UserToken.Create(
+          id = UUID.randomUUID(),
+          token = "test",
+          tokenType = UserTokenType.ResetPassword,
+          createdAt = Instant.now(),
+          expiresAt = Instant.now.plus(1, ChronoUnit.HOURS),
+          userId = request.id
+        )
+      repositories.userTokens.create(tokenRequest).futureValue
+
+      when(clock.instant()).thenAnswer(Instant.now().plus(2, ChronoUnit.HOURS))
+
+      val expiredUserTokens = repositories.userTokens.getExpiredTokens.futureValue
+
+      // two tokens: creating an account and token created using tokenRequest
+      expiredUserTokens.length must be(2)
+    }
+
+    "return no results" in withRepositories() { repositories =>
+      val response = repositories.userTokens.getExpiredTokens.futureValue
       response.isEmpty must be(true)
     }
   }

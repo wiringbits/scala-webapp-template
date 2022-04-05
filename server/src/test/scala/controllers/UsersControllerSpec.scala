@@ -251,7 +251,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
         .verifyEmail(VerifyEmail.Request(UserToken(user.id, verificationToken)))
         .expectError
 
-      error must be("Token is expired")
+      error must be(s"Token for user ${user.id} wasn't found")
     }
 
     "login after successful email confirmation" in withApiClient { client =>

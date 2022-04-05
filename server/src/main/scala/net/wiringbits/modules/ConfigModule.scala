@@ -66,4 +66,12 @@ class ConfigModule extends AbstractModule {
     logger.info(s"Config loaded: $config")
     config
   }
+
+  @Provides
+  @Singleton
+  def expiredTokensConfig(global: Configuration): ExpiredTokensConfig = {
+    val config = ExpiredTokensConfig(global.get[Configuration]("expiredTokensTask"))
+    logger.info(s"Config loaded: $config")
+    config
+  }
 }

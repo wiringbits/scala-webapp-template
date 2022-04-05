@@ -4,6 +4,7 @@ import anorm.SqlStringInterpolation
 import net.wiringbits.repositories.models.UserToken
 
 import java.sql.Connection
+import java.time.Clock
 import java.util.UUID
 
 object UserTokensDAO {
@@ -42,6 +43,15 @@ object UserTokensDAO {
         WHERE user_id = ${userId.toString}::UUID
         ORDER BY created_at DESC, user_token_id
        """.as(tokenParser.*)
+  }
+
+  def getExpiredTokens()(implicit conn: Connection, clock: Clock): List[UserToken] = {
+    SQL"""
+        SELECT user_token_id, token, token_type, created_at, expires_at, user_id
+        FROM user_tokens
+        WHERE expires_at > ${clock.instant()} 
+        ORDER BY created_at DESC, user_token_id
+        """.as(tokenParser.*)
   }
 
   def delete(tokenId: UUID, userId: UUID)(implicit conn: Connection): Unit = {
