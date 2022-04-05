@@ -36,6 +36,8 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
   private val captchaApi = mock[ReCaptchaApi]
   when(captchaApi.verify(any[Captcha]())).thenReturn(Future.successful(true))
 
+  def userTokensConfig: UserTokensConfig = app.injector.instanceOf(classOf[UserTokensConfig])
+
   override def guiceApplicationBuilder(container: PostgreSQLContainer): GuiceApplicationBuilder =
     super
       .guiceApplicationBuilder(container)
@@ -528,7 +530,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
   }
 
   "POST /users/email-verification-token" should {
-    "success on re send verifying user's email" in withApiClient { client =>
+    "success on send verifying token user's email" in withApiClient { client =>
       val name = Name.trusted("wiringbits")
       val email = Email.trusted("test1@email.com")
       val request = SendEmailVerificationToken.Request(
@@ -543,9 +545,12 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
         captcha = Captcha.trusted("test")
       )
 
+      val verificationToken = UUID.randomUUID()
+      when(tokenGenerator.next()).thenReturn(verificationToken)
       client.createUser(userRequest).futureValue
+      
       val response = client.sendEmailVerificationToken(request).futureValue
-      //response.message must be(s"Email sent to verify.")
+      response.expiresAt mustNot be (null)
     }
 
     "fail when user's email is not registered" in withApiClient { client =>

@@ -214,7 +214,7 @@ object ApiClient {
     }
 
     override def sendEmailVerificationToken(request: SendEmailVerificationToken.Request): Future[SendEmailVerificationToken.Response] = {
-      val path = ServerAPI.path :+ "users" :+ "re-send-email"
+      val path = ServerAPI.path :+ "users" :+ "email-verification-token"
       val uri = ServerAPI.withPath(path)
 
       prepareRequest[SendEmailVerificationToken.Response]
