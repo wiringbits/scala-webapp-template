@@ -48,7 +48,7 @@ class SendEmailVerificationTokenAction  @Inject() (
         tokenType = UserTokenType.EmailVerification,
         createdAt = Instant.now(clock),
         userId = user.id,
-        expiresAt = Instant.now(clock).plus(userTokensConfig.resetPasswordExp.toHours, ChronoUnit.HOURS)
+        expiresAt = Instant.now(clock).plus(userTokensConfig.emailVerificationExp.toSeconds, ChronoUnit.SECONDS)
       )
       _ <- userTokensRepository.create(createToken)
 
