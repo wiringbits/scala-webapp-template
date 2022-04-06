@@ -65,9 +65,9 @@ class UsersController @Inject() (
     } yield Ok(Json.toJson(response))
   }
 
-  def sendEmailVerificationToken() = handleJsonBody[SendVerifyEmail.Request] { request =>
+  def sendEmailVerificationToken() = handleJsonBody[SendEmailVerificationToken.Request] { request =>
     val body = request.body
-    logger.info(s"Resend Email: ${body.email}")
+    logger.info(s"Send email to: ${body.email}")
     for {
       response <- sendEmailVerificationTokenAction (body)
     } yield Ok(Json.toJson(response))

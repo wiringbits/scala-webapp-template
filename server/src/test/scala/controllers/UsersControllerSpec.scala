@@ -20,10 +20,12 @@ import java.time.temporal.ChronoUnit
 import java.time.{Clock, Instant}
 import java.util.UUID
 import scala.concurrent.Future
+import net.wiringbits.repositories.UsersRepository
 
 class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
 
   def userTokensRepository: UserTokensRepository = app.injector.instanceOf(classOf[UserTokensRepository])
+  def userRepository: UsersRepository = app.injector.instanceOf(classOf[UsersRepository])
 
   private val clock = mock[Clock]
   when(clock.instant()).thenReturn(Instant.now())
@@ -547,12 +549,64 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
 
       val verificationToken = UUID.randomUUID()
       when(tokenGenerator.next()).thenReturn(verificationToken)
-      client.createUser(userRequest).futureValue
-      
+
+      val userCreated = client.createUser(userRequest).futureValue
+
       val response = client.sendEmailVerificationToken(request).futureValue
-      response.expiresAt mustNot be (null)
+
+      val token = userTokensRepository
+        .find(userCreated.id)
+        .futureValue
+        .find(_.tokenType == UserTokenType.EmailVerification)
+        .value
+      
+      response.expiresAt must be (token.expiresAt)
     }
 
+    "success on verifying email and login" in withApiClient { client =>
+      val name = Name.trusted("wiringbits")
+      val email = Email.trusted("test1@email.com")
+      val captcha =  Captcha.trusted("test")
+      val password = Password.trusted("test123...")
+      val request = SendEmailVerificationToken.Request(
+        email = email,
+        captcha = captcha
+      )
+
+      val userRequest = CreateUser.Request(
+        name = name,
+        email = email,
+        password = password,
+        captcha = captcha
+      )
+
+      userRepository.find(email).value
+      val verificationToken = UUID.randomUUID()
+      when(tokenGenerator.next()).thenReturn(verificationToken)
+
+      val userCreated = client.createUser(userRequest).futureValue
+
+      val userTokenCreate = userTokensRepository
+        .find(userCreated.id)
+        .futureValue
+        .find(_.tokenType == UserTokenType.EmailVerification)
+        .value
+      userTokensRepository.delete(userTokenCreate.id, userCreated.id)
+
+      client.sendEmailVerificationToken(request).futureValue
+      client.verifyEmail(VerifyEmail.Request(UserToken(userCreated.id, verificationToken))).futureValue
+
+      val loginRequest = Login.Request(
+        email = email,
+        password = password,
+        captcha = captcha
+      )
+      val loginResponse = client.login(loginRequest).futureValue
+
+      loginResponse.name must be(userRequest.name)
+      loginResponse.email must be(userRequest.email)
+    }
+  
     "fail when user's email is not registered" in withApiClient { client =>
       val email = Email.trusted("test1@email.com")
       val request = SendEmailVerificationToken.Request(
@@ -581,6 +635,33 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
       error must be("Invalid captcha, try again")
 
       when(captchaApi.verify(any[Captcha]())).thenReturn(Future.successful(true))
+    }
+
+    "fail if the user is already verified" in withApiClient { client =>
+      val name = Name.trusted("wiringbits")
+      val email = Email.trusted("test1@email.com")
+      val request = SendEmailVerificationToken.Request(
+        email = email,
+        captcha = Captcha.trusted("test")
+      )
+
+      val userRequest = CreateUser.Request(
+        name = name,
+        email = email,
+        password = Password.trusted("test123..."),
+        captcha = Captcha.trusted("test")
+      )
+
+      val verificationToken = UUID.randomUUID()
+      when(tokenGenerator.next()).thenReturn(verificationToken)
+
+      createVerifyLoginUser(userRequest, client, tokenGenerator).futureValue
+
+      val error = client
+        .sendEmailVerificationToken(request)
+        .expectError
+
+      error must be(s"User email is already verified")
     }
   }
 }
