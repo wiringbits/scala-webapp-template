@@ -34,21 +34,5 @@ GET /admin/users controllers.AdminController.getUsers()
 # get user logs
 GET /admin/users/:userId/logs controllers.AdminController.getUserLogs(userId)
 
-
-# get database tables
-GET /admin/tables net.wiringbits.webapp.utils.admin.controllers.AdminController.getTables()
-
-# get database table fields
-GET /admin/tables/:tableName net.wiringbits.webapp.utils.admin.controllers.AdminController.getTableMetadata(tableName, offset: Int ?= 0, limit: Int ?= 10)
-
-# get table resource by id (depends on IDFieldName on AdminConfig)
-GET /admin/tables/:tableName/:ID net.wiringbits.webapp.utils.admin.controllers.AdminController.find(tableName, ID)
-
-# create table resource
-POST /admin/tables/:tableName net.wiringbits.webapp.utils.admin.controllers.AdminController.create(tableName)
-
-# update table resource
-PUT /admin/tables/:tableName/:ID net.wiringbits.webapp.utils.admin.controllers.AdminController.update(tableName, ID)
-
-# delete table resource
-DELETE /admin/tables/:tableName/:ID net.wiringbits.webapp.utils.admin.controllers.AdminController.delete(tableName, ID)
+# routes for admin tables (GET, POST, PUT and DELETE)
+-> / net.wiringbits.webapp.utils.admin.AppRouter
