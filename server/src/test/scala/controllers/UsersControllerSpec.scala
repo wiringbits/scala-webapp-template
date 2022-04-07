@@ -20,12 +20,10 @@ import java.time.temporal.ChronoUnit
 import java.time.{Clock, Instant}
 import java.util.UUID
 import scala.concurrent.Future
-import net.wiringbits.repositories.UsersRepository
 
 class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
 
   def userTokensRepository: UserTokensRepository = app.injector.instanceOf(classOf[UserTokensRepository])
-  def userRepository: UsersRepository = app.injector.instanceOf(classOf[UsersRepository])
 
   private val clock = mock[Clock]
   when(clock.instant()).thenReturn(Instant.now())
@@ -39,20 +37,6 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
   when(captchaApi.verify(any[Captcha]())).thenReturn(Future.successful(true))
 
   def userTokensConfig: UserTokensConfig = app.injector.instanceOf(classOf[UserTokensConfig])
-
-  override def guiceApplicationBuilder(container: PostgreSQLContainer): GuiceApplicationBuilder =
-    super
-      .guiceApplicationBuilder(container)
-      .overrides(
-        inject.bind[EmailApi].to(emailApi),
-        inject.bind[ReCaptchaApi].to(captchaApi),
-        inject.bind[Clock].to(clock),
-        inject.bind[TokenGenerator].to(tokenGenerator)
-      )
-
-  private def createHMACToken(token: UUID): String = {
-    TokensHelper.doHMACSHA1(token.toString.getBytes, app.injector.instanceOf[UserTokensConfig].hmacSecret)
-  }
 
   "POST /users" should {
     "return the email verification token after creating a user" in withApiClient { client =>
@@ -531,6 +515,20 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
     }
   }
 
+  override def guiceApplicationBuilder(container: PostgreSQLContainer): GuiceApplicationBuilder =
+    super
+      .guiceApplicationBuilder(container)
+      .overrides(
+        inject.bind[EmailApi].to(emailApi),
+        inject.bind[ReCaptchaApi].to(captchaApi),
+        inject.bind[Clock].to(clock),
+        inject.bind[TokenGenerator].to(tokenGenerator)
+      )
+
+  private def createHMACToken(token: UUID): String = {
+    TokensHelper.doHMACSHA1(token.toString.getBytes, app.injector.instanceOf[UserTokensConfig].hmacSecret)
+  }
+
   "POST /users/email-verification-token" should {
     "success on send verifying token user's email" in withApiClient { client =>
       val name = Name.trusted("wiringbits")
@@ -580,21 +578,16 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
         captcha = captcha
       )
 
-      userRepository.find(email).value
       val verificationToken = UUID.randomUUID()
       when(tokenGenerator.next()).thenReturn(verificationToken)
 
       val userCreated = client.createUser(userRequest).futureValue
 
-      val userTokenCreate = userTokensRepository
-        .find(userCreated.id)
-        .futureValue
-        .find(_.tokenType == UserTokenType.EmailVerification)
-        .value
-      userTokensRepository.delete(userTokenCreate.id, userCreated.id)
+      val emailVerificationToken = UUID.randomUUID()
+      when(tokenGenerator.next()).thenReturn(emailVerificationToken)
 
       client.sendEmailVerificationToken(request).futureValue
-      client.verifyEmail(VerifyEmail.Request(UserToken(userCreated.id, verificationToken))).futureValue
+      client.verifyEmail(VerifyEmail.Request(UserToken(userCreated.id, emailVerificationToken))).futureValue
 
       val loginRequest = Login.Request(
         email = email,
