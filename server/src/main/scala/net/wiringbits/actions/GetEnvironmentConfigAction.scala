@@ -3,16 +3,12 @@ package net.wiringbits.actions
 import net.wiringbits.api.models.GetEnvironmentConfig
 import net.wiringbits.config.ReCaptchaConfig
 
-import java.time.Clock
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
-class ConfigAction @Inject() (
+class GetEnvironmentConfigAction @Inject() (
     reCaptchaConfig: ReCaptchaConfig
-)(implicit
-    ec: ExecutionContext,
-    clock: Clock
-) {
+)() {
   def apply(): Future[GetEnvironmentConfig.Response] = Future.successful {
     GetEnvironmentConfig.Response(reCaptchaConfig.siteKey.string)
   }

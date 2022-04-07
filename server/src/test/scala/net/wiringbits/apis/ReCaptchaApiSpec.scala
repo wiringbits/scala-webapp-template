@@ -2,7 +2,7 @@ package net.wiringbits.apis
 
 import net.wiringbits.common.models.Captcha
 import net.wiringbits.config.ReCaptchaConfig
-import net.wiringbits.models.{ReCaptchaSecret, SiteKey}
+import net.wiringbits.models.{ReCaptchaSecret, ReCaptchaSiteKey}
 import org.mockito.ArgumentMatchers
 import org.mockito.MockitoSugar.{mock, when}
 import org.scalatest.concurrent.ScalaFutures._
@@ -18,7 +18,7 @@ class ReCaptchaApiSpec extends AnyWordSpec {
   private val ws = mock[WSClient]
   private val request = mock[WSRequest]
   private val response = mock[WSResponse]
-  private val config = ReCaptchaConfig(ReCaptchaSecret("test"), SiteKey("test"))
+  private val config = ReCaptchaConfig(ReCaptchaSecret("test"), ReCaptchaSiteKey("test"))
   private val api = new ReCaptchaApi(config, ws)
 
   "verify" should {
