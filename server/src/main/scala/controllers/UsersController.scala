@@ -20,7 +20,7 @@ class UsersController @Inject() (
     updatePasswordAction: UpdatePasswordAction,
     getUserAction: GetUserAction,
     getUserLogsAction: GetUserLogsAction,
-    sendEmailVerificationTokenAction : SendEmailVerificationTokenAction 
+    sendEmailVerificationTokenAction: SendEmailVerificationTokenAction
 )(implicit cc: ControllerComponents, ec: ExecutionContext, jwtConfig: JwtConfig)
     extends AbstractController(cc) {
   private val logger = LoggerFactory.getLogger(this.getClass)
@@ -69,9 +69,9 @@ class UsersController @Inject() (
     val body = request.body
     logger.info(s"Send email to: ${body.email}")
     for {
-      response <- sendEmailVerificationTokenAction (body)
+      response <- sendEmailVerificationTokenAction(body)
     } yield Ok(Json.toJson(response))
-  }  
+  }
 
   def update() = handleJsonBody[UpdateUser.Request] { request =>
     val body = request.body
