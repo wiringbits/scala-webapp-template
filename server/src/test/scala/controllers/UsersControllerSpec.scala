@@ -2,7 +2,14 @@ package controllers
 
 import com.dimafeng.testcontainers.PostgreSQLContainer
 import controllers.common.PlayPostgresSpec
-import net.wiringbits.api.models.{CreateUser, ForgotPassword, Login, ResetPassword, VerifyEmail, SendEmailVerificationToken}
+import net.wiringbits.api.models.{
+  CreateUser,
+  ForgotPassword,
+  Login,
+  ResetPassword,
+  VerifyEmail,
+  SendEmailVerificationToken
+}
 import net.wiringbits.apis.models.EmailRequest
 import net.wiringbits.apis.{EmailApi, ReCaptchaApi}
 import net.wiringbits.common.models._
@@ -557,14 +564,14 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
         .futureValue
         .find(_.tokenType == UserTokenType.EmailVerification)
         .value
-      
-      response.expiresAt must be (token.expiresAt)
+
+      response.expiresAt must be(token.expiresAt)
     }
 
     "success on verifying email and login" in withApiClient { client =>
       val name = Name.trusted("wiringbits")
       val email = Email.trusted("test1@email.com")
-      val captcha =  Captcha.trusted("test")
+      val captcha = Captcha.trusted("test")
       val password = Password.trusted("test123...")
       val request = SendEmailVerificationToken.Request(
         email = email,
@@ -599,7 +606,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
       loginResponse.name must be(userRequest.name)
       loginResponse.email must be(userRequest.email)
     }
-  
+
     "fail when user's email is not registered" in withApiClient { client =>
       val email = Email.trusted("test1@email.com")
       val request = SendEmailVerificationToken.Request(
@@ -611,7 +618,6 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
       error must be(s"The email is not registered")
     }
 
-    
     "fail when the captcha isn't valid" in withApiClient { client =>
       val email = Email.trusted("test1@email.com")
       val request = SendEmailVerificationToken.Request(

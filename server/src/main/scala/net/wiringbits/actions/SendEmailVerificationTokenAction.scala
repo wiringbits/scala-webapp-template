@@ -1,7 +1,7 @@
 package net.wiringbits.actions
 
 import net.wiringbits.apis.models.EmailRequest
-import net.wiringbits.apis.{EmailApi,ReCaptchaApi}
+import net.wiringbits.apis.{EmailApi, ReCaptchaApi}
 import net.wiringbits.config.{UserTokensConfig, WebAppConfig}
 import net.wiringbits.repositories.UsersRepository
 import net.wiringbits.util.{EmailMessage, TokenGenerator, TokensHelper}
@@ -16,15 +16,14 @@ import java.time.temporal.ChronoUnit
 import java.time.{Clock, Instant}
 import java.util.UUID
 
-
-class SendEmailVerificationTokenAction  @Inject() (
+class SendEmailVerificationTokenAction @Inject() (
     usersRepository: UsersRepository,
     tokenGenerator: TokenGenerator,
     userTokensConfig: UserTokensConfig,
     userTokensRepository: UserTokensRepository,
     webAppConfig: WebAppConfig,
     emailApi: EmailApi,
-    reCaptchaApi: ReCaptchaApi,
+    reCaptchaApi: ReCaptchaApi
 )(implicit
     ec: ExecutionContext,
     clock: Clock
@@ -37,19 +36,18 @@ class SendEmailVerificationTokenAction  @Inject() (
       user = userMaybe.getOrElse(throw new RuntimeException(s"User with email ${request.email} wasn't found"))
       _ = ValidateUserIsNotVerified(user)
 
-      
       token = tokenGenerator.next()
       hmacToken = TokensHelper.doHMACSHA1(token.toString.getBytes(), userTokensConfig.hmacSecret)
 
       createToken = UserToken
-      .Create(
-        id = UUID.randomUUID(),
-        token = hmacToken,
-        tokenType = UserTokenType.EmailVerification,
-        createdAt = Instant.now(clock),
-        userId = user.id,
-        expiresAt = Instant.now(clock).plus(userTokensConfig.emailVerificationExp.toSeconds, ChronoUnit.SECONDS)
-      )
+        .Create(
+          id = UUID.randomUUID(),
+          token = hmacToken,
+          tokenType = UserTokenType.EmailVerification,
+          createdAt = Instant.now(clock),
+          userId = user.id,
+          expiresAt = Instant.now(clock).plus(userTokensConfig.emailVerificationExp.toSeconds, ChronoUnit.SECONDS)
+        )
       _ <- userTokensRepository.create(createToken)
 
       emailParameter = s"${user.id}_$token"
@@ -64,7 +62,7 @@ class SendEmailVerificationTokenAction  @Inject() (
 
   private def validations(request: SendEmailVerificationToken.Request) = {
     for {
-      _ <-ValidateCaptcha(reCaptchaApi, request.captcha)
+      _ <- ValidateCaptcha(reCaptchaApi, request.captcha)
       _ <- ValidateEmailIsRegistered(usersRepository, request.email)
     } yield ()
   }
