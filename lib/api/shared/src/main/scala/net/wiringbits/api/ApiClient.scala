@@ -26,6 +26,10 @@ trait ApiClient {
   def adminGetUsers(): Future[AdminGetUsers.Response]
 
   def getEnvironmentConfig(): Future[GetEnvironmentConfig.Response]
+
+  def sendEmailVerificationToken(
+      request: SendEmailVerificationToken.Request
+  ): Future[SendEmailVerificationToken.Response]
 }
 
 object ApiClient {
@@ -224,5 +228,18 @@ object ApiClient {
         .flatMap(Future.fromTry)
     }
 
+    override def sendEmailVerificationToken(
+        request: SendEmailVerificationToken.Request
+    ): Future[SendEmailVerificationToken.Response] = {
+      val path = ServerAPI.path :+ "users" :+ "email-verification-token"
+      val uri = ServerAPI.withPath(path)
+
+      prepareRequest[SendEmailVerificationToken.Response]
+        .post(uri)
+        .body(Json.toJson(request).toString())
+        .send(backend)
+        .map(_.body)
+        .flatMap(Future.fromTry)
+    }
   }
 }

@@ -324,16 +324,17 @@ lazy val server = (project in file("server"))
       "org.playframework.anorm" %% "anorm" % "2.6.10",
       "com.typesafe.play" %% "play-json" % "2.9.2",
       "org.postgresql" % "postgresql" % "42.3.3",
-      "com.github.jwt-scala" %% "jwt-core" % "9.0.4",
+      "com.github.jwt-scala" %% "jwt-core" % "9.0.5",
       "de.svenkubiak" % "jBCrypt" % "0.4.3",
       "commons-validator" % "commons-validator" % "1.7",
-      "com.dimafeng" %% "testcontainers-scala-scalatest" % "0.40.2" % "test",
-      "com.dimafeng" %% "testcontainers-scala-postgresql" % "0.40.2" % "test",
+      "com.dimafeng" %% "testcontainers-scala-scalatest" % "0.40.5" % "test",
+      "com.dimafeng" %% "testcontainers-scala-postgresql" % "0.40.5" % "test",
       "com.softwaremill.sttp.client3" %% "core" % sttp % "test",
       "com.softwaremill.sttp.client3" %% "async-http-client-backend-future" % sttp % "test",
       "net.wiringbits" %% "admin-data-explorer-play-server" % webappUtils,
       "software.amazon.awssdk" % "ses" % "2.17.141",
-      "jakarta.xml.bind" % "jakarta.xml.bind-api" % "3.0.1"
+      "jakarta.xml.bind" % "jakarta.xml.bind-api" % "3.0.1",
+      "org.apache.commons" % "commons-text" % "1.9"
     )
   )
 

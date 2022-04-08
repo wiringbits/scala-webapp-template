@@ -2,7 +2,14 @@ package controllers
 
 import com.dimafeng.testcontainers.PostgreSQLContainer
 import controllers.common.PlayPostgresSpec
-import net.wiringbits.api.models.{CreateUser, ForgotPassword, Login, ResetPassword, VerifyEmail}
+import net.wiringbits.api.models.{
+  CreateUser,
+  ForgotPassword,
+  Login,
+  ResetPassword,
+  VerifyEmail,
+  SendEmailVerificationToken
+}
 import net.wiringbits.apis.models.EmailRequest
 import net.wiringbits.apis.{EmailApi, ReCaptchaApi}
 import net.wiringbits.common.models._
@@ -36,19 +43,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
   private val captchaApi = mock[ReCaptchaApi]
   when(captchaApi.verify(any[Captcha]())).thenReturn(Future.successful(true))
 
-  override def guiceApplicationBuilder(container: PostgreSQLContainer): GuiceApplicationBuilder =
-    super
-      .guiceApplicationBuilder(container)
-      .overrides(
-        inject.bind[EmailApi].to(emailApi),
-        inject.bind[ReCaptchaApi].to(captchaApi),
-        inject.bind[Clock].to(clock),
-        inject.bind[TokenGenerator].to(tokenGenerator)
-      )
-
-  private def createHMACToken(token: UUID): String = {
-    TokensHelper.doHMACSHA1(token.toString.getBytes, app.injector.instanceOf[UserTokensConfig].hmacSecret)
-  }
+  def userTokensConfig: UserTokensConfig = app.injector.instanceOf(classOf[UserTokensConfig])
 
   "POST /users" should {
     "return the email verification token after creating a user" in withApiClient { client =>
@@ -524,6 +519,148 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
           .expectError
 
         error must be("The given email/password doesn't match")
+    }
+  }
+
+  override def guiceApplicationBuilder(container: PostgreSQLContainer): GuiceApplicationBuilder =
+    super
+      .guiceApplicationBuilder(container)
+      .overrides(
+        inject.bind[EmailApi].to(emailApi),
+        inject.bind[ReCaptchaApi].to(captchaApi),
+        inject.bind[Clock].to(clock),
+        inject.bind[TokenGenerator].to(tokenGenerator)
+      )
+
+  private def createHMACToken(token: UUID): String = {
+    TokensHelper.doHMACSHA1(token.toString.getBytes, app.injector.instanceOf[UserTokensConfig].hmacSecret)
+  }
+
+  "POST /users/email-verification-token" should {
+    "success on send verifying token user's email" in withApiClient { client =>
+      val name = Name.trusted("wiringbits")
+      val email = Email.trusted("test1@email.com")
+      val request = SendEmailVerificationToken.Request(
+        email = email,
+        captcha = Captcha.trusted("test")
+      )
+
+      val userRequest = CreateUser.Request(
+        name = name,
+        email = email,
+        password = Password.trusted("test123..."),
+        captcha = Captcha.trusted("test")
+      )
+
+      val verificationToken = UUID.randomUUID()
+      when(tokenGenerator.next()).thenReturn(verificationToken)
+
+      val userCreated = client.createUser(userRequest).futureValue
+
+      val response = client.sendEmailVerificationToken(request).futureValue
+
+      val token = userTokensRepository
+        .find(userCreated.id)
+        .futureValue
+        .find(_.tokenType == UserTokenType.EmailVerification)
+        .value
+
+      response.expiresAt must be(token.expiresAt)
+    }
+
+    "success on verifying email and login" in withApiClient { client =>
+      val name = Name.trusted("wiringbits")
+      val email = Email.trusted("test1@email.com")
+      val captcha = Captcha.trusted("test")
+      val password = Password.trusted("test123...")
+      val request = SendEmailVerificationToken.Request(
+        email = email,
+        captcha = captcha
+      )
+
+      val userRequest = CreateUser.Request(
+        name = name,
+        email = email,
+        password = password,
+        captcha = captcha
+      )
+
+      val verificationToken = UUID.randomUUID()
+      when(tokenGenerator.next()).thenReturn(verificationToken)
+
+      val userCreated = client.createUser(userRequest).futureValue
+
+      val emailVerificationToken = UUID.randomUUID()
+      when(tokenGenerator.next()).thenReturn(emailVerificationToken)
+
+      client.sendEmailVerificationToken(request).futureValue
+      client.verifyEmail(VerifyEmail.Request(UserToken(userCreated.id, emailVerificationToken))).futureValue
+
+      val loginRequest = Login.Request(
+        email = email,
+        password = password,
+        captcha = captcha
+      )
+      val loginResponse = client.login(loginRequest).futureValue
+
+      loginResponse.name must be(userRequest.name)
+      loginResponse.email must be(userRequest.email)
+    }
+
+    "fail when user's email is not registered" in withApiClient { client =>
+      val email = Email.trusted("test1@email.com")
+      val request = SendEmailVerificationToken.Request(
+        email = email,
+        captcha = Captcha.trusted("test")
+      )
+      val error = client.sendEmailVerificationToken(request).expectError
+
+      error must be(s"The email is not registered")
+    }
+
+    "fail when the captcha isn't valid" in withApiClient { client =>
+      val email = Email.trusted("test1@email.com")
+      val request = SendEmailVerificationToken.Request(
+        email = email,
+        captcha = Captcha.trusted("test")
+      )
+
+      when(captchaApi.verify(any[Captcha]())).thenReturn(Future.successful(false))
+
+      val error = client
+        .sendEmailVerificationToken(request)
+        .expectError
+
+      error must be("Invalid captcha, try again")
+
+      when(captchaApi.verify(any[Captcha]())).thenReturn(Future.successful(true))
+    }
+
+    "fail if the user is already verified" in withApiClient { client =>
+      val name = Name.trusted("wiringbits")
+      val email = Email.trusted("test1@email.com")
+      val request = SendEmailVerificationToken.Request(
+        email = email,
+        captcha = Captcha.trusted("test")
+      )
+
+      val userRequest = CreateUser.Request(
+        name = name,
+        email = email,
+        password = Password.trusted("test123..."),
+        captcha = Captcha.trusted("test")
+      )
+
+      val verificationToken = UUID.randomUUID()
+      when(tokenGenerator.next()).thenReturn(verificationToken)
+
+      createVerifyLoginUser(userRequest, client, tokenGenerator).futureValue
+
+      val error = client
+        .sendEmailVerificationToken(request)
+        .expectError
+
+      error must be(s"User email is already verified")
     }
   }
 }

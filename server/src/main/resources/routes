@@ -15,6 +15,8 @@ POST /users/verify-email controllers.UsersController.verifyEmail()
 POST /users/forgot-password controllers.UsersController.forgotPassword()
 # reset existing user's password
 POST /users/reset-password controllers.UsersController.resetPassword()
+# send email verification token (public)
+POST /users/email-verification-token controllers.UsersController.sendEmailVerificationToken()
 
 # get the current user details
 GET /users/me controllers.UsersController.getCurrentUser()

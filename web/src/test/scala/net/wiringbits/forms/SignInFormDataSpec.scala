@@ -39,7 +39,7 @@ class SignInFormDataSpec extends AnyWordSpec {
     }
 
     "return all errors" in {
-      allDataInvalidForm.formValidationErrors.size must be(1)
+      allDataInvalidForm.formValidationErrors.size must be(2)
     }
   }
 
