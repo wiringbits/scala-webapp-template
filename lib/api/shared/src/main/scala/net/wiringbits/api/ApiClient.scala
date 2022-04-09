@@ -25,6 +25,8 @@ trait ApiClient {
   def adminGetUserLogs(userId: UUID): Future[AdminGetUserLogs.Response]
   def adminGetUsers(): Future[AdminGetUsers.Response]
 
+  def getEnvironmentConfig(): Future[GetEnvironmentConfig.Response]
+
   def sendEmailVerificationToken(
       request: SendEmailVerificationToken.Request
   ): Future[SendEmailVerificationToken.Response]
@@ -209,6 +211,17 @@ object ApiClient {
       val uri = ServerAPI.withPath(path)
 
       prepareRequest[AdminGetUsers.Response]
+        .get(uri)
+        .send(backend)
+        .map(_.body)
+        .flatMap(Future.fromTry)
+    }
+
+    override def getEnvironmentConfig(): Future[GetEnvironmentConfig.Response] = {
+      val path = ServerAPI.path :+ "environment-config"
+      val uri = ServerAPI.withPath(path)
+
+      prepareRequest[GetEnvironmentConfig.Response]
         .get(uri)
         .send(backend)
         .map(_.body)

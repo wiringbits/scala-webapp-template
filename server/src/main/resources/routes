@@ -36,3 +36,6 @@ GET /admin/users/:userId/logs controllers.AdminController.getUserLogs(userId)
 
 # routes for admin tables (GET, POST, PUT and DELETE)
 -> / net.wiringbits.webapp.utils.admin.AppRouter
+
+# get frontend configs
+GET /environment-config controllers.EnvironmentConfigController.getEnvironmentConfig()
