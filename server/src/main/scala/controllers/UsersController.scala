@@ -1,5 +1,6 @@
 package controllers
 
+import io.swagger.annotations.Api
 import net.wiringbits.actions._
 import net.wiringbits.api.models._
 import net.wiringbits.config.JwtConfig
@@ -10,6 +11,7 @@ import play.api.mvc.{AbstractController, ControllerComponents}
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
+@Api
 class UsersController @Inject() (
     createUserAction: CreateUserAction,
     verifyUserEmailAction: VerifyUserEmailAction,

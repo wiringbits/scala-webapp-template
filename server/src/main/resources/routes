@@ -4,6 +4,7 @@
 # ~~~~
 
 GET /health controllers.HealthController.check()
+GET /swagger.json        controllers.Assets.at(path="/public", file="swagger.json")
 
 # create new user (public)
 POST /users controllers.UsersController.create()
@@ -39,3 +40,6 @@ GET /admin/users/:userId/logs controllers.AdminController.getUserLogs(userId)
 
 # get frontend configs
 GET /environment-config controllers.EnvironmentConfigController.getEnvironmentConfig()
+
+# static assets for swagger-ui
+GET /docs/*file        controllers.Assets.at(path="/swagger-ui", file)

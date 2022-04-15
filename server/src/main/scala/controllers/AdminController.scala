@@ -1,5 +1,6 @@
 package controllers
 
+import io.swagger.annotations.Api
 import net.wiringbits.common.models.Email
 import net.wiringbits.services.AdminService
 import org.slf4j.LoggerFactory
@@ -10,6 +11,7 @@ import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
+@Api
 class AdminController @Inject() (
     adminService: AdminService
 )(implicit cc: ControllerComponents, ec: ExecutionContext)
