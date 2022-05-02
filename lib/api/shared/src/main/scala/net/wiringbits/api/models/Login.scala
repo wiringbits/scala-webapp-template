@@ -10,9 +10,9 @@ object Login {
 
   @ApiModel(value = "LoginRequest", description = "Request to log into the app")
   case class Request(
-      @ApiModelProperty(value = "The user's email", example = "alexis@wiringbits.net", dataType = "String")
+      @ApiModelProperty(value = "The user's email", dataType = "String", example = "alexis@wiringbits.net")
       email: Email,
-      @ApiModelProperty(value = "The user's password", example = "notSoWeakPassword", dataType = "String")
+      @ApiModelProperty(value = "The user's password", dataType = "String", example = "notSoWeakPassword")
       password: Password,
       @ApiModelProperty(value = "The ReCAPTCHA value", dataType = "String")
       captcha: Captcha

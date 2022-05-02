@@ -10,18 +10,21 @@ package io.swagger.annotations
 
 // Dummy annotation to allow using swagger-annotations in our sjs compiled models
 // Based on https://github.com/swagger-api/swagger-core
+//
+// NOTE: Due to a compiler bug, we must define the values in the order we expect them to be used
+//       otherwise, we end up with compile warnings - https://github.com/scala/bug/issues/7656
 @SuppressWarnings(Array("org.wartremover.warts.ArrayEquals"))
 case class ApiModelProperty(
     value: String = "",
+    dataType: String = "",
+    example: String = "",
     name: String = "",
     allowableValues: String = "",
     access: String = "",
     notes: String = "",
-    dataType: String = "",
     required: Boolean = false,
     position: Int = 0,
     hidden: Boolean = false,
-    example: String = "",
     readOnly: Boolean = false,
     accessMode: ApiModelProperty.AccessMode.AccessMode = ApiModelProperty.AccessMode.AUTO,
     reference: String = "",
