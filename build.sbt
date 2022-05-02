@@ -115,7 +115,7 @@ lazy val baseLibSettings: Project => Project =
         "-unchecked" // Enable additional warnings where generated code depends on assumptions.
       ),
       libraryDependencies ++= Seq(
-        "org.scalatest" %%% "scalatest" % "3.2.11" % Test,
+        "org.scalatest" %%% "scalatest" % "3.2.12" % Test,
         "com.beachape" %%% "enumeratum" % "1.7.0"
       )
     )
@@ -329,8 +329,8 @@ lazy val server = (project in file("server"))
       "com.github.jwt-scala" %% "jwt-core" % "9.0.5",
       "de.svenkubiak" % "jBCrypt" % "0.4.3",
       "commons-validator" % "commons-validator" % "1.7",
-      "com.dimafeng" %% "testcontainers-scala-scalatest" % "0.40.5" % "test",
-      "com.dimafeng" %% "testcontainers-scala-postgresql" % "0.40.5" % "test",
+      "com.dimafeng" %% "testcontainers-scala-scalatest" % "0.40.7" % "test",
+      "com.dimafeng" %% "testcontainers-scala-postgresql" % "0.40.7" % "test",
       "com.softwaremill.sttp.client3" %% "core" % sttp % "test",
       "com.softwaremill.sttp.client3" %% "async-http-client-backend-future" % sttp % "test",
       "net.wiringbits" %% "admin-data-explorer-play-server" % webappUtils,
@@ -403,7 +403,7 @@ lazy val web = (project in file("web"))
       "io.monix" %%% "monix-reactive" % "3.4.0"
     ),
     libraryDependencies ++= Seq(
-      "org.scalatest" %%% "scalatest" % "3.2.11" % Test
+      "org.scalatest" %%% "scalatest" % "3.2.12" % Test
     )
   )
 
@@ -464,7 +464,7 @@ lazy val admin = (project in file("admin"))
       "net.wiringbits" %%% "admin-data-explorer-slinky" % webappUtils
     ),
     libraryDependencies ++= Seq(
-      "org.scalatest" %%% "scalatest" % "3.2.11" % Test
+      "org.scalatest" %%% "scalatest" % "3.2.12" % Test
     )
   )
 

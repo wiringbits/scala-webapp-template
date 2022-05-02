@@ -7,13 +7,14 @@ import play.api.libs.json.{Format, Json}
 import java.util.UUID
 
 object CreateUser {
+//  @SuppressWarnings(Array("org.wartremover.warts.ArrayEquals"))
   @ApiModel(value = "CreateUserRequest", description = "Request for the create user API")
   case class Request(
-      @ApiModelProperty(value = "The user's name", example = "Alex", dataType = "String")
+      @ApiModelProperty(value = "The user's name", dataType = "String", example = "Alex")
       name: Name,
-      @ApiModelProperty(value = "The user's email", example = "email@wiringbits.net", dataType = "String")
+      @ApiModelProperty(value = "The user's email", dataType = "String", example = "email@wiringbits.net")
       email: Email,
-      @ApiModelProperty(value = "The user's password", example = "notSoWeakPassword", dataType = "String")
+      @ApiModelProperty(value = "The user's password", dataType = "String", example = "notSoWeakPassword")
       password: Password,
       @ApiModelProperty(value = "The ReCAPTCHA value", dataType = "String")
       captcha: Captcha

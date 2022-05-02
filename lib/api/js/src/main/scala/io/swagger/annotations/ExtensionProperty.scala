@@ -10,5 +10,8 @@ package io.swagger.annotations
 
 // Dummy annotation to allow using swagger-annotations in our sjs compiled models
 // Based on https://github.com/swagger-api/swagger-core
+//
+// NOTE: Due to a compiler bug, we must define the values in the order we expect them to be used
+//       otherwise, we end up with compile warnings - https://github.com/scala/bug/issues/7656
 case class ExtensionProperty(name: String, value: String, parseValue: Boolean = false)
     extends scala.annotation.Annotation
