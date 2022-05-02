@@ -14,7 +14,7 @@ object ResetPassword {
 
   @ApiModel(value = "ResetPasswordResponse", description = "Response after resetting a user password")
   case class Response(
-      @ApiModelProperty(value = "The user's name", example = "Alex", dataType = "String")
+      @ApiModelProperty(value = "The user's name", dataType = "String", example = "Alex")
       name: Name,
       @ApiModelProperty(value = "The user's email", dataType = "String")
       email: Email,
