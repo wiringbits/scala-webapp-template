@@ -115,7 +115,7 @@ lazy val baseLibSettings: Project => Project =
         "-unchecked" // Enable additional warnings where generated code depends on assumptions.
       ),
       libraryDependencies ++= Seq(
-        "org.scalatest" %%% "scalatest" % "3.2.11" % Test,
+        "org.scalatest" %%% "scalatest" % "3.2.12" % Test,
         "com.beachape" %%% "enumeratum" % "1.7.0"
       )
     )
@@ -403,7 +403,7 @@ lazy val web = (project in file("web"))
       "io.monix" %%% "monix-reactive" % "3.4.0"
     ),
     libraryDependencies ++= Seq(
-      "org.scalatest" %%% "scalatest" % "3.2.11" % Test
+      "org.scalatest" %%% "scalatest" % "3.2.12" % Test
     )
   )
 
@@ -464,7 +464,7 @@ lazy val admin = (project in file("admin"))
       "net.wiringbits" %%% "admin-data-explorer-slinky" % webappUtils
     ),
     libraryDependencies ++= Seq(
-      "org.scalatest" %%% "scalatest" % "3.2.11" % Test
+      "org.scalatest" %%% "scalatest" % "3.2.12" % Test
     )
   )
 
