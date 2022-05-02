@@ -5,8 +5,9 @@ ThisBuild / scalaVersion := "2.13.8"
 ThisBuild / organization := "net.wiringbits"
 
 val playJson = "2.9.2"
-val sttp = "3.5.1"
+val sttp = "3.5.2"
 val webappUtils = "0.4.3"
+val swagger = "1.6.6"
 
 val consoleDisabledOptions = Seq("-Werror", "-Ywarn-unused", "-Ywarn-unused-import")
 
@@ -114,7 +115,7 @@ lazy val baseLibSettings: Project => Project =
         "-unchecked" // Enable additional warnings where generated code depends on assumptions.
       ),
       libraryDependencies ++= Seq(
-        "org.scalatest" %%% "scalatest" % "3.2.11" % Test,
+        "org.scalatest" %%% "scalatest" % "3.2.12" % Test,
         "com.beachape" %%% "enumeratum" % "1.7.0"
       )
     )
@@ -266,7 +267,8 @@ lazy val api = (crossProject(JSPlatform, JVMPlatform) in file("lib/api"))
   .jvmSettings(
     libraryDependencies ++= Seq(
       "com.typesafe.play" %% "play-json" % playJson,
-      "com.softwaremill.sttp.client3" %% "core" % sttp
+      "com.softwaremill.sttp.client3" %% "core" % sttp,
+      "io.swagger" % "swagger-annotations" % swagger
     )
   )
   .jsSettings(
@@ -323,18 +325,19 @@ lazy val server = (project in file("server"))
     libraryDependencies ++= Seq(
       "org.playframework.anorm" %% "anorm" % "2.6.10",
       "com.typesafe.play" %% "play-json" % "2.9.2",
-      "org.postgresql" % "postgresql" % "42.3.3",
+      "org.postgresql" % "postgresql" % "42.3.4",
       "com.github.jwt-scala" %% "jwt-core" % "9.0.5",
       "de.svenkubiak" % "jBCrypt" % "0.4.3",
       "commons-validator" % "commons-validator" % "1.7",
-      "com.dimafeng" %% "testcontainers-scala-scalatest" % "0.40.5" % "test",
-      "com.dimafeng" %% "testcontainers-scala-postgresql" % "0.40.5" % "test",
+      "com.dimafeng" %% "testcontainers-scala-scalatest" % "0.40.7" % "test",
+      "com.dimafeng" %% "testcontainers-scala-postgresql" % "0.40.7" % "test",
       "com.softwaremill.sttp.client3" %% "core" % sttp % "test",
       "com.softwaremill.sttp.client3" %% "async-http-client-backend-future" % sttp % "test",
       "net.wiringbits" %% "admin-data-explorer-play-server" % webappUtils,
       "software.amazon.awssdk" % "ses" % "2.17.141",
       "jakarta.xml.bind" % "jakarta.xml.bind-api" % "3.0.1",
-      "org.apache.commons" % "commons-text" % "1.9"
+      "org.apache.commons" % "commons-text" % "1.9",
+      "io.swagger" % "swagger-annotations" % swagger
     )
   )
 
@@ -400,7 +403,7 @@ lazy val web = (project in file("web"))
       "io.monix" %%% "monix-reactive" % "3.4.0"
     ),
     libraryDependencies ++= Seq(
-      "org.scalatest" %%% "scalatest" % "3.2.11" % Test
+      "org.scalatest" %%% "scalatest" % "3.2.12" % Test
     )
   )
 
@@ -461,7 +464,7 @@ lazy val admin = (project in file("admin"))
       "net.wiringbits" %%% "admin-data-explorer-slinky" % webappUtils
     ),
     libraryDependencies ++= Seq(
-      "org.scalatest" %%% "scalatest" % "3.2.11" % Test
+      "org.scalatest" %%% "scalatest" % "3.2.12" % Test
     )
   )
 

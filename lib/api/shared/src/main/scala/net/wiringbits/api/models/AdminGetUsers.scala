@@ -1,5 +1,6 @@
 package net.wiringbits.api.models
 
+import io.swagger.annotations.ApiModel
 import net.wiringbits.common.models.{Email, Name}
 import play.api.libs.json.{Format, Json}
 
@@ -7,6 +8,8 @@ import java.time.Instant
 import java.util.UUID
 
 object AdminGetUsers {
+
+  @ApiModel(value = "AdminGetUsersResponse", description = "Includes the user list")
   case class Response(data: List[Response.User])
   implicit val adminGetUsersResponseFormat: Format[Response] = Json.format[Response]
 
