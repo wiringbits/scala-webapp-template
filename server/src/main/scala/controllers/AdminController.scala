@@ -1,6 +1,7 @@
 package controllers
 
-import io.swagger.annotations.Api
+import io.swagger.annotations._
+import net.wiringbits.api.models.{AdminGetUserLogs, AdminGetUsers}
 import net.wiringbits.common.models.Email
 import net.wiringbits.services.AdminService
 import org.slf4j.LoggerFactory
@@ -11,13 +12,30 @@ import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-@Api
+@SwaggerDefinition(
+  securityDefinition = new SecurityDefinition(
+    basicAuthDefinitions = Array(
+      new BasicAuthDefinition(key = "admin_credentials", description = "Admin credentials")
+    )
+  )
+)
+@Api(value = "Admin", authorizations = Array(new Authorization(value = "admin_credentials")))
 class AdminController @Inject() (
     adminService: AdminService
 )(implicit cc: ControllerComponents, ec: ExecutionContext)
     extends AbstractController(cc) {
   private val logger = LoggerFactory.getLogger(this.getClass)
 
+  @ApiOperation(
+    value = "Get the logs for a specific user"
+  )
+  @ApiResponses(
+    Array(
+      new ApiResponse(code = 200, message = "The account was created", response = classOf[AdminGetUserLogs.Response]),
+      new ApiResponse(code = 400, message = "Invalid or missing arguments"),
+      new ApiResponse(code = 401, message = "Invalid or missing authentication")
+    )
+  )
   def getUserLogs(userIdStr: String) = handleGET { request =>
     for {
       _ <- adminUser(request)
@@ -27,6 +45,16 @@ class AdminController @Inject() (
     } yield Ok(Json.toJson(response))
   }
 
+  @ApiOperation(
+    value = "Get the registered users"
+  )
+  @ApiResponses(
+    Array(
+      new ApiResponse(code = 200, message = "The account was created", response = classOf[AdminGetUsers.Response]),
+      new ApiResponse(code = 400, message = "Invalid or missing arguments"),
+      new ApiResponse(code = 401, message = "Invalid or missing authentication")
+    )
+  )
   def getUsers() = handleGET { request =>
     for {
       _ <- adminUser(request)
