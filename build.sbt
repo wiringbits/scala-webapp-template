@@ -5,8 +5,9 @@ ThisBuild / scalaVersion := "2.13.8"
 ThisBuild / organization := "net.wiringbits"
 
 val playJson = "2.9.2"
-val sttp = "3.5.1"
+val sttp = "3.5.2"
 val webappUtils = "0.4.3"
+val swagger = "1.6.1"
 
 val consoleDisabledOptions = Seq("-Werror", "-Ywarn-unused", "-Ywarn-unused-import")
 
@@ -266,7 +267,8 @@ lazy val api = (crossProject(JSPlatform, JVMPlatform) in file("lib/api"))
   .jvmSettings(
     libraryDependencies ++= Seq(
       "com.typesafe.play" %% "play-json" % playJson,
-      "com.softwaremill.sttp.client3" %% "core" % sttp
+      "com.softwaremill.sttp.client3" %% "core" % sttp,
+      "io.swagger" % "swagger-annotations" % swagger
     )
   )
   .jsSettings(
@@ -323,7 +325,7 @@ lazy val server = (project in file("server"))
     libraryDependencies ++= Seq(
       "org.playframework.anorm" %% "anorm" % "2.6.10",
       "com.typesafe.play" %% "play-json" % "2.9.2",
-      "org.postgresql" % "postgresql" % "42.3.3",
+      "org.postgresql" % "postgresql" % "42.3.4",
       "com.github.jwt-scala" %% "jwt-core" % "9.0.5",
       "de.svenkubiak" % "jBCrypt" % "0.4.3",
       "commons-validator" % "commons-validator" % "1.7",
@@ -334,7 +336,8 @@ lazy val server = (project in file("server"))
       "net.wiringbits" %% "admin-data-explorer-play-server" % webappUtils,
       "software.amazon.awssdk" % "ses" % "2.17.141",
       "jakarta.xml.bind" % "jakarta.xml.bind-api" % "3.0.1",
-      "org.apache.commons" % "commons-text" % "1.9"
+      "org.apache.commons" % "commons-text" % "1.9",
+      "io.swagger" % "swagger-annotations" % swagger
     )
   )
 
