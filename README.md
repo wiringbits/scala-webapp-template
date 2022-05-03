@@ -17,7 +17,7 @@ To get an idea on what the template provides, play with the live demos, what you
 
 - [Web App](https://template-demo.wiringbits.net)
 - [Admin App](https://template-demo-admin.wiringbits.net) (username = `demo`, password = `wiringbits`)
-
+- [API Docs](https://template-demo.wiringbits.net/api/docs/index.html)
 ## Goal
 
 The goal for this project is to include more functionality that is common for web projects, like:

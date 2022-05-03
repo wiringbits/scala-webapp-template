@@ -16,9 +16,28 @@ server {
   proxy_busy_buffers_size 128k;
   proxy_buffers 64 16k;
 
-  # the admin api is only reachable from the admin website
+  # swagger docs
+  location /swagger.json {
+    proxy_pass http://localhost:9000;
+  }
+
+  # the admin api is only reachable when providing the necessary credentials
   location /api/admin {
-    return 403;
+    auth_basic "Administrators only";
+    auth_basic_user_file {{ nginx_admin_settings_file }};
+    auth_basic_user_file /etc/nginx/admin-config/htpasswd;
+
+    proxy_set_header  Host $host;
+    proxy_set_header  X-Real-IP $remote_addr;
+    proxy_set_header  X-Forwarded-For $remote_addr;
+    proxy_set_header  X-Forwarded-Host $remote_addr;
+    proxy_set_header  X-Forwarded-User $remote_user;
+    proxy_set_header  X-Forwarded-Proto https;
+    proxy_http_version 1.1;
+    proxy_set_header Connection "";
+
+    rewrite ^/api/(.*) /$1 break;
+    proxy_pass http://localhost:9000;
   }
 
   location /api {
@@ -35,10 +54,11 @@ server {
     proxy_pass http://localhost:9000;
   }
 
+  # FIXME: This prevents returning the static resources from the app, like /api/swagger.json
   # caching static assets
-  location ~* \.(jpg|jpeg|png|gif|ico|css|js)$ {
-    expires 7d;
-  }
+  # location ~* \.(jpg|jpeg|png|gif|ico|css|js)$ {
+  #   expires 7d;
+  # }
 
   location / {
     try_files $uri $uri/ /index.html;
