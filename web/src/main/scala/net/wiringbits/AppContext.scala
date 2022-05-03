@@ -5,13 +5,15 @@ import net.wiringbits.common.models.Email
 import net.wiringbits.core.I18nLang
 import net.wiringbits.models.{AuthState, User}
 
+import scala.concurrent.ExecutionContext
+
 case class AppContext(
     api: API,
-    recaptchaKey: String,
     $auth: Var[AuthState],
     $lang: Var[I18nLang],
     contactEmail: Email,
-    contactPhone: String
+    contactPhone: String,
+    implicit val executionContext: ExecutionContext
 ) {
 
   // TODO: This is hacky but it works while preventing to pollute all components from depending on the Texts

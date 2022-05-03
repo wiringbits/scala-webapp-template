@@ -2,6 +2,7 @@ package net.wiringbits.components.widgets
 
 import com.alexitc.materialui.facade.materialUiCore.mod.PropTypes.Color
 import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
+import net.wiringbits.AppContext
 import net.wiringbits.core.I18nHooks
 import net.wiringbits.forms.SignInFormData
 import net.wiringbits.models.User
@@ -10,7 +11,6 @@ import net.wiringbits.webapp.utils.slinkyUtils.components.core.ErrorLabel
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.{Alignment, EdgeInsets}
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container}
 import net.wiringbits.webapp.utils.slinkyUtils.forms.StatefulFormData
-import net.wiringbits.AppContext
 import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 import slinky.core.annotations.react
@@ -103,8 +103,8 @@ import scala.util.{Failure, Success}
     }
 
     val recaptcha = ReCaptcha(
-      onChange = captchaOpt => onDataChanged(x => x.copy(captcha = captchaOpt)),
-      props.ctx.recaptchaKey
+      props.ctx,
+      onChange = captchaOpt => onDataChanged(x => x.copy(captcha = captchaOpt))
     )
 
     val loginButton = {

@@ -24,20 +24,16 @@ object Main {
       hot.initialize()
     }
 
-    val captchaKey = net.wiringbits.BuildInfo.recaptchaKey.filter(_.nonEmpty).getOrElse {
-      "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"
-    }
-
     val scheduler = monix.execution.Scheduler.global
     val $authState = Var[AuthState](AuthState.Unauthenticated)(scheduler)
     val $lang = Var[I18nLang](I18nLang.English)(scheduler)
     val ctx = AppContext(
       API(),
-      recaptchaKey = captchaKey,
       $authState,
       $lang,
       Email.trusted("hello@wiringbits.net"),
-      "+52 (999) 9999 999"
+      "+52 (999) 9999 999",
+      org.scalajs.macrotaskexecutor.MacrotaskExecutor
     )
     val app = ErrorBoundaryComponent(
       ErrorBoundaryComponent.Props(
