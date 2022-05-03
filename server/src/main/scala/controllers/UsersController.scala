@@ -103,7 +103,7 @@ class UsersController @Inject() (
   }
 
   @ApiOperation(
-    value = "Log into the app",
+    value = "Log into the app - API",
     notes = "Returns a JWT to authenticate following requests"
   )
   @ApiImplicitParams(
@@ -123,12 +123,58 @@ class UsersController @Inject() (
       new ApiResponse(code = 400, message = "Invalid or missing arguments")
     )
   )
-  def login() = handleJsonBody[Login.Request] { request =>
+  def loginApi() = handleJsonBody[Login.Request] { request =>
     val body = request.body
-    logger.info(s"Login: ${body.email}")
+    logger.info(s"Login API: ${body.email}")
     for {
       response <- loginAction(body)
     } yield Ok(Json.toJson(response))
+  }
+
+  @ApiOperation(
+    value = "Log into the app - Browser",
+    notes = "Returns a session cookie that's stored securely by the browser"
+  )
+  @ApiImplicitParams(
+    Array(
+      new ApiImplicitParam(
+        name = "body",
+        value = "JSON-encoded request",
+        required = true,
+        paramType = "body",
+        dataTypeClass = classOf[Login.Request]
+      )
+    )
+  )
+  @ApiResponses(
+    Array(
+      new ApiResponse(code = 200, message = "Successful login", response = classOf[Login.Response]),
+      new ApiResponse(code = 400, message = "Invalid or missing arguments")
+    )
+  )
+  def loginBrowser() = handleJsonBody[Login.Request] { request =>
+    val body = request.body
+    logger.info(s"Login Browser: ${body.email}")
+    for {
+      response <- loginAction(body)
+    } yield {
+      // for browsers, the jwt is not required because the userId goes into the session
+      // returning the jwt could allow js to touch the token which is what we are intending to avoid
+      //
+      // unfortunately, we have problems with the cookie propagation, which is why we keep the token
+      // while running the app locally.
+      val jwt = if (jwtConfig.enforced) {
+        logger.warn(
+          s"Browser login successful for ${body.email}, be aware that the jwt was propagated to the browser which should not occur in production"
+        )
+        response.token
+      } else {
+        ""
+      }
+
+      Ok(Json.toJson(response.copy(token = jwt)))
+        .withSession("id" -> response.id.toString)
+    }
   }
 
   @ApiOperation(

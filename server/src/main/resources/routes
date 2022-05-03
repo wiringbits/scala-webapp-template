@@ -8,8 +8,10 @@ GET /swagger.json        controllers.Assets.at(path="/public", file="swagger.jso
 
 # create new user (public)
 POST /users controllers.UsersController.create()
-# login user (public)
-POST /users/login controllers.UsersController.login()
+# login user - browser (public)
+POST /users/login/browser controllers.UsersController.loginBrowser()
+# login user - api (public)
+POST /users/login controllers.UsersController.loginApi()
 # verify new user's email
 POST /users/verify-email controllers.UsersController.verifyEmail()
 # send a link to reset user's password
