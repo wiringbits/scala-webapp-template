@@ -12,6 +12,8 @@ import typings.reactRouter.mod.RouteProps
 import typings.reactRouterDom.components.Route
 import typings.reactRouterDom.{components => router}
 
+import scala.util.{Failure, Success}
+
 @react object AppRouter {
   case class Props(ctx: AppContext)
 
@@ -31,6 +33,8 @@ import typings.reactRouterDom.{components => router}
   }
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
+    import props.ctx.executionContext
+
     val auth = ReactiveHooks.useDistinctValue(props.ctx.$auth)
     val home = route("/", props.ctx)(HomePage(props.ctx))
     val about = route("/about", props.ctx)(AboutPage(props.ctx))
@@ -44,7 +48,15 @@ import typings.reactRouterDom.{components => router}
     def dashboard(user: User) = route("/dashboard", props.ctx)(DashboardPage(props.ctx, user))
     def me(user: User) = route("/me", props.ctx)(UserEditPage(props.ctx, user))
     val signOut = route("/signout", props.ctx) {
-      props.ctx.loggedOut()
+      props.ctx.api.client.logoutBrowser().onComplete {
+        case Success(_) =>
+          props.ctx.loggedOut()
+          println("Logged out successfully")
+
+        case Failure(exception) =>
+          println(s"Failed to log out: ${exception.getMessage}")
+      }
+
       router.Redirect("/")
     }
 
