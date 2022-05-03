@@ -94,11 +94,10 @@ import scala.util.{Failure, Success}
         )
       )
 
-    val recaptcha =
-      ReCaptcha(
-        onChange = captchaOpt => onDataChanged(x => x.copy(captcha = captchaOpt)),
-        captchaKey = props.ctx.recaptchaKey
-      )
+    val recaptcha = ReCaptcha(
+      props.ctx,
+      onChange = captchaOpt => onDataChanged(x => x.copy(captcha = captchaOpt))
+    )
 
     form(onSubmit := (handleSubmit(_)))(
       Container(

@@ -126,8 +126,7 @@ import scala.util.{Failure, Success}
       )
     }
 
-    val recaptcha =
-      ReCaptcha(onChange = captchaOpt => onDataChanged(x => x.copy(captcha = captchaOpt)), props.ctx.recaptchaKey)
+    val recaptcha = ReCaptcha(props.ctx, onChange = captchaOpt => onDataChanged(x => x.copy(captcha = captchaOpt)))
 
     val signUpButton = {
       val text =

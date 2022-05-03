@@ -346,10 +346,8 @@ lazy val webBuildInfoSettings: Project => Project = _.enablePlugins(BuildInfoPlu
     buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
     buildInfoKeys ++= {
       val apiUrl = sys.env.get("API_URL")
-      val recaptchaKey = sys.env.get("RECAPTCHA_KEY")
       val values = Seq(
-        "apiUrl" -> apiUrl,
-        "recaptchaKey" -> recaptchaKey
+        "apiUrl" -> apiUrl
       )
       // Logging these values is useful to make sure that the necessary settings
       // are being overriden when packaging the app.
