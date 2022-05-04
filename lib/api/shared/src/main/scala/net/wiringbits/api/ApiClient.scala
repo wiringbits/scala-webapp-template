@@ -12,6 +12,8 @@ import scala.util.{Failure, Success, Try}
 trait ApiClient {
   def createUser(request: CreateUser.Request): Future[CreateUser.Response]
   def login(request: Login.Request): Future[Login.Response]
+  def loginBrowser(request: Login.Request): Future[Login.Response]
+  def logoutBrowser(): Future[Logout.Response]
 
   def verifyEmail(request: VerifyEmail.Request): Future[VerifyEmail.Response]
   def forgotPassword(request: ForgotPassword.Request): Future[ForgotPassword.Response]
@@ -134,7 +136,7 @@ object ApiClient {
     }
 
     override def login(request: Login.Request): Future[Login.Response] = {
-      val path = ServerAPI.path :+ "users" :+ "login"
+      val path = ServerAPI.path :+ "auth" :+ "login"
       val uri = ServerAPI.withPath(path)
 
       prepareRequest[Login.Response]
@@ -145,8 +147,32 @@ object ApiClient {
         .flatMap(Future.fromTry)
     }
 
+    override def loginBrowser(request: Login.Request): Future[Login.Response] = {
+      val path = ServerAPI.path :+ "auth" :+ "login-browser"
+      val uri = ServerAPI.withPath(path)
+
+      prepareRequest[Login.Response]
+        .post(uri)
+        .body(Json.toJson(request).toString())
+        .send(backend)
+        .map(_.body)
+        .flatMap(Future.fromTry)
+    }
+
+    override def logoutBrowser(): Future[Logout.Response] = {
+      val path = ServerAPI.path :+ "auth" :+ "logout-browser"
+      val uri = ServerAPI.withPath(path)
+
+      prepareRequest[Logout.Response]
+        .post(uri)
+        .body(Json.toJson(Logout.Request()).toString())
+        .send(backend)
+        .map(_.body)
+        .flatMap(Future.fromTry)
+    }
+
     override def currentUser(jwt: String): Future[GetCurrentUser.Response] = {
-      val path = ServerAPI.path :+ "users" :+ "me"
+      val path = ServerAPI.path :+ "auth" :+ "me"
       val uri = ServerAPI.withPath(path)
 
       prepareRequest[GetCurrentUser.Response]

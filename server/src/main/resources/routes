@@ -6,10 +6,17 @@
 GET /health controllers.HealthController.check()
 GET /swagger.json        controllers.Assets.at(path="/public", file="swagger.json")
 
+# login user - browser (public)
+POST /auth/login-browser controllers.AuthController.loginBrowser()
+# login user - api (public)
+POST /auth/login controllers.AuthController.loginApi()
+# logout - browser (public)
+POST /auth/logout-browser controllers.AuthController.logoutBrowser()
+# get the current user details
+GET  /auth/me controllers.AuthController.getCurrentUser()
+
 # create new user (public)
 POST /users controllers.UsersController.create()
-# login user (public)
-POST /users/login controllers.UsersController.login()
 # verify new user's email
 POST /users/verify-email controllers.UsersController.verifyEmail()
 # send a link to reset user's password
@@ -19,8 +26,6 @@ POST /users/reset-password controllers.UsersController.resetPassword()
 # send email verification token (public)
 POST /users/email-verification-token controllers.UsersController.sendEmailVerificationToken()
 
-# get the current user details
-GET /users/me controllers.UsersController.getCurrentUser()
 # update the current user details
 PUT /users/me controllers.UsersController.update()
 # update the current user password
@@ -35,11 +40,11 @@ GET /admin/users controllers.AdminController.getUsers()
 # get user logs
 GET /admin/users/:userId/logs controllers.AdminController.getUserLogs(userId)
 
-# routes for admin tables (GET, POST, PUT and DELETE)
--> / net.wiringbits.webapp.utils.admin.AppRouter
-
 # get frontend configs
 GET /environment-config controllers.EnvironmentConfigController.getEnvironmentConfig()
 
 # static assets for swagger-ui
 GET /docs/*file        controllers.Assets.at(path="/swagger-ui", file)
+
+# routes for admin tables (GET, POST, PUT and DELETE)
+-> / net.wiringbits.webapp.utils.admin.AppRouter

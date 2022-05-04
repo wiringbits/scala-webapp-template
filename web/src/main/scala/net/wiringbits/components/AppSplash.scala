@@ -29,18 +29,15 @@ import scala.util.{Failure, Success}
           .foreach(lang => props.ctx.$lang := lang)
 
         // load authenticated user
-        props.ctx.api.storage.findJwt().filter(_.nonEmpty) match {
-          case Some(jwt) =>
-            props.ctx.api.client.currentUser(jwt).onComplete {
-              case Success(res) =>
-                props.ctx.loggedIn(User(name = res.name, email = res.email, jwt = jwt))
-                setInitialized(true)
+        props.ctx.api.client.currentUser("").onComplete {
+          case Success(res) =>
+            props.ctx.loggedIn(User(name = res.name, email = res.email, jwt = ""))
+            setInitialized(true)
 
-              case Failure(ex) =>
-                ex.printStackTrace()
-                setInitialized(true)
-            }
-          case None =>
+          case Failure(ex) =>
+            println(
+              s"Failed to get current user, we are either unauthenticated or the server had a problem: ${ex.getMessage}"
+            )
             setInitialized(true)
         }
       },
