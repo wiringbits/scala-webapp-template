@@ -1,2 +1,6 @@
 apps/
 .vault
+prod-hosts.ini
+config/server/demo.env.j2
+
+
