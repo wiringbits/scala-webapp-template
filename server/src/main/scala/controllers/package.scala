@@ -37,14 +37,27 @@ package object controllers {
       .getOrElse(Failure(new RuntimeException("Unable to parse the authorization header as a Jwt token")))
   }
 
-  def authenticate(request: Request[_])(implicit config: JwtConfig): Future[UUID] = {
-    Future.fromTry {
+  def authenticate(request: Request[_])(implicit config: JwtConfig, ec: ExecutionContext): Future[UUID] = {
+    def userIdFromSession = Future {
+      request.session
+        .get("id")
+        .flatMap(str => Try(UUID.fromString(str)).toOption)
+        .getOrElse(throw new RuntimeException("Invalid or missing authentication"))
+    }
+
+    def userIdFromHeader = Future.fromTry {
       request.headers
         .get("X-Authorization") // NOTE: THis allows to use nginx basic-auth
         .orElse(request.headers.get(HeaderNames.AUTHORIZATION))
         .map(header => decodeAuthorizationHeader(header))
         .getOrElse(Failure(new RuntimeException("Authorization header not found")))
     }
+
+    userIdFromSession
+      .recoverWith { case NonFatal(_) => userIdFromHeader }
+      .recover { case NonFatal(_) =>
+        throw new RuntimeException("Unauthorized: Invalid or missing authentication")
+      }
   }
 
   def handleJsonBody[T: Reads](
