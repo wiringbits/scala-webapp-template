@@ -28,18 +28,25 @@ import scala.util.{Failure, Success}
           .findLang()
           .foreach(lang => props.ctx.$lang := lang)
 
-        // load authenticated user
-        props.ctx.api.client.currentUser("").onComplete {
-          case Success(res) =>
-            props.ctx.loggedIn(User(name = res.name, email = res.email, jwt = ""))
-            setInitialized(true)
+        props.ctx.api.storage.findJwt().filter(_.nonEmpty) match {
+          case Some(token) =>
+            // load authenticated user
+            props.ctx.api.client.currentUser(token).onComplete {
+              case Success(res) =>
+                props.ctx.loggedIn(User(name = res.name, email = res.email, jwt = token))
+                setInitialized(true)
 
-          case Failure(ex) =>
-            println(
-              s"Failed to get current user, we are either unauthenticated or the server had a problem: ${ex.getMessage}"
-            )
+              case Failure(ex) =>
+                println(
+                  s"Failed to get current user, we are either unauthenticated or the server had a problem: ${ex.getMessage}"
+                )
+                setInitialized(true)
+            }
+          case None =>
+            println(s"Missing auth token")
             setInitialized(true)
         }
+
       },
       ""
     )
