@@ -28,14 +28,7 @@ object Login {
       @ApiModelProperty(value = "The name for the user", dataType = "String", example = "email@wiringbits.net")
       name: Name,
       @ApiModelProperty(value = "The email for the user", dataType = "String", example = "Alex")
-      email: Email,
-      @ApiModelProperty(
-        value = "The JWT for the user",
-        dataType = "String",
-        example =
-          "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzM4NCJ9.eyJleHAiOjE2NTEyNTg3MDcsImlhdCI6MTY0ODY2NjcwNywgImlkIjogIjM3NzEyOTQ2LWFlNjEtNGM4Ny1hNzEwLWQ3NjY5ZGY1OTBhOCIgfQ.oIaSw0GdIRTQF3FEA0zy-aLtF-iJTBugBEusG_HhPAv4DLjblM4yNLnwpziKg7Rc"
-      )
-      token: String
+      email: Email
   )
 
   implicit val loginRequestFormat: Format[Request] = Json.format[Request]

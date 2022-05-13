@@ -12,14 +12,8 @@ import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-@SwaggerDefinition(
-  securityDefinition = new SecurityDefinition(
-    basicAuthDefinitions = Array(
-      new BasicAuthDefinition(key = "admin_credentials", description = "Admin credentials")
-    )
-  )
-)
-@Api(value = "Admin", authorizations = Array(new Authorization(value = "admin_credentials")))
+@SwaggerDefinition()
+@Api(value = "Admin")
 class AdminController @Inject() (
     adminService: AdminService
 )(implicit cc: ControllerComponents, ec: ExecutionContext)

@@ -12,8 +12,7 @@ import scala.util.{Failure, Success, Try}
 trait ApiClient {
   def createUser(request: CreateUser.Request): Future[CreateUser.Response]
   def login(request: Login.Request): Future[Login.Response]
-  def loginBrowser(request: Login.Request): Future[Login.Response]
-  def logoutBrowser(): Future[Logout.Response]
+  def logout(): Future[Logout.Response]
 
   def verifyEmail(request: VerifyEmail.Request): Future[VerifyEmail.Response]
   def forgotPassword(request: ForgotPassword.Request): Future[ForgotPassword.Response]
@@ -147,20 +146,8 @@ object ApiClient {
         .flatMap(Future.fromTry)
     }
 
-    override def loginBrowser(request: Login.Request): Future[Login.Response] = {
-      val path = ServerAPI.path :+ "auth" :+ "login-browser"
-      val uri = ServerAPI.withPath(path)
-
-      prepareRequest[Login.Response]
-        .post(uri)
-        .body(Json.toJson(request).toString())
-        .send(backend)
-        .map(_.body)
-        .flatMap(Future.fromTry)
-    }
-
-    override def logoutBrowser(): Future[Logout.Response] = {
-      val path = ServerAPI.path :+ "auth" :+ "logout-browser"
+    override def logout(): Future[Logout.Response] = {
+      val path = ServerAPI.path :+ "auth" :+ "logout"
       val uri = ServerAPI.withPath(path)
 
       prepareRequest[Logout.Response]

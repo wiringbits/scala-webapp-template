@@ -17,8 +17,7 @@ object ResetPassword {
       @ApiModelProperty(value = "The user's name", dataType = "String", example = "Alex")
       name: Name,
       @ApiModelProperty(value = "The user's email", dataType = "String")
-      email: Email,
-      token: String
+      email: Email
   )
 
   implicit val userTokenFormat: Format[UserToken] = Json.format[UserToken]

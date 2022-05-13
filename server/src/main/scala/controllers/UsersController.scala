@@ -3,7 +3,6 @@ package controllers
 import io.swagger.annotations._
 import net.wiringbits.actions._
 import net.wiringbits.api.models._
-import net.wiringbits.config.JwtConfig
 import org.slf4j.LoggerFactory
 import play.api.libs.json.Json
 import play.api.mvc.{AbstractController, ControllerComponents}
@@ -11,18 +10,7 @@ import play.api.mvc.{AbstractController, ControllerComponents}
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-@SwaggerDefinition(
-  securityDefinition = new SecurityDefinition(
-    apiKeyAuthDefinitions = Array(
-      new ApiKeyAuthDefinition(
-        name = "Authorization",
-        key = "user_jwt",
-        in = ApiKeyAuthDefinition.ApiKeyLocation.HEADER,
-        description = "The user's JWT retrieved when logging into the app"
-      )
-    )
-  )
-)
+@SwaggerDefinition()
 @Api("Users")
 class UsersController @Inject() (
     createUserAction: CreateUserAction,
@@ -33,7 +21,7 @@ class UsersController @Inject() (
     updatePasswordAction: UpdatePasswordAction,
     getUserLogsAction: GetUserLogsAction,
     sendEmailVerificationTokenAction: SendEmailVerificationTokenAction
-)(implicit cc: ControllerComponents, ec: ExecutionContext, jwtConfig: JwtConfig)
+)(implicit cc: ControllerComponents, ec: ExecutionContext)
     extends AbstractController(cc) {
   private val logger = LoggerFactory.getLogger(this.getClass)
 
@@ -201,7 +189,6 @@ class UsersController @Inject() (
 
   @ApiOperation(
     value = "Updates the authenticated user details",
-    authorizations = Array(new Authorization(value = "user_jwt"))
   )
   @ApiImplicitParams(
     Array(
@@ -237,7 +224,6 @@ class UsersController @Inject() (
   @ApiOperation(
     value = "Updates the authenticated user password",
     notes = "The user should know its current password",
-    authorizations = Array(new Authorization(value = "user_jwt"))
   )
   @ApiImplicitParams(
     Array(
@@ -272,7 +258,6 @@ class UsersController @Inject() (
 
   @ApiOperation(
     value = "Get the logs for the authenticated user",
-    authorizations = Array(new Authorization(value = "user_jwt"))
   )
   @ApiResponses(
     Array(

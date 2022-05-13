@@ -54,7 +54,7 @@ import scala.util.{Failure, Success}
               None
             }
         } yield props.ctx.api.client
-          .loginBrowser(request)
+          .login(request)
           .onComplete {
             case Success(res) =>
               setFormData(_.submitted)
