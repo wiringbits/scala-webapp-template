@@ -58,7 +58,7 @@ import scala.util.{Failure, Success}
           .onComplete {
             case Success(res) =>
               setFormData(_.submitted)
-              props.ctx.loggedIn(User(res.name, res.email, res.token))
+              props.ctx.loggedIn(User(res.name, res.email))
               history.push("/dashboard") // redirects to the dashboard
 
             case Failure(ex) =>
