@@ -4,14 +4,12 @@ import play.api.libs.json.{JsValue, Json, Reads}
 import play.api.mvc._
 import play.api.mvc.Results._
 
-import java.time.Clock
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 import scala.util.Try
 
 package object controllers {
-  private implicit val clock: Clock = Clock.systemUTC
   private val logger = LoggerFactory.getLogger(this.getClass)
 
   def adminUser(request: Request[_]): Future[String] = {

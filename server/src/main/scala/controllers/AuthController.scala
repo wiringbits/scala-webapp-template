@@ -5,7 +5,7 @@ import net.wiringbits.actions._
 import net.wiringbits.api.models._
 import org.slf4j.LoggerFactory
 import play.api.libs.json.Json
-import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
+import play.api.mvc.{AbstractController, ControllerComponents}
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext

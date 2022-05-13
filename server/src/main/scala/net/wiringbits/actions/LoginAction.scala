@@ -5,7 +5,6 @@ import net.wiringbits.apis.ReCaptchaApi
 import net.wiringbits.repositories.{UserLogsRepository, UsersRepository}
 import net.wiringbits.validations.{ValidateCaptcha, ValidatePasswordMatches, ValidateVerifiedUser}
 
-import java.time.Clock
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -14,8 +13,7 @@ class LoginAction @Inject() (
     usersRepository: UsersRepository,
     userLogsRepository: UserLogsRepository
 )(implicit
-    ec: ExecutionContext,
-    clock: Clock
+    ec: ExecutionContext
 ) {
   // returns the token to use for authenticating requests
   def apply(request: Login.Request): Future[Login.Response] = {
