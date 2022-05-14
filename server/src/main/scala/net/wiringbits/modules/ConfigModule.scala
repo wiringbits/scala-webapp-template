@@ -13,14 +13,6 @@ class ConfigModule extends AbstractModule {
 
   @Provides
   @Singleton
-  def jwtConfig(global: Configuration): JwtConfig = {
-    val config = JwtConfig(global.get[Configuration]("jwt"))
-    logger.info(s"Config loaded: $config")
-    config
-  }
-
-  @Provides
-  @Singleton
   def recaptchaConfig(global: Configuration): ReCaptchaConfig = {
     val config = ReCaptchaConfig(global.get[Configuration]("recaptcha"))
     logger.info(s"Config loaded: $config")

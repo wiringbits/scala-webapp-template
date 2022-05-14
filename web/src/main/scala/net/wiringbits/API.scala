@@ -14,7 +14,7 @@ object API {
   // allows overriding the server url
   private val apiUrl = {
     net.wiringbits.BuildInfo.apiUrl.filter(_.nonEmpty).getOrElse {
-      "http://localhost:9000"
+      "http://localhost:8080/api"
     }
   }
 

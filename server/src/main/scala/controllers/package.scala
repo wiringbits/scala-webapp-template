@@ -1,20 +1,15 @@
 import net.wiringbits.api.models.ErrorResponse
-import net.wiringbits.config.JwtConfig
-import net.wiringbits.util.JwtUtils
 import org.slf4j.LoggerFactory
-import play.api.http.HeaderNames
 import play.api.libs.json.{JsValue, Json, Reads}
+import play.api.mvc.Results._
 import play.api.mvc._
-import play.api.mvc.Results.InternalServerError
 
-import java.time.Clock
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
 import scala.util.control.NonFatal
-import scala.util.{Failure, Try}
 
 package object controllers {
-  private implicit val clock: Clock = Clock.systemUTC
   private val logger = LoggerFactory.getLogger(this.getClass)
 
   def adminUser(request: Request[_]): Future[String] = {
@@ -23,38 +18,14 @@ package object controllers {
     Future.successful(user)
   }
 
-  private def decodeAuthorizationHeader(header: String)(implicit config: JwtConfig): Try[UUID] = {
-    val tokenType = "Bearer"
-    val headerParts = header.split(" ")
-
-    Option(headerParts)
-      .filter(_.length == 2)
-      .filter(tokenType equalsIgnoreCase _.head)
-      .map(_.drop(1).head)
-      .map { token =>
-        JwtUtils.decodeToken(config, token)
-      }
-      .getOrElse(Failure(new RuntimeException("Unable to parse the authorization header as a Jwt token")))
-  }
-
-  def authenticate(request: Request[_])(implicit config: JwtConfig, ec: ExecutionContext): Future[UUID] = {
+  def authenticate(request: Request[_])(implicit ec: ExecutionContext): Future[UUID] = {
     def userIdFromSession = Future {
       request.session
         .get("id")
         .flatMap(str => Try(UUID.fromString(str)).toOption)
         .getOrElse(throw new RuntimeException("Invalid or missing authentication"))
     }
-
-    def userIdFromHeader = Future.fromTry {
-      request.headers
-        .get("X-Authorization") // NOTE: THis allows to use nginx basic-auth
-        .orElse(request.headers.get(HeaderNames.AUTHORIZATION))
-        .map(header => decodeAuthorizationHeader(header))
-        .getOrElse(Failure(new RuntimeException("Authorization header not found")))
-    }
-
     userIdFromSession
-      .recoverWith { case NonFatal(_) => userIdFromHeader }
       .recover { case NonFatal(_) =>
         throw new RuntimeException("Unauthorized: Invalid or missing authentication")
       }

@@ -3,7 +3,6 @@ package controllers
 import io.swagger.annotations._
 import net.wiringbits.actions._
 import net.wiringbits.api.models._
-import net.wiringbits.config.JwtConfig
 import org.slf4j.LoggerFactory
 import play.api.libs.json.Json
 import play.api.mvc.{AbstractController, ControllerComponents}
@@ -15,10 +14,11 @@ import scala.concurrent.ExecutionContext
   securityDefinition = new SecurityDefinition(
     apiKeyAuthDefinitions = Array(
       new ApiKeyAuthDefinition(
-        name = "Authorization",
-        key = "user_jwt",
+        name = "Cookie",
+        key = "auth_cookie",
         in = ApiKeyAuthDefinition.ApiKeyLocation.HEADER,
-        description = "The user's JWT retrieved when logging into the app"
+        description =
+          "The user's session cookie retrieved when logging into the app, invoke the login API to get the cookie stored in the browser"
       )
     )
   )
@@ -33,7 +33,7 @@ class UsersController @Inject() (
     updatePasswordAction: UpdatePasswordAction,
     getUserLogsAction: GetUserLogsAction,
     sendEmailVerificationTokenAction: SendEmailVerificationTokenAction
-)(implicit cc: ControllerComponents, ec: ExecutionContext, jwtConfig: JwtConfig)
+)(implicit cc: ControllerComponents, ec: ExecutionContext)
     extends AbstractController(cc) {
   private val logger = LoggerFactory.getLogger(this.getClass)
 
@@ -201,7 +201,7 @@ class UsersController @Inject() (
 
   @ApiOperation(
     value = "Updates the authenticated user details",
-    authorizations = Array(new Authorization(value = "user_jwt"))
+    authorizations = Array(new Authorization(value = "auth_cookie"))
   )
   @ApiImplicitParams(
     Array(
@@ -237,7 +237,7 @@ class UsersController @Inject() (
   @ApiOperation(
     value = "Updates the authenticated user password",
     notes = "The user should know its current password",
-    authorizations = Array(new Authorization(value = "user_jwt"))
+    authorizations = Array(new Authorization(value = "auth_cookie"))
   )
   @ApiImplicitParams(
     Array(
@@ -272,7 +272,7 @@ class UsersController @Inject() (
 
   @ApiOperation(
     value = "Get the logs for the authenticated user",
-    authorizations = Array(new Authorization(value = "user_jwt"))
+    authorizations = Array(new Authorization(value = "auth_cookie"))
   )
   @ApiResponses(
     Array(

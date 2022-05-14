@@ -55,7 +55,7 @@ import scala.util.{Failure, Success}
               None
             }
         } yield props.ctx.api.client
-          .updateUser(props.user.jwt, request)
+          .updateUser(request)
           .onComplete {
             case Success(_) =>
               setFormData(_.submitted)

@@ -6,12 +6,10 @@
 GET /health controllers.HealthController.check()
 GET /swagger.json        controllers.Assets.at(path="/public", file="swagger.json")
 
-# login user - browser (public)
-POST /auth/login-browser controllers.AuthController.loginBrowser()
-# login user - api (public)
-POST /auth/login controllers.AuthController.loginApi()
-# logout - browser (public)
-POST /auth/logout-browser controllers.AuthController.logoutBrowser()
+# login user
+POST /auth/login controllers.AuthController.login()
+# logout
+POST /auth/logout controllers.AuthController.logout()
 # get the current user details
 GET  /auth/me controllers.AuthController.getCurrentUser()
 

@@ -32,7 +32,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
   def userTokensRepository: UserTokensRepository = app.injector.instanceOf(classOf[UserTokensRepository])
 
   private val clock = mock[Clock]
-  when(clock.instant()).thenReturn(Instant.now())
+  when(clock.instant).thenReturn(Instant.now())
 
   private val tokenGenerator = mock[TokenGenerator]
 
@@ -282,7 +282,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
       loginResponse.email must be(request.email)
     }
 
-    "return a token when a user tries to reset a password" in withApiClient { client =>
+    "return a email when a user tries to reset a password" in withApiClient { client =>
       val name = Name.trusted("wiringbits")
       val email = Email.trusted("test1@email.com")
       val request = CreateUser.Request(
@@ -307,7 +307,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
         .resetPassword(resetPasswordRequest)
         .futureValue
 
-      response.token mustNot be(empty)
+      response.email must be(email)
     }
 
     "fail when the user tries to login with their old password after the password resetting" in withApiClient {
