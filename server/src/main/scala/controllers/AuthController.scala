@@ -10,7 +10,19 @@ import play.api.mvc.{AbstractController, ControllerComponents}
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-@SwaggerDefinition()
+@SwaggerDefinition(
+  securityDefinition = new SecurityDefinition(
+    apiKeyAuthDefinitions = Array(
+      new ApiKeyAuthDefinition(
+        name = "Cookie",
+        key = "auth_cookie",
+        in = ApiKeyAuthDefinition.ApiKeyLocation.HEADER,
+        description =
+          "The user's session cookie retrieved when logging into the app, invoke the login API to get the cookie stored in the browser"
+      )
+    )
+  )
+)
 @Api("Auth")
 class AuthController @Inject() (
     loginAction: LoginAction,
@@ -20,8 +32,8 @@ class AuthController @Inject() (
   private val logger = LoggerFactory.getLogger(this.getClass)
 
   @ApiOperation(
-    value = "Log into the app - API",
-    notes = "Returns a JWT to authenticate following requests"
+    value = "Log into the app",
+    notes = "Sets a session cookie to authenticate the following requests"
   )
   @ApiImplicitParams(
     Array(
@@ -45,12 +57,13 @@ class AuthController @Inject() (
     logger.info(s"Login API: ${body.email}")
     for {
       response <- loginAction(body)
-    } yield Ok(Json.toJson(response)).withSession("userId" -> response.id.toString)
+    } yield Ok(Json.toJson(response)).withSession("id" -> response.id.toString)
   }
 
   @ApiOperation(
     value = "Logout from the app",
-    notes = "Clears the session cookie that's stored securely"
+    notes = "Clears the session cookie that's stored securely",
+    authorizations = Array(new Authorization(value = "auth_cookie"))
   )
   @ApiImplicitParams(
     Array(
@@ -80,7 +93,8 @@ class AuthController @Inject() (
   }
 
   @ApiOperation(
-    value = "Get the details for the authenticated user"
+    value = "Get the details for the authenticated user",
+    authorizations = Array(new Authorization(value = "auth_cookie"))
   )
   @ApiResponses(
     Array(

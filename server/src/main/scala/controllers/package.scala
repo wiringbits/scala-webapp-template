@@ -1,13 +1,13 @@
 import net.wiringbits.api.models.ErrorResponse
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{JsValue, Json, Reads}
-import play.api.mvc._
 import play.api.mvc.Results._
+import play.api.mvc._
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.control.NonFatal
 import scala.util.Try
+import scala.util.control.NonFatal
 
 package object controllers {
   private val logger = LoggerFactory.getLogger(this.getClass)
@@ -21,7 +21,7 @@ package object controllers {
   def authenticate(request: Request[_])(implicit ec: ExecutionContext): Future[UUID] = {
     def userIdFromSession = Future {
       request.session
-        .get("userId")
+        .get("id")
         .flatMap(str => Try(UUID.fromString(str)).toOption)
         .getOrElse(throw new RuntimeException("Invalid or missing authentication"))
     }

@@ -10,7 +10,19 @@ import play.api.mvc.{AbstractController, ControllerComponents}
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-@SwaggerDefinition()
+@SwaggerDefinition(
+  securityDefinition = new SecurityDefinition(
+    apiKeyAuthDefinitions = Array(
+      new ApiKeyAuthDefinition(
+        name = "Cookie",
+        key = "auth_cookie",
+        in = ApiKeyAuthDefinition.ApiKeyLocation.HEADER,
+        description =
+          "The user's session cookie retrieved when logging into the app, invoke the login API to get the cookie stored in the browser"
+      )
+    )
+  )
+)
 @Api("Users")
 class UsersController @Inject() (
     createUserAction: CreateUserAction,
@@ -189,6 +201,7 @@ class UsersController @Inject() (
 
   @ApiOperation(
     value = "Updates the authenticated user details",
+    authorizations = Array(new Authorization(value = "auth_cookie"))
   )
   @ApiImplicitParams(
     Array(
@@ -224,6 +237,7 @@ class UsersController @Inject() (
   @ApiOperation(
     value = "Updates the authenticated user password",
     notes = "The user should know its current password",
+    authorizations = Array(new Authorization(value = "auth_cookie"))
   )
   @ApiImplicitParams(
     Array(
@@ -258,6 +272,7 @@ class UsersController @Inject() (
 
   @ApiOperation(
     value = "Get the logs for the authenticated user",
+    authorizations = Array(new Authorization(value = "auth_cookie"))
   )
   @ApiResponses(
     Array(

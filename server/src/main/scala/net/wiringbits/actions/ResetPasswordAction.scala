@@ -36,10 +36,6 @@ class ResetPasswordAction @Inject() (
       user = userMaybe.getOrElse(throw new RuntimeException(s"User with id $userId wasn't found"))
       emailMessage = EmailMessage.resetPassword(user.name)
       _ <- usersRepository.resetPassword(userId, hashedPassword, emailMessage)
-
-      // And, returning the auth token
-      // TODO: Set user session id
-
     } yield ResetPassword.Response(name = user.name, email = user.email)
   }
 }
