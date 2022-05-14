@@ -52,7 +52,7 @@ import scala.util.{Failure, Success}
               None
             }
         } yield props.ctx.api.client
-          .updatePassword(props.user.jwt, request)
+          .updatePassword(request)
           .onComplete {
             case Success(_) =>
               // TODO: Show dialog?

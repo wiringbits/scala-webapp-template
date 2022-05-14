@@ -16,7 +16,7 @@ import slinky.core.annotations.react
 
     AsyncComponent.component[GetUserLogs.Response](
       AsyncComponent.Props(
-        fetch = () => props.ctx.api.client.getUserLogs(props.user.jwt),
+        fetch = () => props.ctx.api.client.getUserLogs(),
         render = response => LogList.component(LogList.Props(props.ctx, response, () => forceRefresh())),
         progressIndicator = () => Loader(props.ctx),
         watchedObjects = List(timesRefreshingData)

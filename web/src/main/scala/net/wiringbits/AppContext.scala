@@ -21,12 +21,10 @@ case class AppContext(
   def texts(lang: I18nLang): I18nMessages = new I18nMessages(lang)
 
   def loggedIn(user: User): Unit = {
-    api.storage.saveJwt(user.jwt)
     $auth := AuthState.Authenticated(user)
   }
 
   def loggedOut(): Unit = {
-    api.storage.saveJwt("")
     $auth := AuthState.Unauthenticated
   }
 

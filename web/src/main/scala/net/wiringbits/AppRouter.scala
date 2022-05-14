@@ -48,7 +48,7 @@ import scala.util.{Failure, Success}
     def dashboard(user: User) = route("/dashboard", props.ctx)(DashboardPage(props.ctx, user))
     def me(user: User) = route("/me", props.ctx)(UserEditPage(props.ctx, user))
     val signOut = route("/signout", props.ctx) {
-      props.ctx.api.client.logoutBrowser().onComplete {
+      props.ctx.api.client.logout().onComplete {
         case Success(_) =>
           props.ctx.loggedOut()
           println("Logged out successfully")
