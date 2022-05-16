@@ -11,7 +11,7 @@ case class API(client: ApiClient, admin: APIAdmin)
 object API {
 
   // allows overriding the server url
-  private val apiUrl = {
+  val apiUrl = {
     net.wiringbits.BuildInfo.apiUrl.filter(_.nonEmpty).getOrElse {
       "http://localhost:9000"
     }

@@ -1,32 +1,50 @@
 package net.wiringbits
 
-import net.wiringbits.webapp.utils.slinkyUtils.components.core.{ErrorBoundaryComponent, ErrorBoundaryInfo}
+import japgolly.scalajs.react.vdom.VdomNode
 import org.scalajs.dom
-import slinky.hot
-import slinky.web.ReactDOM
+import facades.reactadmin._
+import net.wiringbits.webapp.utils.api.models.AdminGetTables
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 
-import scala.scalajs.js.annotation.JSImport
-import scala.scalajs.{LinkingInfo, js}
-
-@JSImport("js/index.css", JSImport.Default)
-@js.native
-object IndexCSS extends js.Object
+import scala.util.{Failure, Success}
 
 object Main {
-  val css = IndexCSS
 
-  def main(argv: Array[String]): Unit = {
-    if (LinkingInfo.developmentMode) {
-      hot.initialize()
+  private def AdminTables(response: AdminGetTables.Response) = {
+    val tablesUrl = s"${API.apiUrl}/admin/tables"
+    val tableNames = response.data.map(_.name)
+
+    def buildResources: List[VdomNode] = {
+      tableNames.map { tableName =>
+        Resource(
+          _.name := tableName,
+          _.list := ReactAdmin.ListGuesser,
+          _.edit := ReactAdmin.EditGuesser
+        )
+      }
     }
 
-    val app = ErrorBoundaryComponent(
-      ErrorBoundaryComponent.Props(
-        child = App(API()),
-        renderError = e => ErrorBoundaryInfo(e)
-      )
-    )
+    val resources = buildResources
+    Admin(
+      _.dataProvider :=
+        simpleRestProvider(tablesUrl)
+    )(resources: _*)
+  }
 
-    ReactDOM.render(app, dom.document.getElementById("root"))
+  private def AdminView(api: API) = {
+    api.admin.client.getTables.map { response =>
+      AdminTables(response)
+    }
+  }
+
+  private def App = {
+    AdminView(API())
+  }
+
+  def main(argv: Array[String]): Unit = {
+    App.onComplete {
+      case Success(app) => app.render.renderIntoDOM(dom.document.getElementById("root"))
+      case Failure(ex) => ex.printStackTrace()
+    }
   }
 }
