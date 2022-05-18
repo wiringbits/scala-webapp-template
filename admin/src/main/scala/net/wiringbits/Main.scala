@@ -1,44 +1,16 @@
 package net.wiringbits
 
-import japgolly.scalajs.react.vdom.VdomNode
 import org.scalajs.dom
-import facades.reactadmin._
-import net.wiringbits.webapp.utils.api.models.AdminGetTables
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
+import net.wiringbits.webapp.utils.ui.web.AdminView
 
 import scala.util.{Failure, Success}
 
 object Main {
 
-  private def AdminTables(response: AdminGetTables.Response) = {
-    val tablesUrl = s"${API.apiUrl}/admin/tables"
-    val tableNames = response.data.map(_.name)
-
-    def buildResources: List[VdomNode] = {
-      tableNames.map { tableName =>
-        Resource(
-          _.name := tableName,
-          _.list := ReactAdmin.ListGuesser,
-          _.edit := ReactAdmin.EditGuesser
-        )
-      }
-    }
-
-    val resources = buildResources
-    Admin(
-      _.dataProvider :=
-        simpleRestProvider(tablesUrl)
-    )(resources: _*)
-  }
-
-  private def AdminView(api: API) = {
-    api.admin.client.getTables.map { response =>
-      AdminTables(response)
-    }
-  }
-
   private def App = {
-    AdminView(API())
+    val api = API()
+    AdminView.component(api.admin)
   }
 
   def main(argv: Array[String]): Unit = {

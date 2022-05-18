@@ -6,7 +6,7 @@ ThisBuild / organization := "net.wiringbits"
 
 val playJson = "2.9.2"
 val sttp = "3.5.2"
-val webappUtils = "2.0.2"
+val webappUtils = "0.5.1"
 val swagger = "1.6.6"
 
 val consoleDisabledOptions = Seq("-Werror", "-Ywarn-unused", "-Ywarn-unused-import")
@@ -402,7 +402,7 @@ lazy val web = (project in file("web"))
       "com.softwaremill.sttp.client3" %%% "core" % sttp,
       "org.scala-js" %%% "scala-js-macrotask-executor" % "1.0.0",
       "com.alexitc" %%% "sjs-material-ui-facade" % "0.2.0",
-      "net.wiringbits" %%% "admin-data-explorer-slinky" % webappUtils,
+      "net.wiringbits" %%% "admin-data-explorer-web" % webappUtils,
       "io.monix" %%% "monix-reactive" % "3.4.0"
     ),
     libraryDependencies ++= Seq(
@@ -438,15 +438,11 @@ lazy val admin = (project in file("admin"))
     webpackDevServerPort := 8081,
     webpackBundlingMode := BundlingMode.LibraryOnly(),
     libraryDependencies ++= Seq(
-      "com.github.japgolly.scalajs-react" %%% "core" % "2.1.1",
-      "io.github.nafg.scalajs-facades" %%% "simplefacade" % "0.16.0",
       "com.softwaremill.sttp.client3" %%% "core" % sttp,
-      "net.wiringbits" %%% "admin-data-explorer-slinky" % webappUtils
+      "net.wiringbits" %%% "admin-data-explorer-web" % webappUtils
     ),
     Compile / npmDependencies ++= Seq(
-      "ra-data-simple-rest" -> "^4.0.0",
       "react" -> "^17.0.0",
-      "react-admin" -> "^4.0.0",
       "react-dom" -> "^17.0.0",
       "react-scripts" -> "^5.0.0"
     )
