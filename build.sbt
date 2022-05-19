@@ -402,7 +402,7 @@ lazy val web = (project in file("web"))
       "org.scala-js" %%% "scala-js-macrotask-executor" % "1.0.0",
       "com.alexitc" %%% "sjs-material-ui-facade" % "0.2.0",
       "net.wiringbits" %%% "admin-data-explorer-slinky" % webappUtils,
-      "io.monix" %%% "monix-reactive" % "3.4.0"
+      "io.monix" %%% "monix-reactive" % "3.4.1"
     ),
     libraryDependencies ++= Seq(
       "org.scalatest" %%% "scalatest" % "3.2.12" % Test
