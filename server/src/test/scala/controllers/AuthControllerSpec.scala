@@ -25,7 +25,7 @@ class AuthControllerSpec extends PlayPostgresSpec with LoginUtils {
   def userTokensRepository: UserTokensRepository = app.injector.instanceOf(classOf[UserTokensRepository])
 
   private val clock = mock[Clock]
-  when(clock.instant()).thenReturn(Instant.now())
+  when(clock.instant).thenReturn(Instant.now())
 
   private val tokenGenerator = mock[TokenGenerator]
 
@@ -114,7 +114,7 @@ class AuthControllerSpec extends PlayPostgresSpec with LoginUtils {
     }
 
     "fail when the user tries to verify with an expired token" in withApiClient { client =>
-      when(clock.instant()).thenAnswer(Instant.now())
+      when(clock.instant).thenAnswer(Instant.now())
       val request = CreateUser.Request(
         name = Name.trusted("wiringbits"),
         email = Email.trusted("test1@email.com"),
@@ -126,7 +126,7 @@ class AuthControllerSpec extends PlayPostgresSpec with LoginUtils {
 
       val user = client.createUser(request).futureValue
 
-      when(clock.instant()).thenAnswer(Instant.now().plus(2, ChronoUnit.DAYS))
+      when(clock.instant).thenAnswer(Instant.now().plus(2, ChronoUnit.DAYS))
 
       val error = client
         .verifyEmail(VerifyEmail.Request(UserToken(user.id, verificationToken)))
@@ -154,7 +154,6 @@ class AuthControllerSpec extends PlayPostgresSpec with LoginUtils {
       val response =
         client.login(Login.Request(email = email, password = password, captcha = Captcha.trusted("test"))).futureValue
       response.email must be(email)
-      response.token mustNot be(empty)
     }
 
     "fail when password is incorrect" in withApiClient { client =>

@@ -4,7 +4,22 @@ var generated = require('./scalajs.webpack.config');
 
 var local = {
     devServer: {
-        historyApiFallback: true
+        // the historyAPIFallback allows react-router to work
+        historyApiFallback: true,
+        proxy: {
+            // when a request to /api is done, we want to apply a proxy
+            '/api': {
+                changeOrigin: true,
+                cookieDomainRewrite: 'localhost',
+                target: 'http://localhost:9000',
+                pathRewrite: { '^/api': '/'},
+                onProxyReq: (req) => {
+                    if (req.getHeader('origin')) {
+                        req.setHeader('origin', 'http://localhost:9000')
+                    }
+                }
+            }
+        }
     },
     resolve: {
         alias: {
@@ -27,6 +42,6 @@ var local = {
             }
         ]
     }
-};
+}
 
 module.exports = merge(generated, local);
