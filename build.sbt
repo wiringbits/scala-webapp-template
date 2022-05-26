@@ -401,6 +401,7 @@ lazy val web = (project in file("web"))
       "com.softwaremill.sttp.client3" %%% "core" % sttp,
       "org.scala-js" %%% "scala-js-macrotask-executor" % "1.0.0",
       "com.alexitc" %%% "sjs-material-ui-facade" % "0.2.0",
+      "net.wiringbits" %%% "scalablytyped-facades" % webappUtils,
       "io.monix" %%% "monix-reactive" % "3.4.1"
     ),
     libraryDependencies ++= Seq(
@@ -438,6 +439,7 @@ lazy val admin = (project in file("admin"))
     libraryDependencies ++= Seq(
       "com.softwaremill.sttp.client3" %%% "core" % sttp,
       "net.wiringbits" %%% "admin-data-explorer-web" % webappUtils
+      // "org.scala-js" %%% "scala-js-macrotask-executor" % "1.0.0",
     ),
     Compile / npmDependencies ++= Seq(
       "react" -> "^17.0.0",
