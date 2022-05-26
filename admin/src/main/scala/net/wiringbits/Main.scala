@@ -1,32 +1,22 @@
 package net.wiringbits
 
-import net.wiringbits.webapp.utils.slinkyUtils.components.core.{ErrorBoundaryComponent, ErrorBoundaryInfo}
+import net.wiringbits.webapp.utils.ui.web.AdminView
 import org.scalajs.dom
-import slinky.hot
-import slinky.web.ReactDOM
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 
-import scala.scalajs.js.annotation.JSImport
-import scala.scalajs.{LinkingInfo, js}
-
-@JSImport("js/index.css", JSImport.Default)
-@js.native
-object IndexCSS extends js.Object
+import scala.util.{Failure, Success}
 
 object Main {
-  val css = IndexCSS
+
+  private def App = {
+    val api = API()
+    AdminView.component(api.admin)
+  }
 
   def main(argv: Array[String]): Unit = {
-    if (LinkingInfo.developmentMode) {
-      hot.initialize()
+    App.onComplete {
+      case Success(app) => app.render.renderIntoDOM(dom.document.getElementById("root"))
+      case Failure(ex) => ex.printStackTrace()
     }
-
-    val app = ErrorBoundaryComponent(
-      ErrorBoundaryComponent.Props(
-        child = App(API()),
-        renderError = e => ErrorBoundaryInfo(e)
-      )
-    )
-
-    ReactDOM.render(app, dom.document.getElementById("root"))
   }
 }
