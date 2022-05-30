@@ -5,7 +5,7 @@ ThisBuild / scalaVersion := "2.13.8"
 ThisBuild / organization := "net.wiringbits"
 
 val playJson = "2.9.2"
-val sttp = "3.6.1"
+val sttp = "3.6.2"
 val webappUtils = "0.5.6"
 val swagger = "1.6.6"
 
@@ -325,7 +325,7 @@ lazy val server = (project in file("server"))
     libraryDependencies ++= Seq(
       "org.playframework.anorm" %% "anorm" % "2.6.10",
       "com.typesafe.play" %% "play-json" % "2.9.2",
-      "org.postgresql" % "postgresql" % "42.3.5",
+      "org.postgresql" % "postgresql" % "42.3.6",
       "de.svenkubiak" % "jBCrypt" % "0.4.3",
       "commons-validator" % "commons-validator" % "1.7",
       "com.dimafeng" %% "testcontainers-scala-scalatest" % "0.40.7" % "test",
