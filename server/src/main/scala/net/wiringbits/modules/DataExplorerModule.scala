@@ -8,6 +8,7 @@ class DataExplorerModule extends AbstractModule {
   def dataExplorerSettings: DataExplorerSettings = DataExplorerSettings(settings)
 
   val settings = List(
-    TableSettings("users", "user_id")
+    TableSettings("users", "user_id", hiddenColumns = List("password"), referenceField = Some("email")),
+    TableSettings("user_logs", "user_log_id")
   )
 }
