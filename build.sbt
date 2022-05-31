@@ -6,7 +6,7 @@ ThisBuild / organization := "net.wiringbits"
 
 val playJson = "2.9.2"
 val sttp = "3.6.2"
-val webappUtils = "0.4.3"
+val webappUtils = "0.5.6"
 val swagger = "1.6.6"
 
 val consoleDisabledOptions = Seq("-Werror", "-Ywarn-unused", "-Ywarn-unused-import")
@@ -401,7 +401,7 @@ lazy val web = (project in file("web"))
       "com.softwaremill.sttp.client3" %%% "core" % sttp,
       "org.scala-js" %%% "scala-js-macrotask-executor" % "1.0.0",
       "com.alexitc" %%% "sjs-material-ui-facade" % "0.2.0",
-      "net.wiringbits" %%% "admin-data-explorer-slinky" % webappUtils,
+      "net.wiringbits" %%% "scalablytyped-facades" % webappUtils,
       "io.monix" %%% "monix-reactive" % "3.4.1"
     ),
     libraryDependencies ++= Seq(
@@ -427,46 +427,23 @@ lazy val adminBuildInfoSettings: Project => Project = _.enablePlugins(BuildInfoP
   )
 
 lazy val admin = (project in file("admin"))
-  .dependsOn(common.js, api.js, ui)
-  .enablePlugins(ScalablyTypedConverterPlugin)
-  .configure(
-    baseWebSettings,
-    browserProject,
-    commonSettings,
-    reactNpmDeps,
-    withCssLoading,
-    bundlerSettings,
-    adminBuildInfoSettings
-  )
+  .dependsOn(api.js)
+  .enablePlugins(ScalaJSBundlerPlugin)
+  .configure(browserProject, bundlerSettings, adminBuildInfoSettings)
   .settings(
     name := "wiringbits-admin",
-    useYarn := true,
+    scalaJSUseMainModuleInitializer := true,
+    scalaJSLinkerConfig := scalaJSLinkerConfig.value.withSourceMap(false),
     webpackDevServerPort := 8081,
-    stFlavour := Flavour.Slinky,
-    stReactEnableTreeShaking := Selection.All,
-    stUseScalaJsDom := true,
-    Compile / stMinimize := Selection.All,
-    // material-ui is provided by a pre-packaged library
-    stIgnore ++= List("@material-ui/core", "@material-ui/styles", "@material-ui/icons"),
-    Compile / npmDependencies ++= Seq(
-      "@material-ui/core" -> "3.9.4", // note: version 4 is not supported yet
-      "@material-ui/styles" -> "3.0.0-alpha.10", // note: version 4 is not supported yet
-      "@material-ui/icons" -> "3.0.2",
-      "@types/classnames" -> "2.2.10",
-      "react-router" -> "5.1.2",
-      "@types/react-router" -> "5.1.2",
-      "react-router-dom" -> "5.1.2",
-      "@types/react-router-dom" -> "5.1.2"
-    ),
+    webpackBundlingMode := BundlingMode.LibraryOnly(),
     libraryDependencies ++= Seq(
-      "com.typesafe.play" %%% "play-json" % playJson,
       "com.softwaremill.sttp.client3" %%% "core" % sttp,
-      "org.scala-js" %%% "scala-js-macrotask-executor" % "1.0.0",
-      "com.alexitc" %%% "sjs-material-ui-facade" % "0.2.0",
-      "net.wiringbits" %%% "admin-data-explorer-slinky" % webappUtils
+      "net.wiringbits" %%% "admin-data-explorer-web" % webappUtils
     ),
-    libraryDependencies ++= Seq(
-      "org.scalatest" %%% "scalatest" % "3.2.12" % Test
+    Compile / npmDependencies ++= Seq(
+      "react" -> "^17.0.0",
+      "react-dom" -> "^17.0.0",
+      "react-scripts" -> "^5.0.0"
     )
   )
 

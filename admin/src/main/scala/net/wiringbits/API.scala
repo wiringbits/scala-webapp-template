@@ -23,7 +23,7 @@ object API {
     implicit val sttpBackend = sttp.client3.FetchBackend()
     val client = new ApiClient.DefaultImpl(ApiClient.Config(apiUrl))
     val admin = new AdminDataExplorerApiClient.DefaultImpl(AdminDataExplorerApiClient.Config(apiUrl))
-    val adminApi = APIAdmin(admin)
+    val adminApi = APIAdmin(admin, apiUrl)
     API(client, adminApi)
   }
 }
