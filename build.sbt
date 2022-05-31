@@ -161,7 +161,7 @@ lazy val browserProject: Project => Project =
         Files
           .readAllLines(indexFrom.toPath, IO.utf8)
           .asScala
-          .map(_.replaceAllLiterally("-fastopt-", "-opt-"))
+          .map(_.replaceAllLiterally("-fastopt", "-opt"))
           .mkString("\n")
       }
 
