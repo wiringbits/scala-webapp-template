@@ -14,7 +14,8 @@ class DataExplorerModule extends AbstractModule {
       primaryKeyField = "user_id",
       hiddenColumns = List("password", "email"),
       // to prevent garbage data, let's disable most columns
-      nonEditableColumns = List("user_id", "email", "created_at", "verified_on", "name")
+      nonEditableColumns = List("user_id", "email", "created_at", "verified_on", "name"),
+      canBeDeleted = false
     )
   )
 }
