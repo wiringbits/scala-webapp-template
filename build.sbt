@@ -6,7 +6,7 @@ ThisBuild / organization := "net.wiringbits"
 
 val playJson = "2.9.2"
 val sttp = "3.6.2"
-val webappUtils = "0.5.10"
+val webappUtils = "0.5.13"
 val swagger = "1.6.6"
 
 val consoleDisabledOptions = Seq("-Werror", "-Ywarn-unused", "-Ywarn-unused-import")
@@ -441,9 +441,17 @@ lazy val admin = (project in file("admin"))
       "net.wiringbits" %%% "admin-data-explorer-web" % webappUtils
     ),
     Compile / npmDependencies ++= Seq(
-      "react" -> "^17.0.0",
-      "react-dom" -> "^17.0.0",
-      "react-scripts" -> "^5.0.0"
+      "react" -> "17.0.0",
+      "react-dom" -> "17.0.0",
+      "react-scripts" -> "5.0.0",
+      "react-admin" -> "4.1.0",
+      "ra-ui-materialui" -> "4.1.0",
+      "ra-data-simple-rest" -> "4.1.0",
+      "ra-i18n-polyglot" -> "4.1.0",
+      "ra-language-english" -> "4.1.0",
+      "ra-core" -> "4.1.0",
+      "@mui/material" -> "5.8.1",
+      "@emotion/styled" -> "11.8.1"
     )
   )
 
