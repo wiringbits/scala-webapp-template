@@ -80,10 +80,23 @@ object ApiClient {
       .parse(config.serverUrl)
       .getOrElse(throw new RuntimeException("Invalid server url"))
 
+    /** This is necessary for non-browser clients, this way, the cookies from the last authentication response are
+      * propagated to the next requests
+      */
+    private var lastAuthResponse = Option.empty[Response[_]]
+
+    private def unsafeSetLoginResponse(response: Response[_]): Unit = synchronized {
+      lastAuthResponse = Some(response)
+    }
+
     private def prepareRequest[R: Reads] = {
-      basicRequest
+      val base = basicRequest
         .contentType(MediaType.ApplicationJson)
         .response(asJson[R])
+
+      lastAuthResponse
+        .map(base.cookies)
+        .getOrElse(base)
     }
 
     override def createUser(request: CreateUser.Request): Future[CreateUser.Response] = {
@@ -142,7 +155,11 @@ object ApiClient {
         .post(uri)
         .body(Json.toJson(request).toString())
         .send(backend)
-        .map(_.body)
+        .map { response =>
+          // non-browser clients require the auth cookie to be set manually, hence, we need to store it
+          unsafeSetLoginResponse(response)
+          response.body
+        }
         .flatMap(Future.fromTry)
     }
 

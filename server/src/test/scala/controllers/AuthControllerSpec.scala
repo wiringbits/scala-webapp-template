@@ -232,4 +232,37 @@ class AuthControllerSpec extends PlayPostgresSpec with LoginUtils {
       error must be("The email is not verified, check your spam folder if you don't see the email.")
     }
   }
+
+  "GET /auth/me" should {
+    "return current logged user" in withApiClient { client =>
+      val request = CreateUser.Request(
+        name = Name.trusted("wiringbits"),
+        email = Email.trusted("test1@email.com"),
+        password = Password.trusted("test123..."),
+        captcha = Captcha.trusted("test")
+      )
+      val verificationToken = UUID.randomUUID()
+      when(tokenGenerator.next()).thenReturn(verificationToken)
+      val user = client.createUser(request).futureValue
+
+      client.verifyEmail(VerifyEmail.Request(UserToken(user.id, verificationToken))).futureValue
+
+      val loginRequest = Login.Request(
+        email = Email.trusted("test1@email.com"),
+        password = Password.trusted("test123..."),
+        captcha = Captcha.trusted("test")
+      )
+      client.login(loginRequest).futureValue
+
+      val currentUser = client.currentUser().futureValue
+      currentUser.id must be(user.id)
+      currentUser.name must be(user.name)
+      currentUser.email must be(user.email)
+    }
+
+    "fail if user isn't logged in" in withApiClient { client =>
+      val error = client.currentUser().expectError
+      error must be("Unauthorized: Invalid or missing authentication")
+    }
+  }
 }
