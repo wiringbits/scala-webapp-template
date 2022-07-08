@@ -3,6 +3,7 @@
   gather_facts: no
   vars:
     - nginx_site_file: "config/nginx/web_app_site.j2"
+    - nginx_admin_settings_file: "/etc/nginx/admin-config/htpasswd"
     - webapp_assets_directory: "/var/www/html"
 
   tasks:

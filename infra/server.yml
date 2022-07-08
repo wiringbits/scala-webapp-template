@@ -10,7 +10,7 @@
     - app_env_config_file: "/home/play/app/.env"
 
   tasks:
-    - name: Install java8
+    - name: Install java11
       become: yes
       apt:
         name: default-jre
