@@ -2,7 +2,8 @@ package net.wiringbits.api.models
 
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
 import net.wiringbits.common.models.Password
-import play.api.libs.json.{Format, Json,OFormat,OWrites,JsError,JsSuccess,Reads,JsObject}
+import play.api.libs.json.{Format, Json,OFormat}
+
 
 object UpdatePassword {
 
@@ -16,12 +17,5 @@ object UpdatePassword {
   case class  Response()
 
   implicit val updatePasswordRequestFormat: Format[Request] = Json.format[Request]
-  //implicit val updatePasswordResponseFormat: Format[Response] = Json.format[Response]
-
-  implicit val updatePasswordResponseFormat = OFormat[Response](Reads[Response] {
-        case JsObject(_) => JsSuccess(Response())
-        case _           => JsError("Empty object expected")
-      }, OWrites[Response] { _ =>
-        Json.obj()
-      })
+  implicit val updatePasswordResponseFormat: OFormat[Response.type] = RequestResponseCodec.requestResponseCodec(Response)
 }

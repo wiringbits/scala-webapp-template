@@ -2,7 +2,8 @@ package net.wiringbits.api.models
 
 import io.swagger.annotations.ApiModel
 import net.wiringbits.common.models.UserToken
-import play.api.libs.json.{Format, Json,OFormat,OWrites,JsError,JsSuccess,Reads,JsObject}
+import play.api.libs.json.{Format, Json,OFormat}
+
 
 object VerifyEmail {
 
@@ -14,13 +15,6 @@ object VerifyEmail {
 
   implicit val userTokenFormat: Format[UserToken] = Json.format[UserToken]
   implicit val verifyEmailRequestFormat: Format[Request] = Json.format[Request]
-  
-  //implicit val verifyEmailResponseFormat: Format[Response] = Json.format[Response]
 
-  implicit val verifyEmailResponseFormat = OFormat[Response](Reads[Response] {
-      case JsObject(_) => JsSuccess(Response())
-      case _           => JsError("Empty object expected")
-    }, OWrites[Response] { _ =>
-      Json.obj()
-    })
+  implicit val verifyEmailResponseFormat: OFormat[Response.type] = RequestResponseCodec.requestResponseCodec(Response)
 }

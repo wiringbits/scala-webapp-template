@@ -2,7 +2,7 @@ package net.wiringbits.api.models
 
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
 import net.wiringbits.common.models.{Email, Name}
-import play.api.libs.json.{Format, Json,OFormat,OWrites,JsError,JsSuccess,Reads,JsObject}
+import play.api.libs.json.{Format, Json,OFormat}
 
 import java.time.Instant
 import java.util.UUID
@@ -30,12 +30,7 @@ object GetCurrentUser {
       createdAt: Instant
   )
   
-  //implicit val getUserRequestFormat: Format[Request] = Json.format[Request]
-  implicit val getUserRequestFormat = OFormat[Request](Reads[Request] {
-           case JsObject(_) => JsSuccess(Request())
-           case _           => JsError("Empty object expected")
-         }, OWrites[Request] { _ =>
-           Json.obj()
-         })
+ 
+  implicit val getUserRequestFormat: OFormat[Request.type] = RequestResponseCodec.requestResponseCodec(Request)
   implicit val getUserResponseFormat: Format[Response] = Json.format[Response]
 }
