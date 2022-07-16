@@ -18,7 +18,7 @@ sudo apt-get -y install postgresql
 | Property | Default Value |
 | -------- | ------------- |
 | Port     | `54320`       |
-| Username | `postgress`   |
+| Username | `postgres`   |
 | Password | `null`        |
 
 ---
