@@ -6,7 +6,7 @@ ThisBuild / organization := "net.wiringbits"
 
 val playJson = "2.9.2"
 val sttp = "3.6.2"
-val webappUtils = "0.5.13"
+val webappUtils = "0.5.14"
 val swagger = "1.6.6"
 
 val consoleDisabledOptions = Seq("-Werror", "-Ywarn-unused", "-Ywarn-unused-import")
@@ -102,23 +102,17 @@ lazy val baseWebSettings: Project => Project =
     )
 
 // Used only by the lib projects
-lazy val baseLibSettings: Project => Project =
-  _.enablePlugins(ScalaJSPlugin)
-    .settings(
-      Test / fork := false, // sjs needs this to run tests
-      scalacOptions ++= Seq(
-        "-deprecation", // Emit warning and location for usages of deprecated APIs.
-        "-encoding",
-        "utf-8", // Specify character encoding used by source files.
-        "-explaintypes", // Explain type errors in more detail.
-        "-feature", // Emit warning and location for usages of features that should be imported explicitly.
-        "-unchecked" // Enable additional warnings where generated code depends on assumptions.
-      ),
-      libraryDependencies ++= Seq(
-        "org.scalatest" %%% "scalatest" % "3.2.12" % Test,
-        "com.beachape" %%% "enumeratum" % "1.7.0"
-      )
-    )
+// TODO: This should go to commonSettings instead
+lazy val baseLibSettings: Project => Project = _.settings(
+  scalacOptions ++= Seq(
+    "-deprecation", // Emit warning and location for usages of deprecated APIs.
+    "-encoding",
+    "utf-8", // Specify character encoding used by source files.
+    "-explaintypes", // Explain type errors in more detail.
+    "-feature", // Emit warning and location for usages of features that should be imported explicitly.
+    "-unchecked" // Enable additional warnings where generated code depends on assumptions.
+  )
+)
 
 /** Implement the `build` task define above. Most of this is really just to copy the index.html file around.
   */
@@ -238,24 +232,27 @@ lazy val playSettings: Project => Project = {
 
 lazy val common = (crossProject(JSPlatform, JVMPlatform) in file("lib/common"))
   .configure(baseLibSettings, commonSettings)
-  .jsConfigure(_.enablePlugins(ScalaJSBundlerPlugin, ScalablyTypedConverterPlugin))
+  .jsConfigure(_.enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin, ScalablyTypedConverterPlugin))
   .settings(
     libraryDependencies ++= Seq()
   )
   .jvmSettings(
     libraryDependencies ++= Seq(
       "com.typesafe.play" %% "play-json" % playJson,
-      "com.typesafe.play" %%% "play-json" % playJson, // for a weird reason, jvm tests fail without this
-      "net.wiringbits" %%% "webapp-common" % webappUtils
+      "net.wiringbits" %% "webapp-common" % webappUtils,
+      "org.scalatest" %%% "scalatest" % "3.2.12" % Test
     )
   )
   .jsSettings(
+    Test / fork := false, // sjs needs this to run tests
     stUseScalaJsDom := true,
     Compile / stMinimize := Selection.All,
     libraryDependencies ++= Seq(
       "io.github.cquiroz" %%% "scala-java-time" % "2.3.0",
       "com.typesafe.play" %%% "play-json" % playJson,
-      "net.wiringbits" %%% "webapp-common" % webappUtils
+      "net.wiringbits" %%% "webapp-common" % webappUtils,
+      "org.scalatest" %%% "scalatest" % "3.2.12" % Test,
+      "com.beachape" %%% "enumeratum" % "1.7.0"
     )
   )
 
@@ -263,7 +260,7 @@ lazy val common = (crossProject(JSPlatform, JVMPlatform) in file("lib/common"))
 lazy val api = (crossProject(JSPlatform, JVMPlatform) in file("lib/api"))
   .dependsOn(common)
   .configure(baseLibSettings, commonSettings)
-  .jsConfigure(_.enablePlugins(ScalaJSBundlerPlugin, ScalablyTypedConverterPlugin))
+  .jsConfigure(_.enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin, ScalablyTypedConverterPlugin))
   .jvmSettings(
     libraryDependencies ++= Seq(
       "com.typesafe.play" %% "play-json" % playJson,
@@ -272,24 +269,28 @@ lazy val api = (crossProject(JSPlatform, JVMPlatform) in file("lib/api"))
     )
   )
   .jsSettings(
+    Test / fork := false, // sjs needs this to run tests
     stUseScalaJsDom := true,
     Compile / stMinimize := Selection.All,
     libraryDependencies ++= Seq(
       "com.typesafe.play" %%% "play-json" % playJson,
-      "com.softwaremill.sttp.client3" %%% "core" % sttp
+      "com.softwaremill.sttp.client3" %%% "core" % sttp,
+      "org.scalatest" %%% "scalatest" % "3.2.12" % Test,
+      "com.beachape" %%% "enumeratum" % "1.7.0"
     )
   )
 
 // shared on the ui only
 lazy val ui = (project in file("lib/ui"))
   .configure(baseLibSettings, commonSettings)
-  .configure(_.enablePlugins(ScalaJSBundlerPlugin, ScalablyTypedConverterPlugin))
+  .configure(_.enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin, ScalablyTypedConverterPlugin))
   .dependsOn(api.js, common.js)
   .settings(
     name := "wiringbits-lib-ui",
     useYarn := true,
     scalacOptions += "-Ymacro-annotations",
     Test / requireJsDomEnv := true,
+    Test / fork := false, // sjs needs this to run tests
     stTypescriptVersion := "3.9.3",
     // material-ui is provided by a pre-packaged library
     stIgnore ++= List("@material-ui/core", "@material-ui/styles", "@material-ui/icons"),
@@ -311,7 +312,9 @@ lazy val ui = (project in file("lib/ui"))
       "io.github.cquiroz" %%% "scala-java-time" % "2.0.0",
       "org.scala-js" %%% "scala-js-macrotask-executor" % "1.0.0",
       "com.alexitc" %%% "sjs-material-ui-facade" % "0.2.0",
-      "net.wiringbits" %%% "slinky-utils" % webappUtils
+      "net.wiringbits" %%% "slinky-utils" % webappUtils,
+      "org.scalatest" %%% "scalatest" % "3.2.12" % Test,
+      "com.beachape" %%% "enumeratum" % "1.7.0"
     )
   )
 
@@ -341,7 +344,8 @@ lazy val server = (project in file("server"))
       "javax.xml.bind" % "jaxb-api" % "2.3.1",
       "javax.annotation" % "javax.annotation-api" % "1.3.2",
       "javax.el" % "javax.el-api" % "3.0.0",
-      "org.glassfish" % "javax.el" % "3.0.0"
+      "org.glassfish" % "javax.el" % "3.0.0",
+      "com.beachape" %% "enumeratum" % "1.6.1"
     )
   )
 
