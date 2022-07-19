@@ -230,7 +230,7 @@ class UsersController @Inject() (
     for {
       userId <- authenticate(request)
       _ <- updateUserAction(userId, body)
-      response = UpdateUser.Response()
+      response = UpdateUser.Response
     } yield Ok(Json.toJson(response))
   }
 
@@ -266,7 +266,7 @@ class UsersController @Inject() (
       userId <- authenticate(request)
       _ = logger.info(s"Update password for: $userId")
       _ <- updatePasswordAction(userId, body)
-      response = UpdateUser.Response()
+      response = UpdateUser.Response
     } yield Ok(Json.toJson(response))
   }
 

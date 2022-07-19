@@ -12,8 +12,8 @@ object ForgotPassword {
   )
 
   @ApiModel(value = "ForgotPasswordResponse", description = "Response to the ForgotPasswordRequest")
-  case class  Response()
-
+  case object Response
+  type Response=Response.type
   implicit val forgotPasswordRequestFormat: Format[Request] = Json.format[Request]
-  implicit val forgotPasswordResponseFormat: OFormat[Response.type] = RequestResponseCodec.requestResponseCodec(Response)
+  implicit val forgotPasswordResponseFormat: OFormat[Response] = RequestResponseCodec.requestResponseCodec(Response)
 }

@@ -11,10 +11,10 @@ object VerifyEmail {
   case class Request(token: UserToken)
 
   @ApiModel(value = "VerifyEmailResponse", description = "Response after verifying an email")
-  case class Response()
-
+  case object Response
+  type Response=Response.type
   implicit val userTokenFormat: Format[UserToken] = Json.format[UserToken]
   implicit val verifyEmailRequestFormat: Format[Request] = Json.format[Request]
 
-  implicit val verifyEmailResponseFormat: OFormat[Response.type] = RequestResponseCodec.requestResponseCodec(Response)
+  implicit val verifyEmailResponseFormat: OFormat[Response] = RequestResponseCodec.requestResponseCodec(Response)
 }

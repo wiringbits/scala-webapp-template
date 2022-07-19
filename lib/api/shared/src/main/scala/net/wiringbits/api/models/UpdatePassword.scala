@@ -14,8 +14,8 @@ object UpdatePassword {
   )
 
   @ApiModel(value = "UpdatePasswordResponse", description = "Response after updating the user's password")
-  case class  Response()
-
+  case object Response
+  type Response=Response.type
   implicit val updatePasswordRequestFormat: Format[Request] = Json.format[Request]
-  implicit val updatePasswordResponseFormat: OFormat[Response.type] = RequestResponseCodec.requestResponseCodec(Response)
+  implicit val updatePasswordResponseFormat: OFormat[Response] = RequestResponseCodec.requestResponseCodec(Response)
 }

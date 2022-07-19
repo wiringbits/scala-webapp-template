@@ -169,7 +169,7 @@ object ApiClient {
 
       prepareRequest[Logout.Response]
         .post(uri)
-        .body(Json.toJson(Logout.Request()).toString())
+        .body(Json.toJson(Logout.Request).toString())
         .send(backend)
         .map(_.body)
         .flatMap(Future.fromTry)

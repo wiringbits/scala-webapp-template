@@ -7,8 +7,8 @@ import java.time.Instant
 import java.util.UUID
 
 object GetUserLogs {
-  case class  Request()
-
+  case object Request
+  type Request=Request.type
   @ApiModel(value = "GetUserLogsResponse", description = "Includes the authenticated user logs")
   case class Response(data: List[Response.UserLog])
 
@@ -17,7 +17,7 @@ object GetUserLogs {
     implicit val getUserLogsResponseFormat: Format[UserLog] = Json.format[UserLog]
   }
 
-  implicit val getUserLogsRequestFormat: OFormat[Request.type] = RequestResponseCodec.requestResponseCodec(Request)
+  implicit val getUserLogsRequestFormat: OFormat[Request] = RequestResponseCodec.requestResponseCodec(Request)
   
   implicit val getUserLogsResponseFormat: Format[Response] = Json.format[Response]
 }

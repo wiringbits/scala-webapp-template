@@ -11,8 +11,8 @@ object UpdateUser {
   case class Request(@ApiModelProperty(value = "The user's name", dataType = "String", example = "Alex") name: Name)
 
   @ApiModel(value = "UpdateUserResponse", description = "Response after updating the user details")
-  case class Response()
-
+  case object Response
+  type Response=Response.type
   implicit val updateUserRequestFormat: Format[Request] = Json.format[Request]
-  implicit val responseFormat = RequestResponseCodec.requestResponseCodec(Response)
+  implicit val responseFormat: OFormat[Response] = RequestResponseCodec.requestResponseCodec(Response)
 }

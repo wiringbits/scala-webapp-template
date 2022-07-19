@@ -6,11 +6,12 @@ import play.api.libs.json.{Format, Json,OFormat}
 object Logout {
 
   @ApiModel(value = "LogoutRequest", description = "Request to log out of the app")
-  case class  Request()
-
+  case object Request
+  type Request=Request.type
   @ApiModel(value = "LogoutResponse", description = "Response after logging out of the app")
-  case class  Response()
+  case object Response
+  type Response=Response.type
 
- implicit val logoutRequestFormat: OFormat[Request.type] = RequestResponseCodec.requestResponseCodec(Request)
- implicit val logoutResponseFormat: OFormat[Response.type] = RequestResponseCodec.requestResponseCodec(Response)
+  implicit val logoutRequestFormat: OFormat[Request] = RequestResponseCodec.requestResponseCodec(Request)
+  implicit val logoutResponseFormat: OFormat[Response] = RequestResponseCodec.requestResponseCodec(Response)
 }
