@@ -190,7 +190,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
       val forgotPasswordRequest = ForgotPassword.Request(email, Captcha.trusted("test"))
       val response = client.forgotPassword(forgotPasswordRequest).futureValue
 
-      response must be(ForgotPassword.Response())
+      response must be(ForgotPassword.Response)
     }
 
     "ignore the request when the user tries to reset a password for nonexistent email" in withApiClient { client =>
@@ -199,7 +199,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
 
       val response = client.forgotPassword(forgotPasswordRequest).futureValue
 
-      response must be(ForgotPassword.Response())
+      response must be(ForgotPassword.Response)
     }
 
     "fail when the user tries to reset a password without their email verification step" in withApiClient { client =>
