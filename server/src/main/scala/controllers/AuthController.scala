@@ -88,7 +88,7 @@ class AuthController @Inject() (
       user <- getUserAction(userId)
     } yield {
       logger.info(s"Logout - ${user.email}")
-      Ok(Json.toJson(Logout.Response())).withNewSession
+      Ok(Json.toJson(Logout.Response)).withNewSession
     }
   }
 

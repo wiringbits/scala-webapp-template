@@ -1,16 +1,17 @@
 package net.wiringbits.api.models
 
 import io.swagger.annotations._
-import play.api.libs.json.{Format, Json}
+import play.api.libs.json.{Format, Json, OFormat}
 
 object Logout {
 
   @ApiModel(value = "LogoutRequest", description = "Request to log out of the app")
-  case class Request(noData: String = "")
-
+  case object Request
+  type Request = Request.type
   @ApiModel(value = "LogoutResponse", description = "Response after logging out of the app")
-  case class Response(noData: String = "")
+  case object Response
+  type Response = Response.type
 
-  implicit val logoutRequestFormat: Format[Request] = Json.format[Request]
-  implicit val logoutResponseFormat: Format[Response] = Json.format[Response]
+  implicit val logoutRequestFormat: OFormat[Request] = RequestResponseCodec.requestResponseCodec(Request)
+  implicit val logoutResponseFormat: OFormat[Response] = RequestResponseCodec.requestResponseCodec(Response)
 }

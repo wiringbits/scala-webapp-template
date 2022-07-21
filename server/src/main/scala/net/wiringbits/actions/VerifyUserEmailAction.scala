@@ -34,5 +34,5 @@ class VerifyUserEmailAction @Inject() (
     // then, the user is marked as verified
     emailMessage = EmailMessage.confirm(user.name)
     _ <- usersRepository.verify(userId = userId, tokenId = userToken.id, emailMessage)
-  } yield VerifyEmail.Response()
+  } yield VerifyEmail.Response
 }

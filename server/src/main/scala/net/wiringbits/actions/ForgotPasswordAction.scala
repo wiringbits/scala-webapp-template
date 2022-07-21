@@ -34,7 +34,7 @@ class ForgotPasswordAction @Inject() (
 
       // submit the email only when the user exists, otherwise, ignore the request
       _ <- userMaybe.map(whenExists).getOrElse(Future.unit)
-    } yield ForgotPassword.Response()
+    } yield ForgotPassword.Response
   }
 
   private def whenExists(user: User) = {

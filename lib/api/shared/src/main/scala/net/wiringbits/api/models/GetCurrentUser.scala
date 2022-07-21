@@ -2,13 +2,13 @@ package net.wiringbits.api.models
 
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
 import net.wiringbits.common.models.{Email, Name}
-import play.api.libs.json.{Format, Json}
+import play.api.libs.json.{Format, Json, OFormat}
 
 import java.time.Instant
 import java.util.UUID
 
 object GetCurrentUser {
-  case class Request(noData: String = "")
+  case class Request()
 
   @ApiModel(value = "GetCurrentUserRequest", description = "Request to find the authenticated user details")
   case class Response(
@@ -29,6 +29,7 @@ object GetCurrentUser {
       )
       createdAt: Instant
   )
-  implicit val getUserRequestFormat: Format[Request] = Json.format[Request]
+
+  implicit val getUserRequestFormat: OFormat[Request.type] = RequestResponseCodec.requestResponseCodec(Request)
   implicit val getUserResponseFormat: Format[Response] = Json.format[Response]
 }
