@@ -96,9 +96,23 @@ import scala.util.{Failure, Success}
     )
 
     val error = formData.firstValidationError.map { text =>
+      val emailNotVerified = "The email is not verified, check your spam folder if you don't see the email."
+
       Container(
+        alignItems = Alignment.center,
         margin = Container.EdgeInsets.top(16),
-        child = ErrorLabel(text)
+        child = Fragment(
+          ErrorLabel(text),
+          text match {
+            case `emailNotVerified` =>
+              mui
+                .Button(texts.resendEmail)
+                .variant(muiStrings.text)
+                .color(muiStrings.primary)
+                .onClick(_ => history.push("/resend-verify-email"))
+            case _ => None
+          }
+        )
       )
     }
 
