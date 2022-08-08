@@ -44,6 +44,7 @@ import scala.util.{Failure, Success}
     val emailCode = route("/verify-email/:emailCode", props.ctx)(VerifyEmailWithTokenPage(props.ctx))
     val forgotPassword = route("/forgot-password", props.ctx)(ForgotPasswordPage(props.ctx))
     val resetPassword = route("/reset-password/:resetPasswordCode", props.ctx)(ResetPasswordPage(props.ctx))
+    val resendVerifyEmail = route("/resend-verify-email", props.ctx)(ResendVerifyEmailPage(props.ctx))
 
     def dashboard(user: User) = route("/dashboard", props.ctx)(DashboardPage(props.ctx, user))
     def me(user: User) = route("/me", props.ctx)(UserEditPage(props.ctx, user))
@@ -68,7 +69,7 @@ import scala.util.{Failure, Success}
 
     auth match {
       case AuthState.Unauthenticated =>
-        router.Switch(home, about, signIn, signUp, email, emailCode, forgotPassword, resetPassword, catchAllRoute)
+        router.Switch(home, about, signIn, signUp, email, emailCode, forgotPassword, resetPassword, resendVerifyEmail, catchAllRoute)
 
       case AuthState.Authenticated(user) =>
         router.Switch(home, me(user), dashboard(user), about, signOut, catchAllRoute)
