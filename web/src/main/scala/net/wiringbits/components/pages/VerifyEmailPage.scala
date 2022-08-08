@@ -6,7 +6,12 @@ import com.alexitc.materialui.facade.materialUiCore.mod.PropTypes.Color
 import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
 import com.alexitc.materialui.facade.materialUiStyles.makeStylesMod.StylesHook
 import com.alexitc.materialui.facade.materialUiStyles.mod.makeStyles
-import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{CSSProperties, StyleRulesCallback, Styles, WithStylesOptions}
+import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
+  CSSProperties,
+  StyleRulesCallback,
+  Styles,
+  WithStylesOptions
+}
 import net.wiringbits.AppContext
 import net.wiringbits.core.I18nHooks
 import org.scalablytyped.runtime.StringDictionary
