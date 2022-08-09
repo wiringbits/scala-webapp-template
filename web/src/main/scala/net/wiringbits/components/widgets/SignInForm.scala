@@ -3,6 +3,7 @@ package net.wiringbits.components.widgets
 import com.alexitc.materialui.facade.materialUiCore.mod.PropTypes.Color
 import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
 import net.wiringbits.AppContext
+import net.wiringbits.common.ErrorMessages
 import net.wiringbits.core.I18nHooks
 import net.wiringbits.forms.SignInFormData
 import net.wiringbits.models.User
@@ -95,23 +96,27 @@ import scala.util.{Failure, Success}
         )
     )
 
-    val error = formData.firstValidationError.map { text =>
-      val emailNotVerified = "The email is not verified, check your spam folder if you don't see the email."
+    def resendVerifyEmailButton(text: String) = {
+      val emailNotVerified = ErrorMessages.emailNotVerified
 
+      Fragment(text match {
+        case `emailNotVerified` =>
+          mui
+            .Button(texts.resendEmail)
+            .variant(muiStrings.text)
+            .color(muiStrings.primary)
+            .onClick(_ => history.push("/resend-verify-email"))
+        case _ => None
+      })
+    }
+
+    val error = formData.firstValidationError.map { text =>
       Container(
         alignItems = Alignment.center,
         margin = Container.EdgeInsets.top(16),
         child = Fragment(
           ErrorLabel(text),
-          text match {
-            case `emailNotVerified` =>
-              mui
-                .Button(texts.resendEmail)
-                .variant(muiStrings.text)
-                .color(muiStrings.primary)
-                .onClick(_ => history.push("/resend-verify-email"))
-            case _ => None
-          }
+          resendVerifyEmailButton(text)
         )
       )
     }
