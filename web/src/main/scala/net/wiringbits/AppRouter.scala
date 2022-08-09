@@ -69,7 +69,18 @@ import scala.util.{Failure, Success}
 
     auth match {
       case AuthState.Unauthenticated =>
-        router.Switch(home, about, signIn, signUp, email, emailCode, forgotPassword, resetPassword, resendVerifyEmail, catchAllRoute)
+        router.Switch(
+          home,
+          about,
+          signIn,
+          signUp,
+          email,
+          emailCode,
+          forgotPassword,
+          resetPassword,
+          resendVerifyEmail,
+          catchAllRoute
+        )
 
       case AuthState.Authenticated(user) =>
         router.Switch(home, me(user), dashboard(user), about, signOut, catchAllRoute)
