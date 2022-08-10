@@ -28,6 +28,7 @@ import scala.util.{Failure, Success}
     val (formData, setFormData) = Hooks.useState(
       StatefulFormData(
         ResendVerifyEmailFormData.initial(
+          ResendVerifyEmailFormData.Texts(texts.completeTheCaptcha),
           emailLabel = texts.email
         )
       )

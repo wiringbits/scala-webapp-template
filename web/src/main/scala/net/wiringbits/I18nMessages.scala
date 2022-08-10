@@ -65,6 +65,7 @@ class I18nMessages(_lang: I18nLang) {
   def emailNotReceived = "If you haven't received the email after a few minutes, please check your spam folder"
   def verifyingEmail = "We're verifing your email"
   def waitAMomentPlease = "Wait a moment, please"
+  def completeTheCaptcha = "Complete the captcha"
 
   def welcome(name: Name): String = {
     s"Welcome ${name.string}"

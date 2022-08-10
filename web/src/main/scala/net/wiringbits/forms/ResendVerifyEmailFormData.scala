@@ -5,13 +5,14 @@ import net.wiringbits.common.models.{Captcha, Email}
 import net.wiringbits.webapp.utils.slinkyUtils.forms.{FormData, FormField}
 
 case class ResendVerifyEmailFormData(
+    texts: ResendVerifyEmailFormData.Texts,
     email: FormField[Email],
     captcha: Option[Captcha] = None
 ) extends FormData[SendEmailVerificationToken.Request] {
   override def fields: List[FormField[_]] = List(email)
 
   override def formValidationErrors: List[String] = {
-    val emptyCaptcha = Option.when(captcha.isEmpty)("Complete the captcha")
+    val emptyCaptcha = Option.when(captcha.isEmpty)(texts.emptyCaptchaError)
 
     List(
       fieldsError,
@@ -32,9 +33,13 @@ case class ResendVerifyEmailFormData(
 }
 
 object ResendVerifyEmailFormData {
+  case class Texts(emptyCaptchaError: String)
+
   def initial(
+      texts: ResendVerifyEmailFormData.Texts,
       emailLabel: String
   ): ResendVerifyEmailFormData = ResendVerifyEmailFormData(
+    texts = texts,
     email = new FormField[Email](label = emailLabel, name = "email", required = true, `type` = "email")
   )
 }
