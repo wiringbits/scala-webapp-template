@@ -110,13 +110,13 @@ import scala.util.{Failure, Success}
       })
     }
 
-    val error = formData.firstValidationError.map { text =>
+    val error = formData.firstValidationError.map { errorMessage =>
       Container(
         alignItems = Alignment.center,
         margin = Container.EdgeInsets.top(16),
         child = Fragment(
-          ErrorLabel(text),
-          resendVerifyEmailButton(text)
+          ErrorLabel(errorMessage),
+          resendVerifyEmailButton(errorMessage)
         )
       )
     }
