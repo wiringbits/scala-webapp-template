@@ -15,7 +15,7 @@ import net.wiringbits.webapp.utils.slinkyUtils.forms.StatefulFormData
 import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 import slinky.core.annotations.react
-import slinky.core.facade.{Fragment, Hooks}
+import slinky.core.facade.{Fragment, Hooks, ReactElement}
 import slinky.core.{FunctionalComponent, SyntheticEvent}
 import slinky.web.html._
 import typings.reactRouterDom.{mod => reactRouterDom}
@@ -96,18 +96,18 @@ import scala.util.{Failure, Success}
         )
     )
 
-    def resendVerifyEmailButton(text: String) = {
+    def resendVerifyEmailButton(text: String): ReactElement = {
       val emailNotVerified = ErrorMessages.emailNotVerified
 
-      Fragment(text match {
+      text match {
         case `emailNotVerified` =>
           mui
             .Button(texts.resendEmail)
             .variant(muiStrings.text)
             .color(muiStrings.primary)
             .onClick(_ => history.push("/resend-verify-email"))
-        case _ => None
-      })
+        case _ => Fragment()
+      }
     }
 
     val error = formData.firstValidationError.map { errorMessage =>
