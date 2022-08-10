@@ -17,6 +17,7 @@ import slinky.core.{FunctionalComponent, SyntheticEvent}
 import slinky.core.annotations.react
 import slinky.core.facade.Hooks
 import slinky.web.html._
+import typings.reactRouterDom.{mod => reactRouterDom}
 
 import scala.util.{Failure, Success}
 
@@ -25,6 +26,7 @@ import scala.util.{Failure, Success}
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val texts = I18nHooks.useMessages(props.ctx.$lang)
+    val history = reactRouterDom.useHistory()
     val (formData, setFormData) = Hooks.useState(
       StatefulFormData(
         ResendVerifyEmailFormData.initial(
@@ -56,6 +58,7 @@ import scala.util.{Failure, Success}
           .onComplete {
             case Success(_) =>
               setFormData(_.submitted)
+              history.push("/verify-email")
 
             case Failure(ex) =>
               setFormData(_.submissionFailed(ex.getMessage))
