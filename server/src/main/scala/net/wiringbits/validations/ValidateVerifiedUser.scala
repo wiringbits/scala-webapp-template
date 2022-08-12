@@ -1,6 +1,6 @@
 package net.wiringbits.validations
 
-import net.wiringbits.common.ErrorMessages.emailNotVerified
+import net.wiringbits.common.ErrorMessages
 import net.wiringbits.repositories.models.User
 
 object ValidateVerifiedUser {
@@ -8,6 +8,6 @@ object ValidateVerifiedUser {
     if (user.verifiedOn.isDefined)
       ()
     else
-      throw new RuntimeException(emailNotVerified)
+      throw new RuntimeException(ErrorMessages.emailNotVerified)
   }
 }

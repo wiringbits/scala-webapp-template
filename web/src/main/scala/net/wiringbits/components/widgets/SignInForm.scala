@@ -97,10 +97,9 @@ import scala.util.{Failure, Success}
     )
 
     def resendVerifyEmailButton(text: String): ReactElement = {
-      val emailNotVerified = ErrorMessages.emailNotVerified
-
+      // TODO: It would be ideal to match the error against a code than matching a text
       text match {
-        case `emailNotVerified` =>
+        case ErrorMessages.`emailNotVerified` =>
           mui
             .Button(texts.resendEmail)
             .variant(muiStrings.text)
