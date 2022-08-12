@@ -1,5 +1,6 @@
 package net.wiringbits.validations
 
+import net.wiringbits.common.ErrorMessages
 import net.wiringbits.repositories.models.User
 
 object ValidateVerifiedUser {
@@ -7,6 +8,6 @@ object ValidateVerifiedUser {
     if (user.verifiedOn.isDefined)
       ()
     else
-      throw new RuntimeException("The email is not verified, check your spam folder if you don't see the email.")
+      throw new RuntimeException(ErrorMessages.emailNotVerified)
   }
 }

@@ -48,6 +48,7 @@ class I18nMessages(_lang: I18nLang) {
   def recoverIt = "Recover it"
   def reload = "Reload"
   def logs = "Logs"
+  def resendEmail = "Re-send email"
 
   def aboutPage = "About page"
   def projectDetails = "Add details about the project"
@@ -64,6 +65,7 @@ class I18nMessages(_lang: I18nLang) {
   def emailNotReceived = "If you haven't received the email after a few minutes, please check your spam folder"
   def verifyingEmail = "We're verifing your email"
   def waitAMomentPlease = "Wait a moment, please"
+  def completeTheCaptcha = "Complete the captcha"
 
   def welcome(name: Name): String = {
     s"Welcome ${name.string}"

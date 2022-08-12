@@ -2,6 +2,7 @@ package net.wiringbits.components.pages
 
 import com.alexitc.materialui.facade.csstype.mod.{FlexDirectionProperty, TextAlignProperty}
 import com.alexitc.materialui.facade.materialUiCore.createMuiThemeMod.Theme
+import com.alexitc.materialui.facade.materialUiCore.mod.PropTypes.Color
 import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
 import com.alexitc.materialui.facade.materialUiStyles.makeStylesMod.StylesHook
 import com.alexitc.materialui.facade.materialUiStyles.mod.makeStyles
@@ -18,6 +19,7 @@ import slinky.core.FunctionalComponent
 import slinky.core.annotations.react
 import slinky.core.facade.Fragment
 import slinky.web.html.{br, className, div}
+import typings.reactRouterDom.{mod => reactRouterDom}
 
 @react object VerifyEmailPage {
   case class Props(ctx: AppContext)
@@ -43,6 +45,7 @@ import slinky.web.html.{br, className, div}
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val texts = I18nHooks.useMessages(props.ctx.$lang)
+    val history = reactRouterDom.useHistory()
     val classes = useStyles(())
 
     Fragment(
@@ -62,7 +65,13 @@ import slinky.web.html.{br, className, div}
             .Typography(
               texts.emailNotReceived
             )
-            .variant(muiStrings.h6)
+            .variant(muiStrings.h6),
+          br(),
+          mui
+            .Button(texts.resendEmail)
+            .variant(muiStrings.contained)
+            .color(Color.primary)
+            .onClick(_ => history.push("/resend-verify-email"))
         )
       )
     )

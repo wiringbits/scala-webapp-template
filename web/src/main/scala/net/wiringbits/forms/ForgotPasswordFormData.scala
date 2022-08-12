@@ -32,6 +32,7 @@ case class ForgotPasswordFormData(
 }
 
 object ForgotPasswordFormData {
+  // TODO: Implement "Complete captcha message" from i18nMessages like ResendVerifyEmailFormData
 
   def initial(
       emailLabel: String
