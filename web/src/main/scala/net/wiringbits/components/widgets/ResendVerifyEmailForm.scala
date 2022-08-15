@@ -4,6 +4,7 @@ import com.alexitc.materialui.facade.materialUiCore.{components => mui, material
 import com.alexitc.materialui.facade.materialUiCore.mod.PropTypes.Color
 import com.alexitc.materialui.facade.react.components.Fragment
 import net.wiringbits.AppContext
+import net.wiringbits.common.models.Email
 import net.wiringbits.core.I18nHooks
 import net.wiringbits.forms.ResendVerifyEmailFormData
 import net.wiringbits.ui.components.inputs.EmailInput
@@ -12,11 +13,13 @@ import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{Circular
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.{Alignment, EdgeInsets}
 import net.wiringbits.webapp.utils.slinkyUtils.forms.StatefulFormData
 import org.scalajs.dom
+import org.scalajs.dom.URLSearchParams
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 import slinky.core.{FunctionalComponent, SyntheticEvent}
 import slinky.core.annotations.react
 import slinky.core.facade.Hooks
 import slinky.web.html._
+import typings.reactRouterDom.mod.useLocation
 import typings.reactRouterDom.{mod => reactRouterDom}
 
 import scala.util.{Failure, Success}
@@ -27,11 +30,15 @@ import scala.util.{Failure, Success}
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val texts = I18nHooks.useMessages(props.ctx.$lang)
     val history = reactRouterDom.useHistory()
+    // TODO: Improve email query param
+    val params = new URLSearchParams(useLocation().search)
+    val emailParam = Option(params.get("email")).getOrElse("")
     val (formData, setFormData) = Hooks.useState(
       StatefulFormData(
         ResendVerifyEmailFormData.initial(
           ResendVerifyEmailFormData.Texts(texts.completeTheCaptcha),
-          emailLabel = texts.email
+          emailLabel = texts.email,
+          emailValue = Email.validate(emailParam)
         )
       )
     )
@@ -57,8 +64,10 @@ import scala.util.{Failure, Success}
           .sendEmailVerificationToken(request)
           .onComplete {
             case Success(_) =>
+              val email = formData.data.email.inputValue
+
               setFormData(_.submitted)
-              history.push("/verify-email")
+              history.push(s"/verify-email?email=${email}")
 
             case Failure(ex) =>
               setFormData(_.submissionFailed(ex.getMessage))
