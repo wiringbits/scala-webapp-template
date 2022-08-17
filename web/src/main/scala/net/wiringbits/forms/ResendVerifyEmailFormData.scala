@@ -39,7 +39,7 @@ object ResendVerifyEmailFormData {
   def initial(
       texts: ResendVerifyEmailFormData.Texts,
       emailLabel: String,
-      emailValue: ValidationResult[Email]
+      emailValue: Option[ValidationResult[Email]] = None
   ): ResendVerifyEmailFormData = ResendVerifyEmailFormData(
     texts = texts,
     email = new FormField[Email](
@@ -47,7 +47,7 @@ object ResendVerifyEmailFormData {
       name = "email",
       required = true,
       `type` = "email",
-      value = Some(emailValue)
+      value = emailValue
     )
   )
 }

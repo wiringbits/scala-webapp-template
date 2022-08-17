@@ -38,7 +38,7 @@ import scala.util.{Failure, Success}
         ResendVerifyEmailFormData.initial(
           ResendVerifyEmailFormData.Texts(texts.completeTheCaptcha),
           emailLabel = texts.email,
-          emailValue = Email.validate(emailParam)
+          emailValue = Some(Email.validate(emailParam))
         )
       )
     )
