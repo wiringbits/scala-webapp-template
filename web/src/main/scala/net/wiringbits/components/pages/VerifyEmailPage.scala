@@ -48,7 +48,6 @@ import typings.reactRouterDom.{mod => reactRouterDom}
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val texts = I18nHooks.useMessages(props.ctx.$lang)
     val history = reactRouterDom.useHistory()
-    // TODO: Improve email query param
     val params = new URLSearchParams(useLocation().search)
     val emailParam = Option(params.get("email")).getOrElse("")
     val classes = useStyles(())
