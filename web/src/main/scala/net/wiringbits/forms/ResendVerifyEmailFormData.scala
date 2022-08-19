@@ -2,6 +2,7 @@ package net.wiringbits.forms
 
 import net.wiringbits.api.models.SendEmailVerificationToken
 import net.wiringbits.common.models.{Captcha, Email}
+import net.wiringbits.webapp.common.validators.ValidationResult
 import net.wiringbits.webapp.utils.slinkyUtils.forms.{FormData, FormField}
 
 case class ResendVerifyEmailFormData(
@@ -37,9 +38,16 @@ object ResendVerifyEmailFormData {
 
   def initial(
       texts: ResendVerifyEmailFormData.Texts,
-      emailLabel: String
+      emailLabel: String,
+      emailValue: Option[ValidationResult[Email]] = None
   ): ResendVerifyEmailFormData = ResendVerifyEmailFormData(
     texts = texts,
-    email = new FormField[Email](label = emailLabel, name = "email", required = true, `type` = "email")
+    email = new FormField[Email](
+      label = emailLabel,
+      name = "email",
+      required = true,
+      `type` = "email",
+      value = emailValue
+    )
   )
 }

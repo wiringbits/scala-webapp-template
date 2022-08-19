@@ -100,11 +100,13 @@ import scala.util.{Failure, Success}
       // TODO: It would be ideal to match the error against a code than matching a text
       text match {
         case ErrorMessages.`emailNotVerified` =>
+          val email = formData.data.email.inputValue
+
           mui
             .Button(texts.resendEmail)
             .variant(muiStrings.text)
             .color(muiStrings.primary)
-            .onClick(_ => history.push("/resend-verify-email"))
+            .onClick(_ => history.push(s"/resend-verify-email?email=${email}"))
         case _ => Fragment()
       }
     }
