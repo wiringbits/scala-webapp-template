@@ -66,6 +66,7 @@ class I18nMessages(_lang: I18nLang) {
   def verifyingEmail = "We're verifing your email"
   def waitAMomentPlease = "Wait a moment, please"
   def completeTheCaptcha = "Complete the captcha"
+  def checkoutTheRepo = "Checkout the repository!"
 
   def welcome(name: Name): String = {
     s"Welcome ${name.string}"
