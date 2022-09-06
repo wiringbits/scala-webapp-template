@@ -1,5 +1,6 @@
 package net.wiringbits.components.pages
 
+import com.alexitc.materialui.facade.csstype.mod.TextAlignProperty
 import com.alexitc.materialui.facade.materialUiCore.createMuiThemeMod.Theme
 import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
 import com.alexitc.materialui.facade.materialUiStyles.makeStylesMod.StylesHook
@@ -29,6 +30,9 @@ import slinky.web.html._
         "homeContainer" -> CSSProperties()
           .setMaxWidth(1300)
           .setWidth("100%"),
+        "homeTitle" -> CSSProperties()
+          .setTextAlign(TextAlignProperty.center)
+          .setMargin("8px 0"),
         "snippet" -> CSSProperties()
           .setMaxWidth(800)
           .setWidth("100%")
@@ -66,7 +70,10 @@ import slinky.web.html._
 
 
     val homeFragment = Fragment(
-      title(texts.homePage),
+      mui
+        .Typography(texts.homePage, className := classes("homeTitle"))
+        .variant(muiStrings.h4)
+        .color(muiStrings.inherit),
       paragraph(texts.homePageDescription),
       br(),
       br()
