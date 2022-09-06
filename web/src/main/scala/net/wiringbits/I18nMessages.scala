@@ -68,6 +68,36 @@ class I18nMessages(_lang: I18nLang) {
   def completeTheCaptcha = "Complete the captcha"
   def checkoutTheRepo = "Checkout the repository!"
 
+  def homePageDescription =
+    "A reusable skeleton to build web applications in Scala/Scala.js, including user registration, login, admin portal, and deployments."
+  def userProfile = "User profile"
+  def userProfileDescription = "All the necessary code to create accounts, change passwords, update profile is there, "
+  def tryIt = "Try it."
+  def easilyExposeDataAdminPortal = "Easily expose data through the Admin portal"
+  def easilyExposeDataAdminPortalDescriptionStart = "The portal is powered by "
+  def easilyExposeDataAdminPortalDescriptionEnd = " Which allows exposing database tables with a simple config change."
+  def reactAdmin = "react-admin"
+  def thisSnippet = "This snippet:"
+  def rendersAUserList = "Renders a user list:"
+  def allowsViewingUpdatingASingleUser = "Allows viewing/updating a single user:"
+  def adminUserPassword = " (user='demo', password='wiringbits')"
+  def adminUserTableSnippet = "Admin user table snippet"
+  def adminUserList = "Admin user list"
+  def adminUserView = "Admin user view"
+  def swaggerIntegration = "Swagger integration"
+  def swaggerIntegrationDescription =
+    "The template already has the necessary boilerplate to expose the application's API through Swagger, "
+  def consistentDataLoading = "Consistent data loading"
+  def consistentDataLoadingDescription =
+    "Asynchronous data loading is consistent when using our `AsyncComponent`, for example:"
+  def dataIsBeingLoaded = "When the data is being loaded, a progress indicator is displayed:"
+  def problemFetchingData = "When there is a problem fetching data, we get an opportunity to retry:"
+  def simpleToFollowArchitecture = "A simple-to-follow architecture where tests are first class citizens"
+  def simpleToFollowArchitectureDescription1 =
+    "There is already an integration with GitHub Actions, and, there are already many integration tests to make sure that your APIs/Database work the way you expect them."
+  def simpleToFollowArchitectureDescription2 =
+    "There are many layers which are easy to follow, which means, boarding new developers takes little effort."
+
   def welcome(name: Name): String = {
     s"Welcome ${name.string}"
   }
