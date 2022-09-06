@@ -101,8 +101,14 @@ import slinky.web.html._
       image("/img/home/admin-user-view.png", texts.adminUserView, "screenshot"),
       paragraph(
         Fragment(
-          link(texts.tryIt, "https://template-demo-admin.wiringbits.net"),
-          texts.adminUserPassword
+          paragraph(Fragment(
+            link(texts.tryIt, "https://template-demo-admin.wiringbits.net"),
+            " (user=`",
+            strong("demo"),
+            "`, password=`",
+            strong("wiringbits"),
+            "`)"
+          ))
         )
       ),
       br(),

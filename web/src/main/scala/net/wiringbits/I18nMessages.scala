@@ -80,7 +80,6 @@ class I18nMessages(_lang: I18nLang) {
   def thisSnippet = "This snippet:"
   def rendersAUserList = "Renders a user list:"
   def allowsViewingUpdatingASingleUser = "Allows viewing/updating a single user:"
-  def adminUserPassword = " (user='demo', password='wiringbits')"
   def adminUserTableSnippet = "Admin user table snippet"
   def adminUserList = "Admin user list"
   def adminUserView = "Admin user view"
