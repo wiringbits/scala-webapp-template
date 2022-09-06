@@ -1,89 +1,159 @@
 package net.wiringbits.components.pages
 
-import com.alexitc.materialui.facade.materialUiCore.{components => mui}
+import com.alexitc.materialui.facade.materialUiCore.createMuiThemeMod.Theme
+import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
+import com.alexitc.materialui.facade.materialUiStyles.makeStylesMod.StylesHook
+import com.alexitc.materialui.facade.materialUiStyles.mod.makeStyles
+import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
+  CSSProperties,
+  StyleRulesCallback,
+  Styles,
+  WithStylesOptions
+}
 import net.wiringbits.AppContext
 import net.wiringbits.core.I18nHooks
+import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.Alignment
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets._
+import org.scalablytyped.runtime.StringDictionary
 import slinky.core.FunctionalComponent
 import slinky.core.annotations.react
-import slinky.core.facade.Fragment
+import slinky.core.facade.{Fragment, ReactElement}
 import slinky.web.html._
 
 @react object HomePage {
   case class Props(ctx: AppContext)
 
+  private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {
+    val stylesCallback: StyleRulesCallback[Theme, Unit, String] = theme =>
+      StringDictionary(
+        "homeContainer" -> CSSProperties()
+          .setMaxWidth(1300)
+          .setWidth("100%"),
+        "snippet" -> CSSProperties()
+          .setMaxWidth(800)
+          .setWidth("100%")
+          .setMargin("1em 0"),
+        "screenshot" -> CSSProperties()
+          .setMaxWidth(1200)
+          .setWidth("100%")
+          .setDisplay("block")
+          .setMargin("1em auto")
+      )
+    makeStyles(stylesCallback, WithStylesOptions())
+  }
+
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
-    // TODO: add styles to titles, texts and images
     val texts = I18nHooks.useMessages(props.ctx.$lang)
+    val classes = useStyles(())
 
-    def link(msg: String, url: String) =
-      mui.Link(msg).href(url).target("_blank")
+    def title(msg: String) = mui
+      .Typography(msg)
+      .variant(muiStrings.h4)
+      .color(muiStrings.inherit)
 
-    def image(srcImg: String, altImg: String) =
-      img(src := srcImg, alt := altImg)
+    def paragraph(args: ReactElement) = mui
+      .Typography(args)
+      .variant(muiStrings.body1)
+      .color(muiStrings.inherit)
+
+    def link(msg: String, url: String) = mui
+      .Link(msg)
+      .href(url)
+      .target("_blank")
+
+    def image(srcImg: String, altImg: String, classImg: String) =
+      img(src := srcImg, alt := altImg, className := classes(classImg))
+
 
     val homeFragment = Fragment(
-      Title(texts.homePage),
-      mui.Typography(texts.homePageDescription)
+      title(texts.homePage),
+      paragraph(texts.homePageDescription),
+      br(),
+      br()
     )
 
     val userProfileFragment = Fragment(
-      Title(texts.userProfile),
-      mui.Typography(
-        texts.userProfileDescription,
-        link(texts.tryIt.toLowerCase, "https://template-demo.wiringbits.net/signin")
-      )
+      title(texts.userProfile),
+      paragraph(
+        Fragment(
+          texts.userProfileDescription,
+          link(texts.tryIt.toLowerCase, "https://template-demo.wiringbits.net/signin")
+        )
+      ),
+      br(),
+      br()
     )
 
     val adminPortalFragment = Fragment(
-      Title(texts.easilyExposeDataAdminPortal),
-      mui.Typography(
-        texts.easilyExposeDataAdminPortalDescriptionStart,
-        link(texts.reactAdmin, "https://marmelab.com/react-admin/"),
-        texts.easilyExposeDataAdminPortalDescriptionEnd.toLowerCase
+      title(texts.easilyExposeDataAdminPortal),
+      paragraph(
+        Fragment(
+          texts.easilyExposeDataAdminPortalDescriptionStart,
+          link(texts.reactAdmin, "https://marmelab.com/react-admin/"),
+          texts.easilyExposeDataAdminPortalDescriptionEnd.toLowerCase
+        )
       ),
-      mui.Typography(texts.thisSnippet),
-      image("/img/home/admin-user-table-snippet.png", texts.adminUserTableSnippet),
-      mui.Typography(texts.rendersAUserList),
-      image("/img/home/admin-user-list.png", texts.adminUserList),
-      mui.Typography(texts.allowsViewingUpdatingASingleUser),
-      image("/img/home/admin-user-view.png", texts.adminUserView),
-      mui.Typography(link(texts.tryIt, "https://template-demo-admin.wiringbits.net"), texts.adminUserPassword)
+      paragraph(texts.thisSnippet),
+      image("/img/home/admin-user-table-snippet.png", texts.adminUserTableSnippet, "snippet"),
+      paragraph(texts.rendersAUserList),
+      image("/img/home/admin-user-list.png", texts.adminUserList, "screenshot"),
+      paragraph(texts.allowsViewingUpdatingASingleUser),
+      image("/img/home/admin-user-view.png", texts.adminUserView, "screenshot"),
+      paragraph(
+        Fragment(
+          link(texts.tryIt, "https://template-demo-admin.wiringbits.net"),
+          texts.adminUserPassword
+        )
+      ),
+      br(),
+      br()
     )
 
     val swaggerFragment = Fragment(
-      Title(texts.swaggerIntegration),
-      mui.Typography(
-        texts.swaggerIntegrationDescription,
-        link(texts.tryIt.toLowerCase, "https://template-demo.wiringbits.net/api/docs/index.html")
+      title(texts.swaggerIntegration),
+      paragraph(
+        Fragment(
+          texts.swaggerIntegrationDescription,
+          link(texts.tryIt.toLowerCase, "https://template-demo.wiringbits.net/api/docs/index.html")
+        )
       ),
-      image("/img/home/swagger.png", texts.swaggerIntegration)
+      image("/img/home/swagger.png", texts.swaggerIntegration, "screenshot"),
+      br(),
+      br()
     )
 
     val dataLoadingFragment = Fragment(
-      Title(texts.consistentDataLoading),
-      mui.Typography(texts.consistentDataLoadingDescription),
-      image("/img/home/async-component-snippet.png", texts.swaggerIntegration),
-      mui.Typography(texts.dataIsBeingLoaded),
-      image("/img/home/async-progress.png", texts.swaggerIntegration),
-      mui.Typography(texts.problemFetchingData),
-      image("/img/home/async-retry.png", texts.swaggerIntegration)
+      title(texts.consistentDataLoading),
+      paragraph(texts.consistentDataLoadingDescription),
+      image("/img/home/async-component-snippet.png", texts.swaggerIntegration, "snippet"),
+      paragraph(texts.dataIsBeingLoaded),
+      image("/img/home/async-progress.png", texts.swaggerIntegration, "screenshot"),
+      paragraph(texts.problemFetchingData),
+      image("/img/home/async-retry.png", texts.swaggerIntegration, "screenshot"),
+      br(),
+      br()
     )
 
     val simpleArchitectureFragment = Fragment(
-      Title(texts.simpleToFollowArchitecture),
-      mui.Typography(texts.simpleToFollowArchitectureDescription1),
-      mui.Typography(texts.simpleToFollowArchitectureDescription2)
+      title(texts.simpleToFollowArchitecture),
+      paragraph(texts.simpleToFollowArchitectureDescription1),
+      paragraph(texts.simpleToFollowArchitectureDescription2),
+      br(),
+      br()
     )
 
     Container(
-      child = Fragment(
-        homeFragment,
-        userProfileFragment,
-        adminPortalFragment,
-        swaggerFragment,
-        dataLoadingFragment,
-        simpleArchitectureFragment
+      flex = Some(1),
+      alignItems = Alignment.center,
+      child = div(className := classes("homeContainer"))(
+        Fragment(
+          homeFragment,
+          userProfileFragment,
+          adminPortalFragment,
+          swaggerFragment,
+          dataLoadingFragment,
+          simpleArchitectureFragment
+        )
       )
     )
   }
