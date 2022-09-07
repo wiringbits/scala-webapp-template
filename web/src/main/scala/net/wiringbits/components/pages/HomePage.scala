@@ -110,11 +110,11 @@ import slinky.web.html._
           paragraph(
             Fragment(
               link(texts.tryIt, "https://template-demo-admin.wiringbits.net"),
-              " (user=`",
+              " (user=",
               strong("demo"),
-              "`, password=`",
+              ", password=",
               strong("wiringbits"),
-              "`)"
+              ")"
             )
           )
         )
