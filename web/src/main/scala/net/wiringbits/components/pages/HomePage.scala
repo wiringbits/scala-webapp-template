@@ -36,7 +36,8 @@ import slinky.web.html._
         "snippet" -> CSSProperties()
           .setMaxWidth(800)
           .setWidth("100%")
-          .setMargin("1em 0"),
+          .setDisplay("block")
+          .setMargin("1em auto"),
         "screenshot" -> CSSProperties()
           .setMaxWidth(1200)
           .setWidth("100%")
