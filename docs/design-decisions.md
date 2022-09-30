@@ -1,5 +1,24 @@
-# Design docs
-This document explains why we took certain decisions on how the project is built/structured.
+# Design decisions
+This document explains why we took certain design decisions on how the project is built/structured.
+
+## 2022/Aug - Avoid default parameter in most cases
+We commonly deal with models that are similar but belong to a different domain, [chimney](https://scalalandio.github.io/chimney) help us to transform those models from one domain to another, while this tool is handy, it does not play well with default values in arguments.
+
+Take this snippet as an example:
+
+```scala
+case class CreateUserApiRequest(name: String, age: Option[Int])
+
+case class CreateUserData(name: String, yearsOld: Option[Int] = None)
+
+def transform(request: CreateUserApiRequest): CreateUserData = request.into[CreateUserData].transform
+```
+
+While the `transform` function would succeed, the `age` value will never become the `yearsOld` value, if there wasn't a default value, we'd get a compile error which would give us a chance to fix the problem (`request.into[CreateUserData].withFieldRenamed(_.age, _.yearsOld).transform`).
+
+Still, there can be exceptions:
+- The http API layer usually gets default values when adding a new parameter to an API method, this way, we keep backwards compatibility to support old API clients.
+
 
 ## 2022/Apr - Naming conventions for api/data models
 
