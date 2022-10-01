@@ -31,15 +31,15 @@ We have a live demo so that you can get a taste on what our template provides.
 
 Users app 1m demo:
 
-[![Users app 1m demo](https://img.youtube.com/vi/hURUK4NCGBk/0.jpg)](https://youtu.be/hURUK4NCGBk "Users app 1m demo")
+[![Users app 1m demo](./docs/assets/demo-video-01.png)](https://youtu.be/hURUK4NCGBk "Users app 1m demo")
 
 Admin app 30s demo:
 
-[![Admin app 30s demo](https://img.youtube.com/vi/78rxfdPOGqk/0.jpg)](https://youtu.be/78rxfdPOGqk "Admin app 30s demo")
+[![Admin app 30s demo](./docs/assets/demo-video-02.png)](https://youtu.be/78rxfdPOGqk "Admin app 30s demo")
 
 Deployment 2m demo:
 
-[![Deployment 2m demo](https://img.youtube.com/vi/cN599dMa9EA/0.jpg)](https://youtu.be/cN599dMa9EA "Deployment 2m demo")
+[![Deployment 2m demo](./docs/assets/demo-video-03.png)](https://youtu.be/cN599dMa9EA "Deployment 2m demo")
 
 
 ## What's included?
