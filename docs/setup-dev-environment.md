@@ -129,6 +129,9 @@ Update application.conf to set your environment specific values (just avoid comm
    
    # emails
    export EMAIL_SENDER_ADDRESS="test@wiringbits.net"
+   export EMAIL_PROVIDER=none
+
+   # aws, required only if the email provider is AWS
    export AWS_REGION="us-west-2"
    export AWS_ACCESS_KEY_ID="REPLACE_ME"
    export AWS_SECRET_ACCESS_KEY="REPLACE_ME"
@@ -142,9 +145,12 @@ Time to run the app:
 2. `sbt dev-web` launches the main web app at `localhost:8080` 
 3. `sbt dev-admin` launches the admin web app at `localhost:8081`
 
-**Hint** All these apps are automatically reloaded on code changes.
-**Hint 2**: The server app prints the settings after starting, double check that they match your custom settings.
 
+**Hints**:
+
+- All these apps are automatically reloaded on code changes.
+- The server app prints the settings after starting, double check that they match your custom settings.
+- By default, outgoing emails are logged, be sure to check those to look for the email verification links.
 
 ## Test dependencies
 
@@ -163,5 +169,4 @@ Commands:
 
 ## Deployment setup
 
-Check the [infra](./infra/README.md) project.
-
+Check the [infra](../infra/README.md) project.
