@@ -1,15 +1,16 @@
 package net.wiringbits.actions
 
 import net.wiringbits.api.models.CreateUser
-import net.wiringbits.apis.models.EmailRequest
-import net.wiringbits.apis.{EmailApi, ReCaptchaApi}
-import net.wiringbits.config.{UserTokensConfig, WebAppConfig}
+import net.wiringbits.apis.ReCaptchaApi
+import net.wiringbits.config.UserTokensConfig
 import net.wiringbits.repositories
 import net.wiringbits.repositories.UsersRepository
-import net.wiringbits.util.{EmailMessage, TokenGenerator, TokensHelper}
+import net.wiringbits.repositories.models.User
+import net.wiringbits.util.{EmailsHelper, TokenGenerator, TokensHelper}
 import net.wiringbits.validations.{ValidateCaptcha, ValidateEmailIsAvailable}
 import org.mindrot.jbcrypt.BCrypt
 
+import java.time.Instant
 import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -19,8 +20,7 @@ class CreateUserAction @Inject() (
     reCaptchaApi: ReCaptchaApi,
     tokenGenerator: TokenGenerator,
     userTokensConfig: UserTokensConfig,
-    webAppConfig: WebAppConfig,
-    emailApi: EmailApi
+    emailsHelper: EmailsHelper
 )(implicit
     ec: ExecutionContext
 ) {
@@ -44,13 +44,17 @@ class CreateUserAction @Inject() (
       _ <- usersRepository.create(createUser)
 
       // then, send the verification email
-      emailParameter = s"${createUser.id}_$token"
-      emailMessage = EmailMessage.registration(
-        name = createUser.name,
-        url = webAppConfig.host,
-        emailParameter = emailParameter
+      _ <- emailsHelper.sendRegistrationEmailWithVerificationToken(
+        User(
+          id = createUser.id,
+          name = request.name,
+          email = request.email,
+          hashedPassword = hashedPassword,
+          createdAt = Instant.now,
+          verifiedOn = None
+        ),
+        token
       )
-      _ <- emailApi.sendEmail(EmailRequest(request.email, emailMessage))
     } yield CreateUser.Response(id = createUser.id, email = createUser.email, name = createUser.name)
   }
 
