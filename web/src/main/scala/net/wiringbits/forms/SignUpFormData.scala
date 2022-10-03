@@ -48,6 +48,7 @@ case class SignUpFormData(
 }
 
 object SignUpFormData {
+  // TODO: Implement "Complete captcha message" from i18nMessages like ResendVerifyEmailFormData
 
   def initial(
       nameLabel: String,

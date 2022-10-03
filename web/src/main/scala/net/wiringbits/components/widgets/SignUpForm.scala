@@ -58,8 +58,10 @@ import scala.util.{Failure, Success}
           .createUser(request)
           .onComplete {
             case Success(_) =>
+              val email = formData.data.email.inputValue
+
               setFormData(_.submitted)
-              history.push("/verify-email") // redirects to email page
+              history.push(s"/verify-email?email=${email}") // redirects to email page
 
             case Failure(ex) =>
               setFormData(_.submissionFailed(ex.getMessage))

@@ -58,7 +58,7 @@ import scala.util.{Failure, Success}
           .resetPassword(request)
           .onComplete {
             case Success(res) =>
-              props.ctx.loggedIn(User(name = res.name, email = res.email, jwt = res.token))
+              props.ctx.loggedIn(User(name = res.name, email = res.email))
               setFormData(_.submitted)
               history.push("/dashboard")
             case Failure(ex) =>

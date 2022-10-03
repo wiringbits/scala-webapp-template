@@ -1,8 +1,7 @@
 package net.wiringbits.modules
-import net.wiringbits.webapp.utils.admin.config.TableSettings
-import net.wiringbits.webapp.utils.admin.utils.models.ordering.OrderingCondition
+
 import com.google.inject.{AbstractModule, Provides}
-import net.wiringbits.webapp.utils.admin.config.DataExplorerSettings
+import net.wiringbits.webapp.utils.admin.config.{DataExplorerSettings, TableSettings}
 
 class DataExplorerModule extends AbstractModule {
 
@@ -10,6 +9,13 @@ class DataExplorerModule extends AbstractModule {
   def dataExplorerSettings: DataExplorerSettings = DataExplorerSettings(settings)
 
   val settings = List(
-    TableSettings("users", OrderingCondition("created_at DESC, user_id"), "user_id")
+    TableSettings(
+      tableName = "users",
+      primaryKeyField = "user_id",
+      hiddenColumns = List("password", "email"),
+      // to prevent garbage data, let's disable most columns
+      nonEditableColumns = List("user_id", "email", "created_at", "verified_on", "name"),
+      canBeDeleted = false
+    )
   )
 }

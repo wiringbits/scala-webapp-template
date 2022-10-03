@@ -15,11 +15,12 @@ sudo apt-get update
 
 # Install the latest version of PostgreSQL.
 # If you want a specific version, use 'postgresql-12' or similar instead of 'postgresql':
-sudo apt-get -y install postgresql-13
+sudo apt-get -y install postgresql-14
 ```
 
 Then, connect to the database (`sudo -u postgres psql`) and create the necessary user/database:
 - `CREATE DATABASE server_db;`
+- `\c server_db;`
 - `CREATE EXTENSION IF NOT EXISTS CITEXT;`
 - `ALTER DATABASE server_db SET statement_timeout = '60s';`
 - `ALTER DATABASE server_db SET idle_in_transaction_session_timeout TO '5min';`

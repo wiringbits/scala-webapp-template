@@ -25,7 +25,6 @@ server {
   location /api/admin {
     auth_basic "Administrators only";
     auth_basic_user_file {{ nginx_admin_settings_file }};
-    auth_basic_user_file /etc/nginx/admin-config/htpasswd;
 
     proxy_set_header  Host $host;
     proxy_set_header  X-Real-IP $remote_addr;

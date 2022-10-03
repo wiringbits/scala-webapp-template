@@ -12,17 +12,16 @@ import scala.util.{Failure, Success, Try}
 trait ApiClient {
   def createUser(request: CreateUser.Request): Future[CreateUser.Response]
   def login(request: Login.Request): Future[Login.Response]
-  def loginBrowser(request: Login.Request): Future[Login.Response]
-  def logoutBrowser(): Future[Logout.Response]
+  def logout(): Future[Logout.Response]
 
   def verifyEmail(request: VerifyEmail.Request): Future[VerifyEmail.Response]
   def forgotPassword(request: ForgotPassword.Request): Future[ForgotPassword.Response]
   def resetPassword(request: ResetPassword.Request): Future[ResetPassword.Response]
 
-  def currentUser(jwt: String): Future[GetCurrentUser.Response]
-  def updateUser(jwt: String, request: UpdateUser.Request): Future[UpdateUser.Response]
-  def updatePassword(jwt: String, request: UpdatePassword.Request): Future[UpdatePassword.Response]
-  def getUserLogs(jwt: String): Future[GetUserLogs.Response]
+  def currentUser(): Future[GetCurrentUser.Response]
+  def updateUser(request: UpdateUser.Request): Future[UpdateUser.Response]
+  def updatePassword(request: UpdatePassword.Request): Future[UpdatePassword.Response]
+  def getUserLogs(): Future[GetUserLogs.Response]
 
   def adminGetUserLogs(userId: UUID): Future[AdminGetUserLogs.Response]
   def adminGetUsers(): Future[AdminGetUsers.Response]
@@ -81,10 +80,23 @@ object ApiClient {
       .parse(config.serverUrl)
       .getOrElse(throw new RuntimeException("Invalid server url"))
 
+    /** This is necessary for non-browser clients, this way, the cookies from the last authentication response are
+      * propagated to the next requests
+      */
+    private var lastAuthResponse = Option.empty[Response[_]]
+
+    private def unsafeSetLoginResponse(response: Response[_]): Unit = synchronized {
+      lastAuthResponse = Some(response)
+    }
+
     private def prepareRequest[R: Reads] = {
-      basicRequest
+      val base = basicRequest
         .contentType(MediaType.ApplicationJson)
         .response(asJson[R])
+
+      lastAuthResponse
+        .map(base.cookies)
+        .getOrElse(base)
     }
 
     override def createUser(request: CreateUser.Request): Future[CreateUser.Response] = {
@@ -143,24 +155,16 @@ object ApiClient {
         .post(uri)
         .body(Json.toJson(request).toString())
         .send(backend)
-        .map(_.body)
+        .map { response =>
+          // non-browser clients require the auth cookie to be set manually, hence, we need to store it
+          unsafeSetLoginResponse(response)
+          response.body
+        }
         .flatMap(Future.fromTry)
     }
 
-    override def loginBrowser(request: Login.Request): Future[Login.Response] = {
-      val path = ServerAPI.path :+ "auth" :+ "login-browser"
-      val uri = ServerAPI.withPath(path)
-
-      prepareRequest[Login.Response]
-        .post(uri)
-        .body(Json.toJson(request).toString())
-        .send(backend)
-        .map(_.body)
-        .flatMap(Future.fromTry)
-    }
-
-    override def logoutBrowser(): Future[Logout.Response] = {
-      val path = ServerAPI.path :+ "auth" :+ "logout-browser"
+    override def logout(): Future[Logout.Response] = {
+      val path = ServerAPI.path :+ "auth" :+ "logout"
       val uri = ServerAPI.withPath(path)
 
       prepareRequest[Logout.Response]
@@ -171,51 +175,47 @@ object ApiClient {
         .flatMap(Future.fromTry)
     }
 
-    override def currentUser(jwt: String): Future[GetCurrentUser.Response] = {
+    override def currentUser(): Future[GetCurrentUser.Response] = {
       val path = ServerAPI.path :+ "auth" :+ "me"
       val uri = ServerAPI.withPath(path)
 
       prepareRequest[GetCurrentUser.Response]
         .get(uri)
-        .header("X-Authorization", s"Bearer $jwt")
         .send(backend)
         .map(_.body)
         .flatMap(Future.fromTry)
     }
 
-    override def updateUser(jwt: String, request: UpdateUser.Request): Future[UpdateUser.Response] = {
+    override def updateUser(request: UpdateUser.Request): Future[UpdateUser.Response] = {
       val path = ServerAPI.path :+ "users" :+ "me"
       val uri = ServerAPI.withPath(path)
 
       prepareRequest[UpdateUser.Response]
         .put(uri)
-        .header("X-Authorization", s"Bearer $jwt")
         .body(Json.toJson(request).toString())
         .send(backend)
         .map(_.body)
         .flatMap(Future.fromTry)
     }
 
-    override def updatePassword(jwt: String, request: UpdatePassword.Request): Future[UpdatePassword.Response] = {
+    override def updatePassword(request: UpdatePassword.Request): Future[UpdatePassword.Response] = {
       val path = ServerAPI.path :+ "users" :+ "me" :+ "password"
       val uri = ServerAPI.withPath(path)
 
       prepareRequest[UpdatePassword.Response]
         .put(uri)
-        .header("X-Authorization", s"Bearer $jwt")
         .body(Json.toJson(request).toString())
         .send(backend)
         .map(_.body)
         .flatMap(Future.fromTry)
     }
 
-    override def getUserLogs(jwt: String): Future[GetUserLogs.Response] = {
+    override def getUserLogs(): Future[GetUserLogs.Response] = {
       val path = ServerAPI.path :+ "users" :+ "me" :+ "logs"
       val uri = ServerAPI.withPath(path)
 
       prepareRequest[GetUserLogs.Response]
         .get(uri)
-        .header("X-Authorization", s"Bearer $jwt")
         .send(backend)
         .map(_.body)
         .flatMap(Future.fromTry)

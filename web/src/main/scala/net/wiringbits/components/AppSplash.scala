@@ -28,10 +28,9 @@ import scala.util.{Failure, Success}
           .findLang()
           .foreach(lang => props.ctx.$lang := lang)
 
-        // load authenticated user
-        props.ctx.api.client.currentUser("").onComplete {
+        props.ctx.api.client.currentUser().onComplete {
           case Success(res) =>
-            props.ctx.loggedIn(User(name = res.name, email = res.email, jwt = ""))
+            props.ctx.loggedIn(User(name = res.name, email = res.email))
             setInitialized(true)
 
           case Failure(ex) =>
@@ -40,6 +39,7 @@ import scala.util.{Failure, Success}
             )
             setInitialized(true)
         }
+
       },
       ""
     )

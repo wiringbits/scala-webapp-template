@@ -2,9 +2,9 @@ package net.wiringbits.actions
 
 import net.wiringbits.api.models.ResetPassword
 import net.wiringbits.common.models.Password
-import net.wiringbits.config.{JwtConfig, UserTokensConfig}
+import net.wiringbits.config.UserTokensConfig
 import net.wiringbits.repositories.{UserTokensRepository, UsersRepository}
-import net.wiringbits.util.{EmailMessage, JwtUtils, TokensHelper}
+import net.wiringbits.util.{EmailMessage, TokensHelper}
 import net.wiringbits.validations.ValidateUserToken
 import org.mindrot.jbcrypt.BCrypt
 
@@ -15,7 +15,6 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class ResetPasswordAction @Inject() (
     userTokensConfig: UserTokensConfig,
-    jwtConfig: JwtConfig,
     usersRepository: UsersRepository,
     userTokensRepository: UserTokensRepository
 )(implicit
@@ -37,9 +36,6 @@ class ResetPasswordAction @Inject() (
       user = userMaybe.getOrElse(throw new RuntimeException(s"User with id $userId wasn't found"))
       emailMessage = EmailMessage.resetPassword(user.name)
       _ <- usersRepository.resetPassword(userId, hashedPassword, emailMessage)
-
-      // And, returning the auth token
-      jwt = JwtUtils.createToken(jwtConfig, user.id)(clock)
-    } yield ResetPassword.Response(name = user.name, email = user.email, token = jwt)
+    } yield ResetPassword.Response(name = user.name, email = user.email)
   }
 }

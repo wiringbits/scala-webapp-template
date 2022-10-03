@@ -4,10 +4,6 @@ import net.wiringbits.core.I18nLang
 import org.scalajs.dom
 
 class StorageService {
-
-  def saveJwt(jwt: String): Unit = save("jwt", jwt)
-  def findJwt(): Option[String] = find("jwt")
-
   def saveLang(lang: I18nLang): Unit = save("lang", lang.toString)
   def findLang(): Option[I18nLang] = find("lang").flatMap(I18nLang.from)
 

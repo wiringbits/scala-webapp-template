@@ -5,8 +5,8 @@ ThisBuild / scalaVersion := "2.13.8"
 ThisBuild / organization := "net.wiringbits"
 
 val playJson = "2.9.2"
-val sttp = "3.5.2"
-val webappUtils = "0.4.3"
+val sttp = "3.6.2"
+val webappUtils = "0.5.14"
 val swagger = "1.6.6"
 
 val consoleDisabledOptions = Seq("-Werror", "-Ywarn-unused", "-Ywarn-unused-import")
@@ -102,23 +102,17 @@ lazy val baseWebSettings: Project => Project =
     )
 
 // Used only by the lib projects
-lazy val baseLibSettings: Project => Project =
-  _.enablePlugins(ScalaJSPlugin)
-    .settings(
-      Test / fork := false, // sjs needs this to run tests
-      scalacOptions ++= Seq(
-        "-deprecation", // Emit warning and location for usages of deprecated APIs.
-        "-encoding",
-        "utf-8", // Specify character encoding used by source files.
-        "-explaintypes", // Explain type errors in more detail.
-        "-feature", // Emit warning and location for usages of features that should be imported explicitly.
-        "-unchecked" // Enable additional warnings where generated code depends on assumptions.
-      ),
-      libraryDependencies ++= Seq(
-        "org.scalatest" %%% "scalatest" % "3.2.12" % Test,
-        "com.beachape" %%% "enumeratum" % "1.7.0"
-      )
-    )
+// TODO: This should go to commonSettings instead
+lazy val baseLibSettings: Project => Project = _.settings(
+  scalacOptions ++= Seq(
+    "-deprecation", // Emit warning and location for usages of deprecated APIs.
+    "-encoding",
+    "utf-8", // Specify character encoding used by source files.
+    "-explaintypes", // Explain type errors in more detail.
+    "-feature", // Emit warning and location for usages of features that should be imported explicitly.
+    "-unchecked" // Enable additional warnings where generated code depends on assumptions.
+  )
+)
 
 /** Implement the `build` task define above. Most of this is really just to copy the index.html file around.
   */
@@ -161,7 +155,7 @@ lazy val browserProject: Project => Project =
         Files
           .readAllLines(indexFrom.toPath, IO.utf8)
           .asScala
-          .map(_.replaceAllLiterally("-fastopt-", "-opt-"))
+          .map(_.replaceAllLiterally("-fastopt", "-opt"))
           .mkString("\n")
       }
 
@@ -238,24 +232,27 @@ lazy val playSettings: Project => Project = {
 
 lazy val common = (crossProject(JSPlatform, JVMPlatform) in file("lib/common"))
   .configure(baseLibSettings, commonSettings)
-  .jsConfigure(_.enablePlugins(ScalaJSBundlerPlugin, ScalablyTypedConverterPlugin))
+  .jsConfigure(_.enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin, ScalablyTypedConverterPlugin))
   .settings(
     libraryDependencies ++= Seq()
   )
   .jvmSettings(
     libraryDependencies ++= Seq(
       "com.typesafe.play" %% "play-json" % playJson,
-      "com.typesafe.play" %%% "play-json" % playJson, // for a weird reason, jvm tests fail without this
-      "net.wiringbits" %%% "webapp-common" % webappUtils
+      "net.wiringbits" %% "webapp-common" % webappUtils,
+      "org.scalatest" %%% "scalatest" % "3.2.12" % Test
     )
   )
   .jsSettings(
+    Test / fork := false, // sjs needs this to run tests
     stUseScalaJsDom := true,
     Compile / stMinimize := Selection.All,
     libraryDependencies ++= Seq(
       "io.github.cquiroz" %%% "scala-java-time" % "2.3.0",
       "com.typesafe.play" %%% "play-json" % playJson,
-      "net.wiringbits" %%% "webapp-common" % webappUtils
+      "net.wiringbits" %%% "webapp-common" % webappUtils,
+      "org.scalatest" %%% "scalatest" % "3.2.12" % Test,
+      "com.beachape" %%% "enumeratum" % "1.7.0"
     )
   )
 
@@ -263,7 +260,7 @@ lazy val common = (crossProject(JSPlatform, JVMPlatform) in file("lib/common"))
 lazy val api = (crossProject(JSPlatform, JVMPlatform) in file("lib/api"))
   .dependsOn(common)
   .configure(baseLibSettings, commonSettings)
-  .jsConfigure(_.enablePlugins(ScalaJSBundlerPlugin, ScalablyTypedConverterPlugin))
+  .jsConfigure(_.enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin, ScalablyTypedConverterPlugin))
   .jvmSettings(
     libraryDependencies ++= Seq(
       "com.typesafe.play" %% "play-json" % playJson,
@@ -272,24 +269,28 @@ lazy val api = (crossProject(JSPlatform, JVMPlatform) in file("lib/api"))
     )
   )
   .jsSettings(
+    Test / fork := false, // sjs needs this to run tests
     stUseScalaJsDom := true,
     Compile / stMinimize := Selection.All,
     libraryDependencies ++= Seq(
       "com.typesafe.play" %%% "play-json" % playJson,
-      "com.softwaremill.sttp.client3" %%% "core" % sttp
+      "com.softwaremill.sttp.client3" %%% "core" % sttp,
+      "org.scalatest" %%% "scalatest" % "3.2.12" % Test,
+      "com.beachape" %%% "enumeratum" % "1.7.0"
     )
   )
 
 // shared on the ui only
 lazy val ui = (project in file("lib/ui"))
   .configure(baseLibSettings, commonSettings)
-  .configure(_.enablePlugins(ScalaJSBundlerPlugin, ScalablyTypedConverterPlugin))
+  .configure(_.enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin, ScalablyTypedConverterPlugin))
   .dependsOn(api.js, common.js)
   .settings(
     name := "wiringbits-lib-ui",
     useYarn := true,
     scalacOptions += "-Ymacro-annotations",
     Test / requireJsDomEnv := true,
+    Test / fork := false, // sjs needs this to run tests
     stTypescriptVersion := "3.9.3",
     // material-ui is provided by a pre-packaged library
     stIgnore ++= List("@material-ui/core", "@material-ui/styles", "@material-ui/icons"),
@@ -311,7 +312,9 @@ lazy val ui = (project in file("lib/ui"))
       "io.github.cquiroz" %%% "scala-java-time" % "2.0.0",
       "org.scala-js" %%% "scala-js-macrotask-executor" % "1.0.0",
       "com.alexitc" %%% "sjs-material-ui-facade" % "0.2.0",
-      "net.wiringbits" %%% "slinky-utils" % webappUtils
+      "net.wiringbits" %%% "slinky-utils" % webappUtils,
+      "org.scalatest" %%% "scalatest" % "3.2.12" % Test,
+      "com.beachape" %%% "enumeratum" % "1.7.0"
     )
   )
 
@@ -325,8 +328,7 @@ lazy val server = (project in file("server"))
     libraryDependencies ++= Seq(
       "org.playframework.anorm" %% "anorm" % "2.6.10",
       "com.typesafe.play" %% "play-json" % "2.9.2",
-      "org.postgresql" % "postgresql" % "42.3.4",
-      "com.github.jwt-scala" %% "jwt-core" % "9.0.5",
+      "org.postgresql" % "postgresql" % "42.3.6",
       "de.svenkubiak" % "jBCrypt" % "0.4.3",
       "commons-validator" % "commons-validator" % "1.7",
       "com.dimafeng" %% "testcontainers-scala-scalatest" % "0.40.7" % "test",
@@ -342,7 +344,8 @@ lazy val server = (project in file("server"))
       "javax.xml.bind" % "jaxb-api" % "2.3.1",
       "javax.annotation" % "javax.annotation-api" % "1.3.2",
       "javax.el" % "javax.el-api" % "3.0.0",
-      "org.glassfish" % "javax.el" % "3.0.0"
+      "org.glassfish" % "javax.el" % "3.0.0",
+      "com.beachape" %% "enumeratum" % "1.6.1"
     )
   )
 
@@ -402,8 +405,8 @@ lazy val web = (project in file("web"))
       "com.softwaremill.sttp.client3" %%% "core" % sttp,
       "org.scala-js" %%% "scala-js-macrotask-executor" % "1.0.0",
       "com.alexitc" %%% "sjs-material-ui-facade" % "0.2.0",
-      "net.wiringbits" %%% "admin-data-explorer-slinky" % webappUtils,
-      "io.monix" %%% "monix-reactive" % "3.4.0"
+      "net.wiringbits" %%% "scalablytyped-facades" % webappUtils,
+      "io.monix" %%% "monix-reactive" % "3.4.1"
     ),
     libraryDependencies ++= Seq(
       "org.scalatest" %%% "scalatest" % "3.2.12" % Test
@@ -428,46 +431,31 @@ lazy val adminBuildInfoSettings: Project => Project = _.enablePlugins(BuildInfoP
   )
 
 lazy val admin = (project in file("admin"))
-  .dependsOn(common.js, api.js, ui)
-  .enablePlugins(ScalablyTypedConverterPlugin)
-  .configure(
-    baseWebSettings,
-    browserProject,
-    commonSettings,
-    reactNpmDeps,
-    withCssLoading,
-    bundlerSettings,
-    adminBuildInfoSettings
-  )
+  .dependsOn(api.js)
+  .enablePlugins(ScalaJSBundlerPlugin)
+  .configure(browserProject, bundlerSettings, adminBuildInfoSettings)
   .settings(
     name := "wiringbits-admin",
-    useYarn := true,
+    scalaJSUseMainModuleInitializer := true,
+    scalaJSLinkerConfig := scalaJSLinkerConfig.value.withSourceMap(false),
     webpackDevServerPort := 8081,
-    stFlavour := Flavour.Slinky,
-    stReactEnableTreeShaking := Selection.All,
-    stUseScalaJsDom := true,
-    Compile / stMinimize := Selection.All,
-    // material-ui is provided by a pre-packaged library
-    stIgnore ++= List("@material-ui/core", "@material-ui/styles", "@material-ui/icons"),
-    Compile / npmDependencies ++= Seq(
-      "@material-ui/core" -> "3.9.4", // note: version 4 is not supported yet
-      "@material-ui/styles" -> "3.0.0-alpha.10", // note: version 4 is not supported yet
-      "@material-ui/icons" -> "3.0.2",
-      "@types/classnames" -> "2.2.10",
-      "react-router" -> "5.1.2",
-      "@types/react-router" -> "5.1.2",
-      "react-router-dom" -> "5.1.2",
-      "@types/react-router-dom" -> "5.1.2"
-    ),
+    webpackBundlingMode := BundlingMode.LibraryOnly(),
     libraryDependencies ++= Seq(
-      "com.typesafe.play" %%% "play-json" % playJson,
       "com.softwaremill.sttp.client3" %%% "core" % sttp,
-      "org.scala-js" %%% "scala-js-macrotask-executor" % "1.0.0",
-      "com.alexitc" %%% "sjs-material-ui-facade" % "0.2.0",
-      "net.wiringbits" %%% "admin-data-explorer-slinky" % webappUtils
+      "net.wiringbits" %%% "admin-data-explorer-web" % webappUtils
     ),
-    libraryDependencies ++= Seq(
-      "org.scalatest" %%% "scalatest" % "3.2.12" % Test
+    Compile / npmDependencies ++= Seq(
+      "react" -> "17.0.0",
+      "react-dom" -> "17.0.0",
+      "react-scripts" -> "5.0.0",
+      "react-admin" -> "4.1.0",
+      "ra-ui-materialui" -> "4.1.0",
+      "ra-data-simple-rest" -> "4.1.0",
+      "ra-i18n-polyglot" -> "4.1.0",
+      "ra-language-english" -> "4.1.0",
+      "ra-core" -> "4.1.0",
+      "@mui/material" -> "5.8.1",
+      "@emotion/styled" -> "11.8.1"
     )
   )
 
