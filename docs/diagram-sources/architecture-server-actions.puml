@@ -1,0 +1,31 @@
+@startuml
+Title Wiringbits Scala WebApp Template - Server Architecture - Actions
+
+skinparam {
+    linetype ortho
+}
+
+skinparam component {
+  BackgroundColor LightBlue
+}
+skinparam rectangle {
+  BackgroundColor White
+}
+
+rectangle Controllers {
+    component Actions {
+        rectangle Services {
+            rectangle ExternalApis {
+                rectangle ExternalApiClients {
+                    rectangle ExternalApiModels
+                }
+            }
+            rectangle Repositories {
+                rectangle DAOs {
+                    rectangle DataModels
+                }
+            }
+        }
+    }
+}
+@enduml

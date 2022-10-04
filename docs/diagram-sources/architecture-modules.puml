@@ -1,0 +1,40 @@
+@startuml
+Title Wiringbits Scala WebApp Template - Module Diagram
+
+skinparam {
+    ArrowColor Red
+}
+
+package LibCommon {
+    [Typed models shared everywhere\n* Scala/Scala.js]
+}
+
+package LibUI {
+    [Code shared on UI apps (web/admin)\n* Scala.js]
+}
+
+package LibAPI {
+    [REST API client and models\n* Scala/Scala.js]
+}
+
+package WebApp {
+    [The main web app\n* Scala.js]
+}
+package AdminApp {
+    [The admin web app\n* Scala.js]
+}
+package ServerApp {
+    [The server side app\n* Scala]
+}
+
+WebApp .left....> LibUI : uses
+WebApp .left....> LibAPI : uses
+
+AdminApp .right.> LibUI : uses
+AdminApp .right.> LibAPI : uses
+
+ServerApp .> LibAPI : uses
+
+LibUI .up..> LibCommon : uses
+LibAPI .down.> LibCommon : uses
+@enduml

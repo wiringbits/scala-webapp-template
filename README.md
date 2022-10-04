@@ -57,4 +57,8 @@ Deployment 2m demo:
 
 ## Get started
 
-Checkout the [docs](./docs/README.md)
+Checkout the [docs](./docs/README.md).
+
+## Hire us
+
+The open source work we do is funded by our Scala/Scala.js consulting and development services, [schedule a call](http://alexis.wiringbits.net/) to hire us for your project.

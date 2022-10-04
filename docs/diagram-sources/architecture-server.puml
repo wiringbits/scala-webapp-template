@@ -1,0 +1,24 @@
+@startuml
+Title Wiringbits Scala WebApp Template - Server Architecture
+
+skinparam {
+    linetype ortho
+}
+
+rectangle Controllers {
+    rectangle Actions {
+        rectangle Services {
+            rectangle ExternalApis {
+                rectangle ExternalApiClients {
+                    rectangle ExternalApiModels
+                }
+            }
+            rectangle Repositories {
+                rectangle DAOs {
+                    rectangle DataModels
+                }
+            }
+        }
+    }
+}
+@enduml

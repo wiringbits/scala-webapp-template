@@ -1,0 +1,34 @@
+@startuml
+Title Wiringbits Scala WebApp Template - Infrastructure Diagram
+
+skinparam {
+    ArrowColor Red
+    linetype ortho
+}
+
+cloud Cloud {
+    database Postgres
+    rectangle UbuntuServer {
+        node ScalaServerApp
+        node nginx
+
+        folder FileSystem {
+            file WebAssets
+            file AdminAssets
+        }
+    }
+
+    component EmailService
+    ScalaServerApp -> EmailService
+    nginx -> WebAssets
+    nginx --> AdminAssets
+    nginx --> ScalaServerApp
+    ScalaServerApp --> Postgres
+}
+
+person RegularUser
+person AdminUser
+
+RegularUser -> nginx
+AdminUser --> nginx
+@enduml
