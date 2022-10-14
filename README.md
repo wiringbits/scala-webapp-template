@@ -59,6 +59,10 @@ Deployment 2m demo:
 
 Checkout the [docs](./docs/README.md).
 
+There is also a recorded presentation from ScalaCon 2022:
+
+- [A Practical Skeleton for Your Next Scala Scala js Web Application](https://www.youtube.com/watch?v=xWGMr0AsAMU)
+
 ## Hire us
 
 The open source work we do is funded by our Scala/Scala.js consulting and development services, [schedule a call](http://alexis.wiringbits.net/) to hire us for your project.
