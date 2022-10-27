@@ -4,7 +4,7 @@
 - [Architecture](./architecture.md)
 - [Design desicions](./design-decisions.md)
 - [Learning material](./learning-material.md)
-- Swagger integration (ToDo).
+- [Swagger integration](./swagger-integration.md).
 
 
 ## Diagrams
