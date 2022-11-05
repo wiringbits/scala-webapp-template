@@ -1,11 +1,11 @@
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption.REPLACE_EXISTING
 
-ThisBuild / scalaVersion := "2.13.8"
+ThisBuild / scalaVersion := "2.13.10"
 ThisBuild / organization := "net.wiringbits"
 
 val playJson = "2.9.2"
-val sttp = "3.6.2"
+val sttp = "3.8.3"
 val webappUtils = "0.5.14"
 val swagger = "1.6.6"
 
@@ -58,7 +58,6 @@ lazy val baseServerSettings: Project => Project = {
       "-unchecked",
       "-deprecation",
       "-feature",
-      "-target:jvm-1.8",
       "-encoding",
       "UTF-8",
       "-Wconf:src=src_managed/.*:silent",
@@ -240,10 +239,11 @@ lazy val common = (crossProject(JSPlatform, JVMPlatform) in file("lib/common"))
     libraryDependencies ++= Seq(
       "com.typesafe.play" %% "play-json" % playJson,
       "net.wiringbits" %% "webapp-common" % webappUtils,
-      "org.scalatest" %%% "scalatest" % "3.2.12" % Test
+      "org.scalatest" %% "scalatest" % "3.2.12" % Test
     )
   )
   .jsSettings(
+    useYarn := true,
     Test / fork := false, // sjs needs this to run tests
     stUseScalaJsDom := true,
     Compile / stMinimize := Selection.All,
@@ -269,6 +269,7 @@ lazy val api = (crossProject(JSPlatform, JVMPlatform) in file("lib/api"))
     )
   )
   .jsSettings(
+    useYarn := true,
     Test / fork := false, // sjs needs this to run tests
     stUseScalaJsDom := true,
     Compile / stMinimize := Selection.All,

@@ -9,6 +9,7 @@ import org.scalatestplus.play.guice.GuiceOneServerPerTest
 import org.testcontainers.utility.DockerImageName
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.{Application, Configuration, Environment, Mode}
+import sttp.client3.HttpClientFutureBackend
 
 import java.sql.DriverManager
 import scala.concurrent.{ExecutionContext, Future}
@@ -54,9 +55,7 @@ trait PlayPostgresSpec extends PlayAPISpec with TestContainerForEach with GuiceO
   }
 
   def withApiClient[A](runTest: ApiClient => A): A = {
-    import sttp.client3.asynchttpclient.future.AsyncHttpClientFutureBackend
-
-    implicit val sttpBackend = AsyncHttpClientFutureBackend()
+    implicit val sttpBackend = HttpClientFutureBackend()
 
     val config = ApiClient.Config(s"http://localhost:$port")
     val client = new ApiClient.DefaultImpl(config)
