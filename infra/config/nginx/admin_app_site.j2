@@ -5,7 +5,7 @@ server {
   auth_basic_user_file {{ nginx_admin_settings_file }};
 
   server_name {{ admin_app_domain }};
-  root {{ webapp_assets_directory }};
+  root {{ webapp_admin_assets_directory }};
   index index.html;
 
   set_real_ip_from 10.0.0.0/8;
@@ -30,7 +30,7 @@ server {
     proxy_set_header Connection "";
 
     rewrite ^/api/(.*) /$1 break;
-    proxy_pass http://localhost:9000;
+    proxy_pass http://localhost:{{ server_app_port }};
   }
 
   # caching static assets

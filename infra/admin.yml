@@ -4,7 +4,6 @@
   vars:
     - webapp_source_zip: "apps/admin.zip"
     - webapp_remote_file: "admin.zip"
-    - webapp_assets_directory: "/var/www/admin"
 
   tasks:
     - name: Build the application
@@ -26,7 +25,7 @@
     - name: Create the admin data directory
       become: yes
       file:
-        path: /var/www/admin
+        path: "{{ webapp_admin_assets_directory }}"
         state: directory
         owner: www-data
         group: www-data
@@ -36,12 +35,12 @@
       unarchive:
         remote_src: yes
         src: admin.zip
-        dest: /var/www/admin
+        dest: "{{ webapp_admin_assets_directory }}"
 
     - name: Set the permissions
       become: yes
       file:
-        dest: /var/www/admin
+        dest: "{{ webapp_admin_assets_directory }}"
         owner: www-data
         group: www-data
         recurse: yes

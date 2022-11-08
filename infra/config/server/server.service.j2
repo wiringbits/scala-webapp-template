@@ -8,8 +8,8 @@ StandardOutput=tty
 StandardError=tty
 EnvironmentFile={{ app_env_config_file }}
 LimitNOFILE=65535
-User=play
-ExecStart={{ app_home }}/{{ app_directory_name }}/bin/{{ app_startup_script }} -Dpidfile.path=/dev/null
+User={{ app_user }}
+ExecStart={{ app_home }}/{{ app_directory_name }}/bin/{{ app_startup_script }} -Dpidfile.path=/dev/null -Dhttp.port={{ server_app_port }}
 Restart=on-failure
 
 [Install]

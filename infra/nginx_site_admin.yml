@@ -5,7 +5,6 @@
     - nginx_site_file: "config/nginx/admin_app_site.j2"
     - nginx_admin_settings_directory: "/etc/nginx/admin-config"
     - nginx_admin_settings_file: "/etc/nginx/admin-config/htpasswd"
-    - webapp_assets_directory: "/var/www/admin"
 
   tasks:
     - name: Create the custom config directory
@@ -45,6 +44,13 @@
         src: /etc/nginx/sites-available/{{ admin_app_domain }}
         dest: /etc/nginx/sites-enabled/{{ admin_app_domain }}
         state: link
+
+    - name: Install snapd
+      become: yes
+      apt:
+        name: snapd
+        state: latest
+        update_cache: yes
 
     # Get SSL certificate
     # Source: https://certbot.eff.org/lets-encrypt/ubuntufocal-nginx
