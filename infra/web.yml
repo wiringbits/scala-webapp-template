@@ -4,7 +4,6 @@
   vars:
     - webapp_source_zip: "apps/web.zip"
     - webapp_remote_file: "web.zip"
-    - webapp_assets_directory: "/var/www/html"
 
   tasks:
     - name: Build the application

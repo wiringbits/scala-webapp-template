@@ -18,7 +18,7 @@ server {
 
   # swagger docs
   location /swagger.json {
-    proxy_pass http://localhost:9000;
+    proxy_pass http://localhost:{{ server_app_port }};
   }
 
   # the admin api is only reachable when providing the necessary credentials
@@ -36,7 +36,7 @@ server {
     proxy_set_header Connection "";
 
     rewrite ^/api/(.*) /$1 break;
-    proxy_pass http://localhost:9000;
+    proxy_pass http://localhost:{{ server_app_port }};
   }
 
   location /api {
@@ -50,7 +50,7 @@ server {
     proxy_set_header Connection "";
 
     rewrite ^/api/(.*) /$1 break;
-    proxy_pass http://localhost:9000;
+    proxy_pass http://localhost:{{ server_app_port }};
   }
 
   # FIXME: This prevents returning the static resources from the app, like /api/swagger.json

@@ -4,10 +4,6 @@
   vars:
     - app_source_zip: "apps/server.zip"
     - app_source_zip_remote: "server.zip"
-    - app_user: "play"
-    - app_group: "play"
-    - app_home: "/home/play/app"
-    - app_env_config_file: "/home/play/app/.env"
 
   tasks:
     - name: Install java11
