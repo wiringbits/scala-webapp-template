@@ -1,10 +1,18 @@
-name: Build the server app
+name: Build the app
 
 on:
   push:
     branches: [ master ]
   pull_request:
     branches: [ master ]
+
+concurrency:
+  # Only run once for latest commit per ref and cancel other (previous) runs.
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read # for checkout
 
 jobs:
   build:
