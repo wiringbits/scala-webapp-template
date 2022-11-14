@@ -7,6 +7,7 @@ import net.wiringbits.config.NotificationsConfig
 import org.slf4j.LoggerFactory
 
 import scala.concurrent.ExecutionContext
+import scala.concurrent.duration.DurationInt
 import scala.util.{Failure, Success}
 
 class NotificationsTask @Inject() (
@@ -17,7 +18,7 @@ class NotificationsTask @Inject() (
     ec: ExecutionContext,
     actorSystem: ActorSystem
 ) {
-  val logger = LoggerFactory.getLogger(this.getClass)
+  private val logger = LoggerFactory.getLogger(this.getClass)
 
   logger.info("Starting the notifications task")
   actorSystem.scheduler.scheduleOnce(
@@ -27,23 +28,23 @@ class NotificationsTask @Inject() (
   }
 
   def run(): Unit = {
-    getPendingNotifications()
-      .onComplete {
-        case Failure(exception) => logger.error("Failed to get notifications", exception)
-        case Success(notifications) =>
-          val message = s"There's ${notifications.size} pending notifications"
-          if (notifications.isEmpty) logger.trace(message)
-          else logger.info(message)
-          notifications.foreach { notification =>
-            sendNotificationAction(notification).onComplete {
-              case Failure(ex) =>
-                logger.info(s"There was an error trying to send notification with id = ${notification.id}", ex)
-              case Success(_) => ()
-            }
-          }
-      }
+    val result = for {
+      stream <- getPendingNotifications()
+      _ <- stream
+        .throttle(100, 1.minute)
+        .runWith(akka.stream.scaladsl.Sink.foreachAsync(1)(sendNotificationAction.apply))
+    } yield ()
 
-    actorSystem.scheduler.scheduleOnce(notificationsConfig.interval) { run() }
-    ()
+    result.onComplete {
+      case Failure(ex) =>
+        logger.error(
+          s"Failed to process pending notifications, retrying after ${notificationsConfig.interval}: ${ex.getMessage}",
+          ex
+        )
+        actorSystem.scheduler.scheduleOnce(notificationsConfig.interval) { run() }
+
+      case Success(_) =>
+        actorSystem.scheduler.scheduleOnce(notificationsConfig.interval) { run() }
+    }
   }
 }

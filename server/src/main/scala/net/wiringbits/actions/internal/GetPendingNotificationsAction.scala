@@ -7,7 +7,7 @@ import javax.inject.Inject
 import scala.concurrent.Future
 
 class GetPendingNotificationsAction @Inject() (userNotificationsRepository: UserNotificationsRepository) {
-  def apply(): Future[List[UserNotification]] = {
-    userNotificationsRepository.getPendingNotifications
+  def apply(): Future[akka.stream.scaladsl.Source[UserNotification, Future[Int]]] = {
+    userNotificationsRepository.streamPendingNotifications
   }
 }
