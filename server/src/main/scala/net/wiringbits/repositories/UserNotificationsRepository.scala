@@ -13,7 +13,8 @@ import scala.util.control.NonFatal
 
 class UserNotificationsRepository @Inject() (database: Database)(implicit ec: DatabaseExecutionContext, clock: Clock) {
   def streamPendingNotifications: Future[akka.stream.scaladsl.Source[UserNotification, Future[Int]]] = Future {
-    implicit val conn = database.getConnection() // TODO: Consider using a different connection pool
+    // autocommit=false is necessary to avoid loding the whole result into memory
+    implicit val conn = database.getConnection(autocommit = false)
     try {
       val stream = UserNotificationsDAO.streamPendingNotifications()
       // make sure to close the connection when it isn't required anymore
@@ -25,7 +26,7 @@ class UserNotificationsRepository @Inject() (database: Database)(implicit ec: Da
     } catch {
       case NonFatal(ex) =>
         conn.close()
-        throw new RuntimeException("Failed to stream pending notifications, this isn't expected at all", ex)
+        throw new RuntimeException("Failed to stream pending notifications", ex)
     }
   }
 

@@ -31,10 +31,9 @@ object UserNotificationsDAO {
   }
 
   def streamPendingNotifications(
-      allowedErrors: Int = 10
+      allowedErrors: Int = 10,
+      fetchSize: Int = 1000
   )(implicit conn: Connection, clock: Clock): akka.stream.scaladsl.Source[UserNotification, Future[Int]] = {
-    // TODO: Seems like anorm ends up loading the whole stream into memory, which causes an OutOfMemoryError
-    // when the data doesn't fit into memory
     val query = SQL"""
       SELECT user_notification_id, user_id, notification_type, subject, message, status, status_details, error_count, execute_at, created_at, updated_at
       FROM user_notifications
@@ -42,8 +41,7 @@ object UserNotificationsDAO {
         AND execute_at <= ${clock.instant()}
         AND error_count < $allowedErrors 
       ORDER BY execute_at, user_notification_id
-      LIMIT 500
-      """
+      """.withFetchSize(Some(fetchSize)) // without this, all data is loaded into memory
 
     // this requires a Materializer that isn't used, better to set a null instead of depend on a Materializer
     @SuppressWarnings(Array("org.wartremover.warts.Null"))

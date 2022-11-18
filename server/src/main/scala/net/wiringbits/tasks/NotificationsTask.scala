@@ -2,7 +2,7 @@ package net.wiringbits.tasks
 
 import akka.actor.ActorSystem
 import com.google.inject.Inject
-import net.wiringbits.actions.internal.{GetPendingNotificationsAction, SendNotificationAction}
+import net.wiringbits.actions.internal.{SendNotificationAction, StreamPendingNotificationsAction}
 import net.wiringbits.config.NotificationsConfig
 import org.slf4j.LoggerFactory
 
@@ -12,7 +12,7 @@ import scala.util.{Failure, Success}
 
 class NotificationsTask @Inject() (
     notificationsConfig: NotificationsConfig,
-    getPendingNotifications: GetPendingNotificationsAction,
+    streamPendingNotifications: StreamPendingNotificationsAction,
     sendNotificationAction: SendNotificationAction
 )(implicit
     ec: ExecutionContext,
@@ -29,7 +29,8 @@ class NotificationsTask @Inject() (
 
   def run(): Unit = {
     val result = for {
-      stream <- getPendingNotifications()
+      stream <- streamPendingNotifications()
+      // the reason to throttle and handle 1 notification concurrently is to avoid overloading the app
       _ <- stream
         .throttle(100, 1.minute)
         .runWith(akka.stream.scaladsl.Sink.foreachAsync(1)(sendNotificationAction.apply))

@@ -1,9 +1,12 @@
 package net.wiringbits.repositories
 
+import akka.actor.ActorSystem
+import akka.stream.scaladsl._
 import net.wiringbits.common.models.{Email, Name}
 import net.wiringbits.core.RepositorySpec
 import net.wiringbits.repositories.daos.UserNotificationsDAO
 import net.wiringbits.repositories.models.{NotificationStatus, NotificationType, User, UserNotification}
+import org.scalatest.BeforeAndAfterAll
 import org.scalatest.OptionValues._
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.matchers.must.Matchers._
@@ -11,8 +14,18 @@ import org.scalatest.matchers.must.Matchers._
 import java.time.Instant
 import java.util.UUID
 
-class UserNotificationsRepositorySpec extends RepositorySpec {
-  "getPendingNotifications" should {
+class UserNotificationsRepositorySpec extends RepositorySpec with BeforeAndAfterAll {
+
+  // required to test the streaming operations
+  private implicit lazy val system: ActorSystem = ActorSystem("UserNotificationsRepositorySpec")
+
+  override def afterAll(): Unit = {
+    system.terminate().futureValue
+    super.afterAll()
+  }
+
+  "streamPendingNotifications" should {
+
     "return pending notifications" in withRepositories() { repositories =>
       val request = User.CreateUser(
         id = UUID.randomUUID(),
@@ -38,12 +51,15 @@ class UserNotificationsRepositorySpec extends RepositorySpec {
       repositories.database.withConnection { implicit conn =>
         UserNotificationsDAO.create(notificationRequest)
       }
-      val maybe = repositories.userNotifications.getPendingNotifications.futureValue
-      val response = maybe.headOption.value
-      response.status must be(notificationRequest.status)
-      response.notificationType must be(notificationRequest.notificationType)
-      response.message must be(notificationRequest.message)
-      response.subject must be(notificationRequest.subject)
+      val result = repositories.userNotifications.streamPendingNotifications.futureValue
+        .runWith(Sink.seq)
+        .futureValue
+      result.size must be(1)
+      val item = result.headOption.value
+      item.status must be(notificationRequest.status)
+      item.notificationType must be(notificationRequest.notificationType)
+      item.message must be(notificationRequest.message)
+      item.subject must be(notificationRequest.subject)
     }
 
     "only return pending notifications" in withRepositories() { repositories =>
@@ -79,17 +95,22 @@ class UserNotificationsRepositorySpec extends RepositorySpec {
           )
         }
       }
-      val response = repositories.userNotifications.getPendingNotifications.futureValue
+      val response = repositories.userNotifications.streamPendingNotifications.futureValue
+        .runWith(Sink.seq)
+        .futureValue
+      response.length must be(limit / 2)
       response.foreach { x =>
         x.status must be(NotificationStatus.Pending)
         x.notificationType must be(notificationRequest.notificationType)
         x.message must be(notificationRequest.message)
         x.subject must be(notificationRequest.subject)
       }
-      response.length must be(limit / 2)
     }
+
     "return no results" in withRepositories() { repositories =>
-      val response = repositories.userNotifications.getPendingNotifications.futureValue
+      val response = repositories.userNotifications.streamPendingNotifications.futureValue
+        .runWith(Sink.seq)
+        .futureValue
       response.isEmpty must be(true)
     }
   }
@@ -124,11 +145,15 @@ class UserNotificationsRepositorySpec extends RepositorySpec {
       repositories.userNotifications
         .setStatusToFailed(notificationRequest.id, executeAt = Instant.now(), failReason = failReason)
         .futureValue
-      val maybe = repositories.userNotifications.getPendingNotifications.futureValue
-      val response = maybe.headOption.value
-      response.id must be(notificationRequest.id)
-      response.status must be(NotificationStatus.Failed)
-      response.statusDetails must be(Some(failReason))
+      val result = repositories.userNotifications.streamPendingNotifications.futureValue
+        .runWith(Sink.seq)
+        .futureValue
+
+      result.size must be(1)
+      val item = result.headOption.value
+      item.id must be(notificationRequest.id)
+      item.status must be(NotificationStatus.Failed)
+      item.statusDetails must be(Some(failReason))
     }
 
     "fail if the notification doesn't exists" in withRepositories() { repositories =>
@@ -166,8 +191,10 @@ class UserNotificationsRepositorySpec extends RepositorySpec {
       }
       repositories.userNotifications.setStatusToSuccess(notificationRequest.id).futureValue
 
-      val response = repositories.userNotifications.getPendingNotifications.futureValue
-      response.isEmpty must be(true)
+      val result = repositories.userNotifications.streamPendingNotifications.futureValue
+        .runWith(Sink.seq)
+        .futureValue
+      result.isEmpty must be(true)
     }
 
     "fail if the notification doesn't exists" in withRepositories() { repositories =>
