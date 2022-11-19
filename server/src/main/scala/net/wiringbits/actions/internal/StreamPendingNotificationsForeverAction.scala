@@ -18,7 +18,7 @@ class StreamPendingNotificationsForeverAction @Inject() (userNotificationsReposi
   private val logger = LoggerFactory.getLogger(this.getClass)
 
   def apply(reconnectionDelay: FiniteDuration = 10.seconds): Source[UserNotification, akka.NotUsed] = {
-    // Let's use unfoldAsync to continuously fetch items from dataabase
+    // Let's use unfoldAsync to continuously fetch items from database
     // First execution doesn't involve a delay
     Source
       .unfoldAsync[Boolean, Source[UserNotification, Future[Int]]](false) { delay =>
