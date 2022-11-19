@@ -9,11 +9,24 @@ import java.time.{Clock, Instant}
 import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.Future
+import scala.util.control.NonFatal
 
 class UserNotificationsRepository @Inject() (database: Database)(implicit ec: DatabaseExecutionContext, clock: Clock) {
-  def getPendingNotifications: Future[List[UserNotification]] = Future {
-    database.withConnection { implicit conn =>
-      UserNotificationsDAO.getPendingNotifications()
+  def streamPendingNotifications: Future[akka.stream.scaladsl.Source[UserNotification, Future[Int]]] = Future {
+    // autocommit=false is necessary to avoid loding the whole result into memory
+    implicit val conn = database.getConnection(autocommit = false)
+    try {
+      val stream = UserNotificationsDAO.streamPendingNotifications()
+      // make sure to close the connection when it isn't required anymore
+      stream.mapMaterializedValue(_.onComplete { _ =>
+        conn.close()
+      })
+
+      stream
+    } catch {
+      case NonFatal(ex) =>
+        conn.close()
+        throw new RuntimeException("Failed to stream pending notifications", ex)
     }
   }
 

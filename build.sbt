@@ -8,6 +8,7 @@ val playJson = "2.9.2"
 val sttp = "3.8.3"
 val webappUtils = "0.5.14"
 val swagger = "1.6.6"
+val anorm = "2.6.10"
 
 val consoleDisabledOptions = Seq("-Werror", "-Ywarn-unused", "-Ywarn-unused-import")
 
@@ -327,7 +328,8 @@ lazy val server = (project in file("server"))
     fork := true,
     Test / fork := true, // allows for graceful shutdown of containers once the tests have finished running
     libraryDependencies ++= Seq(
-      "org.playframework.anorm" %% "anorm" % "2.6.10",
+      "org.playframework.anorm" %% "anorm" % anorm,
+      "org.playframework.anorm" %% "anorm-akka" % anorm,
       "com.typesafe.play" %% "play-json" % "2.9.2",
       "org.postgresql" % "postgresql" % "42.3.6",
       "de.svenkubiak" % "jBCrypt" % "0.4.3",
