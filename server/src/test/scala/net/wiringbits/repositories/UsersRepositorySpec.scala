@@ -1,16 +1,27 @@
 package net.wiringbits.repositories
 
+import akka.actor.ActorSystem
+import akka.stream.scaladsl.Sink
 import net.wiringbits.common.models.{Email, Name}
 import net.wiringbits.core.RepositorySpec
 import net.wiringbits.repositories.models.User
 import net.wiringbits.util.EmailMessage
-import org.scalatest.OptionValues.convertOptionToValuable
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.OptionValues._
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.matchers.must.Matchers._
 
 import java.util.UUID
 
-class UsersRepositorySpec extends RepositorySpec {
+class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll {
+
+  // required to test the streaming operations
+  private implicit lazy val system: ActorSystem = ActorSystem("UserNotificationsRepositorySpec")
+
+  override def afterAll(): Unit = {
+    system.terminate().futureValue
+    super.afterAll()
+  }
 
   "create" should {
     "work" in withRepositories() { repositories =>
@@ -225,7 +236,9 @@ class UsersRepositorySpec extends RepositorySpec {
       val newPassword = "test"
       repositories.users.updatePassword(request.id, newPassword, EmailMessage.updatePassword(request.name)).futureValue
 
-      val response = repositories.userNotifications.getPendingNotifications.futureValue
+      val response = repositories.userNotifications.streamPendingNotifications.futureValue
+        .runWith(Sink.seq)
+        .futureValue
       response.length must be(1)
     }
 
@@ -267,7 +280,9 @@ class UsersRepositorySpec extends RepositorySpec {
       repositories.users.create(request).futureValue
       repositories.users.verify(request.id, UUID.randomUUID(), EmailMessage.confirm(request.name)).futureValue
 
-      val response = repositories.userNotifications.getPendingNotifications.futureValue
+      val response = repositories.userNotifications.streamPendingNotifications.futureValue
+        .runWith(Sink.seq)
+        .futureValue
       response.length must be(1)
     }
 
@@ -313,7 +328,9 @@ class UsersRepositorySpec extends RepositorySpec {
       val newPassword = "test"
       repositories.users.resetPassword(request.id, newPassword, EmailMessage.resetPassword(request.name)).futureValue
 
-      val response = repositories.userNotifications.getPendingNotifications.futureValue
+      val response = repositories.userNotifications.streamPendingNotifications.futureValue
+        .runWith(Sink.seq)
+        .futureValue
       response.length must be(1)
     }
 

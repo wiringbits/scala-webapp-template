@@ -5,6 +5,7 @@ import net.wiringbits.repositories.models.{NotificationStatus, UserNotification}
 import java.sql.Connection
 import java.time.{Clock, Instant}
 import java.util.UUID
+import scala.concurrent.Future
 
 object UserNotificationsDAO {
 
@@ -29,17 +30,23 @@ object UserNotificationsDAO {
       .execute()
   }
 
-  def getPendingNotifications(
-      allowedErrors: Int = 10
-  )(implicit conn: Connection, clock: Clock): List[UserNotification] = {
-    SQL"""
+  def streamPendingNotifications(
+      allowedErrors: Int = 10,
+      fetchSize: Int = 1000
+  )(implicit conn: Connection, clock: Clock): akka.stream.scaladsl.Source[UserNotification, Future[Int]] = {
+    val query = SQL"""
       SELECT user_notification_id, user_id, notification_type, subject, message, status, status_details, error_count, execute_at, created_at, updated_at
       FROM user_notifications
       WHERE status != ${NotificationStatus.Success.toString}
         AND execute_at <= ${clock.instant()}
         AND error_count < $allowedErrors 
       ORDER BY execute_at, user_notification_id
-      """.as(userNotificationParser.*)
+      """.withFetchSize(Some(fetchSize)) // without this, all data is loaded into memory
+
+    // this requires a Materializer that isn't used, better to set a null instead of depend on a Materializer
+    @SuppressWarnings(Array("org.wartremover.warts.Null"))
+    val materializer = null
+    AkkaStream.source(query, userNotificationParser)(materializer, conn)
   }
 
   def setStatusToFailed(notificationId: UUID, executeAt: Instant, failReason: String)(implicit
