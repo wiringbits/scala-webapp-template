@@ -1,16 +1,10 @@
 package net.wiringbits.repositories
 
 import anorm._
+import anorm.postgresql._
 import net.wiringbits.common.models.{Email, Name}
-import net.wiringbits.repositories.models.{
-  NotificationStatus,
-  NotificationType,
-  User,
-  UserLog,
-  UserNotification,
-  UserToken,
-  UserTokenType
-}
+import net.wiringbits.models.{BackgroundJobStatus, BackgroundJobType}
+import net.wiringbits.repositories.models._
 
 package object daos {
 
@@ -75,6 +69,28 @@ package object daos {
       "notification_type",
       "subject",
       "message",
+      "status",
+      "status_details",
+      "error_count",
+      "execute_at",
+      "created_at",
+      "updated_at"
+    )
+  }
+
+  implicit val backgroundJobStatusColumn: Column[BackgroundJobStatus] = enumColumn(
+    BackgroundJobStatus.withNameInsensitiveOption
+  )
+
+  implicit val backgroundJobTypeColumn: Column[BackgroundJobType] = enumColumn(
+    BackgroundJobType.withNameInsensitiveOption
+  )
+
+  implicit val backgroundJobParser: RowParser[BackgroundJobData] = {
+    Macro.parser[BackgroundJobData](
+      "background_job_id",
+      "type",
+      "payload",
       "status",
       "status_details",
       "error_count",
