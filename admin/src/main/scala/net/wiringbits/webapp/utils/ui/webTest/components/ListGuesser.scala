@@ -1,9 +1,11 @@
 package net.wiringbits.webapp.utils.ui.webTest.components
 
 import io.github.nafg.simplefacade.Factory
+import japgolly.scalajs.react.vdom.all.div
 import japgolly.scalajs.react.vdom.html_<^.{VdomNode, _}
 import net.wiringbits.webapp.utils.api.models.AdminGetTables
 import net.wiringbits.webapp.utils.ui.webTest.facades.reactadmin
+import net.wiringbits.webapp.utils.ui.webTest.facades.reactadmin._
 import net.wiringbits.webapp.utils.ui.webTest.facades.reactadmin.fields._
 import net.wiringbits.webapp.utils.ui.webTest.facades.reactadmin.inputs._
 import net.wiringbits.webapp.utils.ui.webTest.models.ColumnType
@@ -25,15 +27,22 @@ object ListGuesser {
       }
     }
 
-    val filters: List[VdomNode] = List(
-      SearchInput(_.source := "name", _.alwaysOn := true),
+    // TODO: implement the same example from: https://marmelab.com/react-admin/doc/4.1/List.html
+
+    val filterList: Seq[VdomNode] = Seq(
       TextInput(_.source := "name", _.label := "Name", _.alwaysOn := true),
       TextInput(_.source := "last_name", _.label := "Last Name", _.alwaysOn := true)
     )
 
-    reactadmin.ComponentList(
-      _.filters := filters
-    )(
+    val listToolbar: VdomNode = TopToolbar()(
+      // TODO: FilterButton is not working
+      FilterButton(
+        _.filters := filterList
+      ),
+      ExportButton()
+    )
+
+    reactadmin.ComponentList(_.actions := listToolbar)(
       reactadmin.Datagrid(_.rowClick := "edit", _.bulkActionButtons := response.canBeDeleted)(widgetFields: _*)
     )
   }
