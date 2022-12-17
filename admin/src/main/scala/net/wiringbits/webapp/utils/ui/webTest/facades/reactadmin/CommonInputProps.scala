@@ -7,7 +7,7 @@ trait CommonInputProps extends PropTypes {
 
   val source: PropTypes.Prop[String] = of[String]
   val className: PropTypes.Prop[String] = of[String]
-//  val defaultValue: PropTypes.Prop[Any] = of[Any]
+  val defaultValue: PropTypes.Prop[Any] = of[Any]
   val disabled: PropTypes.Prop[Boolean] = of[Boolean]
   val format: PropTypes.Prop[Fn] = of[Fn]
   val fullWidth: PropTypes.Prop[Boolean] = of[Boolean]
@@ -15,6 +15,9 @@ trait CommonInputProps extends PropTypes {
   val label: PropTypes.Prop[String] = of[String]
   val parse: PropTypes.Prop[Fn] = of[Fn]
 
+  // TODO: add sx props
 //  val sx: PropTypes.Prop[Any] = of[Any]
+
+  // TODO: add validate as function or array
 //  val validate: PropTypes.Prop[Fn] = of[Fn]
 }

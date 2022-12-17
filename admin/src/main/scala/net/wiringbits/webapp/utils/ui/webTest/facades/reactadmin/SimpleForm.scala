@@ -9,9 +9,9 @@ import scala.scalajs.js
 
 object SimpleForm extends FacadeModule.NodeChildren.Simple {
   override def raw: js.Object = facades.reactadmin.ReactAdmin.SimpleForm
-  override def mkProps = new Props
   class Props extends PropTypes.WithChildren[VdomNode] {
     val children: PropTypes.Prop[VdomNode] = of[VdomNode]
     val toolbar: PropTypes.Prop[VdomNode] = of[VdomNode]
   }
+  override def mkProps = new Props
 }
