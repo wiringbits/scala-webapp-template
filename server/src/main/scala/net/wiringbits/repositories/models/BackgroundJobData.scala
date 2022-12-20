@@ -1,6 +1,6 @@
 package net.wiringbits.repositories.models
 
-import net.wiringbits.models.{BackgroundJobStatus, BackgroundJobType}
+import net.wiringbits.models.jobs.{BackgroundJobPayload, BackgroundJobStatus, BackgroundJobType}
 import play.api.libs.json.JsValue
 
 import java.time.Instant
@@ -22,7 +22,7 @@ object BackgroundJobData {
   case class Create(
       id: UUID,
       `type`: BackgroundJobType,
-      payload: JsValue,
+      payload: BackgroundJobPayload,
       status: BackgroundJobStatus,
       executeAt: Instant,
       createdAt: Instant,

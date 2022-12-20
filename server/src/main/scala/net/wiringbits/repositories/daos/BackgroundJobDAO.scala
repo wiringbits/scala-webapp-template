@@ -1,8 +1,9 @@
 package net.wiringbits.repositories.daos
 
 import anorm.postgresql._
-import net.wiringbits.models.BackgroundJobStatus
+import net.wiringbits.models.jobs.BackgroundJobStatus
 import net.wiringbits.repositories.models.BackgroundJobData
+import play.api.libs.json.Json
 
 import java.sql.Connection
 import java.time.{Clock, Instant}
@@ -20,7 +21,7 @@ object BackgroundJobDAO {
       VALUES (
         ${request.id},
         ${request.`type`.toString},
-        ${request.payload},
+        ${Json.toJson(request.payload)},
         ${request.status.toString},
         ${request.executeAt},
         ${request.createdAt},

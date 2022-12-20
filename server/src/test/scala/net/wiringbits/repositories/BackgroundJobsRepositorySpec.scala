@@ -3,7 +3,7 @@ package net.wiringbits.repositories
 import akka.actor.ActorSystem
 import akka.stream.scaladsl._
 import net.wiringbits.core.RepositorySpec
-import net.wiringbits.models.{BackgroundJobStatus, BackgroundJobType}
+import net.wiringbits.models.jobs.{BackgroundJobStatus, BackgroundJobType}
 import net.wiringbits.repositories.daos.BackgroundJobDAO
 import net.wiringbits.repositories.models.BackgroundJobData
 import org.scalatest.BeforeAndAfterAll

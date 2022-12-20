@@ -1,4 +1,4 @@
-package net.wiringbits.models
+package net.wiringbits.models.jobs
 
 import enumeratum.EnumEntry.Uppercase
 import enumeratum.{Enum, EnumEntry}

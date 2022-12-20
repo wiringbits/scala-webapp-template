@@ -5,25 +5,22 @@ import com.google.inject.Inject
 import net.wiringbits.actions.internal.StreamPendingBackgroundJobsForeverAction
 import net.wiringbits.apis.EmailApi
 import net.wiringbits.apis.models.EmailRequest
-import net.wiringbits.common.models.Email
-import net.wiringbits.config.NotificationsConfig
-import net.wiringbits.models.BackgroundJobType
+import net.wiringbits.config.BackgroundJobsExecutorConfig
+import net.wiringbits.models.jobs.{BackgroundJobPayload, BackgroundJobType}
 import net.wiringbits.repositories.BackgroundJobsRepository
 import net.wiringbits.repositories.models.BackgroundJobData
 import net.wiringbits.util.{DelayGenerator, EmailMessage}
 import org.slf4j.LoggerFactory
-import play.api.libs.json.JsValue
 
 import java.time.Clock
 import java.time.temporal.ChronoUnit
-import java.util.UUID
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success}
 
 class BackgroundJobsExecutorTask @Inject() (
-    notificationsConfig: NotificationsConfig, // TODO: Update
+    config: BackgroundJobsExecutorConfig,
     streamPendingBackgroundJobsForeverAction: StreamPendingBackgroundJobsForeverAction,
     emailApi: EmailApi,
     backgroundJobsRepository: BackgroundJobsRepository
@@ -35,17 +32,22 @@ class BackgroundJobsExecutorTask @Inject() (
   private val logger = LoggerFactory.getLogger(this.getClass)
 
   logger.info("Starting the background jobs executor task")
-  actorSystem.scheduler.scheduleOnce(
-    notificationsConfig.interval // TODO: update
-  ) {
+  actorSystem.scheduler.scheduleOnce(config.interval) {
     run()
   }
 
   private def execute(job: BackgroundJobData): Future[Unit] = {
     val executionResult = job.`type` match {
-      case BackgroundJobType.SendEmail => sendEmail(job.id, job.payload)
-      case BackgroundJobType.SendStatsToAdmin =>
-        Future.failed(new RuntimeException("SendStatsToAdmin is not implemented yet"))
+      case BackgroundJobType.SendEmail =>
+        job.payload.asOpt[BackgroundJobPayload.SendEmail] match {
+          case Some(typedPayload) => sendEmail(typedPayload)
+          case None =>
+            Future.failed(
+              new RuntimeException(
+                s"The given payload is not supported by the SendEmail task, please double check, job id = ${job.id}"
+              )
+            )
+        }
     }
 
     executionResult
@@ -61,25 +63,9 @@ class BackgroundJobsExecutorTask @Inject() (
   }
 
   // TODO: Move to another file
-  private def sendEmail(jobId: UUID, payload: JsValue): Future[Unit] = {
-    // TODO: Consider validating payloads before executing this method
-    val emailRequestOpt = for {
-      subject <- (payload \ "subject").asOpt[String]
-      body <- (payload \ "body").asOpt[String]
-      email <- (payload \ "email")
-        .asOpt[String]
-        .flatMap(str => Email.validate(str).toOption)
-    } yield EmailRequest(email, EmailMessage(subject = subject, body = body))
-
-    emailRequestOpt match {
-      case Some(emailRequest) => emailApi.sendEmail(emailRequest)
-      case None =>
-        Future.failed(
-          new RuntimeException(
-            s"The given payload is not supported by the SendEmail task, please double check, job id = $jobId"
-          )
-        )
-    }
+  private def sendEmail(payload: BackgroundJobPayload.SendEmail): Future[Unit] = {
+    val emailRequest = EmailRequest(payload.email, EmailMessage(subject = payload.subject, body = payload.body))
+    emailApi.sendEmail(emailRequest)
   }
 
   def run(): Unit = {
@@ -91,16 +77,13 @@ class BackgroundJobsExecutorTask @Inject() (
 
     result.onComplete {
       case Failure(ex) =>
-        // TODO: Update config
         logger.error(
-          s"Failed to process pending background jobs, retrying after ${notificationsConfig.interval}: ${ex.getMessage}",
+          s"Failed to process pending background jobs, retrying after ${config.interval}: ${ex.getMessage}",
           ex
         )
-        actorSystem.scheduler.scheduleOnce(notificationsConfig.interval) { run() }
+        actorSystem.scheduler.scheduleOnce(config.interval) { run() }
 
-      case Success(_) =>
-        // TODO: Update config
-        actorSystem.scheduler.scheduleOnce(notificationsConfig.interval) { run() }
+      case Success(_) => actorSystem.scheduler.scheduleOnce(config.interval) { run() }
     }
   }
 }

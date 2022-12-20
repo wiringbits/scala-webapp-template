@@ -3,12 +3,11 @@ package net.wiringbits.repositories
 import net.wiringbits.common.models.{Email, Name}
 import net.wiringbits.config.UserTokensConfig
 import net.wiringbits.executors.DatabaseExecutionContext
-import net.wiringbits.models.{BackgroundJobStatus, BackgroundJobType}
+import net.wiringbits.models.jobs.{BackgroundJobPayload, BackgroundJobStatus, BackgroundJobType}
 import net.wiringbits.repositories.daos.{BackgroundJobDAO, UserLogsDAO, UserTokensDAO, UsersDAO}
 import net.wiringbits.repositories.models._
 import net.wiringbits.util.EmailMessage
 import play.api.db.Database
-import play.api.libs.json.Json
 
 import java.sql.Connection
 import java.time.Clock
@@ -115,12 +114,15 @@ class UsersRepository @Inject() (
   private def sendEmailLater(userId: UUID, emailMessage: EmailMessage)(implicit conn: Connection): Unit = {
     val userOpt = UsersDAO.find(userId)
     userOpt.foreach { user =>
+      val payload = BackgroundJobPayload.SendEmail(
+        email = user.email,
+        subject = emailMessage.subject,
+        body = emailMessage.body
+      )
       val createNotification = BackgroundJobData.Create(
         id = UUID.randomUUID(),
         `type` = BackgroundJobType.SendEmail,
-        // TODO: Use a model instead
-        payload =
-          Json.obj("subject" -> emailMessage.subject, "body" -> emailMessage.body, "email" -> user.email.string),
+        payload = payload,
         status = BackgroundJobStatus.Pending,
         executeAt = clock.instant(),
         createdAt = clock.instant(),

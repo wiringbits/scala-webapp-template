@@ -3,7 +3,7 @@ package net.wiringbits.repositories
 import anorm._
 import anorm.postgresql._
 import net.wiringbits.common.models.{Email, Name}
-import net.wiringbits.models.{BackgroundJobStatus, BackgroundJobType}
+import net.wiringbits.models.jobs.{BackgroundJobStatus, BackgroundJobType}
 import net.wiringbits.repositories.models._
 
 package object daos {

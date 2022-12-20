@@ -1,4 +1,4 @@
-package net.wiringbits.models
+package net.wiringbits.models.jobs
 
 import enumeratum.EnumEntry.Uppercase
 import enumeratum.{Enum, EnumEntry}
@@ -10,7 +10,6 @@ sealed trait BackgroundJobType extends EnumEntry with Uppercase
   */
 object BackgroundJobType extends Enum[BackgroundJobType] {
   final case object SendEmail extends BackgroundJobType
-  final case object SendStatsToAdmin extends BackgroundJobType
 
   val values = findValues
 }
