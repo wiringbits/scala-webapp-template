@@ -2,8 +2,9 @@ package net.wiringbits.repositories
 
 import akka.actor.ActorSystem
 import akka.stream.scaladsl._
+import net.wiringbits.common.models.Email
 import net.wiringbits.core.RepositorySpec
-import net.wiringbits.models.jobs.{BackgroundJobStatus, BackgroundJobType}
+import net.wiringbits.models.jobs.{BackgroundJobPayload, BackgroundJobStatus, BackgroundJobType}
 import net.wiringbits.repositories.daos.BackgroundJobDAO
 import net.wiringbits.repositories.models.BackgroundJobData
 import org.scalatest.BeforeAndAfterAll
@@ -25,13 +26,15 @@ class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll
     super.afterAll()
   }
 
+  private val backgroundJobPayload =
+    BackgroundJobPayload.SendEmail(Email.trusted("sample@wiringbits.net"), subject = "Test message", body = "it works")
   "streamPendingJobs" should {
 
     "work (simple case)" in withRepositories() { repositories =>
       val createRequest = BackgroundJobData.Create(
         id = UUID.randomUUID(),
         `type` = BackgroundJobType.SendEmail,
-        payload = Json.obj("subject" -> "Test message", "body" -> "it works"),
+        payload = backgroundJobPayload,
         status = BackgroundJobStatus.Pending,
         executeAt = Instant.now(),
         createdAt = Instant.now(),
@@ -50,14 +53,14 @@ class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll
       val item = result.headOption.value
       item.status must be(createRequest.status)
       item.`type` must be(createRequest.`type`)
-      item.payload must be(createRequest.payload)
+      item.payload must be(Json.toJson(createRequest.payload))
     }
 
     "only return pending jobs" in withRepositories() { repositories =>
       val createRequestBase = BackgroundJobData.Create(
         id = UUID.randomUUID(),
         `type` = BackgroundJobType.SendEmail,
-        payload = Json.obj("subject" -> "Test message", "body" -> "it works"),
+        payload = backgroundJobPayload,
         status = BackgroundJobStatus.Pending,
         executeAt = Instant.now(),
         createdAt = Instant.now(),
@@ -82,7 +85,7 @@ class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll
       response.foreach { x =>
         x.status must be(BackgroundJobStatus.Pending)
         x.`type` must be(createRequestBase.`type`)
-        x.payload must be(createRequestBase.payload)
+        x.payload must be(Json.toJson(createRequestBase.payload))
       }
     }
 
@@ -99,7 +102,7 @@ class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll
       val createRequest = BackgroundJobData.Create(
         id = UUID.randomUUID(),
         `type` = BackgroundJobType.SendEmail,
-        payload = Json.obj("subject" -> "Test message", "body" -> "it works"),
+        payload = backgroundJobPayload,
         status = BackgroundJobStatus.Pending,
         executeAt = Instant.now(),
         createdAt = Instant.now(),
@@ -138,7 +141,7 @@ class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll
       val createRequest = BackgroundJobData.Create(
         id = UUID.randomUUID(),
         `type` = BackgroundJobType.SendEmail,
-        payload = Json.obj("subject" -> "Test message", "body" -> "it works"),
+        payload = backgroundJobPayload,
         status = BackgroundJobStatus.Pending,
         executeAt = Instant.now(),
         createdAt = Instant.now(),

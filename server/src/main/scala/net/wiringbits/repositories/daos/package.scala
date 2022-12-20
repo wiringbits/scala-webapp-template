@@ -52,30 +52,8 @@ package object daos {
     UserTokenType.withNameInsensitiveOption
   )
 
-  implicit val notificationStatusColumn: Column[NotificationStatus] = enumColumn(
-    NotificationStatus.withNameInsensitiveOption
-  )
-
-  implicit val notificationTypeColumn: Column[NotificationType] = enumColumn(NotificationType.withNameInsensitiveOption)
-
   implicit val tokenParser: RowParser[UserToken] = {
     Macro.parser[UserToken]("user_token_id", "token", "token_type", "created_at", "expires_at", "user_id")
-  }
-
-  implicit val userNotificationParser: RowParser[UserNotification] = {
-    Macro.parser[UserNotification](
-      "user_notification_id",
-      "user_id",
-      "notification_type",
-      "subject",
-      "message",
-      "status",
-      "status_details",
-      "error_count",
-      "execute_at",
-      "created_at",
-      "updated_at"
-    )
   }
 
   implicit val backgroundJobStatusColumn: Column[BackgroundJobStatus] = enumColumn(

@@ -16,3 +16,6 @@ CREATE TABLE background_jobs (
 );
 
 CREATE INDEX background_jobs_execute_at_index ON background_jobs USING BTREE (execute_at);
+
+-- these are now handled by background_jobs
+DROP TABLE user_notifications;
