@@ -3,11 +3,13 @@ package net.wiringbits.repositories
 import net.wiringbits.common.models.{Email, Name}
 import net.wiringbits.config.UserTokensConfig
 import net.wiringbits.executors.DatabaseExecutionContext
-import net.wiringbits.repositories.daos.{UserLogsDAO, UserNotificationsDAO, UserTokensDAO, UsersDAO}
+import net.wiringbits.models.jobs.{BackgroundJobPayload, BackgroundJobStatus, BackgroundJobType}
+import net.wiringbits.repositories.daos.{BackgroundJobDAO, UserLogsDAO, UserTokensDAO, UsersDAO}
 import net.wiringbits.repositories.models._
 import net.wiringbits.util.EmailMessage
 import play.api.db.Database
 
+import java.sql.Connection
 import java.time.Clock
 import java.time.temporal.ChronoUnit
 import java.util.UUID
@@ -77,39 +79,15 @@ class UsersRepository @Inject() (
   }
 
   def updatePassword(userId: UUID, password: String, emailMessage: EmailMessage): Future[Unit] = Future {
-    val createNotification = UserNotification.Create(
-      id = UUID.randomUUID(),
-      userId = userId,
-      notificationType = NotificationType.PasswordUpdated,
-      subject = emailMessage.subject,
-      message = emailMessage.body,
-      status = NotificationStatus.Pending,
-      executeAt = clock.instant(),
-      createdAt = clock.instant(),
-      updatedAt = clock.instant()
-    )
-
     database.withTransaction { implicit conn =>
       UsersDAO.resetPassword(userId, password)
       val request = UserLog.CreateUserLog(UUID.randomUUID(), userId, "Password was updated")
       UserLogsDAO.create(request)
-      UserNotificationsDAO.create(createNotification)
+      sendEmailLater(userId, emailMessage)
     }
   }
 
   def verify(userId: UUID, tokenId: UUID, emailMessage: EmailMessage): Future[Unit] = Future {
-    val createNotification = UserNotification.Create(
-      id = UUID.randomUUID(),
-      userId = userId,
-      notificationType = NotificationType.EmailVerified,
-      subject = emailMessage.subject,
-      message = emailMessage.body,
-      status = NotificationStatus.Pending,
-      executeAt = clock.instant(),
-      createdAt = clock.instant(),
-      updatedAt = clock.instant()
-    )
-
     database.withTransaction { implicit conn =>
       UsersDAO.verify(userId)
       UserLogsDAO.create(
@@ -120,28 +98,38 @@ class UsersRepository @Inject() (
         )
       )
       UserTokensDAO.delete(tokenId = tokenId, userId = userId)
-      UserNotificationsDAO.create(createNotification)
+      sendEmailLater(userId, emailMessage)
     }
   }
 
   def resetPassword(userId: UUID, password: String, emailMessage: EmailMessage): Future[Unit] = Future {
-    val createNotification = UserNotification.Create(
-      id = UUID.randomUUID(),
-      userId = userId,
-      notificationType = NotificationType.PasswordReset,
-      subject = emailMessage.subject,
-      message = emailMessage.body,
-      status = NotificationStatus.Pending,
-      executeAt = clock.instant(),
-      createdAt = clock.instant(),
-      updatedAt = clock.instant()
-    )
-
     database.withTransaction { implicit conn =>
       UsersDAO.resetPassword(userId, password)
       val request = UserLog.CreateUserLog(UUID.randomUUID(), userId, "Password was reset")
       UserLogsDAO.create(request)
-      UserNotificationsDAO.create(createNotification)
+      sendEmailLater(userId, emailMessage)
+    }
+  }
+
+  private def sendEmailLater(userId: UUID, emailMessage: EmailMessage)(implicit conn: Connection): Unit = {
+    val userOpt = UsersDAO.find(userId)
+    userOpt.foreach { user =>
+      val payload = BackgroundJobPayload.SendEmail(
+        email = user.email,
+        subject = emailMessage.subject,
+        body = emailMessage.body
+      )
+      val createNotification = BackgroundJobData.Create(
+        id = UUID.randomUUID(),
+        `type` = BackgroundJobType.SendEmail,
+        payload = payload,
+        status = BackgroundJobStatus.Pending,
+        executeAt = clock.instant(),
+        createdAt = clock.instant(),
+        updatedAt = clock.instant()
+      )
+
+      BackgroundJobDAO.create(createNotification)
     }
   }
 }
