@@ -1,0 +1,38 @@
+---
+- hosts: frontend
+  gather_facts: no
+  vars:
+    - nginx_site_file: "config/nginx/preview_web_app_site.j2"
+    - nginx_admin_settings_file: "/etc/nginx/admin-config/htpasswd"
+
+  tasks:
+    - name: Create the sites-available directory
+      become: yes
+      file:
+        path: /etc/nginx/sites-available
+        state: directory
+
+    - name: Copy the site config
+      become: yes
+      template:
+        src: "{{ nginx_site_file }}"
+        dest: /etc/nginx/sites-available/{{ web_app_domain }}
+
+    - name: Create the sites-enabled directory
+      become: yes
+      file:
+        path: /etc/nginx/sites-enabled
+        state: directory
+
+    - name: Enable the site
+      become: yes
+      file:
+        src: /etc/nginx/sites-available/{{ web_app_domain }}
+        dest: /etc/nginx/sites-enabled/{{ web_app_domain }}
+        state: link
+
+    - name: Reload nginx config
+      become: yes
+      service:
+        name: nginx
+        state: reloaded
