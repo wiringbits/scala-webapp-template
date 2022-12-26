@@ -52,14 +52,6 @@ jobs:
           DEPLOY_PREVIEW_SCRIPT: ${{secrets.DEPLOY_PREVIEW_SCRIPT}}
           SCALA_PREVIEW_SCRIPT: ${{secrets.SCALA_PREVIEW_SCRIPT}}
 
-      - name: Test
-        run: |
-          pwd
-          ls -ltha
-          ls -ltha ./infra/scripts
-          head ./infra/scripts/deploy-preview.sh
-          head ./infra/scripts/PreviewEnv.scala
-
       - name: Setup Scala
         uses: japgolly/setup-everything-scala@v3.1
         with:
