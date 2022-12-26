@@ -20,7 +20,7 @@ case class SignUpFormData(
       password2 <- repeatPassword.valueOpt
     } yield password1 != password2)
       .filter(identity)
-      .map(_ => "The passwords are different")
+      .map(_ => "Try using the same password for both fields")
 
     val emptyCaptcha = Option.when(captcha.isEmpty)("Complete the captcha")
 
