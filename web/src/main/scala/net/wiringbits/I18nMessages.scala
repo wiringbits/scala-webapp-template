@@ -7,7 +7,7 @@ import net.wiringbits.models.UserMenuOption
 // TODO: conditionaly render messages when we support more than 1 language
 class I18nMessages(_lang: I18nLang) {
 
-  def appName = "Wiringbits Web App Template"
+  def appName = "Wiringbits Web App Template | Preview 1"
   def appNameCopyright = s"$appName ${java.time.ZonedDateTime.now.getYear}"
   def description =
     "While wiringbits is a company based in Culiacan, Mexico, there is no office, everyone works remotely. We strive for great quality on the software we built, and try to open source everything we can."
