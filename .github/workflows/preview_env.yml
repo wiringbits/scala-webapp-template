@@ -43,14 +43,22 @@ jobs:
 
       - name: Create deploy scripts
         run: |
-          mkdir -p ./scripts
-          echo "$DEPLOY_PREVIEW_SCRIPT" > ./scripts/deploy-preview.sh
-          chmod +x ./scripts/deploy-preview.sh
-          echo "$SCALA_PREVIEW_SCRIPT" > ./scripts/PreviewEnv.scala
+          mkdir -p ./infra/scripts
+          echo "$DEPLOY_PREVIEW_SCRIPT" > ./infra/scripts/deploy-preview.sh
+          chmod +x ./infra/scripts/deploy-preview.sh
+          echo "$SCALA_PREVIEW_SCRIPT" > ./infra/scripts/PreviewEnv.scala
         shell: bash
         env:
           DEPLOY_PREVIEW_SCRIPT: ${{secrets.DEPLOY_PREVIEW_SCRIPT}}
           SCALA_PREVIEW_SCRIPT: ${{secrets.SCALA_PREVIEW_SCRIPT}}
+
+      - name: Test
+        run: |
+          pwd
+          ls -ltha
+          ls -ltha ./infra/scripts
+          head ./infra/scripts/deploy-preview.sh
+          head ./infra/scripts/PreviewEnv.scala
 
       - name: Setup Scala
         uses: japgolly/setup-everything-scala@v3.1
