@@ -57,11 +57,16 @@ Deployment 2m demo:
 
 ## Get started
 
-Checkout the [docs](./docs/README.md).
+Read the [docs](./docs/README.md) or watch our [onboarding videos](http://onboarding.wiringbits.net).
 
-There is also a recorded presentation from ScalaCon 2022:
 
-- [A Practical Skeleton for Your Next Scala Scala js Web Application](https://www.youtube.com/watch?v=xWGMr0AsAMU)
+## Presentations
+
+There have been some presentations involing this project:
+
+- Jan 2023; [ScaLatin](https://scalac.io/scalatin/); Creando aplicaciones web con Scala/Scala.js; [slides](http://scalatin2023.wiringbits.net)
+- Oct 2022; [ScalaCon](https://www.scalacon.org/); [A Practical Skeleton for Your Next Scala Scala js Web Application](https://www.youtube.com/watch?v=xWGMr0AsAMU)
+
 
 ## Hire us
 
