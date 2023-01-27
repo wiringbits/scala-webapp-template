@@ -64,7 +64,7 @@ Read the [docs](./docs/README.md) or watch our [onboarding videos](http://onboar
 
 There have been some presentations involing this project:
 
-- Jan 2023; [ScaLatin](https://scalac.io/scalatin/); Creando aplicaciones web con Scala/Scala.js; [slides](http://scalatin2023.wiringbits.net)
+- Jan 2023; [ScaLatin](https://scalac.io/scalatin/); [Creando aplicaciones web con Scala/Scala.js](https://www.youtube.com/watch?v=PqI8brUxCRg); [slides](http://scalatin2023.wiringbits.net)
 - Oct 2022; [ScalaCon](https://www.scalacon.org/); [A Practical Skeleton for Your Next Scala Scala js Web Application](https://www.youtube.com/watch?v=xWGMr0AsAMU)
 
 
