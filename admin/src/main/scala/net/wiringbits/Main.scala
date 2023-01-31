@@ -1,17 +1,14 @@
 package net.wiringbits
 
-import io.github.nafg.simplefacade.Factory
 import net.wiringbits.webapp.utils.ui.web.AdminView
-import net.wiringbits.webapp.utils.ui.web.facades.reactadmin.Admin
 import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 
-import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
 object Main {
 
-  private def App: Future[Factory[Admin.Props]] = {
+  private def App = {
     val api = API()
     AdminView(api.admin)
   }
