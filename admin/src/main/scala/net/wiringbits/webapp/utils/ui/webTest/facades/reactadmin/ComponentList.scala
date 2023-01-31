@@ -13,6 +13,6 @@ object ComponentList extends FacadeModule.NodeChildren.Simple {
   class Props extends PropTypes.WithChildren[VdomNode] {
     val children: PropTypes.Prop[VdomNode] = of[VdomNode]
     val actions: PropTypes.Prop[VdomNode] = of[VdomNode]
-    val filters: PropTypes.Prop[Seq[VdomNode]] = of[Seq[VdomNode]]
+    val filters: PropTypes.Prop[List[VdomNode]] = of[List[VdomNode]]
   }
 }

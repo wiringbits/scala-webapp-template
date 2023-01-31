@@ -27,11 +27,16 @@ object ListGuesser {
       }
     }
 
-    // TODO: backend should define the filter cells
-    val filterList: Seq[VdomNode] = Seq(
-      TextInput(_.source := "name", _.alwaysOn := true),
-      TextInput(_.source := "last_name")
-    )
+    val filterList: List[VdomNode] = fields.filter(_.filterable).map { field =>
+      field.`type` match {
+        case ColumnType.Date => DateInput(_.source := field.name)
+        case ColumnType.Text | ColumnType.Email => TextInput(_.source := field.name)
+        case ColumnType.Reference(reference, source) =>
+          ReferenceField(_.reference := reference, _.source := field.name)(
+            TextField(_.source := source)
+          )
+      }
+    }
 
     val listToolbar: VdomNode = TopToolbar()(
       FilterButton(

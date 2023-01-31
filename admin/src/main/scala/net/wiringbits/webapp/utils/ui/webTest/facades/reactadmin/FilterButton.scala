@@ -11,6 +11,6 @@ object FilterButton extends FacadeModule.Simple {
   override def raw: js.Object = facades.reactadmin.ReactAdmin.FilterButton
   override def mkProps = new Props
   class Props extends PropTypes {
-    val filters: PropTypes.Prop[Seq[VdomNode]] = of[Seq[VdomNode]]
+    val filters: PropTypes.Prop[List[VdomNode]] = of[List[VdomNode]]
   }
 }
