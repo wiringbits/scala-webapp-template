@@ -1,8 +1,8 @@
 package net.wiringbits
 
 import io.github.nafg.simplefacade.Factory
-import net.wiringbits.webapp.utils.ui.webTest.AdminView
-import net.wiringbits.webapp.utils.ui.webTest.facades.reactadmin.Admin
+import net.wiringbits.webapp.utils.ui.web.AdminView
+import net.wiringbits.webapp.utils.ui.web.facades.reactadmin.Admin
 import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 

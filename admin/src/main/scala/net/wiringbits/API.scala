@@ -2,7 +2,7 @@ package net.wiringbits
 
 import net.wiringbits.api.ApiClient
 import net.wiringbits.webapp.utils.api.AdminDataExplorerApiClient
-import net.wiringbits.webapp.utils.ui.webTest.{API => APIAdmin}
+import net.wiringbits.webapp.utils.ui.web.{API => APIAdmin}
 
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 
