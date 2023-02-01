@@ -10,7 +10,7 @@ object Main {
 
   private def App = {
     val api = API()
-    AdminView.component(api.admin)
+    AdminView(api.admin)
   }
 
   def main(argv: Array[String]): Unit = {
