@@ -4,6 +4,7 @@ Let's get started setting up your development environment.
 
 **NOTE** The instructions will work better on Linux/Mac, there could be some details that do not work on Windows (help wanted).
 
+There are demo videos while configuring a local environment in Ubuntu 22.04, covering everything, from the JDK install step until the application runs: http://onboarding.wiringbits.net 
 
 **[Table of Contents](http://tableofcontent.eu)**
 
