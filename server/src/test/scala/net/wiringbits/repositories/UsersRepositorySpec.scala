@@ -16,7 +16,7 @@ import java.util.UUID
 class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll {
 
   // required to test the streaming operations
-  private implicit lazy val system: ActorSystem = ActorSystem("UserNotificationsRepositorySpec")
+  private implicit lazy val system: ActorSystem = ActorSystem("UserRepositorySpec")
 
   override def afterAll(): Unit = {
     system.terminate().futureValue
@@ -236,7 +236,7 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll {
       val newPassword = "test"
       repositories.users.updatePassword(request.id, newPassword, EmailMessage.updatePassword(request.name)).futureValue
 
-      val response = repositories.userNotifications.streamPendingNotifications.futureValue
+      val response = repositories.backgroundJobs.streamPendingJobs.futureValue
         .runWith(Sink.seq)
         .futureValue
       response.length must be(1)
@@ -280,7 +280,7 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll {
       repositories.users.create(request).futureValue
       repositories.users.verify(request.id, UUID.randomUUID(), EmailMessage.confirm(request.name)).futureValue
 
-      val response = repositories.userNotifications.streamPendingNotifications.futureValue
+      val response = repositories.backgroundJobs.streamPendingJobs.futureValue
         .runWith(Sink.seq)
         .futureValue
       response.length must be(1)
@@ -328,7 +328,7 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll {
       val newPassword = "test"
       repositories.users.resetPassword(request.id, newPassword, EmailMessage.resetPassword(request.name)).futureValue
 
-      val response = repositories.userNotifications.streamPendingNotifications.futureValue
+      val response = repositories.backgroundJobs.streamPendingJobs.futureValue
         .runWith(Sink.seq)
         .futureValue
       response.length must be(1)

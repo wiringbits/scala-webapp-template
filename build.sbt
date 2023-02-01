@@ -330,6 +330,7 @@ lazy val server = (project in file("server"))
     libraryDependencies ++= Seq(
       "org.playframework.anorm" %% "anorm" % anorm,
       "org.playframework.anorm" %% "anorm-akka" % anorm,
+      "org.playframework.anorm" %% "anorm-postgres" % anorm,
       "com.typesafe.play" %% "play-json" % "2.9.2",
       "org.postgresql" % "postgresql" % "42.3.6",
       "de.svenkubiak" % "jBCrypt" % "0.4.3",

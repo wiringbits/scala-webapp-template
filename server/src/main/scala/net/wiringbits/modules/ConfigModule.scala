@@ -53,8 +53,8 @@ class ConfigModule extends AbstractModule {
 
   @Provides
   @Singleton
-  def notificationsConfig(global: Configuration): NotificationsConfig = {
-    val config = NotificationsConfig(global.get[Configuration]("notificationsTask"))
+  def backgroundJobsExecutorConfig(global: Configuration): BackgroundJobsExecutorConfig = {
+    val config = BackgroundJobsExecutorConfig(global.get[Configuration]("backgroundJobsExecutorTask"))
     logger.info(s"Config loaded: $config")
     config
   }
