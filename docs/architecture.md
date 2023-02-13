@@ -99,10 +99,12 @@ Repositories is the entry point to the storage layer, given that we use Postgres
 
 Given the transactional capabilities, there are times when a repository could deal with small business rules, the ones that matter for data integrity. For example, creating a user could require to store a token used to verify the user's email.
 
-The work done by Repositories is mostly composing DAOs.
+Details:
 
-Repositories do not know any other layer besides DAOs.
-
+- The work done by Repositories is mostly composing DAOs.
+- Repositories do not know any other layer besides DAOs.
+- This layer is **NOT** responsible of validating input format.
+- This layer could validate whether an item already exists.
 
 ### DAOs
 ![DAOs architecture diagram](./assets/diagrams/architecture-server-daos.png)
