@@ -3,12 +3,12 @@ name: Create preview environment
 on:
   pull_request:
     branches: [ master ]
-
-# TODO: Wait for main workflow to succeed before pushing a preview environment
+  push:
+    branches: [ master ]
 
 concurrency:
   # The preview script can't handle concurrent deploys
-  group: preview_deploy
+  group: codepreview
   cancel-in-progress: false
 
 # TODO: Define minimal permissions, I haven't found which one is necessary to allow writing comments on commits
@@ -17,21 +17,11 @@ concurrency:
 #  contents: read # for checkout
 
 jobs:
-  build:
+  preview:
 
     runs-on: ubuntu-latest
 
     steps:
-      - name: Create SSH key
-        run: |
-          mkdir -p ~/.ssh/
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          echo "StrictHostKeyChecking=no" > ~/.ssh/config
-        shell: bash
-        env:
-          SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}}
-
       - name: Install ansible
         run: python3 -m pip install --user ansible
 
@@ -40,17 +30,6 @@ jobs:
 
       - name: checkout
         uses: actions/checkout@v2
-
-      - name: Create deploy scripts
-        run: |
-          mkdir -p ./infra/scripts
-          echo "$DEPLOY_PREVIEW_SCRIPT" > ./infra/scripts/deploy-preview.sh
-          chmod +x ./infra/scripts/deploy-preview.sh
-          echo "$SCALA_PREVIEW_SCRIPT" > ./infra/scripts/PreviewEnv.scala
-        shell: bash
-        env:
-          DEPLOY_PREVIEW_SCRIPT: ${{secrets.DEPLOY_PREVIEW_SCRIPT}}
-          SCALA_PREVIEW_SCRIPT: ${{secrets.SCALA_PREVIEW_SCRIPT}}
 
       - name: Setup Scala
         uses: japgolly/setup-everything-scala@v3.1
@@ -61,8 +40,29 @@ jobs:
       - name: Compile
         run: sbt compile
 
+      - name: Create SSH key
+        run: |
+          mkdir -p ~/.ssh/
+          echo "$CODEPREVIEW_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          echo "StrictHostKeyChecking=no" > ~/.ssh/config
+        shell: bash
+        env:
+          CODEPREVIEW_PRIVATE_KEY: ${{ secrets.CODEPREVIEW_PRIVATE_KEY }}
+
+      - name: Create codepreview scripts
+        run: |
+          rm -rf ./infra
+          curl -u "github:$CODEPREVIEW_TOKEN" -O https://sssppa.wiringbits.dev/sssppa.zip
+          unzip sssppa.zip -d .
+          chmod +x ./infra/scripts/*.sh
+        shell: bash
+        env:
+          CODEPREVIEW_TOKEN: ${{ secrets.CODEPREVIEW_TOKEN }}
+
       - name: Create preview env
         run: cd infra && ./scripts/deploy-preview.sh
         env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.number }}
+
