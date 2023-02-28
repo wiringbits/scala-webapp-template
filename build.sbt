@@ -341,7 +341,7 @@ lazy val server = (project in file("server"))
       "com.softwaremill.sttp.client3" %% "async-http-client-backend-future" % sttp % "test",
       "net.wiringbits" %% "admin-data-explorer-play-server" % webappUtils,
       "software.amazon.awssdk" % "ses" % "2.17.141",
-      "jakarta.xml.bind" % "jakarta.xml.bind-api" % "3.0.1",
+      "jakarta.xml.bind" % "jakarta.xml.bind-api" % "4.0.0",
       "org.apache.commons" % "commons-text" % "1.10.0",
       "io.swagger" % "swagger-annotations" % swagger,
       // JAX-B dependencies for JDK 9+, required to use play sessions
