@@ -342,7 +342,7 @@ lazy val server = (project in file("server"))
       "net.wiringbits" %% "admin-data-explorer-play-server" % webappUtils,
       "software.amazon.awssdk" % "ses" % "2.17.141",
       "jakarta.xml.bind" % "jakarta.xml.bind-api" % "3.0.1",
-      "org.apache.commons" % "commons-text" % "1.9",
+      "org.apache.commons" % "commons-text" % "1.10.0",
       "io.swagger" % "swagger-annotations" % swagger,
       // JAX-B dependencies for JDK 9+, required to use play sessions
       "javax.xml.bind" % "jaxb-api" % "2.3.1",
