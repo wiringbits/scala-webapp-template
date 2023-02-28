@@ -312,7 +312,7 @@ lazy val ui = (project in file("lib/ui"))
     Compile / stMinimize := Selection.All,
     libraryDependencies ++= Seq(
       "io.github.cquiroz" %%% "scala-java-time" % "2.0.0",
-      "org.scala-js" %%% "scala-js-macrotask-executor" % "1.0.0",
+      "org.scala-js" %%% "scala-js-macrotask-executor" % "1.1.1",
       "com.alexitc" %%% "sjs-material-ui-facade" % "0.2.0",
       "net.wiringbits" %%% "slinky-utils" % webappUtils,
       "org.scalatest" %%% "scalatest" % "3.2.12" % Test,
@@ -407,7 +407,7 @@ lazy val web = (project in file("web"))
     libraryDependencies ++= Seq(
       "com.typesafe.play" %%% "play-json" % playJson,
       "com.softwaremill.sttp.client3" %%% "core" % sttp,
-      "org.scala-js" %%% "scala-js-macrotask-executor" % "1.0.0",
+      "org.scala-js" %%% "scala-js-macrotask-executor" % "1.1.1",
       "com.alexitc" %%% "sjs-material-ui-facade" % "0.2.0",
       "net.wiringbits" %%% "scalablytyped-facades" % webappUtils,
       "io.monix" %%% "monix-reactive" % "3.4.1"
