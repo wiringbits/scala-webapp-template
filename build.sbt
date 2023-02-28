@@ -6,7 +6,7 @@ ThisBuild / organization := "net.wiringbits"
 
 val playJson = "2.9.2"
 val sttp = "3.8.3"
-val webappUtils = "0.5.16"
+val webappUtils = "0.5.18"
 val swagger = "1.6.6"
 val anorm = "2.6.10"
 
