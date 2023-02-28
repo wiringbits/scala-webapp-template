@@ -3,17 +3,17 @@ evictionErrorLevel := sbt.util.Level.Warn
 
 addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "1.2.0")
 
-addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.8.15")
+addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.8.19")
 
-addSbtPlugin("org.scala-js" % "sbt-scalajs" % "1.11.0")
+addSbtPlugin("org.scala-js" % "sbt-scalajs" % "1.13.0")
 
-addSbtPlugin("ch.epfl.scala" % "sbt-scalajs-bundler" % "0.20.0")
+addSbtPlugin("ch.epfl.scala" % "sbt-scalajs-bundler" % "0.21.1")
 
 addSbtPlugin("org.scalablytyped.converter" % "sbt-converter" % "1.0.0-beta39")
 
 addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.11.0")
 
-addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.4.6")
+addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.5.0")
 
 addSbtPlugin("org.wartremover" % "sbt-wartremover" % "3.0.6")
 
