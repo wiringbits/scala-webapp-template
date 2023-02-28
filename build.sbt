@@ -93,8 +93,8 @@ lazy val baseWebSettings: Project => Project =
       /* for slinky */
       libraryDependencies ++= Seq("me.shadaj" %%% "slinky-hot" % "0.7.2"),
       libraryDependencies ++= Seq(
-        "io.github.cquiroz" %%% "scala-java-time" % "2.3.0",
-        "io.github.cquiroz" %%% "scala-java-time-tzdb" % "2.3.0"
+        "io.github.cquiroz" %%% "scala-java-time" % "2.5.0",
+        "io.github.cquiroz" %%% "scala-java-time-tzdb" % "2.5.0"
       ),
       scalacOptions += "-Ymacro-annotations",
       Test / fork := false, // sjs needs this to run tests
@@ -249,7 +249,7 @@ lazy val common = (crossProject(JSPlatform, JVMPlatform) in file("lib/common"))
     stUseScalaJsDom := true,
     Compile / stMinimize := Selection.All,
     libraryDependencies ++= Seq(
-      "io.github.cquiroz" %%% "scala-java-time" % "2.3.0",
+      "io.github.cquiroz" %%% "scala-java-time" % "2.5.0",
       "com.typesafe.play" %%% "play-json" % playJson,
       "net.wiringbits" %%% "webapp-common" % webappUtils,
       "org.scalatest" %%% "scalatest" % "3.2.12" % Test,
