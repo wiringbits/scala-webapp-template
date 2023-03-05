@@ -332,7 +332,7 @@ lazy val server = (project in file("server"))
       "org.playframework.anorm" %% "anorm-akka" % anorm,
       "org.playframework.anorm" %% "anorm-postgres" % anorm,
       "com.typesafe.play" %% "play-json" % "2.9.4",
-      "org.postgresql" % "postgresql" % "42.3.8",
+      "org.postgresql" % "postgresql" % "42.5.4",
       "de.svenkubiak" % "jBCrypt" % "0.4.3",
       "commons-validator" % "commons-validator" % "1.7",
       "com.dimafeng" %% "testcontainers-scala-scalatest" % "0.40.12" % "test",
