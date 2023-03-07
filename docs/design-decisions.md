@@ -45,3 +45,8 @@ While it is very handy to keep all the necessary sql operations at the evolution
 In short, when creating a local database, you will see yourself creating extensions manually like `CREATE EXTENSION CITEXT;`
 
 Ref: 0439d7b3159e01f886ceeb3f0ff0d2d471f5e304
+
+
+## Undated - Do not use `Downs` in evolutions
+
+From experience, downs can become annoying, imagine that you are trying branch `A` while another developer pushes a change to an existing evolution which includes downs, your data will be destroyed without any confirmation, on the other hand, when there are no downs, you will be required to throw away the data manually, in theory, we could get this behavior by updating `application.conf` but we have found that avoiding downs tend to work better.
