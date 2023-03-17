@@ -29,6 +29,28 @@ jobs:
           java-version: 'adopt:1.11.0-11'
           node-version: '16.7.0'
 
+      - name: Cache sbt dependencies
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.sbt
+            ~/.ivy2/cache
+            ~/.cache/coursier
+          key: ${{ runner.os }}-sbt-${{ hashFiles('**/*.sbt') }}
+          restore-keys: |
+            ${{ runner.os }}-sbt-
+
+      - name: Cache sbt build artifacts
+        uses: actions/cache@v2
+        with:
+          path: |
+            admin/target/scala-*
+            web/target/scala-*
+            server/target/universal/
+          key: ${{ runner.os }}-build-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-build-
+            
       - name: Check code format
         run: sbt scalafmtCheckAll
 
