@@ -4,7 +4,12 @@ import com.alexitc.materialui.facade.materialUiCore.createMuiThemeMod.Theme
 import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
 import com.alexitc.materialui.facade.materialUiStyles.makeStylesMod.StylesHook
 import com.alexitc.materialui.facade.materialUiStyles.mod.makeStyles
-import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{CSSProperties, StyleRulesCallback, Styles, WithStylesOptions}
+import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
+  CSSProperties,
+  StyleRulesCallback,
+  Styles,
+  WithStylesOptions
+}
 import net.wiringbits.components.widgets._
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.{Alignment, EdgeInsets}
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{Container, Title}
