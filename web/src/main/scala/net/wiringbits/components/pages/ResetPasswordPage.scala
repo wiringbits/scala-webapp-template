@@ -37,7 +37,7 @@ import scala.scalajs.js
     val texts = I18nHooks.useMessages(props.ctx.$lang)
     val history = useHistory()
     val params = useParams()
-    val resetPasswordCode = params("resetPasswordCode")
+    val resetPasswordCode = params.get("resetPasswordCode").getOrElse("")
     val userToken = UserToken.validate(resetPasswordCode)
 
     Container(
