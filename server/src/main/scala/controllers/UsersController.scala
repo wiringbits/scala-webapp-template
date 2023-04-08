@@ -60,7 +60,7 @@ class UsersController @Inject() (
   )
   def create() = handleJsonBody[CreateUser.Request] { request =>
     val body = request.body
-    logger.info(s"Create user: $body")
+    logger.info(s"Create user: ${body.email.string}")
     for {
       response <- createUserAction(body)
     } yield Ok(Json.toJson(response))
