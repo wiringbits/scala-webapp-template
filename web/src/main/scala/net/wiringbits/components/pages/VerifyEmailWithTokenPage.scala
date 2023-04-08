@@ -67,7 +67,6 @@ import scala.util.{Failure, Success}
     val params = useParams()
     val (state, setState) = Hooks.useState(initialState)
     val emailCodeOpt = UserToken.validate(params("emailCode"))
-    params("emailCode")
 
     def sendEmailCode(): Unit = {
       setState(_.copy(loading = true))
