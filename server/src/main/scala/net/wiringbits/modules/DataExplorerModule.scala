@@ -6,7 +6,11 @@ import net.wiringbits.webapp.utils.admin.config.{DataExplorerSettings, TableSett
 class DataExplorerModule extends AbstractModule {
 
   @Provides()
-  def dataExplorerSettings: DataExplorerSettings = DataExplorerSettings(settings)
+  def dataExplorerSettings: DataExplorerSettings = DataExplorerSettings(baseUrl, settings)
+
+  val baseUrl = net.wiringbits.BuildInfo.apiUrl.filter(_.nonEmpty).getOrElse {
+    "http://localhost:9000"
+  }
 
   val settings = List(
     TableSettings(

@@ -11,6 +11,7 @@ import net.wiringbits.ui.components.inputs.EmailInput
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.ErrorLabel
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container, Title}
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.{Alignment, EdgeInsets}
+import net.wiringbits.webapp.utils.slinkyUtils.facades.reactrouterdom.{useHistory, useLocation}
 import net.wiringbits.webapp.utils.slinkyUtils.forms.StatefulFormData
 import org.scalajs.dom
 import org.scalajs.dom.URLSearchParams
@@ -19,8 +20,6 @@ import slinky.core.{FunctionalComponent, SyntheticEvent}
 import slinky.core.annotations.react
 import slinky.core.facade.Hooks
 import slinky.web.html._
-import typings.reactRouterDom.mod.useLocation
-import typings.reactRouterDom.{mod => reactRouterDom}
 
 import scala.util.{Failure, Success}
 
@@ -29,7 +28,7 @@ import scala.util.{Failure, Success}
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val texts = I18nHooks.useMessages(props.ctx.$lang)
-    val history = reactRouterDom.useHistory()
+    val history = useHistory()
     val params = new URLSearchParams(useLocation().search)
     val emailParam = Option(params.get("email")).getOrElse("")
     val (formData, setFormData) = Hooks.useState(

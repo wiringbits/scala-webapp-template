@@ -3,9 +3,9 @@ package net.wiringbits
 import com.alexitc.materialui.facade.materialUiCore.{components => mui}
 import com.alexitc.materialui.facade.materialUiStyles.components.ThemeProvider
 import net.wiringbits.components.AppSplash
+import net.wiringbits.webapp.utils.slinkyUtils.facades.reactrouterdom.BrowserRouter
 import slinky.core.FunctionalComponent
 import slinky.core.annotations.react
-import typings.reactRouterDom.{components => router}
 
 @react object App {
   case class Props(ctx: AppContext)
@@ -16,7 +16,7 @@ import typings.reactRouterDom.{components => router}
     ThemeProvider(AppTheme.value)(
       mui.MuiThemeProvider(AppTheme.value)(
         mui.CssBaseline(),
-        router.BrowserRouter.basename("")(
+        BrowserRouter(basename = "/")(
           AppSplash(props.ctx, appRouter)
         )
       )

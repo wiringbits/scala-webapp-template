@@ -7,6 +7,7 @@ import net.wiringbits.forms.ForgotPasswordFormData
 import net.wiringbits.ui.components.inputs.EmailInput
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.ErrorLabel
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container}
+import net.wiringbits.webapp.utils.slinkyUtils.facades.reactrouterdom.useHistory
 import net.wiringbits.webapp.utils.slinkyUtils.forms.StatefulFormData
 import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
@@ -14,7 +15,6 @@ import slinky.core.annotations.react
 import slinky.core.facade.{Fragment, Hooks}
 import slinky.core.{FunctionalComponent, SyntheticEvent}
 import slinky.web.html.{form, onSubmit}
-import typings.reactRouter.mod.useHistory
 
 import scala.util.{Failure, Success}
 

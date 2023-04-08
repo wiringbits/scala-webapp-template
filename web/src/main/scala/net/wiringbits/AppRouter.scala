@@ -5,30 +5,23 @@ import net.wiringbits.components.widgets.{AppBar, Footer}
 import net.wiringbits.core.ReactiveHooks
 import net.wiringbits.models.{AuthState, User}
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Scaffold
+import net.wiringbits.webapp.utils.slinkyUtils.facades.reactrouterdom.{Redirect, Route, Switch}
 import slinky.core.FunctionalComponent
 import slinky.core.annotations.react
 import slinky.core.facade.ReactElement
-import typings.reactRouter.mod.RouteProps
-import typings.reactRouterDom.components.Route
-import typings.reactRouterDom.{components => router}
 
 import scala.util.{Failure, Success}
 
 @react object AppRouter {
   case class Props(ctx: AppContext)
 
-  private def route(path: String, ctx: AppContext)(child: => ReactElement): Route.Builder[RouteProps] = {
-    router.Route(
-      RouteProps()
-        .setExact(true)
-        .setPath(path)
-        .setRender { route =>
-          Scaffold(
-            appbar = Some(AppBar(ctx)),
-            body = child,
-            footer = Some(Footer(ctx))
-          )
-        }
+  private def route(path: String, ctx: AppContext)(child: => ReactElement): ReactElement = {
+    Route(path = path, exact = true)(
+      Scaffold(
+        appbar = Some(AppBar(ctx)),
+        body = child,
+        footer = Some(Footer(ctx))
+      )
     )
   }
 
@@ -58,18 +51,14 @@ import scala.util.{Failure, Success}
           println(s"Failed to log out: ${exception.getMessage}")
       }
 
-      router.Redirect("/")
+      Redirect("/")
     }
 
-    val catchAllRoute = router.Route(
-      RouteProps().setRender { _ =>
-        router.Redirect("/")
-      }
-    )
+    val catchAllRoute = Route(path = "*")(render = Redirect("/"))
 
     auth match {
       case AuthState.Unauthenticated =>
-        router.Switch(
+        Switch(
           home,
           about,
           signIn,
@@ -83,7 +72,7 @@ import scala.util.{Failure, Success}
         )
 
       case AuthState.Authenticated(user) =>
-        router.Switch(home, me(user), dashboard(user), about, signOut, catchAllRoute)
+        Switch(home, me(user), dashboard(user), about, signOut, catchAllRoute)
     }
   }
 }

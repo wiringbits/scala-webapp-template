@@ -11,6 +11,7 @@ import net.wiringbits.ui.components.inputs.{EmailInput, PasswordInput}
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.ErrorLabel
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.{Alignment, EdgeInsets}
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container}
+import net.wiringbits.webapp.utils.slinkyUtils.facades.reactrouterdom.useHistory
 import net.wiringbits.webapp.utils.slinkyUtils.forms.StatefulFormData
 import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
@@ -18,7 +19,6 @@ import slinky.core.annotations.react
 import slinky.core.facade.{Fragment, Hooks, ReactElement}
 import slinky.core.{FunctionalComponent, SyntheticEvent}
 import slinky.web.html._
-import typings.reactRouterDom.{mod => reactRouterDom}
 
 import scala.util.{Failure, Success}
 
@@ -27,7 +27,7 @@ import scala.util.{Failure, Success}
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val texts = I18nHooks.useMessages(props.ctx.$lang)
-    val history = reactRouterDom.useHistory()
+    val history = useHistory()
     val (formData, setFormData) = Hooks.useState(
       StatefulFormData(
         SignInFormData.initial(

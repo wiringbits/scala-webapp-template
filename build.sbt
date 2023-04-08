@@ -6,7 +6,7 @@ ThisBuild / organization := "net.wiringbits"
 
 val playJson = "2.9.2"
 val sttp = "3.8.3"
-val webappUtils = "0.5.16"
+val webappUtils = "0.6.1"
 val swagger = "1.6.6"
 val anorm = "2.6.10"
 
@@ -295,16 +295,20 @@ lazy val ui = (project in file("lib/ui"))
     Test / fork := false, // sjs needs this to run tests
     stTypescriptVersion := "3.9.3",
     // material-ui is provided by a pre-packaged library
-    stIgnore ++= List("@material-ui/core", "@material-ui/styles", "@material-ui/icons"),
+    stIgnore ++= List(
+      "@material-ui/core",
+      "@material-ui/styles",
+      "@material-ui/icons",
+      "react-router",
+      "react-router-dom"
+    ),
     Compile / npmDependencies ++= Seq(
       "@material-ui/core" -> "3.9.4", // note: version 4 is not supported yet
       "@material-ui/styles" -> "3.0.0-alpha.10", // note: version 4 is not supported yet
       "@material-ui/icons" -> "3.0.2",
       "@types/classnames" -> "2.2.10",
       "react-router" -> "5.1.2",
-      "@types/react-router" -> "5.1.2",
-      "react-router-dom" -> "5.1.2",
-      "@types/react-router-dom" -> "5.1.2"
+      "react-router-dom" -> "5.1.2"
     ),
     stFlavour := Flavour.Slinky,
     stReactEnableTreeShaking := Selection.All,
@@ -320,9 +324,26 @@ lazy val ui = (project in file("lib/ui"))
     )
   )
 
+lazy val serverBuildInfoSettings: Project => Project = _.enablePlugins(BuildInfoPlugin)
+  .settings(
+    buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
+    buildInfoKeys ++= {
+      val apiUrl = sys.env.get("API_URL")
+      val values = Seq(
+        "apiUrl" -> apiUrl
+      )
+      // Logging these values is useful to make sure that the necessary settings
+      // are being overriden when packaging the app.
+      sLog.value.info(s"BuildInfo settings:\n${values.mkString("\n")}")
+      values.map(t => BuildInfoKey(t._1, t._2))
+    },
+    buildInfoPackage := "net.wiringbits",
+    buildInfoUsePackageAsPath := true
+  )
+
 lazy val server = (project in file("server"))
   .dependsOn(common.jvm, api.jvm)
-  .configure(baseServerSettings, commonSettings, playSettings)
+  .configure(baseServerSettings, commonSettings, playSettings, serverBuildInfoSettings)
   .settings(
     name := "wiringbits-server",
     fork := true,
@@ -391,16 +412,20 @@ lazy val web = (project in file("web"))
     stUseScalaJsDom := true,
     Compile / stMinimize := Selection.All,
     // material-ui is provided by a pre-packaged library
-    stIgnore ++= List("@material-ui/core", "@material-ui/styles", "@material-ui/icons"),
+    stIgnore ++= List(
+      "@material-ui/core",
+      "@material-ui/styles",
+      "@material-ui/icons",
+      "react-router",
+      "react-router-dom"
+    ),
     Compile / npmDependencies ++= Seq(
       "@material-ui/core" -> "3.9.4", // note: version 4 is not supported yet
       "@material-ui/styles" -> "3.0.0-alpha.10", // note: version 4 is not supported yet
       "@material-ui/icons" -> "3.0.2",
       "@types/classnames" -> "2.2.10",
       "react-router" -> "5.1.2",
-      "@types/react-router" -> "5.1.2",
       "react-router-dom" -> "5.1.2",
-      "@types/react-router-dom" -> "5.1.2",
       "react-google-recaptcha" -> "2.1.0",
       "@types/react-google-recaptcha" -> "2.1.0"
     ),

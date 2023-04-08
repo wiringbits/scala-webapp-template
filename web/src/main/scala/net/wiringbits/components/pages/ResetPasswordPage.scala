@@ -4,23 +4,18 @@ import com.alexitc.materialui.facade.materialUiCore.createMuiThemeMod.Theme
 import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
 import com.alexitc.materialui.facade.materialUiStyles.makeStylesMod.StylesHook
 import com.alexitc.materialui.facade.materialUiStyles.mod.makeStyles
-import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
-  CSSProperties,
-  StyleRulesCallback,
-  Styles,
-  WithStylesOptions
-}
+import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{CSSProperties, StyleRulesCallback, Styles, WithStylesOptions}
 import net.wiringbits.common.models.UserToken
 import net.wiringbits.components.widgets.{AppCard, ResetPasswordForm}
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container
 import net.wiringbits.AppContext
 import net.wiringbits.core.I18nHooks
+import net.wiringbits.webapp.utils.slinkyUtils.facades.reactrouterdom.{useHistory, useParams}
 import org.scalablytyped.runtime.StringDictionary
 import slinky.core.FunctionalComponent
 import slinky.core.annotations.react
 import slinky.core.facade.Fragment
 import slinky.web.html.{className, div}
-import typings.reactRouter.mod.{useHistory, useParams}
 
 import scala.scalajs.js
 
@@ -42,7 +37,7 @@ import scala.scalajs.js
     val texts = I18nHooks.useMessages(props.ctx.$lang)
     val history = useHistory()
     val params = useParams()
-    val resetPasswordCode = params.asInstanceOf[js.Dynamic].resetPasswordCode.toString
+    val resetPasswordCode = params("resetPasswordCode")
     val userToken = UserToken.validate(resetPasswordCode)
 
     Container(

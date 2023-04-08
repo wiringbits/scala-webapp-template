@@ -5,24 +5,19 @@ import com.alexitc.materialui.facade.materialUiCore.createMuiThemeMod.Theme
 import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
 import com.alexitc.materialui.facade.materialUiStyles.makeStylesMod.StylesHook
 import com.alexitc.materialui.facade.materialUiStyles.mod.makeStyles
-import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
-  CSSProperties,
-  StyleRulesCallback,
-  Styles,
-  WithStylesOptions
-}
+import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{CSSProperties, StyleRulesCallback, Styles, WithStylesOptions}
 import net.wiringbits.api.models.VerifyEmail
 import net.wiringbits.common.models.UserToken
 import net.wiringbits.core.I18nHooks
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container}
 import net.wiringbits.AppContext
+import net.wiringbits.webapp.utils.slinkyUtils.facades.reactrouterdom.{useHistory, useParams}
 import org.scalablytyped.runtime.StringDictionary
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 import slinky.core.FunctionalComponent
 import slinky.core.annotations.react
 import slinky.core.facade.{Fragment, Hooks}
 import slinky.web.html.{className, div}
-import typings.reactRouterDom.mod.{useHistory, useParams}
 
 import scala.scalajs.js
 import scala.scalajs.js.timers.setTimeout
@@ -71,7 +66,8 @@ import scala.util.{Failure, Success}
     val history = useHistory()
     val params = useParams()
     val (state, setState) = Hooks.useState(initialState)
-    val emailCodeOpt = UserToken.validate(params.asInstanceOf[js.Dynamic].emailCode.toString)
+    val emailCodeOpt = UserToken.validate(params("emailCode"))
+    params("emailCode")
 
     def sendEmailCode(): Unit = {
       setState(_.copy(loading = true))
