@@ -5,7 +5,7 @@ ThisBuild / scalaVersion := "2.13.10"
 ThisBuild / organization := "net.wiringbits"
 
 val playJson = "2.9.4"
-val sttp = "3.8.14"
+val sttp = "3.8.15"
 val webappUtils = "0.6.1"
 val swagger = "1.6.10"
 val anorm = "2.7.0"
