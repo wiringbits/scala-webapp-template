@@ -41,6 +41,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
+            **/target/
             /home/runner/.ivy2/local
           key: compiled-code-preview-cache-${{ hashFiles('**/build.sbt') }}
           restore-keys: compiled-code-preview-cache-
