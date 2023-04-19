@@ -37,15 +37,6 @@ jobs:
           java-version: 'adopt:1.11.0-11'
           node-version: '16.7.0'
 
-      - name: Cache compiled code
-        uses: actions/cache@v3
-        with:
-          path: |
-            **/target/
-            /home/runner/.ivy2/local
-          key: compiled-code-preview-cache-${{ hashFiles('**/build.sbt') }}
-          restore-keys: compiled-code-preview-cache-
-
       - name: Compile
         run: sbt compile
 
@@ -74,4 +65,3 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.number }}
-
