@@ -29,6 +29,15 @@ jobs:
           java-version: 'adopt:1.11.0-11'
           node-version: '16.7.0'
 
+      - name: Cache compiled code
+        uses: actions/cache@v3
+        with:
+          path: |
+            **/target/
+            /home/runner/.ivy2/local
+          key: compiled-code-cache-${{ hashFiles('**/build.sbt') }}
+          restore-keys: compiled-code-cache-
+
       - name: Check code format
         run: sbt scalafmtCheckAll
 

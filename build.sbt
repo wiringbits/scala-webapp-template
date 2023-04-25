@@ -5,9 +5,9 @@ ThisBuild / scalaVersion := "2.13.10"
 ThisBuild / organization := "net.wiringbits"
 
 val playJson = "2.9.4"
-val sttp = "3.8.12"
+val sttp = "3.8.15"
 val webappUtils = "0.5.16"
-val swagger = "1.6.9"
+val swagger = "1.6.10"
 val anorm = "2.7.0"
 
 val consoleDisabledOptions = Seq("-Werror", "-Ywarn-unused", "-Ywarn-unused-import")
@@ -224,8 +224,8 @@ lazy val playSettings: Project => Project = {
       // test
       libraryDependencies ++= Seq(
         "org.scalatestplus.play" %% "scalatestplus-play" % "5.1.0" % Test,
-        "org.mockito" %% "mockito-scala" % "1.17.12" % Test,
-        "org.mockito" %% "mockito-scala-scalatest" % "1.17.12" % Test
+        "org.mockito" %% "mockito-scala" % "1.17.14" % Test,
+        "org.mockito" %% "mockito-scala-scalatest" % "1.17.14" % Test
       )
     )
 }
@@ -332,11 +332,11 @@ lazy val server = (project in file("server"))
       "org.playframework.anorm" %% "anorm-akka" % anorm,
       "org.playframework.anorm" %% "anorm-postgres" % anorm,
       "com.typesafe.play" %% "play-json" % "2.9.4",
-      "org.postgresql" % "postgresql" % "42.5.4",
+      "org.postgresql" % "postgresql" % "42.6.0",
       "de.svenkubiak" % "jBCrypt" % "0.4.3",
       "commons-validator" % "commons-validator" % "1.7",
-      "com.dimafeng" %% "testcontainers-scala-scalatest" % "0.40.12" % "test",
-      "com.dimafeng" %% "testcontainers-scala-postgresql" % "0.40.12" % "test",
+      "com.dimafeng" %% "testcontainers-scala-scalatest" % "0.40.15" % "test",
+      "com.dimafeng" %% "testcontainers-scala-postgresql" % "0.40.15" % "test",
       "com.softwaremill.sttp.client3" %% "core" % sttp % "test",
       "com.softwaremill.sttp.client3" %% "async-http-client-backend-future" % sttp % "test",
       "net.wiringbits" %% "admin-data-explorer-play-server" % webappUtils,
