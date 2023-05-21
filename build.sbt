@@ -240,7 +240,7 @@ lazy val common = (crossProject(JSPlatform, JVMPlatform) in file("lib/common"))
     libraryDependencies ++= Seq(
       "com.typesafe.play" %% "play-json" % playJson,
       "net.wiringbits" %% "webapp-common" % webappUtils,
-      "org.scalatest" %% "scalatest" % "3.2.15" % Test
+      "org.scalatest" %% "scalatest" % "3.2.16" % Test
     )
   )
   .jsSettings(
@@ -252,7 +252,7 @@ lazy val common = (crossProject(JSPlatform, JVMPlatform) in file("lib/common"))
       "io.github.cquiroz" %%% "scala-java-time" % "2.3.0",
       "com.typesafe.play" %%% "play-json" % playJson,
       "net.wiringbits" %%% "webapp-common" % webappUtils,
-      "org.scalatest" %%% "scalatest" % "3.2.15" % Test,
+      "org.scalatest" %%% "scalatest" % "3.2.16" % Test,
       "com.beachape" %%% "enumeratum" % "1.7.0"
     )
   )
@@ -277,7 +277,7 @@ lazy val api = (crossProject(JSPlatform, JVMPlatform) in file("lib/api"))
     libraryDependencies ++= Seq(
       "com.typesafe.play" %%% "play-json" % playJson,
       "com.softwaremill.sttp.client3" %%% "core" % sttp,
-      "org.scalatest" %%% "scalatest" % "3.2.15" % Test,
+      "org.scalatest" %%% "scalatest" % "3.2.16" % Test,
       "com.beachape" %%% "enumeratum" % "1.7.0"
     )
   )
@@ -315,7 +315,7 @@ lazy val ui = (project in file("lib/ui"))
       "org.scala-js" %%% "scala-js-macrotask-executor" % "1.1.1",
       "com.alexitc" %%% "sjs-material-ui-facade" % "0.2.0",
       "net.wiringbits" %%% "slinky-utils" % webappUtils,
-      "org.scalatest" %%% "scalatest" % "3.2.15" % Test,
+      "org.scalatest" %%% "scalatest" % "3.2.16" % Test,
       "com.beachape" %%% "enumeratum" % "1.7.0"
     )
   )
@@ -413,7 +413,7 @@ lazy val web = (project in file("web"))
       "io.monix" %%% "monix-reactive" % "3.4.1"
     ),
     libraryDependencies ++= Seq(
-      "org.scalatest" %%% "scalatest" % "3.2.15" % Test
+      "org.scalatest" %%% "scalatest" % "3.2.16" % Test
     )
   )
 
