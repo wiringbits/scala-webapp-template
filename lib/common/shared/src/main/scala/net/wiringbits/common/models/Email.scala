@@ -8,7 +8,7 @@ class Email private (val string: String) extends WrappedString
 object Email extends WrappedString.Companion[Email] {
 
   private val emailRegex =
-    """^[\w.!#$%&'*+/=?^_`{|}~-]+@([\w-]+\.)+[\w-]{2,4}$""".r
+    """^[\w.!#$%&'*+/=?^_`{|}~-]+@([\w-]+\.)+[\w-]{2,7}$""".r
 
   override def validate(string: String): ValidationResult[Email] = {
     val valid = emailRegex.findAllMatchIn(string).length == 1
