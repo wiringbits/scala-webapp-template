@@ -13,7 +13,8 @@ class EmailSpec extends AnyWordSpec {
     "one_mail@test.com",
     "valid.mail@test.xs",
     "valid_@gf.com",
-    "test@gmail.co.au"
+    "test@gmail.co.au",
+    "test@gmail.space"
   )
 
   val invalid = List(
