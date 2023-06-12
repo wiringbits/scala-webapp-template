@@ -17,12 +17,11 @@ import net.wiringbits.AppContext
 import net.wiringbits.core.I18nHooks
 import org.scalablytyped.runtime.StringDictionary
 import slinky.core.FunctionalComponent
-import slinky.core.annotations.react
 import slinky.core.facade.Fragment
 import slinky.web.html.{className, div}
 import typings.reactRouterDom.mod.useHistory
 
-@react object ForgotPasswordPage {
+object ForgotPasswordPage {
   case class Props(ctx: AppContext)
 
   private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {
@@ -51,7 +50,7 @@ import typings.reactRouterDom.mod.useHistory
               alignItems = Alignment.center,
               child = mui.Typography(texts.recoverYourPassword).variant(muiStrings.h5)
             ),
-            ForgotPasswordForm(props.ctx),
+            ForgotPasswordForm(ForgotPasswordForm.Props(props.ctx)),
             Container(
               margin = Container.EdgeInsets.top(8),
               flexDirection = Container.FlexDirection.row,

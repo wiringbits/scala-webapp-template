@@ -1,8 +1,8 @@
 package controllers
 
-import io.swagger.annotations._
+import io.swagger.annotations.*
 import play.api.libs.json.Json
-import play.api.mvc.{AbstractController, ControllerComponents}
+import play.api.mvc.{AbstractController, AnyContent, ControllerComponents, Request}
 
 import javax.inject.Inject
 
@@ -15,7 +15,7 @@ class HealthController @Inject() (cc: ControllerComponents) extends AbstractCont
       new ApiResponse(code = 200, message = "The app is healthy")
     )
   )
-  def check() = Action { _ =>
+  def check() = Action { (x: Request[AnyContent] ) =>
     Ok(Json.obj())
   }
 }

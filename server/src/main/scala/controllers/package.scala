@@ -9,6 +9,8 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 import scala.util.control.NonFatal
 
+import net.wiringbits.api.models.errorResponseFormat
+
 package object controllers {
   private val logger = LoggerFactory.getLogger(this.getClass)
 

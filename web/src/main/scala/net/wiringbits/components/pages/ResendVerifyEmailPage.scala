@@ -5,9 +5,8 @@ import net.wiringbits.components.widgets.ResendVerifyEmailForm
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.Alignment
 import slinky.core.FunctionalComponent
-import slinky.core.annotations.react
 
-@react object ResendVerifyEmailPage {
+object ResendVerifyEmailPage {
   case class Props(ctx: AppContext)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>

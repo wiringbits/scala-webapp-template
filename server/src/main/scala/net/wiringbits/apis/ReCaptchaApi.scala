@@ -3,9 +3,11 @@ package net.wiringbits.apis
 import net.wiringbits.common.models.Captcha
 import net.wiringbits.config.ReCaptchaConfig
 import play.api.libs.ws.WSClient
-
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+
+import play.api.libs.ws.DefaultBodyWritables.writeableOf_String
+
 
 class ReCaptchaApi @Inject() (reCaptchaConfig: ReCaptchaConfig, ws: WSClient)(implicit
     ec: ExecutionContext

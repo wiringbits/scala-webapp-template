@@ -6,7 +6,6 @@ import net.wiringbits.core.ReactiveHooks
 import net.wiringbits.models.{AuthState, User}
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Scaffold
 import slinky.core.FunctionalComponent
-import slinky.core.annotations.react
 import slinky.core.facade.ReactElement
 import typings.reactRouter.mod.RouteProps
 import typings.reactRouterDom.components.Route
@@ -14,7 +13,7 @@ import typings.reactRouterDom.{components => router}
 
 import scala.util.{Failure, Success}
 
-@react object AppRouter {
+object AppRouter {
   case class Props(ctx: AppContext)
 
   private def route(path: String, ctx: AppContext)(child: => ReactElement): Route.Builder[RouteProps] = {

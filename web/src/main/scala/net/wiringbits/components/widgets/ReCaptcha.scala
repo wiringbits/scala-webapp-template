@@ -4,11 +4,10 @@ import net.wiringbits.AppContext
 import net.wiringbits.common.models.Captcha
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.AsyncComponent
 import slinky.core.FunctionalComponent
-import slinky.core.annotations.react
 import slinky.core.facade.Hooks
 import typings.reactGoogleRecaptcha.components.ReactGoogleRecaptcha
 
-@react object ReCaptcha {
+object ReCaptcha {
   case class Props(ctx: AppContext, onChange: Option[Captcha] => Unit)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
