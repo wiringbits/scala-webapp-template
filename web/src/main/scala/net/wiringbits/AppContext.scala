@@ -8,13 +8,12 @@ import net.wiringbits.models.{AuthState, User}
 import scala.concurrent.ExecutionContext
 import scala.language.postfixOps
 
-case class AppContext()(
+case class AppContext(
     api: API,
     $auth: Var[AuthState],
     $lang: Var[I18nLang],
     contactEmail: Email,
-    contactPhone: String)
-   (implicit val executionContext: ExecutionContext)
+    contactPhone: String)(implicit executionContext: ExecutionContext)
 {
 
   // TODO: This is hacky but it works while preventing to pollute all components from depending on the Texts

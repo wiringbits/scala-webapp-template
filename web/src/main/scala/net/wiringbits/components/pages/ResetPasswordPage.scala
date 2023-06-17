@@ -17,14 +17,13 @@ import net.wiringbits.AppContext
 import net.wiringbits.core.I18nHooks
 import org.scalablytyped.runtime.StringDictionary
 import slinky.core.FunctionalComponent
-import slinky.core.annotations.react
 import slinky.core.facade.Fragment
 import slinky.web.html.{className, div}
 import typings.reactRouter.mod.{useHistory, useParams}
 
 import scala.scalajs.js
 
-@react object ResetPasswordPage {
+object ResetPasswordPage {
   case class Props(ctx: AppContext)
 
   private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {
@@ -50,14 +49,14 @@ import scala.scalajs.js
       justifyContent = Container.Alignment.center,
       alignItems = Container.Alignment.center,
       child = div(className := classes("resetPasswordFormContainer"))(
-        AppCard(
+        AppCard.component(AppCard.Props(
           Fragment(
             Container(
               alignItems = Container.Alignment.center,
               justifyContent = Container.Alignment.center,
               child = mui.Typography(texts.enterNewPassword).variant(muiStrings.h5)
             ),
-            ResetPasswordForm(props.ctx, userToken),
+            ResetPasswordForm.component(ResetPasswordForm.Props(props.ctx, userToken)),
             Container(
               margin = Container.EdgeInsets.top(8),
               flexDirection = Container.FlexDirection.row,
@@ -69,12 +68,12 @@ import scala.scalajs.js
                   .Button(texts.signIn)
                   .variant(muiStrings.text)
                   .color(muiStrings.primary)
-                  .onClick(_ => history.push("/signin"))
+                  //.onClick(_ => history.push("/signin"))
               )
             )
           )
         )
       )
-    )
+    ))
   }
 }

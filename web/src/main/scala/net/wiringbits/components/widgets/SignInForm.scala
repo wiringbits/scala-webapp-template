@@ -14,7 +14,6 @@ import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{Circular
 import net.wiringbits.webapp.utils.slinkyUtils.forms.StatefulFormData
 import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
-import slinky.core.annotations.react
 import slinky.core.facade.{Fragment, Hooks, ReactElement}
 import slinky.core.{FunctionalComponent, SyntheticEvent}
 import slinky.web.html._
@@ -22,7 +21,7 @@ import typings.reactRouterDom.{mod => reactRouterDom}
 
 import scala.util.{Failure, Success}
 
-@react object SignInForm {
+object SignInForm {
   case class Props(ctx: AppContext)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
@@ -60,7 +59,7 @@ import scala.util.{Failure, Success}
             case Success(res) =>
               setFormData(_.submitted)
               props.ctx.loggedIn(User(res.name, res.email))
-              history.push("/dashboard") // redirects to the dashboard
+              //history.push("/dashboard") // redirects to the dashboard
 
             case Failure(ex) =>
               setFormData(_.submissionFailed(ex.getMessage))
@@ -106,7 +105,7 @@ import scala.util.{Failure, Success}
             .Button(texts.resendEmail)
             .variant(muiStrings.text)
             .color(muiStrings.primary)
-            .onClick(_ => history.push(s"/resend-verify-email?email=${email}"))
+            //.onClick(_ => history.push(s"/resend-verify-email?email=${email}"))
         case _ => Fragment()
       }
     }
@@ -122,9 +121,9 @@ import scala.util.{Failure, Success}
       )
     }
 
-    val recaptcha = ReCaptcha(
+    val recaptcha = ReCaptcha.component(ReCaptcha.Props(
       props.ctx,
-      onChange = captchaOpt => onDataChanged(x => x.copy(captcha = captchaOpt))
+      onChange = captchaOpt => onDataChanged(x => x.copy(captcha = captchaOpt)))
     )
 
     val loginButton = {

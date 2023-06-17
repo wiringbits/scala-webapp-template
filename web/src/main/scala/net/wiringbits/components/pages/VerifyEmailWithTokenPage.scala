@@ -19,7 +19,6 @@ import net.wiringbits.AppContext
 import org.scalablytyped.runtime.StringDictionary
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 import slinky.core.FunctionalComponent
-import slinky.core.annotations.react
 import slinky.core.facade.{Fragment, Hooks}
 import slinky.web.html.{className, div}
 import typings.reactRouterDom.mod.{useHistory, useParams}
@@ -28,7 +27,7 @@ import scala.scalajs.js
 import scala.scalajs.js.timers.setTimeout
 import scala.util.{Failure, Success}
 
-@react object VerifyEmailWithTokenPage {
+object VerifyEmailWithTokenPage {
   case class Props(ctx: AppContext)
 
   private case class State(
@@ -83,7 +82,7 @@ import scala.util.{Failure, Success}
               val message = texts.goingToBeRedirected
               setState(_.copy(loading = false, title = title, message = message))
               setTimeout(2000) {
-                history.push("/signin")
+                //history.push("/signin")
               }
 
             case Failure(ex) =>

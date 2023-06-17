@@ -8,10 +8,10 @@ import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{Containe
 import net.wiringbits.AppContext
 import net.wiringbits.core.I18nHooks
 import slinky.core.FunctionalComponent
-import slinky.core.annotations.react
 import slinky.core.facade.{Fragment, Hooks}
-
-@react object UserEditPage {
+import slinky.core.facade.ReactElement._
+import slinky.core.facade.ReactElement.stringToElement
+object UserEditPage {
   case class Props(ctx: AppContext, user: User)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
@@ -27,15 +27,16 @@ import slinky.core.facade.{Fragment, Hooks}
       mui
         .Tabs(UserMenuOption.values.indexOf(menuOption))(
           UserMenuOption.values.map(x => mui.Tab().label(texts.userMenuOption(x)).withKey(x.toString))
+            .asInstanceOf[slinky.core.TagMod[slinky.web.html.*.tag.type]]
         )
         .onChange((_, index) => setMenuOption(UserMenuOption.values(index.toString.toInt)))
     )
 
     val body = mui.CardContent()(
       menuOption match {
-        case EditSummary => UserInfo(props.ctx, props.user)
+        case EditSummary => UserInfo.component(UserInfo.Props(props.ctx, props.user))
         case EditPassword =>
-          EditPasswordForm(props.ctx, props.user)
+          EditPasswordForm.component(EditPasswordForm.Props(props.ctx, props.user))
       }
     )
 

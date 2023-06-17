@@ -3,6 +3,7 @@ package net.wiringbits
 import net.wiringbits.api.ApiClient
 import net.wiringbits.webapp.utils.api.AdminDataExplorerApiClient
 import net.wiringbits.webapp.utils.ui.web.{API => APIAdmin}
+import sttp.client3._
 
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 
@@ -19,8 +20,7 @@ object API {
 
   def apply(): API = {
     println(s"Server API expected at: $apiUrl")
-
-    implicit val sttpBackend = sttp.client3.FetchBackend()
+    implicit val sttpBackend: SttpBackend[concurrent.Future, sttp.capabilities.WebSockets] = sttp.client3.FetchBackend()
     val client = new ApiClient.DefaultImpl(ApiClient.Config(apiUrl))
     val admin = new AdminDataExplorerApiClient.DefaultImpl(AdminDataExplorerApiClient.Config(apiUrl))
     val adminApi = APIAdmin(admin, apiUrl)

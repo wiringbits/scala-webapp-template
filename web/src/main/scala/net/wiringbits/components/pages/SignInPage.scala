@@ -17,12 +17,12 @@ import net.wiringbits.AppContext
 import net.wiringbits.core.I18nHooks
 import org.scalablytyped.runtime.StringDictionary
 import slinky.core.FunctionalComponent
-import slinky.core.annotations.react
 import slinky.core.facade.Fragment
 import slinky.web.html.{className, div}
 import typings.reactRouterDom.mod.useHistory
+import typings.reactRouterDom.{mod => reactRouterDom}
 
-@react object SignInPage {
+object SignInPage {
   case class Props(ctx: AppContext)
 
   private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {
@@ -45,7 +45,7 @@ import typings.reactRouterDom.mod.useHistory
       justifyContent = Alignment.center,
       alignItems = Alignment.center,
       child = div(className := classes("signInPageFormContainer"))(
-        AppCard(
+        AppCard.component(AppCard.Props(
           Fragment(
             Container(
               justifyContent = Alignment.center,
@@ -57,7 +57,7 @@ import typings.reactRouterDom.mod.useHistory
               alignItems = Alignment.center,
               justifyContent = Alignment.center,
               padding = EdgeInsets.top(16),
-              child = SignInForm(props.ctx)
+              child = SignInForm.component(SignInForm.Props(props.ctx))
             ),
             Container(
               margin = Container.EdgeInsets.top(8),
@@ -70,7 +70,7 @@ import typings.reactRouterDom.mod.useHistory
                   .Button(texts.signUp)
                   .variant(muiStrings.text)
                   .color(muiStrings.primary)
-                  .onClick(_ => history.push("/signUp"))
+                  //.onClick(_ => history.push("/signUp"))
               )
             ),
             Container(
@@ -83,12 +83,12 @@ import typings.reactRouterDom.mod.useHistory
                   .Button(texts.recoverIt)
                   .variant(muiStrings.text)
                   .color(muiStrings.primary)
-                  .onClick(_ => history.push("/forgot-password"))
+                  //.onClick(_ => history.push("/forgot-password"))
               )
             )
           )
         )
       )
-    )
+    ))
   }
 }

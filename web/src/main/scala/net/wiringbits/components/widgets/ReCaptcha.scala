@@ -6,6 +6,7 @@ import net.wiringbits.webapp.utils.slinkyUtils.components.core.AsyncComponent
 import slinky.core.FunctionalComponent
 import slinky.core.facade.Hooks
 import typings.reactGoogleRecaptcha.components.ReactGoogleRecaptcha
+import concurrent.ExecutionContext.Implicits.global
 
 object ReCaptcha {
   case class Props(ctx: AppContext, onChange: Option[Captcha] => Unit)

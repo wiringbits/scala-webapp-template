@@ -1,6 +1,6 @@
 package net.wiringbits
 
-import net.wiringbits.components.pages._
+import net.wiringbits.components.pages.*
 import net.wiringbits.components.widgets.{AppBar, Footer}
 import net.wiringbits.core.ReactiveHooks
 import net.wiringbits.models.{AuthState, User}
@@ -9,7 +9,8 @@ import slinky.core.FunctionalComponent
 import slinky.core.facade.ReactElement
 import typings.reactRouter.mod.RouteProps
 import typings.reactRouterDom.components.Route
-import typings.reactRouterDom.{components => router}
+import typings.reactRouterDom.components as router
+import concurrent.ExecutionContext.Implicits.global
 
 import scala.util.{Failure, Success}
 
@@ -23,30 +24,34 @@ object AppRouter {
         .setPath(path)
         .setRender { route =>
           Scaffold(
-            appbar = Some(AppBar(ctx)),
+            appbar = Some(AppBar.component(AppBar.Props(ctx))),
             body = child,
-            footer = Some(Footer(ctx))
+            footer = Some(Footer.component(Footer.Props(ctx)))
           )
         }
     )
   }
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
-    import props.ctx.executionContext
 
     val auth = ReactiveHooks.useDistinctValue(props.ctx.$auth)
-    val home = route("/", props.ctx)(HomePage(props.ctx))
-    val about = route("/about", props.ctx)(AboutPage(props.ctx))
-    val signIn = route("/signin", props.ctx)(SignInPage(props.ctx))
-    val signUp = route("/signup", props.ctx)(SignUpPage(props.ctx))
-    val email = route("/verify-email", props.ctx)(VerifyEmailPage(props.ctx))
-    val emailCode = route("/verify-email/:emailCode", props.ctx)(VerifyEmailWithTokenPage(props.ctx))
-    val forgotPassword = route("/forgot-password", props.ctx)(ForgotPasswordPage(props.ctx))
-    val resetPassword = route("/reset-password/:resetPasswordCode", props.ctx)(ResetPasswordPage(props.ctx))
-    val resendVerifyEmail = route("/resend-verify-email", props.ctx)(ResendVerifyEmailPage(props.ctx))
+    val home = route("/", props.ctx)(HomePage.component(HomePage.Props(props.ctx)))
+    val about = route("/about", props.ctx)(AboutPage.component(AboutPage.Props(props.ctx)))
+    val signIn = route("/signin", props.ctx)(SignInPage.component(SignInPage.Props(props.ctx)))
+    val signUp = route("/signup", props.ctx)(SignUpPage.component(SignUpPage.Props(props.ctx)))
+    val email = route("/verify-email", props.ctx)(VerifyEmailPage.component(VerifyEmailPage.Props(props.ctx)))
+    val emailCode = route("/verify-email/:emailCode", props.ctx)(VerifyEmailWithTokenPage.component(
+      VerifyEmailWithTokenPage.Props(props.ctx)))
+    val forgotPassword = route("/forgot-password", props.ctx)(ForgotPasswordPage.component(
+      ForgotPasswordPage.Props(props.ctx)))
+    val resetPassword = route("/reset-password/:resetPasswordCode", props.ctx)(ResetPasswordPage.component(
+      ResetPasswordPage.Props(props.ctx)))
+    val resendVerifyEmail = route("/resend-verify-email", props.ctx)(ResendVerifyEmailPage.component(
+      ResendVerifyEmailPage.Props(props.ctx)))
 
-    def dashboard(user: User) = route("/dashboard", props.ctx)(DashboardPage(props.ctx, user))
-    def me(user: User) = route("/me", props.ctx)(UserEditPage(props.ctx, user))
+    def dashboard(user: User) = route("/dashboard", props.ctx)(DashboardPage.component(
+      DashboardPage.Props(props.ctx, user)))
+    def me(user: User) = route("/me", props.ctx)(UserEditPage.component(UserEditPage.Props(props.ctx, user)))
     val signOut = route("/signout", props.ctx) {
       props.ctx.api.client.logout().onComplete {
         case Success(_) =>

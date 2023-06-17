@@ -14,7 +14,7 @@ object ResendVerifyEmailPage {
       flex = Some(1),
       justifyContent = Alignment.center,
       alignItems = Alignment.center,
-      child = ResendVerifyEmailForm(props.ctx)
+      child = ResendVerifyEmailForm.component(ResendVerifyEmailForm.Props(props.ctx))
     )
   }
 }

@@ -1,6 +1,6 @@
 package net.wiringbits.components.widgets
 
-import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
+import com.alexitc.materialui.facade.materialUiCore.{components as mui, materialUiCoreStrings as muiStrings}
 import net.wiringbits.AppContext
 import net.wiringbits.core.I18nHooks
 import net.wiringbits.forms.ForgotPasswordFormData
@@ -15,6 +15,7 @@ import slinky.core.{FunctionalComponent, SyntheticEvent}
 import slinky.web.html.{form, onSubmit}
 import typings.reactRouter.mod.useHistory
 
+
 import scala.util.{Failure, Success}
 
 object ForgotPasswordForm {
@@ -22,7 +23,7 @@ object ForgotPasswordForm {
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val texts = I18nHooks.useMessages(props.ctx.$lang)
-    val history = useHistory()
+    val history= useHistory()
 
     val (formData, setFormData) = Hooks.useState(
       StatefulFormData(
@@ -54,7 +55,7 @@ object ForgotPasswordForm {
           .onComplete {
             case Success(_) =>
               setFormData(_.submitted)
-              history.push("/signin") // redirects to sign in page
+              //history.push("/signin") // redirects to sign in page
 
             case Failure(ex) =>
               setFormData(_.submissionFailed(ex.getMessage))
@@ -93,9 +94,9 @@ object ForgotPasswordForm {
         )
       )
 
-    val recaptcha = ReCaptcha(
+    val recaptcha = ReCaptcha.component(ReCaptcha.Props(
       props.ctx,
-      onChange = captchaOpt => onDataChanged(x => x.copy(captcha = captchaOpt))
+      onChange = captchaOpt => onDataChanged(x => x.copy(captcha = captchaOpt)))
     )
 
     form(onSubmit := (handleSubmit(_)))(
@@ -121,5 +122,4 @@ object ForgotPasswordForm {
         child = forgotPasswordButton
       )
     )
-  }
-}
+}}

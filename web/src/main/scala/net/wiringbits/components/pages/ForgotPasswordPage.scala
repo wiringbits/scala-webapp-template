@@ -20,7 +20,7 @@ import slinky.core.FunctionalComponent
 import slinky.core.facade.Fragment
 import slinky.web.html.{className, div}
 import typings.reactRouterDom.mod.useHistory
-
+import slinky.core.facade.ReactElement.jsUndefOrToElement
 object ForgotPasswordPage {
   case class Props(ctx: AppContext)
 
@@ -44,13 +44,13 @@ object ForgotPasswordPage {
       justifyContent = Alignment.center,
       alignItems = Alignment.center,
       child = div(className := classes("forgotPasswordFormContainer"))(
-        AppCard(
+        AppCard.component(AppCard.Props(
           Fragment(
             Container(
               alignItems = Alignment.center,
               child = mui.Typography(texts.recoverYourPassword).variant(muiStrings.h5)
             ),
-            ForgotPasswordForm(ForgotPasswordForm.Props(props.ctx)),
+            ForgotPasswordForm.component(ForgotPasswordForm.Props(props.ctx)),
             Container(
               margin = Container.EdgeInsets.top(8),
               flexDirection = Container.FlexDirection.row,
@@ -62,12 +62,12 @@ object ForgotPasswordPage {
                   .Button(texts.signUp)
                   .variant(muiStrings.text)
                   .color(muiStrings.primary)
-                  .onClick(_ => history.push("/signUp"))
+                  //.onClick(_ => history.push("/signUp"))
               )
             )
           )
-        )
       )
     )
+    ))
   }
 }
