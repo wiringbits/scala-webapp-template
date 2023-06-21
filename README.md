@@ -77,7 +77,18 @@ These are code-size measurements from the deployed version at 5/Feb/2023, overal
 ### Admin app
 
 ![sssppa-admin-code-size](./docs/assets/images/sssppa-admin-code-size.png)
+## Contributing Guide
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
+[![GitHub issues](https://img.shields.io/github/issues/wiringbits/scala-webapp-template)](https://github.com/wiringbits/scala-webapp-template/issues)
+[![GitHub contributors](https://img.shields.io/github/contributors/wiringbits/scala-webapp-template)](https://github.com/wiringbits/scala-webapp-template/graphs/contributors)
 
+Contributions are welcome! There are several ways to contribute to our project:
+
+**Reporting Bugs**: If you find a bug, please open an issue and describe the problem. Make sure to include steps to reproduce the issue and any error messages you receive regarding that issue.
+
+**Fixing Bugs**: If you'd like to fix a bug, please create a pull request with your changes. Make sure to include a description of the problem and how your changes will address it.
+
+Additional examples and documentation improvements are also very welcome.
 ## Hire us
 
 The open source work we do is funded by our Scala/Scala.js consulting and development services, [schedule a call](http://alexis.wiringbits.net/) to hire us for your project.
