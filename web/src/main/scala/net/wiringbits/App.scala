@@ -5,7 +5,6 @@ import com.alexitc.materialui.facade.materialUiStyles.components.ThemeProvider
 import net.wiringbits.components.AppSplash
 import slinky.core.FunctionalComponent
 import typings.reactRouterDom.{components => router}
-import slinky.core.facade.ReactElement.jsUndefOrToElement
 
 object App {
   case class Props(ctx: AppContext)

@@ -5,19 +5,19 @@ import net.wiringbits.config.ReCaptchaConfig
 import play.api.libs.ws.WSClient
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import play.api.libs.json.Json
 
 import play.api.libs.ws.DefaultBodyWritables.writeableOf_String
 
   
-class ReCaptchaApi @Inject() (reCaptchaConfig: ReCaptchaConfig, ws: WSClient)(implicit
-    ec: ExecutionContext
+class ReCaptchaApi @Inject() (reCaptchaConfig: ReCaptchaConfig, ws: WSClient)(
+  implicit ec: ExecutionContext
 ) {
 
   private val url = "https://www.google.com/recaptcha/api/siteverify"
 
   def verify(captcha: Captcha): Future[Boolean] = {
-    ws.
-      url(url)
+    ws.url(url)
       .addQueryStringParameters("secret" -> reCaptchaConfig.secret.string, "response" -> captcha.string)
       .post("{}")
       .map { response =>

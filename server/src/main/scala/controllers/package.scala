@@ -21,7 +21,8 @@ package object controllers {
   }
 
   def authenticate(request: Request[_])(implicit ec: ExecutionContext): Future[UUID] = {
-    def userIdFromSession = Future {
+    println(request.session)
+    def userIdFromSession :Future[UUID]= Future {
       request.session
         .get("id")
         .flatMap(str => Try(UUID.fromString(str)).toOption)

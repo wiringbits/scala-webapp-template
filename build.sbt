@@ -60,15 +60,8 @@ lazy val baseServerSettings: Project => Project = {
       "-unchecked",
       "-deprecation",
       "-feature",
-//      "-encoding",
       "UTF-8",
-      "-Wconf:src=src_managed/.*:silent",
-      "-Xlint:missing-interpolator",
-      "-Xlint:adapted-args",
-      "-Ywarn-dead-code",
-      "-Ywarn-numeric-widen",
-      "-Ywarn-value-discard",
-      "-Ywarn-unused"
+      "-Wconf:src=src_managed/.*:silent"
     ),
     Compile / doc / scalacOptions ++= Seq("-no-link-warnings"),
     // Some options are very noisy when using the console and prevent us using it smoothly, let's disable them
@@ -289,7 +282,6 @@ lazy val ui = (project in file("lib/ui"))
   .settings(
     name := "wiringbits-lib-ui",
     useYarn := true,
-    scalacOptions += "-Ymacro-annotations",
     Test / requireJsDomEnv := true,
     Test / fork := false, // sjs needs this to run tests
     stTypescriptVersion := "3.9.3",
@@ -410,6 +402,7 @@ lazy val web = (project in file("web"))
       "com.alexitc" %%% "sjs-material-ui-facade" % "0.2.0",
       "net.wiringbits" %%% "scalablytyped-facades" % webappUtils,
       "io.monix" %%% "monix-reactive" % "3.4.1"
+
     ),
     libraryDependencies ++= Seq(
       "org.scalatest" %%% "scalatest" % "3.2.16" % Test

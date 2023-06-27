@@ -3,7 +3,6 @@ package net.wiringbits.api.models
 import io.swagger.annotations._
 import net.wiringbits.common.models.{Captcha, Email, Name, Password}
 import play.api.libs.json.{Format, Json}
-import play.api.libs.json._
 
 import java.util.UUID
 

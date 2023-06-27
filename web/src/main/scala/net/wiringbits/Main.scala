@@ -8,10 +8,12 @@ import net.wiringbits.webapp.utils.slinkyUtils.components.core.{ErrorBoundaryCom
 import org.scalajs.dom
 import slinky.hot
 import slinky.web.ReactDOM
+
 import scala.scalajs.js.annotation.JSImport
 import scala.scalajs.{LinkingInfo, js}
-//@JSImport("js/index.css", JSImport.Default)
-//@js.native
+
+@JSImport("js/index.css", JSImport.Default)
+@js.native
 object IndexCSS extends js.Object
 
 object Main {

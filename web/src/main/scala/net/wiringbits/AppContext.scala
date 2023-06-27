@@ -24,7 +24,7 @@ case class AppContext(
   def loggedIn(user: User): Unit = {
     $auth := AuthState.Authenticated(user)
   }
-  
+
   def loggedOut(): Unit = {
     $auth := AuthState.Unauthenticated
   }
