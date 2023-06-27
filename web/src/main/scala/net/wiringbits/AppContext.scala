@@ -13,7 +13,8 @@ case class AppContext(
     $auth: Var[AuthState],
     $lang: Var[I18nLang],
     contactEmail: Email,
-    contactPhone: String)(implicit executionContext: ExecutionContext)
+    contactPhone: String,
+    executionContext: ExecutionContext)
 {
 
   // TODO: This is hacky but it works while preventing to pollute all components from depending on the Texts

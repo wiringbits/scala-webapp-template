@@ -1,15 +1,10 @@
 package net.wiringbits.components.pages
 
 import com.alexitc.materialui.facade.materialUiCore.createMuiThemeMod.Theme
-import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
+import com.alexitc.materialui.facade.materialUiCore.{components as mui, materialUiCoreStrings as muiStrings}
 import com.alexitc.materialui.facade.materialUiStyles.makeStylesMod.StylesHook
 import com.alexitc.materialui.facade.materialUiStyles.mod.makeStyles
-import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
-  CSSProperties,
-  StyleRulesCallback,
-  Styles,
-  WithStylesOptions
-}
+import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{CSSProperties, StyleRulesCallback, Styles, WithStylesOptions}
 import net.wiringbits.components.widgets.{AppCard, ForgotPasswordForm}
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.Alignment
@@ -21,6 +16,8 @@ import slinky.core.facade.Fragment
 import slinky.web.html.{className, div}
 import typings.reactRouterDom.mod.useHistory
 import slinky.core.facade.ReactElement.jsUndefOrToElement
+
+import scala.scalajs.js
 object ForgotPasswordPage {
   case class Props(ctx: AppContext)
 
@@ -37,7 +34,7 @@ object ForgotPasswordPage {
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val texts = I18nHooks.useMessages(props.ctx.$lang)
     val classes = useStyles(())
-    val history = useHistory()
+    val history = useHistory().asInstanceOf[js.Dynamic]
 
     Container(
       flex = Some(1),
@@ -62,7 +59,7 @@ object ForgotPasswordPage {
                   .Button(texts.signUp)
                   .variant(muiStrings.text)
                   .color(muiStrings.primary)
-                  //.onClick(_ => history.push("/signUp"))
+                  .onClick(_ => history.push("/signUp"))
               )
             )
           )

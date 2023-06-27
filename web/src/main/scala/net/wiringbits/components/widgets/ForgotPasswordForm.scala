@@ -13,9 +13,9 @@ import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 import slinky.core.facade.{Fragment, Hooks}
 import slinky.core.{FunctionalComponent, SyntheticEvent}
 import slinky.web.html.{form, onSubmit}
-import typings.reactRouter.mod.useHistory
+import typings.reactRouterDom.mod as reactRouterDom
 
-
+import scala.scalajs.js
 import scala.util.{Failure, Success}
 
 object ForgotPasswordForm {
@@ -23,7 +23,7 @@ object ForgotPasswordForm {
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val texts = I18nHooks.useMessages(props.ctx.$lang)
-    val history= useHistory()
+    val history= reactRouterDom.useHistory().asInstanceOf[js.Dynamic]
 
     val (formData, setFormData) = Hooks.useState(
       StatefulFormData(
@@ -55,7 +55,7 @@ object ForgotPasswordForm {
           .onComplete {
             case Success(_) =>
               setFormData(_.submitted)
-              //history.push("/signin") // redirects to sign in page
+              history.push("/signin") // redirects to sign in page
 
             case Failure(ex) =>
               setFormData(_.submissionFailed(ex.getMessage))

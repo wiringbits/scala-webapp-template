@@ -8,10 +8,8 @@ import net.wiringbits.webapp.utils.slinkyUtils.components.core.{ErrorBoundaryCom
 import org.scalajs.dom
 import slinky.hot
 import slinky.web.ReactDOM
-import concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js.annotation.JSImport
 import scala.scalajs.{LinkingInfo, js}
-import scala.concurrent.ExecutionContext.global
 //@JSImport("js/index.css", JSImport.Default)
 //@js.native
 object IndexCSS extends js.Object
@@ -32,8 +30,8 @@ object Main {
       $authState,
       $lang,
       Email.trusted("hello@wiringbits.net"),
-      "+52 (999) 9999 999"
-
+      "+52 (999) 9999 999",
+      org.scalajs.macrotaskexecutor.MacrotaskExecutor
     )
     val app = ErrorBoundaryComponent(
       ErrorBoundaryComponent.Props(

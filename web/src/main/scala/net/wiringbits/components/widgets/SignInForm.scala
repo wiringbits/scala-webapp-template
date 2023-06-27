@@ -1,7 +1,7 @@
 package net.wiringbits.components.widgets
 
 import com.alexitc.materialui.facade.materialUiCore.mod.PropTypes.Color
-import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
+import com.alexitc.materialui.facade.materialUiCore.{components as mui, materialUiCoreStrings as muiStrings}
 import net.wiringbits.AppContext
 import net.wiringbits.common.ErrorMessages
 import net.wiringbits.core.I18nHooks
@@ -13,12 +13,13 @@ import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container}
 import net.wiringbits.webapp.utils.slinkyUtils.forms.StatefulFormData
 import org.scalajs.dom
-import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 import slinky.core.facade.{Fragment, Hooks, ReactElement}
 import slinky.core.{FunctionalComponent, SyntheticEvent}
-import slinky.web.html._
-import typings.reactRouterDom.{mod => reactRouterDom}
+import slinky.web.html.*
+import typings.reactRouterDom.mod as reactRouterDom
 
+import scala.scalajs.js
 import scala.util.{Failure, Success}
 
 object SignInForm {
@@ -26,7 +27,7 @@ object SignInForm {
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val texts = I18nHooks.useMessages(props.ctx.$lang)
-    val history = reactRouterDom.useHistory()
+    val history = reactRouterDom.useHistory().asInstanceOf[js.Dynamic]
     val (formData, setFormData) = Hooks.useState(
       StatefulFormData(
         SignInFormData.initial(
@@ -59,7 +60,7 @@ object SignInForm {
             case Success(res) =>
               setFormData(_.submitted)
               props.ctx.loggedIn(User(res.name, res.email))
-              //history.push("/dashboard") // redirects to the dashboard
+              history.push("/dashboard") // redirects to the dashboard
 
             case Failure(ex) =>
               setFormData(_.submissionFailed(ex.getMessage))
@@ -105,7 +106,7 @@ object SignInForm {
             .Button(texts.resendEmail)
             .variant(muiStrings.text)
             .color(muiStrings.primary)
-            //.onClick(_ => history.push(s"/resend-verify-email?email=${email}"))
+            .onClick(_ => history.push(s"/resend-verify-email?email=${email}"))
         case _ => Fragment()
       }
     }

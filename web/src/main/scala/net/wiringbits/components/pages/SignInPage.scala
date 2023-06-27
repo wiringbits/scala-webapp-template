@@ -1,16 +1,11 @@
 package net.wiringbits.components.pages
 
 import com.alexitc.materialui.facade.materialUiCore.createMuiThemeMod.Theme
-import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
+import com.alexitc.materialui.facade.materialUiCore.{components as mui, materialUiCoreStrings as muiStrings}
 import com.alexitc.materialui.facade.materialUiStyles.makeStylesMod.StylesHook
 import com.alexitc.materialui.facade.materialUiStyles.mod.makeStyles
-import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
-  CSSProperties,
-  StyleRulesCallback,
-  Styles,
-  WithStylesOptions
-}
-import net.wiringbits.components.widgets._
+import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{CSSProperties, StyleRulesCallback, Styles, WithStylesOptions}
+import net.wiringbits.components.widgets.*
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.{Alignment, EdgeInsets}
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{Container, Title}
 import net.wiringbits.AppContext
@@ -20,7 +15,9 @@ import slinky.core.FunctionalComponent
 import slinky.core.facade.Fragment
 import slinky.web.html.{className, div}
 import typings.reactRouterDom.mod.useHistory
-import typings.reactRouterDom.{mod => reactRouterDom}
+import typings.reactRouterDom.mod as reactRouterDom
+
+import scala.scalajs.js
 
 object SignInPage {
   case class Props(ctx: AppContext)
@@ -38,7 +35,7 @@ object SignInPage {
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val texts = I18nHooks.useMessages(props.ctx.$lang)
     val classes = useStyles(())
-    val history = useHistory()
+    val history = useHistory().asInstanceOf[js.Dynamic]
 
     Container(
       flex = Some(1),
@@ -70,7 +67,7 @@ object SignInPage {
                   .Button(texts.signUp)
                   .variant(muiStrings.text)
                   .color(muiStrings.primary)
-                  //.onClick(_ => history.push("/signUp"))
+                  .onClick(_ => history.push("/signUp"))
               )
             ),
             Container(
@@ -83,7 +80,7 @@ object SignInPage {
                   .Button(texts.recoverIt)
                   .variant(muiStrings.text)
                   .color(muiStrings.primary)
-                  //.onClick(_ => history.push("/forgot-password"))
+                  .onClick(_ => history.push("/forgot-password"))
               )
             )
           )

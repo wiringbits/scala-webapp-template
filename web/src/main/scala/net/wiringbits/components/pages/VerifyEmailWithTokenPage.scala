@@ -67,7 +67,7 @@ object VerifyEmailWithTokenPage {
     )
 
     val classes = useStyles(())
-    val history = useHistory()
+    val history = useHistory().asInstanceOf[js.Dynamic]
     val params = useParams()
     val (state, setState) = Hooks.useState(initialState)
     val emailCodeOpt = UserToken.validate(params.asInstanceOf[js.Dynamic].emailCode.toString)
@@ -82,7 +82,7 @@ object VerifyEmailWithTokenPage {
               val message = texts.goingToBeRedirected
               setState(_.copy(loading = false, title = title, message = message))
               setTimeout(2000) {
-                //history.push("/signin")
+                history.push("/signin")
               }
 
             case Failure(ex) =>

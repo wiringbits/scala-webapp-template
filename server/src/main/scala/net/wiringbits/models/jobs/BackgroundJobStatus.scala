@@ -12,3 +12,8 @@ object BackgroundJobStatus extends Enum[BackgroundJobStatus] {
 
   val values = findValues
 }
+//enum BackgroundJobStatus{
+//  case Success extends BackgroundJobStatus
+//  case Pending extends BackgroundJobStatus
+//  case Failed extends BackgroundJobStatus
+//}

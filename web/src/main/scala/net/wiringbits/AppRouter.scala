@@ -9,9 +9,7 @@ import slinky.core.FunctionalComponent
 import slinky.core.facade.ReactElement
 import typings.reactRouter.mod.RouteProps
 import typings.reactRouterDom.components.Route
-import typings.reactRouterDom.components as router
-import concurrent.ExecutionContext.Implicits.global
-
+import typings.reactRouterDom.{components as router}
 import scala.util.{Failure, Success}
 
 object AppRouter {
@@ -33,7 +31,7 @@ object AppRouter {
   }
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
-
+    implicit val ec=props.ctx.executionContext
     val auth = ReactiveHooks.useDistinctValue(props.ctx.$auth)
     val home = route("/", props.ctx)(HomePage.component(HomePage.Props(props.ctx)))
     val about = route("/about", props.ctx)(AboutPage.component(AboutPage.Props(props.ctx)))

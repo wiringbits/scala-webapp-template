@@ -1,6 +1,6 @@
 package net.wiringbits.components.widgets
 
-import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
+import com.alexitc.materialui.facade.materialUiCore.{components as mui, materialUiCoreStrings as muiStrings}
 import com.alexitc.materialui.facade.materialUiCore.mod.PropTypes.Color
 import com.alexitc.materialui.facade.react.components.Fragment
 import net.wiringbits.AppContext
@@ -17,11 +17,11 @@ import org.scalajs.dom.URLSearchParams
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 import slinky.core.{FunctionalComponent, SyntheticEvent}
 import slinky.core.facade.Hooks
-import slinky.web.html._
+import slinky.web.html.*
 import typings.reactRouterDom.mod.useLocation
+import typings.reactRouterDom.mod as reactRouterDom
 
-import typings.reactRouterDom.{mod => reactRouterDom}
-
+import scala.scalajs.js
 import scala.util.{Failure, Success}
 
 object ResendVerifyEmailForm {
@@ -29,7 +29,7 @@ object ResendVerifyEmailForm {
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val texts = I18nHooks.useMessages(props.ctx.$lang)
-    val history = reactRouterDom.useHistory()
+    val history = reactRouterDom.useHistory().asInstanceOf[js.Dynamic]
     val params = URLSearchParams(dom.window.location.search)
     val emailParam = Option(params.get("email")).getOrElse("")
     val (formData, setFormData) = Hooks.useState(
@@ -66,7 +66,7 @@ object ResendVerifyEmailForm {
               val email = formData.data.email.inputValue
 
               setFormData(_.submitted)
-              //history.push(s"/verify-email?email=${email}")
+              history.push(s"/verify-email?email=${email}")
 
             case Failure(ex) =>
               setFormData(_.submissionFailed(ex.getMessage))

@@ -39,7 +39,7 @@ object ResetPasswordPage {
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val classes = useStyles(())
     val texts = I18nHooks.useMessages(props.ctx.$lang)
-    val history = useHistory()
+    val history = useHistory().asInstanceOf[js.Dynamic]
     val params = useParams()
     val resetPasswordCode = params.asInstanceOf[js.Dynamic].resetPasswordCode.toString
     val userToken = UserToken.validate(resetPasswordCode)
@@ -68,7 +68,7 @@ object ResetPasswordPage {
                   .Button(texts.signIn)
                   .variant(muiStrings.text)
                   .color(muiStrings.primary)
-                  //.onClick(_ => history.push("/signin"))
+                  .onClick(_ => history.push("/signin"))
               )
             )
           )

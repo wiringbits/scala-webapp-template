@@ -1,6 +1,6 @@
 package net.wiringbits.components.widgets
 
-import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
+import com.alexitc.materialui.facade.materialUiCore.{components as mui, materialUiCoreStrings as muiStrings}
 import net.wiringbits.AppContext
 import net.wiringbits.common.models.UserToken
 import net.wiringbits.core.I18nHooks
@@ -17,6 +17,7 @@ import slinky.core.{FunctionalComponent, SyntheticEvent}
 import slinky.web.html.{form, onSubmit}
 import typings.reactRouter.mod.useHistory
 
+import scala.scalajs.js
 import scala.util.{Failure, Success}
 
 object ResetPasswordForm {
@@ -24,7 +25,7 @@ object ResetPasswordForm {
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val texts = I18nHooks.useMessages(props.ctx.$lang)
-    val history = useHistory()
+    val history = useHistory().asInstanceOf[js.Dynamic]
 
     val (formData, setFormData) = Hooks.useState(
       StatefulFormData(
@@ -59,7 +60,7 @@ object ResetPasswordForm {
             case Success(res) =>
               props.ctx.loggedIn(User(name = res.name, email = res.email))
               setFormData(_.submitted)
-              //history.push("/dashboard")
+              history.push("/dashboard")
             case Failure(ex) =>
               setFormData(_.submissionFailed(ex.getMessage))
           }

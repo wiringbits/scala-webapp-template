@@ -10,7 +10,7 @@ val webappUtils = "0.5.16"
 val swagger = "1.6.11"
 val anorm = "2.7.0"
 val enumeratum="1.7.2"
-val scala_java_time="2.3.0"
+val scala_java_time="2.5.0"
 
 
 val consoleDisabledOptions = Seq("-Werror", "-Ywarn-unused", "-Ywarn-unused-import")
@@ -53,8 +53,6 @@ lazy val commonSettings: Project => Project = {
     )
   )
 }
-
-// Used only by the server
 // TODO: Reuse it in all projects
 lazy val baseServerSettings: Project => Project = {
   _.settings(
@@ -62,7 +60,7 @@ lazy val baseServerSettings: Project => Project = {
       "-unchecked",
       "-deprecation",
       "-feature",
-      "-encoding",
+//      "-encoding",
       "UTF-8",
       "-Wconf:src=src_managed/.*:silent",
       "-Xlint:missing-interpolator",
@@ -98,7 +96,6 @@ lazy val baseWebSettings: Project => Project =
         "io.github.cquiroz" %%% "scala-java-time" % scala_java_time,
         "io.github.cquiroz" %%% "scala-java-time-tzdb" % scala_java_time
       ),
-      scalacOptions += "-Ymacro-annotations",
       Test / fork := false, // sjs needs this to run tests
       Test / requireJsDomEnv := true
     )

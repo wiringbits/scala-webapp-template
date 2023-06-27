@@ -25,7 +25,7 @@ object SignUpForm {
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val texts = I18nHooks.useMessages(props.ctx.$lang)
-    val history = reactRouterDom.mod.useHistory()
+    val history = reactRouterDom.mod.useHistory().asInstanceOf[js.Dynamic]
     val (formData, setFormData) = Hooks.useState(
       StatefulFormData(
         SignUpFormData.initial(
@@ -61,7 +61,7 @@ object SignUpForm {
               val email = formData.data.email.inputValue
 
               setFormData(_.submitted)
-              //history.push(s"/verify-email?email=${email}") // redirects to email page
+              history.push(s"/verify-email?email=${email}") // redirects to email page
 
             case Failure(ex) =>
               setFormData(_.submissionFailed(ex.getMessage))
