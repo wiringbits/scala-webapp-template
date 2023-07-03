@@ -19,7 +19,7 @@ import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{Containe
 import org.scalablytyped.runtime.StringDictionary
 import slinky.core.FunctionalComponent
 import slinky.core.facade.Fragment
-import slinky.core.facade.ReactElement.anyToElementContainer
+
 object LogList {
   case class Props(ctx: AppContext, response: GetUserLogs.Response, forceRefresh: () => Unit)
 
@@ -44,7 +44,7 @@ object LogList {
             .secondary(Formatter.instant(item.createdAt))
         )
         .divider(true)
-        .withKey(item.id.toString)
+        .withKey(item.id.toString).build
     }
 
     Container(
@@ -64,7 +64,7 @@ object LogList {
           )
         ),
         mui
-          .List(items.asInstanceOf[slinky.core.TagMod[slinky.web.html.ul.tag.type]])
+          .List(items)
           .className(classes("list"))
           .dense(true)
       )

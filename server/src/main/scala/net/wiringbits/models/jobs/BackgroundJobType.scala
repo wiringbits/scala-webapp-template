@@ -9,9 +9,9 @@ sealed trait BackgroundJobType extends EnumEntry with Uppercase
   * SendEmail tasks stored at the database
   */
 object BackgroundJobType extends Enum[BackgroundJobType] {
-  final case object SendEmail extends BackgroundJobType
+   case object SendEmail extends BackgroundJobType
 
-  val values = findValues
+   val values = findValues
 }
 
 

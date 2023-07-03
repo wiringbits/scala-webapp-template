@@ -1,6 +1,6 @@
 package net.wiringbits.util
 
-import org.scalatest.matchers.must.Matchers.{be, convertToAnyMustWrapper, empty}
+import org.scalatest.matchers.must.Matchers.{be, must, mustNot, empty}
 import org.scalatest.wordspec.AnyWordSpec
 
 import java.util.UUID

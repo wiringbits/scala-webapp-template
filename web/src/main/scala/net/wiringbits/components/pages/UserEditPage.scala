@@ -26,8 +26,7 @@ object UserEditPage {
     val tabs = mui.CardContent()(
       mui
         .Tabs(UserMenuOption.values.indexOf(menuOption))(
-          UserMenuOption.values.map(x => mui.Tab().label(texts.userMenuOption(x)).withKey(x.toString))
-            .asInstanceOf[slinky.core.TagMod[slinky.web.html.*.tag.type]]
+          UserMenuOption.values.map(x => mui.Tab().label(texts.userMenuOption(x)).withKey(x.toString).build)
         )
         .onChange((_, index) => setMenuOption(UserMenuOption.values(index.toString.toInt)))
     )

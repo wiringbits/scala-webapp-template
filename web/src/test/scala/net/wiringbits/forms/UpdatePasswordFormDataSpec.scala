@@ -1,7 +1,7 @@
 package net.wiringbits.forms
 
 import net.wiringbits.common.models.Password
-import org.scalatest.matchers.must.Matchers.{be, convertToAnyMustWrapper, empty}
+import org.scalatest.matchers.must.Matchers.{be, must, empty}
 import org.scalatest.wordspec.AnyWordSpec
 
 class UpdatePasswordFormDataSpec extends AnyWordSpec {

@@ -2,6 +2,7 @@ package controllers
 
 import controllers.common.PlayPostgresSpec
 import net.wiringbits.config.ReCaptchaConfig
+import org.scalatest.BeforeAndAfterAll
 
 class EnvironmentConfigControllerSpec extends PlayPostgresSpec {
   def reCaptchaConfig: ReCaptchaConfig = app.injector.instanceOf(classOf[ReCaptchaConfig])

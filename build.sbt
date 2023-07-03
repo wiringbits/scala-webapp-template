@@ -10,7 +10,7 @@ val webappUtils = "0.5.16"
 val swagger = "1.6.11"
 val anorm = "2.7.0"
 val enumeratum="1.7.2"
-val scala_java_time="2.5.0"
+val scalaJavaTime="2.5.0"
 
 
 val consoleDisabledOptions = Seq("-Werror", "-Ywarn-unused", "-Ywarn-unused-import")
@@ -60,8 +60,7 @@ lazy val baseServerSettings: Project => Project = {
       "-unchecked",
       "-deprecation",
       "-feature",
-      "UTF-8",
-      "-Wconf:src=src_managed/.*:silent"
+      "UTF-8"
     ),
     Compile / doc / scalacOptions ++= Seq("-no-link-warnings"),
     // Some options are very noisy when using the console and prevent us using it smoothly, let's disable them
@@ -86,9 +85,10 @@ lazy val baseWebSettings: Project => Project =
       /* for slinky */
       libraryDependencies ++= Seq("me.shadaj" %%% "slinky-hot" % "0.7.3"),
       libraryDependencies ++= Seq(
-        "io.github.cquiroz" %%% "scala-java-time" % scala_java_time,
-        "io.github.cquiroz" %%% "scala-java-time-tzdb" % scala_java_time
+        "io.github.cquiroz" %%% "scala-java-time" % scalaJavaTime,
+        "io.github.cquiroz" %%% "scala-java-time-tzdb" % scalaJavaTime
       ),
+
       Test / fork := false, // sjs needs this to run tests
       Test / requireJsDomEnv := true
     )
@@ -215,9 +215,11 @@ lazy val playSettings: Project => Project = {
       ),
       // test
       libraryDependencies ++= Seq(
-        "org.scalatestplus.play" %% "scalatestplus-play" % "6.0.0-M6" % Test,
-      //  "org.mockito" %% "mockito-scala" % "1.17.14" % Test,
-      //  "org.mockito" %% "mockito-scala-scalatest" % "1.17.14" % Test
+        "org.scalatestplus.play" %% "scalatestplus-play" % "6.0.0-M4" % Test,
+        "org.scalatestplus" %% "mockito-3-4" % "3.2.10.0" % Test,
+        "eu.monniot" %% "scala3mock" % "0.1.1" % Test,
+        "eu.monniot" %% "scala3mock-scalatest" % "0.1.1" % Test
+
       )
     )
 }
@@ -241,7 +243,7 @@ lazy val common = (crossProject(JSPlatform, JVMPlatform) in file("lib/common"))
     stUseScalaJsDom := true,
     Compile / stMinimize := Selection.All,
     libraryDependencies ++= Seq(
-      "io.github.cquiroz" %%% "scala-java-time" % scala_java_time,
+      "io.github.cquiroz" %%% "scala-java-time" % scalaJavaTime,
       "com.typesafe.play" %%% "play-json" % playJson,
       "net.wiringbits" %%% "webapp-common" % webappUtils,
       "org.scalatest" %%% "scalatest" % "3.2.16" % Test,
@@ -302,7 +304,7 @@ lazy val ui = (project in file("lib/ui"))
     stUseScalaJsDom := true,
     Compile / stMinimize := Selection.All,
     libraryDependencies ++= Seq(
-      "io.github.cquiroz" %%% "scala-java-time" % scala_java_time,
+      "io.github.cquiroz" %%% "scala-java-time" % scalaJavaTime,
       "org.scala-js" %%% "scala-js-macrotask-executor" % "1.1.1",
       "com.alexitc" %%% "sjs-material-ui-facade" % "0.2.0",
       "net.wiringbits" %%% "slinky-utils" % webappUtils,
@@ -402,7 +404,6 @@ lazy val web = (project in file("web"))
       "com.alexitc" %%% "sjs-material-ui-facade" % "0.2.0",
       "net.wiringbits" %%% "scalablytyped-facades" % webappUtils,
       "io.monix" %%% "monix-reactive" % "3.4.1"
-
     ),
     libraryDependencies ++= Seq(
       "org.scalatest" %%% "scalatest" % "3.2.16" % Test

@@ -21,7 +21,6 @@ package object controllers {
   }
 
   def authenticate(request: Request[_])(implicit ec: ExecutionContext): Future[UUID] = {
-    println(request.session)
     def userIdFromSession :Future[UUID]= Future {
       request.session
         .get("id")

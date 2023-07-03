@@ -45,7 +45,7 @@ object VerifyEmailPage {
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val texts = I18nHooks.useMessages(props.ctx.$lang)
     val history = reactRouterDom.useHistory().asInstanceOf[js.Dynamic]
-    val params = URLSearchParams(dom.window.location.search)
+    val params = new URLSearchParams(useLocation().asInstanceOf[js.Dynamic].search.asInstanceOf[String])
     val emailParam = Option(params.get("email")).getOrElse("")
     val classes = useStyles(())
 
