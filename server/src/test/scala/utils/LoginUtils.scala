@@ -4,18 +4,14 @@ import net.wiringbits.api.ApiClient
 import net.wiringbits.api.models.{CreateUser, Login, VerifyEmail}
 import net.wiringbits.common.models.{Captcha, Password, UserToken}
 import net.wiringbits.util.TokenGenerator
-//import org.mockito.MockitoSugar.when
-import eu.monniot.scala3mock.matchers.MatchAny
-import eu.monniot.scala3mock.macros.{mock, when}
-import eu.monniot.scala3mock.main.withExpectations
-import eu.monniot.scala3mock.main.Default
 
-import org.scalatestplus.mockito.MockitoSugar._
+import org.scalatestplus.mockito.MockitoSugar
 
 import org.scalatest._
 import org.scalatest.matchers.should.Matchers
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
+import org.mockito.Mockito.*
 
 trait LoginUtils{
 
@@ -28,7 +24,8 @@ trait LoginUtils{
 
 
     val verificationToken = UUID.randomUUID()
-    when(()=>tokenGenerator.next()).expects().returns(verificationToken)
+
+    when(tokenGenerator.next()).thenReturn(verificationToken)
 
 
 
