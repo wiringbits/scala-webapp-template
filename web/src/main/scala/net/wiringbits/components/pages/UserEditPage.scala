@@ -9,8 +9,7 @@ import net.wiringbits.AppContext
 import net.wiringbits.core.I18nHooks
 import slinky.core.FunctionalComponent
 import slinky.core.facade.{Fragment, Hooks}
-import slinky.core.facade.ReactElement._
-import slinky.core.facade.ReactElement.stringToElement
+import slinky.core.facade.ReactElement.*
 object UserEditPage {
   case class Props(ctx: AppContext, user: User)
 

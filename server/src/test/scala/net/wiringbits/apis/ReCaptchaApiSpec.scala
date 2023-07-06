@@ -10,7 +10,7 @@ import org.scalatest.matchers.must.Matchers._
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.{BodyWritable, WSClient, WSRequest, WSResponse}
-import play.api.libs.ws.DefaultBodyWritables.writeableOf_String
+import play.api.libs.ws.DefaultBodyWritables.*
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import org.mockito.Mockito.*

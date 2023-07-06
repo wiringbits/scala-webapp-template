@@ -11,8 +11,6 @@ import org.mockito.ArgumentMatchers.any
 import play.api.inject
 import play.api.inject.guice.GuiceApplicationBuilder
 import utils.LoginUtils
-
-//import eu.monniot.scala3mock.macros.{mock, when}
 import org.mockito.Mockito.*
 import org.scalatestplus.mockito.MockitoSugar
 import java.time.{Clock, Instant}

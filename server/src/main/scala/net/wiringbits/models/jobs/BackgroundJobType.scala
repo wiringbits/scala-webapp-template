@@ -13,9 +13,3 @@ object BackgroundJobType extends Enum[BackgroundJobType] {
 
    val values = findValues
 }
-
-
-//enum BackgroundJobType {
-//  case SendEmail extends BackgroundJobType
-//
-//}

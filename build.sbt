@@ -59,8 +59,7 @@ lazy val baseServerSettings: Project => Project = {
     scalacOptions ++= Seq(
       "-unchecked",
       "-deprecation",
-      "-feature",
-      "UTF-8"
+      "-feature"
     ),
     Compile / doc / scalacOptions ++= Seq("-no-link-warnings"),
     // Some options are very noisy when using the console and prevent us using it smoothly, let's disable them
@@ -74,7 +73,6 @@ lazy val baseWebSettings: Project => Project =
     .settings(
       scalacOptions ++= Seq(
         "-deprecation", // Emit warning and location for usages of deprecated APIs.
-        "utf-8", // Specify character encoding used by source files.
         "-explaintypes", // Explain type errors in more detail.
         "-feature", // Emit warning and location for usages of features that should be imported explicitly.
         "-unchecked" // Enable additional warnings where generated code depends on assumptions.
@@ -216,9 +214,7 @@ lazy val playSettings: Project => Project = {
       // test
       libraryDependencies ++= Seq(
         "org.scalatestplus.play" %% "scalatestplus-play" % "6.0.0-M4" % Test,
-        "org.scalatestplus" %% "mockito-4-6" % "3.2.15.0" % Test,
-        "eu.monniot" %% "scala3mock" % "0.1.1" % Test,
-        "eu.monniot" %% "scala3mock-scalatest" % "0.1.1" % Test
+        "org.scalatestplus" %% "mockito-4-6" % "3.2.15.0" % Test
 
       )
     )
