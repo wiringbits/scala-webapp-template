@@ -13,13 +13,12 @@ import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
 }
 import org.scalablytyped.runtime.StringDictionary
 import slinky.core.FunctionalComponent
-import slinky.core.annotations.react
 import slinky.core.facade.{Fragment, ReactElement}
 import slinky.web.html._
 
 import scala.scalajs.js
 
-@react object AppCard {
+object AppCard {
   case class Props(child: ReactElement, title: Option[String] = None, centerTitle: Boolean = false)
 
   private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {

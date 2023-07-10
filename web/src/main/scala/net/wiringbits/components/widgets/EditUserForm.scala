@@ -13,14 +13,13 @@ import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{Circular
 import net.wiringbits.webapp.utils.slinkyUtils.forms.StatefulFormData
 import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
-import slinky.core.annotations.react
 import slinky.core.facade.{Fragment, Hooks}
 import slinky.core.{FunctionalComponent, SyntheticEvent}
 import slinky.web.html._
 
 import scala.util.{Failure, Success}
 
-@react object EditUserForm {
+object EditUserForm {
   case class Props(ctx: AppContext, user: User, response: GetCurrentUser.Response, onSave: () => Unit)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>

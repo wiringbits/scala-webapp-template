@@ -1,6 +1,6 @@
 package net.wiringbits.util
 
-import org.scalatest.matchers.must.Matchers.{be, convertToAnyMustWrapper}
+import org.scalatest.matchers.must.Matchers.{be, must}
 import org.scalatest.wordspec.AnyWordSpec
 
 class DelayGeneratorSpec extends AnyWordSpec {

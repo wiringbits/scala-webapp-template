@@ -6,9 +6,8 @@ import net.wiringbits.models.User
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.AsyncComponent
 import net.wiringbits.webapp.utils.slinkyUtils.core.GenericHooks
 import slinky.core.FunctionalComponent
-import slinky.core.annotations.react
 
-@react object Logs {
+object Logs {
   case class Props(ctx: AppContext, user: User)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
@@ -18,7 +17,7 @@ import slinky.core.annotations.react
       AsyncComponent.Props(
         fetch = () => props.ctx.api.client.getUserLogs(),
         render = response => LogList.component(LogList.Props(props.ctx, response, () => forceRefresh())),
-        progressIndicator = () => Loader(props.ctx),
+        progressIndicator = () => Loader.component(Loader.Props(props.ctx)),
         watchedObjects = List(timesRefreshingData)
       )
     )

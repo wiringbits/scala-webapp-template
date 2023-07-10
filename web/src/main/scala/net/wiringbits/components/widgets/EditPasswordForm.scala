@@ -12,14 +12,13 @@ import net.wiringbits.webapp.utils.slinkyUtils.forms.StatefulFormData
 import net.wiringbits.AppContext
 import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
-import slinky.core.annotations.react
 import slinky.core.facade.{Fragment, Hooks}
 import slinky.core.{FunctionalComponent, SyntheticEvent}
 import slinky.web.html.{form, onSubmit}
 
 import scala.util.{Failure, Success}
 
-@react object EditPasswordForm {
+object EditPasswordForm {
   case class Props(ctx: AppContext, user: User)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>

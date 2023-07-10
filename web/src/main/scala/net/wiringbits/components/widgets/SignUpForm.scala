@@ -12,20 +12,20 @@ import net.wiringbits.webapp.utils.slinkyUtils.forms.StatefulFormData
 import net.wiringbits.AppContext
 import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
-import slinky.core.annotations.react
 import slinky.core.facade.{Fragment, Hooks}
 import slinky.core.{FunctionalComponent, SyntheticEvent}
 import slinky.web.html._
-import typings.reactRouterDom.{mod => reactRouterDom}
+import typings.reactRouterDom
+import scala.scalajs.js
 
 import scala.util.{Failure, Success}
 
-@react object SignUpForm {
+object SignUpForm {
   case class Props(ctx: AppContext)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val texts = I18nHooks.useMessages(props.ctx.$lang)
-    val history = reactRouterDom.useHistory()
+    val history = reactRouterDom.mod.useHistory().asInstanceOf[js.Dynamic]
     val (formData, setFormData) = Hooks.useState(
       StatefulFormData(
         SignUpFormData.initial(
@@ -128,7 +128,7 @@ import scala.util.{Failure, Success}
       )
     }
 
-    val recaptcha = ReCaptcha(props.ctx, onChange = captchaOpt => onDataChanged(x => x.copy(captcha = captchaOpt)))
+    val recaptcha = ReCaptcha.component(ReCaptcha.Props(props.ctx, onChange = captchaOpt => onDataChanged(x => x.copy(captcha = captchaOpt))))
 
     val signUpButton = {
       val text =

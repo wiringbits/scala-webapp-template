@@ -5,22 +5,24 @@ import controllers.common.PlayPostgresSpec
 import net.wiringbits.api.models.{CreateUser, Login, VerifyEmail}
 import net.wiringbits.apis.models.EmailRequest
 import net.wiringbits.apis.{EmailApi, ReCaptchaApi}
-import net.wiringbits.common.models._
+import net.wiringbits.common.models.*
 import net.wiringbits.config.UserTokensConfig
 import net.wiringbits.repositories.UserTokensRepository
 import net.wiringbits.util.TokenGenerator
 import org.mockito.ArgumentMatchers.any
-import org.mockito.MockitoSugar.{mock, when}
+import org.mockito.Mockito.*
+import org.mockito.stubbing.Answer
 import play.api.inject
 import play.api.inject.guice.GuiceApplicationBuilder
 import utils.LoginUtils
+import org.scalatestplus.mockito.MockitoSugar
 
 import java.time.temporal.ChronoUnit
 import java.time.{Clock, Instant}
 import java.util.UUID
 import scala.concurrent.Future
 
-class AuthControllerSpec extends PlayPostgresSpec with LoginUtils {
+class AuthControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoSugar{
 
   def userTokensRepository: UserTokensRepository = app.injector.instanceOf(classOf[UserTokensRepository])
 
@@ -114,7 +116,7 @@ class AuthControllerSpec extends PlayPostgresSpec with LoginUtils {
     }
 
     "fail when the user tries to verify with an expired token" in withApiClient { client =>
-      when(clock.instant).thenAnswer(Instant.now())
+      when(clock.instant).thenAnswer( _ =>Instant.now())
       val request = CreateUser.Request(
         name = Name.trusted("wiringbits"),
         email = Email.trusted("test1@email.com"),
@@ -126,7 +128,10 @@ class AuthControllerSpec extends PlayPostgresSpec with LoginUtils {
 
       val user = client.createUser(request).futureValue
 
-      when(clock.instant).thenAnswer(Instant.now().plus(2, ChronoUnit.DAYS))
+      when(clock.instant).thenAnswer(new Answer[Instant] {
+        override def answer(invocation: org.mockito.invocation.InvocationOnMock): Instant = {
+        Instant.now().plus(2, ChronoUnit.DAYS)}}
+      )
 
       val error = client
         .verifyEmail(VerifyEmail.Request(UserToken(user.id, verificationToken)))

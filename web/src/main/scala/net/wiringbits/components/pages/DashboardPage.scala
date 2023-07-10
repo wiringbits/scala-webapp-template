@@ -6,10 +6,9 @@ import net.wiringbits.core.I18nHooks
 import net.wiringbits.models.User
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{Container, Subtitle, Title}
 import slinky.core.FunctionalComponent
-import slinky.core.annotations.react
 import slinky.core.facade.Fragment
 
-@react object DashboardPage {
+object DashboardPage {
   case class Props(ctx: AppContext, user: User)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
@@ -22,7 +21,7 @@ import slinky.core.facade.Fragment
           Subtitle(texts.welcome(props.user.name))
         )
       ),
-      Logs(props.ctx, props.user)
+      Logs.component(Logs.Props(props.ctx, props.user))
     )
   }
 }

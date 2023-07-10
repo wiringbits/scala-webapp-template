@@ -8,21 +8,20 @@ import net.wiringbits.apis.{EmailApi, ReCaptchaApi}
 import net.wiringbits.common.models._
 import net.wiringbits.util.TokenGenerator
 import org.mockito.ArgumentMatchers.any
-import org.mockito.MockitoSugar.{mock, when}
 import play.api.inject
 import play.api.inject.guice.GuiceApplicationBuilder
 import utils.LoginUtils
-
+import org.mockito.Mockito.*
+import org.scalatestplus.mockito.MockitoSugar
 import java.time.{Clock, Instant}
 import java.util.UUID
 import scala.concurrent.Future
 
-class AdminControllerSpec extends PlayPostgresSpec with LoginUtils {
-
+class AdminControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoSugar {
   private val tokenGenerator = mock[TokenGenerator]
 
   private val clock = mock[Clock]
-  when(clock.instant()).thenReturn(Instant.now())
+  when(clock.instant).thenReturn(Instant.now())
 
   private val emailApi = mock[EmailApi]
   when(emailApi.sendEmail(any[EmailRequest]())).thenReturn(Future.unit)

@@ -21,11 +21,10 @@ import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{Containe
 import net.wiringbits.webapp.utils.slinkyUtils.core.MediaQueryHooks
 import org.scalablytyped.runtime.StringDictionary
 import slinky.core.FunctionalComponent
-import slinky.core.annotations.react
 import slinky.core.facade.{Fragment, Hooks}
 import slinky.web.html._
 
-@react object AppBar {
+object AppBar {
   case class Props(ctx: AppContext)
 
   private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {

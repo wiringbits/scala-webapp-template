@@ -45,4 +45,4 @@ GET /environment-config controllers.EnvironmentConfigController.getEnvironmentCo
 GET /docs/*file        controllers.Assets.at(path="/swagger-ui", file)
 
 # routes for admin tables (GET, POST, PUT and DELETE)
--> / net.wiringbits.webapp.utils.admin.AppRouter
+#-> / net.wiringbits.webapp.utils.admin.AppRouter

@@ -18,10 +18,9 @@ import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container
 import net.wiringbits.webapp.utils.slinkyUtils.core.MediaQueryHooks
 import org.scalablytyped.runtime.StringDictionary
 import slinky.core.FunctionalComponent
-import slinky.core.annotations.react
 import slinky.core.facade.Fragment
 
-@react object Footer {
+object Footer {
   case class Props(ctx: AppContext)
 
   private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {

@@ -44,7 +44,7 @@ object LogList {
             .secondary(Formatter.instant(item.createdAt))
         )
         .divider(true)
-        .withKey(item.id.toString)
+        .withKey(item.id.toString).build
     }
 
     Container(

@@ -4,17 +4,18 @@ import net.wiringbits.common.models.Captcha
 import net.wiringbits.config.ReCaptchaConfig
 import net.wiringbits.models.{ReCaptchaSecret, ReCaptchaSiteKey}
 import org.mockito.ArgumentMatchers
-import org.mockito.MockitoSugar.{mock, when}
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.matchers.must.Matchers._
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.{BodyWritable, WSClient, WSRequest, WSResponse}
-
+import play.api.libs.ws.DefaultBodyWritables.*
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import org.mockito.Mockito.*
 
-class ReCaptchaApiSpec extends AnyWordSpec {
+class ReCaptchaApiSpec extends AnyWordSpec with MockitoSugar {
   private val ws = mock[WSClient]
   private val request = mock[WSRequest]
   private val response = mock[WSResponse]

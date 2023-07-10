@@ -1,14 +1,17 @@
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption.REPLACE_EXISTING
 
-ThisBuild / scalaVersion := "2.13.10"
+ThisBuild / scalaVersion := "3.3.0-RC3"
 ThisBuild / organization := "net.wiringbits"
 
-val playJson = "2.9.4"
+val playJson = "2.10.0-RC7"
 val sttp = "3.8.15"
 val webappUtils = "0.5.16"
 val swagger = "1.6.11"
 val anorm = "2.7.0"
+val enumeratum="1.7.2"
+val scalaJavaTime="2.5.0"
+
 
 val consoleDisabledOptions = Seq("-Werror", "-Ywarn-unused", "-Ywarn-unused-import")
 
@@ -50,24 +53,13 @@ lazy val commonSettings: Project => Project = {
     )
   )
 }
-
-// Used only by the server
 // TODO: Reuse it in all projects
 lazy val baseServerSettings: Project => Project = {
   _.settings(
     scalacOptions ++= Seq(
       "-unchecked",
       "-deprecation",
-      "-feature",
-      "-encoding",
-      "UTF-8",
-      "-Wconf:src=src_managed/.*:silent",
-      "-Xlint:missing-interpolator",
-      "-Xlint:adapted-args",
-      "-Ywarn-dead-code",
-      "-Ywarn-numeric-widen",
-      "-Ywarn-value-discard",
-      "-Ywarn-unused"
+      "-feature"
     ),
     Compile / doc / scalacOptions ++= Seq("-no-link-warnings"),
     // Some options are very noisy when using the console and prevent us using it smoothly, let's disable them
@@ -81,8 +73,6 @@ lazy val baseWebSettings: Project => Project =
     .settings(
       scalacOptions ++= Seq(
         "-deprecation", // Emit warning and location for usages of deprecated APIs.
-        "-encoding",
-        "utf-8", // Specify character encoding used by source files.
         "-explaintypes", // Explain type errors in more detail.
         "-feature", // Emit warning and location for usages of features that should be imported explicitly.
         "-unchecked" // Enable additional warnings where generated code depends on assumptions.
@@ -93,10 +83,10 @@ lazy val baseWebSettings: Project => Project =
       /* for slinky */
       libraryDependencies ++= Seq("me.shadaj" %%% "slinky-hot" % "0.7.3"),
       libraryDependencies ++= Seq(
-        "io.github.cquiroz" %%% "scala-java-time" % "2.3.0",
-        "io.github.cquiroz" %%% "scala-java-time-tzdb" % "2.3.0"
+        "io.github.cquiroz" %%% "scala-java-time" % scalaJavaTime,
+        "io.github.cquiroz" %%% "scala-java-time-tzdb" % scalaJavaTime
       ),
-      scalacOptions += "-Ymacro-annotations",
+
       Test / fork := false, // sjs needs this to run tests
       Test / requireJsDomEnv := true
     )
@@ -223,9 +213,9 @@ lazy val playSettings: Project => Project = {
       ),
       // test
       libraryDependencies ++= Seq(
-        "org.scalatestplus.play" %% "scalatestplus-play" % "5.1.0" % Test,
-        "org.mockito" %% "mockito-scala" % "1.17.14" % Test,
-        "org.mockito" %% "mockito-scala-scalatest" % "1.17.14" % Test
+        "org.scalatestplus.play" %% "scalatestplus-play" % "6.0.0-M4" % Test,
+        "org.scalatestplus" %% "mockito-4-6" % "3.2.15.0" % Test
+
       )
     )
 }
@@ -249,11 +239,11 @@ lazy val common = (crossProject(JSPlatform, JVMPlatform) in file("lib/common"))
     stUseScalaJsDom := true,
     Compile / stMinimize := Selection.All,
     libraryDependencies ++= Seq(
-      "io.github.cquiroz" %%% "scala-java-time" % "2.3.0",
+      "io.github.cquiroz" %%% "scala-java-time" % scalaJavaTime,
       "com.typesafe.play" %%% "play-json" % playJson,
       "net.wiringbits" %%% "webapp-common" % webappUtils,
       "org.scalatest" %%% "scalatest" % "3.2.16" % Test,
-      "com.beachape" %%% "enumeratum" % "1.7.0"
+      "com.beachape" %%% "enumeratum" % enumeratum
     )
   )
 
@@ -278,7 +268,7 @@ lazy val api = (crossProject(JSPlatform, JVMPlatform) in file("lib/api"))
       "com.typesafe.play" %%% "play-json" % playJson,
       "com.softwaremill.sttp.client3" %%% "core" % sttp,
       "org.scalatest" %%% "scalatest" % "3.2.16" % Test,
-      "com.beachape" %%% "enumeratum" % "1.7.0"
+      "com.beachape" %%% "enumeratum" % enumeratum
     )
   )
 
@@ -290,7 +280,6 @@ lazy val ui = (project in file("lib/ui"))
   .settings(
     name := "wiringbits-lib-ui",
     useYarn := true,
-    scalacOptions += "-Ymacro-annotations",
     Test / requireJsDomEnv := true,
     Test / fork := false, // sjs needs this to run tests
     stTypescriptVersion := "3.9.3",
@@ -311,12 +300,12 @@ lazy val ui = (project in file("lib/ui"))
     stUseScalaJsDom := true,
     Compile / stMinimize := Selection.All,
     libraryDependencies ++= Seq(
-      "io.github.cquiroz" %%% "scala-java-time" % "2.0.0",
+      "io.github.cquiroz" %%% "scala-java-time" % scalaJavaTime,
       "org.scala-js" %%% "scala-js-macrotask-executor" % "1.1.1",
       "com.alexitc" %%% "sjs-material-ui-facade" % "0.2.0",
       "net.wiringbits" %%% "slinky-utils" % webappUtils,
       "org.scalatest" %%% "scalatest" % "3.2.16" % Test,
-      "com.beachape" %%% "enumeratum" % "1.7.0"
+      "com.beachape" %%% "enumeratum" % enumeratum
     )
   )
 
@@ -331,7 +320,7 @@ lazy val server = (project in file("server"))
       "org.playframework.anorm" %% "anorm" % anorm,
       "org.playframework.anorm" %% "anorm-akka" % anorm,
       "org.playframework.anorm" %% "anorm-postgres" % anorm,
-      "com.typesafe.play" %% "play-json" % "2.9.4",
+      "com.typesafe.play" %% "play-json" % playJson,
       "org.postgresql" % "postgresql" % "42.6.0",
       "de.svenkubiak" % "jBCrypt" % "0.4.3",
       "commons-validator" % "commons-validator" % "1.7",
@@ -339,7 +328,7 @@ lazy val server = (project in file("server"))
       "com.dimafeng" %% "testcontainers-scala-postgresql" % "0.40.16" % "test",
       "com.softwaremill.sttp.client3" %% "core" % sttp % "test",
       "com.softwaremill.sttp.client3" %% "async-http-client-backend-future" % sttp % "test",
-      "net.wiringbits" %% "admin-data-explorer-play-server" % webappUtils,
+      //"net.wiringbits" %% "admin-data-explorer-play-server" % webappUtils,
       "software.amazon.awssdk" % "ses" % "2.17.141",
       "jakarta.xml.bind" % "jakarta.xml.bind-api" % "4.0.0",
       "org.apache.commons" % "commons-text" % "1.10.0",
@@ -349,7 +338,7 @@ lazy val server = (project in file("server"))
       "javax.annotation" % "javax.annotation-api" % "1.3.2",
       "javax.el" % "javax.el-api" % "3.0.0",
       "org.glassfish" % "javax.el" % "3.0.0",
-      "com.beachape" %% "enumeratum" % "1.7.2"
+      "com.beachape" %% "enumeratum" % enumeratum
     )
   )
 

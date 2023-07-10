@@ -18,16 +18,17 @@ import net.wiringbits.repositories.UserTokensRepository
 import net.wiringbits.repositories.models.UserTokenType
 import net.wiringbits.util.{TokenGenerator, TokensHelper}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.MockitoSugar.{mock, when}
+import org.mockito.Mockito.*
 import play.api.inject
 import play.api.inject.guice.GuiceApplicationBuilder
 import utils.LoginUtils
+import org.scalatestplus.mockito.MockitoSugar
 
 import java.time.{Clock, Instant}
 import java.util.UUID
 import scala.concurrent.Future
 
-class UsersControllerSpec extends PlayPostgresSpec with LoginUtils {
+class UsersControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoSugar{
 
   def userTokensRepository: UserTokensRepository = app.injector.instanceOf(classOf[UserTokensRepository])
 

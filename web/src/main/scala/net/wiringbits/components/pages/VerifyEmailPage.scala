@@ -3,27 +3,24 @@ package net.wiringbits.components.pages
 import com.alexitc.materialui.facade.csstype.mod.{FlexDirectionProperty, TextAlignProperty}
 import com.alexitc.materialui.facade.materialUiCore.createMuiThemeMod.Theme
 import com.alexitc.materialui.facade.materialUiCore.mod.PropTypes.Color
-import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
+import com.alexitc.materialui.facade.materialUiCore.{components as mui, materialUiCoreStrings as muiStrings}
 import com.alexitc.materialui.facade.materialUiStyles.makeStylesMod.StylesHook
 import com.alexitc.materialui.facade.materialUiStyles.mod.makeStyles
-import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
-  CSSProperties,
-  StyleRulesCallback,
-  Styles,
-  WithStylesOptions
-}
+import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{CSSProperties, StyleRulesCallback, Styles, WithStylesOptions}
 import net.wiringbits.AppContext
 import net.wiringbits.core.I18nHooks
 import org.scalablytyped.runtime.StringDictionary
 import org.scalajs.dom.URLSearchParams
 import slinky.core.FunctionalComponent
-import slinky.core.annotations.react
 import slinky.core.facade.Fragment
 import slinky.web.html.{br, className, div}
 import typings.reactRouterDom.mod.useLocation
-import typings.reactRouterDom.{mod => reactRouterDom}
+import typings.reactRouterDom.mod as reactRouterDom
+import org.scalajs.dom
 
-@react object VerifyEmailPage {
+import scala.scalajs.js
+
+object VerifyEmailPage {
   case class Props(ctx: AppContext)
 
   private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {
@@ -47,8 +44,8 @@ import typings.reactRouterDom.{mod => reactRouterDom}
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val texts = I18nHooks.useMessages(props.ctx.$lang)
-    val history = reactRouterDom.useHistory()
-    val params = new URLSearchParams(useLocation().search)
+    val history = reactRouterDom.useHistory().asInstanceOf[js.Dynamic]
+    val params = new URLSearchParams(useLocation().asInstanceOf[js.Dynamic].search.asInstanceOf[String])
     val emailParam = Option(params.get("email")).getOrElse("")
     val classes = useStyles(())
 

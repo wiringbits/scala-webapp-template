@@ -5,10 +5,9 @@ import com.alexitc.materialui.facade.materialUiCore.{components => mui, material
 import net.wiringbits.core.I18nHooks
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container}
 import slinky.core.FunctionalComponent
-import slinky.core.annotations.react
 import slinky.core.facade.Fragment
 
-@react object Loader {
+object Loader {
   case class Props(ctx: AppContext)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>

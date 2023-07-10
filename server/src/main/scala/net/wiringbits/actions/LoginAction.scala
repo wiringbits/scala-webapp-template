@@ -18,7 +18,7 @@ class LoginAction @Inject() (
   // returns the token to use for authenticating requests
   def apply(request: Login.Request): Future[Login.Response] = {
     for {
-      _ <- ValidateCaptcha(captchaApi, request.captcha)
+      _ <- ValidateCaptcha(captchaApi, request.captcha) //Future.unit  
       // the user is verified
       maybe <- usersRepository.find(request.email)
       _ = maybe.foreach(ValidateVerifiedUser.apply)

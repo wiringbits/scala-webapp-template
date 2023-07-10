@@ -8,10 +8,9 @@ import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{Circular
 import net.wiringbits.AppContext
 import net.wiringbits.core.I18nHooks
 import slinky.core.FunctionalComponent
-import slinky.core.annotations.react
 import slinky.core.facade.Fragment
 
-@react object UserInfo {
+object UserInfo {
   case class Props(ctx: AppContext, user: User)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>

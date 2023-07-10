@@ -1,7 +1,7 @@
 package net.wiringbits.components.widgets
 
 import com.alexitc.materialui.facade.materialUiCore.mod.PropTypes.Color
-import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
+import com.alexitc.materialui.facade.materialUiCore.{components as mui, materialUiCoreStrings as muiStrings}
 import net.wiringbits.AppContext
 import net.wiringbits.common.ErrorMessages
 import net.wiringbits.core.I18nHooks
@@ -13,21 +13,21 @@ import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container}
 import net.wiringbits.webapp.utils.slinkyUtils.forms.StatefulFormData
 import org.scalajs.dom
-import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
-import slinky.core.annotations.react
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 import slinky.core.facade.{Fragment, Hooks, ReactElement}
 import slinky.core.{FunctionalComponent, SyntheticEvent}
-import slinky.web.html._
-import typings.reactRouterDom.{mod => reactRouterDom}
+import slinky.web.html.*
+import typings.reactRouterDom.mod as reactRouterDom
 
+import scala.scalajs.js
 import scala.util.{Failure, Success}
 
-@react object SignInForm {
+object SignInForm {
   case class Props(ctx: AppContext)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val texts = I18nHooks.useMessages(props.ctx.$lang)
-    val history = reactRouterDom.useHistory()
+    val history = reactRouterDom.useHistory().asInstanceOf[js.Dynamic]
     val (formData, setFormData) = Hooks.useState(
       StatefulFormData(
         SignInFormData.initial(
@@ -122,9 +122,9 @@ import scala.util.{Failure, Success}
       )
     }
 
-    val recaptcha = ReCaptcha(
+    val recaptcha = ReCaptcha.component(ReCaptcha.Props(
       props.ctx,
-      onChange = captchaOpt => onDataChanged(x => x.copy(captcha = captchaOpt))
+      onChange = captchaOpt => onDataChanged(x => x.copy(captcha = captchaOpt)))
     )
 
     val loginButton = {
