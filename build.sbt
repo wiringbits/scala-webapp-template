@@ -7,7 +7,6 @@ ThisBuild / organization := "net.wiringbits"
 val playJson = "2.10.0-RC7"
 val sttp = "3.8.15"
 val webappUtils = "0.5.16"
-val swagger = "1.6.11"
 val anorm = "2.7.0"
 val enumeratum="1.7.2"
 val scalaJavaTime="2.5.0"
@@ -256,7 +255,6 @@ lazy val api = (crossProject(JSPlatform, JVMPlatform) in file("lib/api"))
     libraryDependencies ++= Seq(
       "com.typesafe.play" %% "play-json" % playJson,
       "com.softwaremill.sttp.client3" %% "core" % sttp,
-      "io.swagger" % "swagger-annotations" % swagger
     )
   )
   .jsSettings(
@@ -350,7 +348,6 @@ lazy val server = (project in file("server"))
       "software.amazon.awssdk" % "ses" % "2.17.141",
       "jakarta.xml.bind" % "jakarta.xml.bind-api" % "4.0.0",
       "org.apache.commons" % "commons-text" % "1.10.0",
-      "io.swagger" % "swagger-annotations" % swagger,
       // JAX-B dependencies for JDK 9+, required to use play sessions
       "javax.xml.bind" % "jaxb-api" % "2.3.1",
       "javax.annotation" % "javax.annotation-api" % "1.3.2",

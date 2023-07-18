@@ -41,8 +41,5 @@ GET /admin/users/:userId/logs controllers.AdminController.getUserLogs(userId)
 # get frontend configs
 GET /environment-config controllers.EnvironmentConfigController.getEnvironmentConfig()
 
-# static assets for swagger-ui
-GET /docs/*file        controllers.Assets.at(path="/swagger-ui", file)
-
 # routes for admin tables (GET, POST, PUT and DELETE)
 #-> / net.wiringbits.webapp.utils.admin.AppRouter
