@@ -309,8 +309,26 @@ lazy val ui = (project in file("lib/ui"))
     )
   )
 
+lazy val tapirServerCore = (project in file("tapir/core"))
+  .settings(
+    name := "tapir-server-core",
+    libraryDependencies += "com.softwaremill.sttp.tapir" %% "tapir-core" % "1.5.0"
+  )
+
+lazy val tapirServerPlay = (project in file("tapir/tapir-play"))
+  .settings(
+    name := "tapir-server-play",
+    scalaVersion := "3.3.0-RC3",
+    libraryDependencies ++= Seq(
+      "com.typesafe.play" %% "play-akka-http-server" % "2.9.0-M5",
+      "com.softwaremill.sttp.shared" %% "akka" % "1.3.14",
+      "org.scala-lang.modules" %% "scala-collection-compat" % "2.11.0"
+    )
+  )
+  .dependsOn(tapirServerCore)
+
 lazy val server = (project in file("server"))
-  .dependsOn(common.jvm, api.jvm)
+  .dependsOn(common.jvm, api.jvm, tapirServerPlay)
   .configure(baseServerSettings, commonSettings, playSettings)
   .settings(
     name := "wiringbits-server",
