@@ -41,6 +41,7 @@ class AdminController @Inject() (
 }
 
 object AdminController {
+  import sttp.model.StatusCode
   import sttp.tapir.*
   import sttp.tapir.json.play.*
 
@@ -60,6 +61,12 @@ object AdminController {
         )
       )
     )
+    .errorOut(
+      oneOf[Unit](
+        oneOfVariant(statusCode(StatusCode.BadRequest).description("Invalid or missing arguments")),
+        oneOfVariant(statusCode(StatusCode.Unauthorized).description("Invalid or missing authentication"))
+      )
+    )
     .summary("Get the logs for a specific user")
 
   private val getUsersEndpoint = endpoint.get
@@ -76,6 +83,12 @@ object AdminController {
             )
           )
         )
+      )
+    )
+    .errorOut(
+      oneOf[Unit](
+        oneOfVariant(statusCode(StatusCode.BadRequest).description("Invalid or missing arguments")),
+        oneOfVariant(statusCode(StatusCode.Unauthorized).description("Invalid or missing authentication"))
       )
     )
     .summary("Get the registered users")

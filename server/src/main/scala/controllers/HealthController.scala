@@ -18,7 +18,7 @@ object HealthController {
 
   private val check = endpoint.get
     .in("health")
-    .out(stringBody)
+    .out(emptyOutput.description("The app is healthy"))
     .summary("Queries the application's health")
 
   val routes: List[PublicEndpoint[_, _, _, _]] = List(

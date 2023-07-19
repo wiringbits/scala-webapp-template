@@ -47,6 +47,7 @@ class AuthController @Inject() (
 }
 
 object AuthController {
+  import sttp.model.StatusCode
   import sttp.tapir.*
   import sttp.tapir.json.play.*
 
@@ -62,12 +63,19 @@ object AuthController {
       )
     )
     .out(
-      jsonBody[Login.Response].example(
-        Login.Response(
-          id = UUID.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6"),
-          name = Name.trusted("Alexis"),
-          email = Email.trusted("alexis@wiringbits.net")
+      jsonBody[Login.Response]
+        .description("Successful login")
+        .example(
+          Login.Response(
+            id = UUID.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6"),
+            name = Name.trusted("Alexis"),
+            email = Email.trusted("alexis@wiringbits.net")
+          )
         )
+    )
+    .errorOut(
+      oneOf[Unit](
+        oneOfVariant(statusCode(StatusCode.BadRequest).description("Invalid or missing arguments"))
       )
     )
     .summary("Log into the app")
@@ -76,7 +84,12 @@ object AuthController {
   private val logout = endpoint.post
     .in("auth" / "logout")
     .in(jsonBody[Logout.Request].example(Logout.Request()))
-    .out(jsonBody[Logout.Response].example(Logout.Response()))
+    .out(jsonBody[Logout.Response].description("Successful logout").example(Logout.Response()))
+    .errorOut(
+      oneOf[Unit](
+        oneOfVariant(statusCode(StatusCode.BadRequest).description("Invalid or missing arguments"))
+      )
+    )
     .summary("Logout from the app")
     .description("Clears the session cookie that's stored securely")
 
@@ -84,13 +97,20 @@ object AuthController {
     .in("auth" / "me")
     .in(jsonBody[GetCurrentUser.Request].example(GetCurrentUser.Request()))
     .out(
-      jsonBody[GetCurrentUser.Response].example(
-        GetCurrentUser.Response(
-          id = UUID.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6"),
-          name = Name.trusted("Alexis"),
-          email = Email.trusted("alexis@wiringbits.net"),
-          createdAt = Instant.parse("2021-01-01T00:00:00Z")
+      jsonBody[GetCurrentUser.Response]
+        .description("Got user details")
+        .example(
+          GetCurrentUser.Response(
+            id = UUID.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6"),
+            name = Name.trusted("Alexis"),
+            email = Email.trusted("alexis@wiringbits.net"),
+            createdAt = Instant.parse("2021-01-01T00:00:00Z")
+          )
         )
+    )
+    .errorOut(
+      oneOf[Unit](
+        oneOfVariant(statusCode(StatusCode.BadRequest).description("Invalid or missing arguments"))
       )
     )
     .summary("Get the details for the authenticated user")
