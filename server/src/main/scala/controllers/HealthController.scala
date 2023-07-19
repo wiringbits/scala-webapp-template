@@ -19,8 +19,9 @@ object HealthController {
   private val check = endpoint.get
     .in("health")
     .out(stringBody)
+    .summary("Queries the application's health")
 
   val routes: List[PublicEndpoint[_, _, _, _]] = List(
     check
-  ).map(_.tag("Health"))
+  ).map(_.tag("Misc"))
 }

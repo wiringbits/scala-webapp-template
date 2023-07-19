@@ -29,9 +29,11 @@ object EnvironmentConfigController {
 
   private val getEnvironmentConfig = endpoint.get
     .in("environment-config")
-    .out(jsonBody[GetEnvironmentConfig.Response])
+    .out(jsonBody[GetEnvironmentConfig.Response].example(GetEnvironmentConfig.Response("siteKey")))
+    .summary("Get the config values for the current environment")
+    .description("These values are required by the frontend app to interact with the backend")
 
   val routes: List[PublicEndpoint[_, _, _, _]] = List(
     getEnvironmentConfig
-  ).map(_.tag("Environment Config"))
+  ).map(_.tag("Misc"))
 }
