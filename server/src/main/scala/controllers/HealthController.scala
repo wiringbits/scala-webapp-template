@@ -11,3 +11,16 @@ class HealthController @Inject() (cc: ControllerComponents) extends AbstractCont
     Ok(Json.obj())
   }
 }
+
+object HealthController {
+  import sttp.tapir.*
+  import sttp.tapir.json.circe.*
+
+  private val check = endpoint.get
+    .in("health")
+    .out(stringBody)
+
+  val routes: List[PublicEndpoint[_, _, _, _]] = List(
+    check
+  ).map(_.tag("Health"))
+}

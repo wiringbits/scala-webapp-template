@@ -1,6 +1,7 @@
 package net.wiringbits.api.models
 
 import play.api.libs.json.{Format, Json}
+import sttp.tapir.Schema
 
 // play json errors are like:
 // {"error":{"requestId":2,"message":"Invalid Json: ..."}}
@@ -12,4 +13,7 @@ object PlayErrorResponse {
 
   implicit val playErrorResponseErrorFormat: Format[PlayError] = Json.format[PlayError]
   implicit val playErrorResponseFormat: Format[PlayErrorResponse] = Json.format[PlayErrorResponse]
+
+  implicit val playErrorResponseErrorSchema: Schema[PlayError] = Schema.derived
+  implicit val playErrorResponseSchema: Schema[PlayErrorResponse] = Schema.derived
 }

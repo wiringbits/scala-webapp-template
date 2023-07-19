@@ -22,3 +22,16 @@ class EnvironmentConfigController @Inject() (
     } yield Ok(Json.toJson(response))
   }
 }
+
+object EnvironmentConfigController {
+  import sttp.tapir.*
+  import sttp.tapir.json.play.*
+
+  private val getEnvironmentConfig = endpoint.get
+    .in("environment-config")
+    .out(jsonBody[GetEnvironmentConfig.Response])
+
+  val routes: List[PublicEndpoint[_, _, _, _]] = List(
+    getEnvironmentConfig
+  ).map(_.tag("Environment Config"))
+}

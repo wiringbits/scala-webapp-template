@@ -41,5 +41,7 @@ GET /admin/users/:userId/logs controllers.AdminController.getUserLogs(userId)
 # get frontend configs
 GET /environment-config controllers.EnvironmentConfigController.getEnvironmentConfig()
 
+-> / controllers.ApiRoutes
+
 # routes for admin tables (GET, POST, PUT and DELETE)
 #-> / net.wiringbits.webapp.utils.admin.AppRouter

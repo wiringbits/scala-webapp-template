@@ -42,3 +42,28 @@ class AuthController @Inject() (
     } yield Ok(Json.toJson(response))
   }
 }
+
+object AuthController {
+  import sttp.tapir.*
+  import sttp.tapir.json.play.*
+
+  private val login = endpoint.post
+    .in("auth" / "login")
+    .in(jsonBody[Login.Request])
+    .out(jsonBody[Login.Response])
+
+  private val logout = endpoint.post
+    .in("auth" / "logout")
+    .in(jsonBody[Logout.Request])
+    .out(jsonBody[Logout.Response])
+
+  private val getCurrentUser = endpoint.get
+    .in("auth" / "me")
+    .out(jsonBody[GetCurrentUser.Response])
+
+  val routes: List[PublicEndpoint[_, _, _, _]] = List(
+    login,
+    logout,
+    getCurrentUser
+  ).map(_.tag("Auth"))
+}

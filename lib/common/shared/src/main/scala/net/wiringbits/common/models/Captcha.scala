@@ -2,6 +2,8 @@ package net.wiringbits.common.models
 
 import net.wiringbits.webapp.common.models.WrappedString
 import net.wiringbits.webapp.common.validators.ValidationResult
+import sttp.tapir.generic.auto.*
+import sttp.tapir.{Schema, SchemaType}
 
 class Captcha private (val string: String) extends WrappedString
 
@@ -18,4 +20,6 @@ object Captcha extends WrappedString.Companion[Captcha] {
   }
 
   override def trusted(string: String): Captcha = new Captcha(string)
+
+  implicit val captchaSchema: Schema[Captcha] = Schema(SchemaType.SString())
 }

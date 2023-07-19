@@ -91,3 +91,58 @@ class UsersController @Inject() (
     } yield Ok(Json.toJson(response))
   }
 }
+
+object UsersController {
+  import sttp.tapir.*
+  import sttp.tapir.json.play.*
+
+  private val create = endpoint.post
+    .in("users")
+    .in(jsonBody[CreateUser.Request])
+    .out(jsonBody[CreateUser.Response])
+
+  private val verifyEmail = endpoint.post
+    .in("users" / "verify-email")
+    .in(jsonBody[VerifyEmail.Request])
+    .out(jsonBody[VerifyEmail.Response])
+
+  private val forgotPassword = endpoint.post
+    .in("users" / "forgot-password")
+    .in(jsonBody[ForgotPassword.Request])
+    .out(jsonBody[ForgotPassword.Response])
+
+  private val resetPassword = endpoint.post
+    .in("users" / "reset-password")
+    .in(jsonBody[ResetPassword.Request])
+    .out(jsonBody[ResetPassword.Response])
+
+  private val sendEmailVerificationToken = endpoint.post
+    .in("users" / "email-verification-token")
+    .in(jsonBody[SendEmailVerificationToken.Request])
+    .out(jsonBody[SendEmailVerificationToken.Response])
+
+  private val update = endpoint.put
+    .in("users" / "me")
+    .in(jsonBody[UpdateUser.Request])
+    .out(jsonBody[UpdateUser.Response])
+
+  private val updatePassword = endpoint.put
+    .in("users" / "me" / "password")
+    .in(jsonBody[UpdatePassword.Request])
+    .out(jsonBody[UpdatePassword.Response])
+
+  private val getLogs = endpoint.get
+    .in("users" / "me" / "logs")
+    .out(jsonBody[GetUserLogs.Response])
+
+  val routes: List[PublicEndpoint[_, _, _, _]] = List(
+    create,
+    verifyEmail,
+    forgotPassword,
+    resetPassword,
+    sendEmailVerificationToken,
+    update,
+    updatePassword,
+    getLogs
+  ).map(_.tag("Users"))
+}

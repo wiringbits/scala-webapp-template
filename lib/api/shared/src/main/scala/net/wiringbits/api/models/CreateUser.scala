@@ -2,6 +2,7 @@ package net.wiringbits.api.models
 
 import net.wiringbits.common.models.{Captcha, Email, Name, Password}
 import play.api.libs.json.{Format, Json}
+import sttp.tapir.Schema
 
 import java.util.UUID
 
@@ -11,4 +12,7 @@ object CreateUser {
 
   implicit val createUserRequestFormat: Format[Request] = Json.format[Request]
   implicit val createUserResponseFormat: Format[Response] = Json.format[Response]
+
+  implicit val createUserResponseSchema: Schema[Response] = Schema.derived
+  implicit val createUserRequestSchema: Schema[Request] = Schema.derived
 }

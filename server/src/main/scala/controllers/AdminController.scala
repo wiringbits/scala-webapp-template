@@ -36,3 +36,21 @@ class AdminController @Inject() (
     } yield Ok(Json.toJson(maskedResponse))
   }
 }
+
+object AdminController {
+  import sttp.tapir.*
+  import sttp.tapir.json.play.*
+
+  private val getUserLogsEndpoint = endpoint.get
+    .in("admin" / "users" / path[UUID]("userId") / "logs")
+    .out(jsonBody[AdminGetUserLogs.Response])
+
+  private val getUsersEndpoint = endpoint.get
+    .in("admin" / "users")
+    .out(jsonBody[AdminGetUsers.Response])
+
+  val routes: List[PublicEndpoint[_, _, _, _]] = List(
+    getUserLogsEndpoint,
+    getUsersEndpoint
+  ).map(_.tag("Admin"))
+}

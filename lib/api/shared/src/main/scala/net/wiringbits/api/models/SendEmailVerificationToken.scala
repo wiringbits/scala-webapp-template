@@ -5,6 +5,7 @@ import play.api.libs.json.{Format, Json}
 
 import java.time.Instant
 import net.wiringbits.common.models.Captcha
+import sttp.tapir.Schema
 
 object SendEmailVerificationToken {
 
@@ -15,4 +16,6 @@ object SendEmailVerificationToken {
   implicit val sendEmailVerificationTokenRequestFormat: Format[Request] = Json.format[Request]
   implicit val sendEmailVerificationTokenResponseFormat: Format[Response] = Json.format[Response]
 
+  implicit val sendEmailVerificationTokenRequestSchema: Schema[Request] = Schema.derived
+  implicit val sendEmailVerificationTokenResponseSchema: Schema[Response] = Schema.derived
 }

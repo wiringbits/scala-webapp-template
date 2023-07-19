@@ -1,5 +1,7 @@
 package net.wiringbits.common.models
 
+import play.api.libs.json.{Format, Json}
+
 import java.util.UUID
 import scala.util.Try
 
@@ -15,4 +17,6 @@ object UserToken {
       Option.when(isValid)(UserToken(UUID.fromString(splittedToken(0)), UUID.fromString(splittedToken(1))))
     ).toOption.flatten
   }
+
+  implicit val userTokenFormat: Format[UserToken] = Json.format[UserToken]
 }

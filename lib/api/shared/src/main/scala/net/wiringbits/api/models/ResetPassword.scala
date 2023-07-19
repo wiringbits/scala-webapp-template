@@ -2,6 +2,8 @@ package net.wiringbits.api.models
 
 import net.wiringbits.common.models.{Email, Name, Password, UserToken}
 import play.api.libs.json.{Format, Json}
+import sttp.tapir.Schema
+import sttp.tapir.generic.auto.*
 
 object ResetPassword {
 
@@ -9,7 +11,9 @@ object ResetPassword {
 
   case class Response(name: Name, email: Email)
 
-  implicit val userTokenFormat: Format[UserToken] = Json.format[UserToken]
   implicit val resetPasswordRequestFormat: Format[Request] = Json.format[Request]
   implicit val resetPasswordResponseFormat: Format[Response] = Json.format[Response]
+
+  implicit val resetPasswordRequestSchema: Schema[Request] = Schema.derived
+  implicit val resetPasswordResponseSchema: Schema[Response] = Schema.derived
 }
