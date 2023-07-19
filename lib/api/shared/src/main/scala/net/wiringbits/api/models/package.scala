@@ -1,6 +1,10 @@
 package net.wiringbits.api
 
-import play.api.libs.json._
+import net.wiringbits.common.models.{Captcha, Email, Name, Password}
+import net.wiringbits.webapp.common.models.WrappedString
+import play.api.libs.json.*
+import sttp.tapir.generic.auto.*
+import sttp.tapir.{Codec, CodecFormat, Schema, SchemaType}
 
 import java.time.Instant
 
@@ -18,4 +22,6 @@ package object models {
 
   case class ErrorResponse(error: String)
   implicit val errorResponseFormat: Format[ErrorResponse] = Json.format[ErrorResponse]
+
+  implicit def wrappedStringSchema[T <: WrappedString]: Schema[T] = Schema(SchemaType.SString())
 }

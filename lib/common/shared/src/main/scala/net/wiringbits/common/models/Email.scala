@@ -2,8 +2,6 @@ package net.wiringbits.common.models
 
 import net.wiringbits.webapp.common.models.WrappedString
 import net.wiringbits.webapp.common.validators.ValidationResult
-import sttp.tapir.{Schema, SchemaType}
-import sttp.tapir.generic.auto.*
 
 class Email private (val string: String) extends WrappedString
 
@@ -22,6 +20,4 @@ object Email extends WrappedString.Companion[Email] {
   }
 
   override def trusted(string: String): Email = new Email(string)
-
-  implicit val schema: Schema[Email] = Schema(SchemaType.SString())
 }

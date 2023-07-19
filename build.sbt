@@ -218,7 +218,6 @@ lazy val playSettings: Project => Project = {
 }
 
 lazy val common = (crossProject(JSPlatform, JVMPlatform) in file("lib/common"))
-  .dependsOn(tapirPlayJson)
   .configure(baseLibSettings, commonSettings)
   .jsConfigure(_.enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin, ScalablyTypedConverterPlugin))
   .settings(
