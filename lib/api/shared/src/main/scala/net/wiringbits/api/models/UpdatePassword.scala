@@ -13,6 +13,8 @@ object UpdatePassword {
   implicit val updatePasswordRequestFormat: Format[Request] = Json.format[Request]
   implicit val updatePasswordResponseFormat: Format[Response] = Json.format[Response]
 
-  implicit val updatePasswordRequestSchema: Schema[Request] = Schema.derived
-  implicit val updatePasswordResponseSchema: Schema[Response] = Schema.derived
+  implicit val updatePasswordRequestSchema: Schema[Request] =
+    Schema.derived[Request].name(Schema.SName("UpdatePasswordRequest"))
+  implicit val updatePasswordResponseSchema: Schema[Response] =
+    Schema.derived[Response].name(Schema.SName("UpdatePasswordResponse"))
 }

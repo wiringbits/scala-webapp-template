@@ -14,6 +14,8 @@ object PlayErrorResponse {
   implicit val playErrorResponseErrorFormat: Format[PlayError] = Json.format[PlayError]
   implicit val playErrorResponseFormat: Format[PlayErrorResponse] = Json.format[PlayErrorResponse]
 
-  implicit val playErrorResponseErrorSchema: Schema[PlayError] = Schema.derived
-  implicit val playErrorResponseSchema: Schema[PlayErrorResponse] = Schema.derived
+  implicit val playErrorResponseErrorSchema: Schema[PlayError] =
+    Schema.derived[PlayError].name(Schema.SName("PlayError"))
+  implicit val playErrorResponseSchema: Schema[PlayErrorResponse] =
+    Schema.derived[PlayErrorResponse].name(Schema.SName("PlayErrorResponse"))
 }

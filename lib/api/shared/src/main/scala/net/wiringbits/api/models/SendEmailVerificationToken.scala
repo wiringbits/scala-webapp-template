@@ -16,6 +16,8 @@ object SendEmailVerificationToken {
   implicit val sendEmailVerificationTokenRequestFormat: Format[Request] = Json.format[Request]
   implicit val sendEmailVerificationTokenResponseFormat: Format[Response] = Json.format[Response]
 
-  implicit val sendEmailVerificationTokenRequestSchema: Schema[Request] = Schema.derived
-  implicit val sendEmailVerificationTokenResponseSchema: Schema[Response] = Schema.derived
+  implicit val sendEmailVerificationTokenRequestSchema: Schema[Request] =
+    Schema.derived[Request].name(Schema.SName("SendEmailVerificationTokenRequest"))
+  implicit val sendEmailVerificationTokenResponseSchema: Schema[Response] =
+    Schema.derived[Response].name(Schema.SName("SendEmailVerificationTokenResponse"))
 }

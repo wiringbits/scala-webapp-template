@@ -16,5 +16,7 @@ object AdminGetUserLogs {
   object Response {
     case class UserLog(id: UUID, message: String, createdAt: Instant)
     implicit val adminGetUserLogsResponseUserLogFormat: Format[UserLog] = Json.format[UserLog]
+    implicit val adminGetUserLogsResponseUserLogSchema: Schema[UserLog] =
+      Schema.derived[UserLog].name(Schema.SName("AdminGetUserLogsResponseUserLog"))
   }
 }

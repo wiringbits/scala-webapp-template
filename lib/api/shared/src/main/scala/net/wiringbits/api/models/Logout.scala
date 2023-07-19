@@ -12,6 +12,6 @@ object Logout {
   implicit val logoutRequestFormat: Format[Request] = Json.format[Request]
   implicit val logoutResponseFormat: Format[Response] = Json.format[Response]
 
-  implicit val logoutRequestSchema: Schema[Request] = Schema.derived[Request]
-  implicit val logoutResponseSchema: Schema[Response] = Schema.derived[Response]
+  implicit val logoutRequestSchema: Schema[Request] = Schema.derived[Request].name(Schema.SName("LogoutRequest"))
+  implicit val logoutResponseSchema: Schema[Response] = Schema.derived[Response].name(Schema.SName("LogoutResponse"))
 }

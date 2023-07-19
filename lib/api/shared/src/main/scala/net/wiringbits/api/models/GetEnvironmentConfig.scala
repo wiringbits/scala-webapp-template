@@ -7,6 +7,7 @@ object GetEnvironmentConfig {
   case class Response(recaptchaSiteKey: String)
 
   implicit val configResponseFormat: Format[Response] = Json.format[Response]
-  
-  implicit val configResponseSchema: Schema[Response] = Schema.derived
+
+  implicit val configResponseSchema: Schema[Response] =
+    Schema.derived[Response].name(Schema.SName("GetEnvironmentConfigResponse"))
 }

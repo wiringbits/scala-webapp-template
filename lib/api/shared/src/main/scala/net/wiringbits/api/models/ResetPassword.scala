@@ -14,6 +14,8 @@ object ResetPassword {
   implicit val resetPasswordRequestFormat: Format[Request] = Json.format[Request]
   implicit val resetPasswordResponseFormat: Format[Response] = Json.format[Response]
 
-  implicit val resetPasswordRequestSchema: Schema[Request] = Schema.derived
-  implicit val resetPasswordResponseSchema: Schema[Response] = Schema.derived
+  implicit val resetPasswordRequestSchema: Schema[Request] =
+    Schema.derived[Request].name(Schema.SName("ResetPasswordRequest"))
+  implicit val resetPasswordResponseSchema: Schema[Response] =
+    Schema.derived[Response].name(Schema.SName("ResetPasswordResponse"))
 }

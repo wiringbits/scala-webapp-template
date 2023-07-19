@@ -15,11 +15,15 @@ object GetUserLogs {
   object Response {
     case class UserLog(id: UUID, message: String, createdAt: Instant)
     implicit val getUserLogsResponseFormat: Format[UserLog] = Json.format[UserLog]
+    implicit val getUserLogsResponseSchema: Schema[UserLog] =
+      Schema.derived[UserLog].name(Schema.SName("GetUserLogsResponseUserLog"))
   }
 
   implicit val getUserLogsRequestFormat: Format[Request] = Json.format[Request]
   implicit val getUserLogsResponseFormat: Format[Response] = Json.format[Response]
 
-  implicit val getUserLogsRequestSchema: Schema[Request] = Schema.derived
-  implicit val getUserLogsResponseSchema: Schema[Response] = Schema.derived
+  implicit val getUserLogsRequestSchema: Schema[Request] =
+    Schema.derived[Request].name(Schema.SName("GetUserLogsRequest"))
+  implicit val getUserLogsResponseSchema: Schema[Response] =
+    Schema.derived[Response].name(Schema.SName("GetUserLogsResponse"))
 }

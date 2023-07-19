@@ -18,5 +18,7 @@ object AdminGetUsers {
   object Response {
     case class User(id: UUID, name: Name, email: Email, createdAt: Instant)
     implicit val adminGetUsersResponseUserFormat: Format[User] = Json.format[User]
+    implicit val adminGetUsersResponseUserSchema: Schema[User] =
+      Schema.derived[User].name(Schema.SName("AdminGetUsersResponseUser"))
   }
 }
