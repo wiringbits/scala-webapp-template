@@ -9,9 +9,9 @@ val sttp = "3.8.15"
 val webappUtils = "0.5.16"
 val swagger = "1.6.11"
 val anorm = "2.7.0"
-val enumeratum="1.7.2"
-val scalaJavaTime="2.5.0"
-
+val enumeratum = "1.7.2"
+val scalaJavaTime = "2.5.0"
+val tapir = "1.5.0"
 
 val consoleDisabledOptions = Seq("-Werror", "-Ywarn-unused", "-Ywarn-unused-import")
 
@@ -31,24 +31,24 @@ lazy val commonSettings: Project => Project = {
     },
     Compile / compile / wartremoverErrors ++= List(
       Wart.ArrayEquals,
-//      Wart.Any,
-//      Wart.AsInstanceOf,
-//      Wart.ExplicitImplicitTypes,
+      //      Wart.Any,
+      //      Wart.AsInstanceOf,
+      //      Wart.ExplicitImplicitTypes,
       Wart.IsInstanceOf,
       Wart.JavaConversions,
-//      Wart.JavaSerializable,
+      //      Wart.JavaSerializable,
       Wart.MutableDataStructures,
-//      Wart.NonUnitStatements,
-//      Wart.Nothing,
+      //      Wart.NonUnitStatements,
+      //      Wart.Nothing,
       Wart.Null,
       Wart.OptionPartial,
-//      Wart.Overloading,
-//      Wart.Product,
-//      Wart.PublicInference,
+      //      Wart.Overloading,
+      //      Wart.Product,
+      //      Wart.PublicInference,
       Wart.Return,
-//      Wart.Serializable,
-//      Wart.StringPlusAny,
-//      Wart.ToString,
+      //      Wart.Serializable,
+      //      Wart.StringPlusAny,
+      //      Wart.ToString,
       Wart.TryPartial
     )
   )
@@ -86,7 +86,6 @@ lazy val baseWebSettings: Project => Project =
         "io.github.cquiroz" %%% "scala-java-time" % scalaJavaTime,
         "io.github.cquiroz" %%% "scala-java-time-tzdb" % scalaJavaTime
       ),
-
       Test / fork := false, // sjs needs this to run tests
       Test / requireJsDomEnv := true
     )
@@ -215,7 +214,6 @@ lazy val playSettings: Project => Project = {
       libraryDependencies ++= Seq(
         "org.scalatestplus.play" %% "scalatestplus-play" % "6.0.0-M4" % Test,
         "org.scalatestplus" %% "mockito-4-6" % "3.2.15.0" % Test
-
       )
     )
 }
@@ -309,6 +307,36 @@ lazy val ui = (project in file("lib/ui"))
     )
   )
 
+lazy val tapirServerCore = (project in file("tapir/core"))
+  .settings(
+    name := "tapir-server-core",
+    libraryDependencies += "com.softwaremill.sttp.tapir" %% "tapir-core" % tapir
+  )
+
+lazy val tapirServerPlay = (project in file("tapir/tapir-play"))
+  .settings(
+    name := "tapir-server-play",
+    scalaVersion := "3.3.0-RC3",
+    libraryDependencies ++= Seq(
+      "com.typesafe.play" %% "play-akka-http-server" % "2.9.0-M5",
+      "com.softwaremill.sttp.shared" %% "akka" % "1.3.14",
+      "org.scala-lang.modules" %% "scala-collection-compat" % "2.11.0"
+    )
+  )
+  .dependsOn(tapirServerCore)
+
+lazy val tapirPlayJson = (crossProject(JSPlatform, JVMPlatform) in file("tapir/playjson"))
+  .settings(
+    name := "tapir-play-json",
+    libraryDependencies ++= Seq(
+      "com.typesafe.play" %%% "play-json" % playJson,
+      "com.softwaremill.sttp.tapir" %% "tapir-core" % tapir
+    )
+  )
+  .jsSettings(
+    libraryDependencies += "io.github.cquiroz" %%% "scala-java-time" % scalaJavaTime
+  )
+
 lazy val server = (project in file("server"))
   .dependsOn(common.jvm, api.jvm)
   .configure(baseServerSettings, commonSettings, playSettings)
@@ -328,7 +356,7 @@ lazy val server = (project in file("server"))
       "com.dimafeng" %% "testcontainers-scala-postgresql" % "0.40.16" % "test",
       "com.softwaremill.sttp.client3" %% "core" % sttp % "test",
       "com.softwaremill.sttp.client3" %% "async-http-client-backend-future" % sttp % "test",
-      //"net.wiringbits" %% "admin-data-explorer-play-server" % webappUtils,
+      // "net.wiringbits" %% "admin-data-explorer-play-server" % webappUtils,
       "software.amazon.awssdk" % "ses" % "2.17.141",
       "jakarta.xml.bind" % "jakarta.xml.bind-api" % "4.0.0",
       "org.apache.commons" % "commons-text" % "1.10.0",
