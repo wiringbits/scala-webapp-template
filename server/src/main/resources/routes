@@ -3,6 +3,8 @@
 # https://www.playframework.com/documentation/latest/ScalaRouting
 # ~~~~
 
+# TODO: handle all routes with tapir
+
 GET /health controllers.HealthController.check()
 GET /swagger.json        controllers.Assets.at(path="/public", file="swagger.json")
 
@@ -41,8 +43,7 @@ GET /admin/users/:userId/logs controllers.AdminController.getUserLogs(userId)
 # get frontend configs
 GET /environment-config controllers.EnvironmentConfigController.getEnvironmentConfig()
 
-# static assets for swagger-ui
-GET /docs/*file        controllers.Assets.at(path="/swagger-ui", file)
+-> / controllers.ApiRoutes
 
 # routes for admin tables (GET, POST, PUT and DELETE)
 #-> / net.wiringbits.webapp.utils.admin.AppRouter

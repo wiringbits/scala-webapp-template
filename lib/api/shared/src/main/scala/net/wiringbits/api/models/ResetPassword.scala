@@ -1,26 +1,25 @@
 package net.wiringbits.api.models
 
-import io.swagger.annotations.{ApiModel, ApiModelProperty}
 import net.wiringbits.common.models.{Email, Name, Password, UserToken}
 import play.api.libs.json.{Format, Json}
+import sttp.tapir.Schema
+import sttp.tapir.generic.auto.*
 
 object ResetPassword {
 
-  @ApiModel(value = "ResetPasswordRequest", description = "Request to reset a user password")
-  case class Request(
-      token: UserToken,
-      @ApiModelProperty(value = "The user's password", dataType = "String") password: Password
-  )
+  case class Request(token: UserToken, password: Password)
 
-  @ApiModel(value = "ResetPasswordResponse", description = "Response after resetting a user password")
-  case class Response(
-      @ApiModelProperty(value = "The user's name", dataType = "String", example = "Alex")
-      name: Name,
-      @ApiModelProperty(value = "The user's email", dataType = "String")
-      email: Email
-  )
+  case class Response(name: Name, email: Email)
 
-  implicit val userTokenFormat: Format[UserToken] = Json.format[UserToken]
   implicit val resetPasswordRequestFormat: Format[Request] = Json.format[Request]
   implicit val resetPasswordResponseFormat: Format[Response] = Json.format[Response]
+
+  implicit val resetPasswordRequestSchema: Schema[Request] = Schema
+    .derived[Request]
+    .name(Schema.SName("ResetPasswordRequest"))
+    .description("Request to reset a user password")
+  implicit val resetPasswordResponseSchema: Schema[Response] = Schema
+    .derived[Response]
+    .name(Schema.SName("ResetPasswordResponse"))
+    .description("Response after resetting a user password")
 }

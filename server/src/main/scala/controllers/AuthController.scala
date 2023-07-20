@@ -1,29 +1,17 @@
 package controllers
 
-import io.swagger.annotations._
-import net.wiringbits.actions._
-import net.wiringbits.api.models._
+import net.wiringbits.actions.*
+import net.wiringbits.api.models.*
+import net.wiringbits.common.models.{Captcha, Email, Name, Password}
 import org.slf4j.LoggerFactory
 import play.api.libs.json.Json
-import play.api.mvc.{AbstractController, ControllerComponents}
+import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
 
+import java.time.Instant
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-@SwaggerDefinition(
-  securityDefinition = new SecurityDefinition(
-    apiKeyAuthDefinitions = Array(
-      new ApiKeyAuthDefinition(
-        name = "Cookie",
-        key = "auth_cookie",
-        in = ApiKeyAuthDefinition.ApiKeyLocation.HEADER,
-        description =
-          "The user's session cookie retrieved when logging into the app, invoke the login API to get the cookie stored in the browser"
-      )
-    )
-  )
-)
-@Api("Auth")
 class AuthController @Inject() (
     loginAction: LoginAction,
     getUserAction: GetUserAction
@@ -31,28 +19,7 @@ class AuthController @Inject() (
     extends AbstractController(cc) {
   private val logger = LoggerFactory.getLogger(this.getClass)
 
-  @ApiOperation(
-    value = "Log into the app",
-    notes = "Sets a session cookie to authenticate the following requests"
-  )
-  @ApiImplicitParams(
-    Array(
-      new ApiImplicitParam(
-        name = "body",
-        value = "JSON-encoded request",
-        required = true,
-        paramType = "body",
-        dataTypeClass = classOf[Login.Request]
-      )
-    )
-  )
-  @ApiResponses(
-    Array(
-      new ApiResponse(code = 200, message = "Successful login", response = classOf[Login.Response]),
-      new ApiResponse(code = 400, message = "Invalid or missing arguments")
-    )
-  )
-  def login() = handleJsonBody[Login.Request] { request =>
+  def login: Action[Login.Request] = handleJsonBody[Login.Request] { request =>
     val body = request.body
     logger.info(s"Login API: ${body.email}")
     for {
@@ -60,29 +27,7 @@ class AuthController @Inject() (
     } yield Ok(Json.toJson(response)).withSession("id" -> response.id.toString)
   }
 
-  @ApiOperation(
-    value = "Logout from the app",
-    notes = "Clears the session cookie that's stored securely",
-    authorizations = Array(new Authorization(value = "auth_cookie"))
-  )
-  @ApiImplicitParams(
-    Array(
-      new ApiImplicitParam(
-        name = "body",
-        value = "JSON-encoded request",
-        required = true,
-        paramType = "body",
-        dataTypeClass = classOf[Logout.Request]
-      )
-    )
-  )
-  @ApiResponses(
-    Array(
-      new ApiResponse(code = 200, message = "Successful logout", response = classOf[Logout.Response]),
-      new ApiResponse(code = 400, message = "Invalid or missing arguments")
-    )
-  )
-  def logout() = handleJsonBody[Logout.Request] { request =>
+  def logout: Action[Logout.Request] = handleJsonBody[Logout.Request] { request =>
     for {
       userId <- authenticate(request)
       user <- getUserAction(userId)
@@ -92,21 +37,87 @@ class AuthController @Inject() (
     }
   }
 
-  @ApiOperation(
-    value = "Get the details for the authenticated user",
-    authorizations = Array(new Authorization(value = "auth_cookie"))
-  )
-  @ApiResponses(
-    Array(
-      new ApiResponse(code = 200, message = "Got user details", response = classOf[GetCurrentUser.Response]),
-      new ApiResponse(code = 400, message = "Authentication failed")
-    )
-  )
-  def getCurrentUser() = handleGET { request =>
+  def getCurrentUser: Action[AnyContent] = handleGET { request =>
     for {
       userId <- authenticate(request)
       _ = logger.info(s"Get user info: $userId")
       response <- getUserAction(userId)
     } yield Ok(Json.toJson(response))
   }
+}
+
+object AuthController {
+  import sttp.model.StatusCode
+  import sttp.tapir.*
+  import sttp.tapir.json.play.*
+
+  private val login = endpoint.post
+    .in("auth" / "login")
+    .in(
+      jsonBody[Login.Request].example(
+        Login.Request(
+          email = Email.trusted("alexis@wiringbits.net"),
+          password = Password.trusted("notSoWeakPassword"),
+          captcha = Captcha.trusted("captcha")
+        )
+      )
+    )
+    .out(
+      jsonBody[Login.Response]
+        .description("Successful login")
+        .example(
+          Login.Response(
+            id = UUID.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6"),
+            name = Name.trusted("Alexis"),
+            email = Email.trusted("alexis@wiringbits.net")
+          )
+        )
+    )
+    .errorOut(
+      oneOf[Unit](
+        oneOfVariant(statusCode(StatusCode.BadRequest).description("Invalid or missing arguments"))
+      )
+    )
+    .summary("Log into the app")
+    .description("Sets a session cookie to authenticate the following requests")
+
+  private val logout = endpoint.post
+    .in("auth" / "logout")
+    .in(jsonBody[Logout.Request].example(Logout.Request()))
+    .out(jsonBody[Logout.Response].description("Successful logout").example(Logout.Response()))
+    .errorOut(
+      oneOf[Unit](
+        oneOfVariant(statusCode(StatusCode.BadRequest).description("Invalid or missing arguments"))
+      )
+    )
+    .summary("Logout from the app")
+    .description("Clears the session cookie that's stored securely")
+
+  private val getCurrentUser = endpoint.get
+    .in("auth" / "me")
+    .in(jsonBody[GetCurrentUser.Request].example(GetCurrentUser.Request()))
+    .out(
+      jsonBody[GetCurrentUser.Response]
+        .description("Got user details")
+        .example(
+          GetCurrentUser.Response(
+            id = UUID.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6"),
+            name = Name.trusted("Alexis"),
+            email = Email.trusted("alexis@wiringbits.net"),
+            createdAt = Instant.parse("2021-01-01T00:00:00Z")
+          )
+        )
+    )
+    .errorOut(
+      oneOf[Unit](
+        oneOfVariant(statusCode(StatusCode.BadRequest).description("Invalid or missing arguments"))
+      )
+    )
+    .summary("Get the details for the authenticated user")
+
+  val routes: List[PublicEndpoint[_, _, _, _]] = List(
+    login,
+    logout,
+    getCurrentUser
+  ).map(_.tag("Auth"))
 }

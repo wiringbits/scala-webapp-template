@@ -1,21 +1,27 @@
 package controllers
 
-import io.swagger.annotations.*
 import play.api.libs.json.Json
-import play.api.mvc.{AbstractController, AnyContent, ControllerComponents, Request}
+import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents, Request}
 
 import javax.inject.Inject
 
-@Api("Misc")
 class HealthController @Inject() (cc: ControllerComponents) extends AbstractController(cc) {
 
-  @ApiOperation(value = "Queries the application's health")
-  @ApiResponses(
-    Array(
-      new ApiResponse(code = 200, message = "The app is healthy")
-    )
-  )
-  def check() = Action { (x: Request[AnyContent] ) =>
+  def check: Action[AnyContent] = Action { _ =>
     Ok(Json.obj())
   }
+}
+
+object HealthController {
+  import sttp.tapir.*
+  import sttp.tapir.json.circe.*
+
+  private val check = endpoint.get
+    .in("health")
+    .out(emptyOutput.description("The app is healthy"))
+    .summary("Queries the application's health")
+
+  val routes: List[PublicEndpoint[_, _, _, _]] = List(
+    check
+  ).map(_.tag("Misc"))
 }

@@ -1,3 +1,5 @@
+[//]: # (TODO: update swagger integration docs)
+
 # Swagger integration
 
 We have a swagger integration so that users can explore the server API through swagger-ui.

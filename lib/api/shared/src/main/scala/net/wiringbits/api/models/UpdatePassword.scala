@@ -1,20 +1,24 @@
 package net.wiringbits.api.models
 
-import io.swagger.annotations.{ApiModel, ApiModelProperty}
 import net.wiringbits.common.models.Password
 import play.api.libs.json.{Format, Json}
+import sttp.tapir.Schema
 
 object UpdatePassword {
 
-  @ApiModel(value = "UpdatePasswordRequest", description = "Request to change the user's password")
-  case class Request(
-      @ApiModelProperty(value = "The user's old password", dataType = "String") oldPassword: Password,
-      @ApiModelProperty(value = "The user's new password", dataType = "String") newPassword: Password
-  )
+  case class Request(oldPassword: Password, newPassword: Password)
 
-  @ApiModel(value = "UpdatePasswordResponse", description = "Response after updating the user's password")
   case class Response(noData: String = "")
 
   implicit val updatePasswordRequestFormat: Format[Request] = Json.format[Request]
   implicit val updatePasswordResponseFormat: Format[Response] = Json.format[Response]
+
+  implicit val updatePasswordRequestSchema: Schema[Request] = Schema
+    .derived[Request]
+    .name(Schema.SName("UpdatePasswordRequest"))
+    .description("Request to change the user's password")
+  implicit val updatePasswordResponseSchema: Schema[Response] = Schema
+    .derived[Response]
+    .name(Schema.SName("UpdatePasswordResponse"))
+    .description("Response after updating the user's password")
 }

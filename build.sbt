@@ -7,7 +7,6 @@ ThisBuild / organization := "net.wiringbits"
 val playJson = "2.10.0-RC7"
 val sttp = "3.8.15"
 val webappUtils = "0.5.16"
-val swagger = "1.6.11"
 val anorm = "2.7.0"
 val enumeratum = "1.7.2"
 val scalaJavaTime = "2.5.0"
@@ -247,14 +246,13 @@ lazy val common = (crossProject(JSPlatform, JVMPlatform) in file("lib/common"))
 
 // shared apis
 lazy val api = (crossProject(JSPlatform, JVMPlatform) in file("lib/api"))
-  .dependsOn(common)
+  .dependsOn(common, tapirPlayJson)
   .configure(baseLibSettings, commonSettings)
   .jsConfigure(_.enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin, ScalablyTypedConverterPlugin))
   .jvmSettings(
     libraryDependencies ++= Seq(
       "com.typesafe.play" %% "play-json" % playJson,
-      "com.softwaremill.sttp.client3" %% "core" % sttp,
-      "io.swagger" % "swagger-annotations" % swagger
+      "com.softwaremill.sttp.client3" %% "core" % sttp
     )
   )
   .jsSettings(
@@ -338,7 +336,7 @@ lazy val tapirPlayJson = (crossProject(JSPlatform, JVMPlatform) in file("tapir/p
   )
 
 lazy val server = (project in file("server"))
-  .dependsOn(common.jvm, api.jvm)
+  .dependsOn(common.jvm, api.jvm, tapirServerPlay, tapirPlayJson.jvm)
   .configure(baseServerSettings, commonSettings, playSettings)
   .settings(
     name := "wiringbits-server",
@@ -360,13 +358,14 @@ lazy val server = (project in file("server"))
       "software.amazon.awssdk" % "ses" % "2.17.141",
       "jakarta.xml.bind" % "jakarta.xml.bind-api" % "4.0.0",
       "org.apache.commons" % "commons-text" % "1.10.0",
-      "io.swagger" % "swagger-annotations" % swagger,
       // JAX-B dependencies for JDK 9+, required to use play sessions
       "javax.xml.bind" % "jaxb-api" % "2.3.1",
       "javax.annotation" % "javax.annotation-api" % "1.3.2",
       "javax.el" % "javax.el-api" % "3.0.0",
       "org.glassfish" % "javax.el" % "3.0.0",
-      "com.beachape" %% "enumeratum" % enumeratum
+      "com.beachape" %% "enumeratum" % enumeratum,
+      "com.softwaremill.sttp.tapir" %% "tapir-swagger-ui-bundle" % tapir,
+      "com.softwaremill.sttp.tapir" %% "tapir-json-circe" % tapir
     )
   )
 
