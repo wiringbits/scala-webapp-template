@@ -5,9 +5,6 @@
 
 # TODO: handle all routes with tapir
 
-#GET /health controllers.HealthController.check()
-GET /swagger.json        controllers.Assets.at(path="/public", file="swagger.json")
-
 # login user
 POST /auth/login controllers.AuthController.login()
 # logout
@@ -34,15 +31,6 @@ PUT /users/me/password controllers.UsersController.updatePassword()
 # get the current user logs
 GET /users/me/logs controllers.UsersController.getLogs()
 
-## get users
-#GET /admin/users controllers.AdminController.getUsers()
-#
-## get user logs
-#GET /admin/users/:userId/logs controllers.AdminController.getUserLogs(userId)
-
-# get frontend configs
-GET /environment-config controllers.EnvironmentConfigController.getEnvironmentConfig()
-
 # TODO: handle all in one route
 
 -> / controllers.HealthController
@@ -50,6 +38,8 @@ GET /environment-config controllers.EnvironmentConfigController.getEnvironmentCo
 -> / controllers.ApiRoutes
 
 -> / controllers.AdminController
+
+-> / controllers.EnvironmentConfigController
 
 # routes for admin tables (GET, POST, PUT and DELETE)
 #-> / net.wiringbits.webapp.utils.admin.AppRouter
