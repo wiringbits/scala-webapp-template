@@ -5,7 +5,7 @@ import play.api.libs.ws.StandaloneWSClient
 import play.api.routing.Router.Routes
 import play.api.routing.SimpleRouter
 import sttp.apispec.openapi.Info
-import sttp.tapir.PublicEndpoint
+import sttp.tapir.Endpoint
 import sttp.tapir.server.play.PlayServerInterpreter
 import sttp.tapir.swagger.bundle.SwaggerInterpreter
 
@@ -29,7 +29,7 @@ class ApiRoutes @Inject() (implicit materializer: Materializer, wsClient: Standa
 }
 
 object ApiRoutes {
-  private val routes: List[PublicEndpoint[_, _, _, _]] = List(
+  private val routes: List[Endpoint[_, _, _, _, _]] = List(
     HealthController.routes,
     AdminController.routes,
     AuthController.routes,
