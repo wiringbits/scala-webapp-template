@@ -34,11 +34,11 @@ PUT /users/me/password controllers.UsersController.updatePassword()
 # get the current user logs
 GET /users/me/logs controllers.UsersController.getLogs()
 
-# get users
-GET /admin/users controllers.AdminController.getUsers()
-
-# get user logs
-GET /admin/users/:userId/logs controllers.AdminController.getUserLogs(userId)
+## get users
+#GET /admin/users controllers.AdminController.getUsers()
+#
+## get user logs
+#GET /admin/users/:userId/logs controllers.AdminController.getUserLogs(userId)
 
 # get frontend configs
 GET /environment-config controllers.EnvironmentConfigController.getEnvironmentConfig()
@@ -48,6 +48,8 @@ GET /environment-config controllers.EnvironmentConfigController.getEnvironmentCo
 -> / controllers.HealthController
 
 -> / controllers.ApiRoutes
+
+-> / controllers.AdminController
 
 # routes for admin tables (GET, POST, PUT and DELETE)
 #-> / net.wiringbits.webapp.utils.admin.AppRouter

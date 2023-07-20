@@ -1,15 +1,16 @@
 import net.wiringbits.api.models.ErrorResponse
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{JsValue, Json, Reads}
-import play.api.mvc.Results._
-import play.api.mvc._
+import play.api.mvc.Results.*
+import play.api.mvc.*
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 import scala.util.control.NonFatal
-
 import net.wiringbits.api.models.errorResponseFormat
+import sttp.model.StatusCode
+import sttp.tapir.{EndpointOutput, oneOfVariant, statusCode}
 
 package object controllers {
   private val logger = LoggerFactory.getLogger(this.getClass)
@@ -21,7 +22,7 @@ package object controllers {
   }
 
   def authenticate(request: Request[_])(implicit ec: ExecutionContext): Future[UUID] = {
-    def userIdFromSession :Future[UUID]= Future {
+    def userIdFromSession: Future[UUID] = Future {
       request.session
         .get("id")
         .flatMap(str => Try(UUID.fromString(str)).toOption)
@@ -61,5 +62,16 @@ package object controllers {
       // debug level used because this includes any validation error as well as server errors
       logger.debug(s"Error response while handling a request: ${ex.getMessage}", ex)
       InternalServerError(renderError(ex.getMessage))
+  }
+
+  // TODO: better name?
+  object HttpErrors {
+    val badRequest: EndpointOutput.OneOfVariant[Unit] = oneOfVariant(
+      statusCode(StatusCode.BadRequest).description("Invalid or missing arguments")
+    )
+
+    val unauthorized: EndpointOutput.OneOfVariant[Unit] = oneOfVariant(
+      statusCode(StatusCode.Unauthorized).description("Invalid or missing authentication")
+    )
   }
 }

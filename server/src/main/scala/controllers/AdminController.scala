@@ -1,42 +1,58 @@
 package controllers
 
 import akka.http.javadsl.model.headers.WWWAuthenticate
+import akka.stream.Materializer
+import controllers.AdminController.getUserLogsEndpoint
 import net.wiringbits.api.models.{AdminGetUserLogs, AdminGetUsers}
 import net.wiringbits.common.models.{Email, Name}
 import net.wiringbits.services.AdminService
 import org.slf4j.LoggerFactory
 import play.api.libs.json.Json
 import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
+import play.api.routing.Router.Routes
+import play.api.routing.SimpleRouter
 import sttp.model.headers.WWWAuthenticateChallenge
+import sttp.tapir.Endpoint
+import sttp.tapir.server.ServerEndpoint
+import sttp.tapir.server.play.PlayServerInterpreter
 
 import java.time.Instant
 import java.util.UUID
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class AdminController @Inject() (
     adminService: AdminService
-)(implicit cc: ControllerComponents, ec: ExecutionContext)
-    extends AbstractController(cc) {
+)(implicit ec: ExecutionContext, mat: Materializer)
+    extends SimpleRouter {
   private val logger = LoggerFactory.getLogger(this.getClass)
+  private val interpreter = PlayServerInterpreter()
 
-  def getUserLogs(userIdStr: String): Action[AnyContent] = handleGET { request =>
+  private def getUserLogs(
+      userId: UUID,
+      adminCookie: String,
+      authBasic: String
+  ): Future[Either[Unit, AdminGetUserLogs.Response]] = {
+    logger.info(s"Get user logs: $userId")
     for {
-      _ <- adminUser(request)
-      _ = logger.info(s"Get user logs: $userIdStr")
-      userId = UUID.fromString(userIdStr)
       response <- adminService.userLogs(userId)
-    } yield Ok(Json.toJson(response))
+    } yield Right(response)
   }
 
-  def getUsers: Action[AnyContent] = handleGET { request =>
+  private def getUsers(adminCookie: String, authBasic: String): Future[Either[Unit, AdminGetUsers.Response]] = {
+    logger.info(s"Get users")
     for {
-      _ <- adminUser(request)
-      _ = logger.info(s"Get users")
       response <- adminService.users()
       // TODO: Avoid masking data when this the admin website is not public
       maskedResponse = response.copy(data = response.data.map(_.copy(email = Email.trusted("email@wiringbits.net"))))
-    } yield Ok(Json.toJson(maskedResponse))
+    } yield Right(maskedResponse)
+  }
+
+  override def routes: Routes = {
+    // TODO: do this in a better way, fold?
+    interpreter
+      .toRoutes(AdminController.getUserLogsEndpoint.serverLogic(getUserLogs))
+      .orElse(interpreter.toRoutes(AdminController.getUsersEndpoint.serverLogic(getUsers)))
   }
 }
 
@@ -45,8 +61,23 @@ object AdminController {
   import sttp.tapir.*
   import sttp.tapir.json.play.*
 
-  private val getUserLogsEndpoint = endpoint.get
-    .in("admin" / "users" / path[UUID]("userId") / "logs")
+  private val baseEndpoint = endpoint
+    .in("admin")
+    .tag("Admin")
+
+  private val authBasic = auth
+    .basic[String]()
+    .securitySchemeName("Basic authorization")
+    .description("Admin credentials")
+
+  private val adminCookie = cookie[String]("X-Forwarded-User")
+    .default("Unknown")
+    .schema(_.hidden(true))
+
+  private val getUserLogsEndpoint = baseEndpoint.get
+    .in("users" / path[UUID]("userId") / "logs")
+    .in(adminCookie)
+    .in(authBasic)
     .out(
       jsonBody[AdminGetUserLogs.Response].example(
         AdminGetUserLogs.Response(
@@ -61,16 +92,13 @@ object AdminController {
         )
       )
     )
-    .errorOut(
-      oneOf[Unit](
-        oneOfVariant(statusCode(StatusCode.BadRequest).description("Invalid or missing arguments")),
-        oneOfVariant(statusCode(StatusCode.Unauthorized).description("Invalid or missing authentication"))
-      )
-    )
+    .errorOut(oneOf(HttpErrors.badRequest, HttpErrors.unauthorized))
     .summary("Get the logs for a specific user")
 
-  private val getUsersEndpoint = endpoint.get
-    .in("admin" / "users")
+  private val getUsersEndpoint = baseEndpoint.get
+    .in("users")
+    .in(adminCookie)
+    .in(authBasic)
     .out(
       jsonBody[AdminGetUsers.Response].example(
         AdminGetUsers.Response(
@@ -85,16 +113,11 @@ object AdminController {
         )
       )
     )
-    .errorOut(
-      oneOf[Unit](
-        oneOfVariant(statusCode(StatusCode.BadRequest).description("Invalid or missing arguments")),
-        oneOfVariant(statusCode(StatusCode.Unauthorized).description("Invalid or missing authentication"))
-      )
-    )
+    .errorOut(oneOf(HttpErrors.badRequest, HttpErrors.unauthorized))
     .summary("Get the registered users")
 
-  val routes: List[PublicEndpoint[_, _, _, _]] = List(
+  val routes: List[Endpoint[_, _, _, _, _]] = List(
     getUserLogsEndpoint,
     getUsersEndpoint
-  ).map(_.tag("Admin"))
+  )
 }
