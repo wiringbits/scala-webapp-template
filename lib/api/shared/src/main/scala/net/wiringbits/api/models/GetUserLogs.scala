@@ -22,8 +22,11 @@ object GetUserLogs {
   implicit val getUserLogsRequestFormat: Format[Request] = Json.format[Request]
   implicit val getUserLogsResponseFormat: Format[Response] = Json.format[Response]
 
-  implicit val getUserLogsRequestSchema: Schema[Request] =
-    Schema.derived[Request].name(Schema.SName("GetUserLogsRequest"))
-  implicit val getUserLogsResponseSchema: Schema[Response] =
-    Schema.derived[Response].name(Schema.SName("GetUserLogsResponse"))
+  implicit val getUserLogsRequestSchema: Schema[Request] = Schema
+    .derived[Request]
+    .name(Schema.SName("GetUserLogsRequest"))
+  implicit val getUserLogsResponseSchema: Schema[Response] = Schema
+    .derived[Response]
+    .name(Schema.SName("GetUserLogsResponse"))
+    .description("Includes the authenticated user logs")
 }

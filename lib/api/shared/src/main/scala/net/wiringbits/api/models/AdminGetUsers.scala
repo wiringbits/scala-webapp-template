@@ -12,13 +12,16 @@ object AdminGetUsers {
 
   case class Response(data: List[Response.User])
   implicit val adminGetUsersResponseFormat: Format[Response] = Json.format[Response]
-  implicit val adminGetUsersResponseSchema: Schema[Response] =
-    Schema.derived[Response].name(Schema.SName("AdminGetUsersResponse"))
+  implicit val adminGetUsersResponseSchema: Schema[Response] = Schema
+    .derived[Response]
+    .name(Schema.SName("AdminGetUsersResponse"))
+    .description("Includes the user list")
 
   object Response {
     case class User(id: UUID, name: Name, email: Email, createdAt: Instant)
     implicit val adminGetUsersResponseUserFormat: Format[User] = Json.format[User]
-    implicit val adminGetUsersResponseUserSchema: Schema[User] =
-      Schema.derived[User].name(Schema.SName("AdminGetUsersResponseUser"))
+    implicit val adminGetUsersResponseUserSchema: Schema[User] = Schema
+      .derived[User]
+      .name(Schema.SName("AdminGetUsersResponseUser"))
   }
 }

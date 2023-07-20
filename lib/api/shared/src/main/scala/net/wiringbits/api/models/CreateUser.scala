@@ -13,8 +13,12 @@ object CreateUser {
   implicit val createUserRequestFormat: Format[Request] = Json.format[Request]
   implicit val createUserResponseFormat: Format[Response] = Json.format[Response]
 
-  implicit val createUserResponseSchema: Schema[Response] =
-    Schema.derived[Response].name(Schema.SName("CreateUserResponse"))
-  implicit val createUserRequestSchema: Schema[Request] =
-    Schema.derived[Request].name(Schema.SName("CreateUserRequest"))
+  implicit val createUserRequestSchema: Schema[Request] = Schema
+    .derived[Request]
+    .name(Schema.SName("CreateUserRequest"))
+    .description("Request for the create user API")
+  implicit val createUserResponseSchema: Schema[Response] = Schema
+    .derived[Response]
+    .name(Schema.SName("CreateUserResponse"))
+    .description("Response for the create user API")
 }

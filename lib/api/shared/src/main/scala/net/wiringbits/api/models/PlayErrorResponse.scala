@@ -16,6 +16,8 @@ object PlayErrorResponse {
 
   implicit val playErrorResponseErrorSchema: Schema[PlayError] =
     Schema.derived[PlayError].name(Schema.SName("PlayError"))
-  implicit val playErrorResponseSchema: Schema[PlayErrorResponse] =
-    Schema.derived[PlayErrorResponse].name(Schema.SName("PlayErrorResponse"))
+  implicit val playErrorResponseSchema: Schema[PlayErrorResponse] = Schema
+    .derived[PlayErrorResponse]
+    .name(Schema.SName("PlayErrorResponse"))
+    .description("Response with an application error")
 }

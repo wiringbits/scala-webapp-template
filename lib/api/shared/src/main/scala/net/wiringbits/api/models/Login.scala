@@ -16,6 +16,12 @@ object Login {
   implicit val loginRequestFormat: Format[Request] = Json.format[Request]
   implicit val loginResponseFormat: Format[Response] = Json.format[Response]
 
-  implicit val loginRequestSchema: Schema[Request] = Schema.derived[Request].name(Schema.SName("LoginRequest"))
-  implicit val loginResponseSchema: Schema[Response] = Schema.derived[Response].name(Schema.SName("LoginResponse"))
+  implicit val loginRequestSchema: Schema[Request] = Schema
+    .derived[Request]
+    .name(Schema.SName("LoginRequest"))
+    .description("Request to log into the app")
+  implicit val loginResponseSchema: Schema[Response] = Schema
+    .derived[Response]
+    .name(Schema.SName("LoginResponse"))
+    .description("Response after logging into the app")
 }

@@ -336,7 +336,7 @@ lazy val tapirPlayJson = (crossProject(JSPlatform, JVMPlatform) in file("tapir/p
   )
 
 lazy val server = (project in file("server"))
-  .dependsOn(common.jvm, api.jvm, tapirServerPlay, tapirPlayJson.js)
+  .dependsOn(common.jvm, api.jvm, tapirServerPlay, tapirPlayJson.jvm)
   .configure(baseServerSettings, commonSettings, playSettings)
   .settings(
     name := "wiringbits-server",

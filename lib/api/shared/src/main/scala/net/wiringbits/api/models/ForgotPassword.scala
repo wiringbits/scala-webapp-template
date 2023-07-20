@@ -12,8 +12,12 @@ object ForgotPassword {
   implicit val forgotPasswordRequestFormat: Format[Request] = Json.format[Request]
   implicit val forgotPasswordResponseFormat: Format[Response] = Json.format[Response]
 
-  implicit val forgotPasswordResponseSchema: Schema[Response] =
-    Schema.derived[Response].name(Schema.SName("ForgotPasswordResponse"))
-  implicit val forgotPasswordRequestSchema: Schema[Request] =
-    Schema.derived[Request].name(Schema.SName("ForgotPasswordRequest"))
+  implicit val forgotPasswordRequestSchema: Schema[Request] = Schema
+    .derived[Request]
+    .name(Schema.SName("ForgotPasswordRequest"))
+    .description("Request to reset a forgotten password")
+  implicit val forgotPasswordResponseSchema: Schema[Response] = Schema
+    .derived[Response]
+    .name(Schema.SName("ForgotPasswordResponse"))
+    .description("Response to the ForgotPasswordRequest")
 }

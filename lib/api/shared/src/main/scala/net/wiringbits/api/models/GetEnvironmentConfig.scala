@@ -8,6 +8,8 @@ object GetEnvironmentConfig {
 
   implicit val configResponseFormat: Format[Response] = Json.format[Response]
 
-  implicit val configResponseSchema: Schema[Response] =
-    Schema.derived[Response].name(Schema.SName("GetEnvironmentConfigResponse"))
+  implicit val configResponseSchema: Schema[Response] = Schema
+    .derived[Response]
+    .name(Schema.SName("GetEnvironmentConfigResponse"))
+    .description("Request to fetch the environment config")
 }

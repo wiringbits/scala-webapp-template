@@ -14,8 +14,12 @@ object VerifyEmail {
   implicit val verifyEmailRequestFormat: Format[Request] = Json.format[Request]
   implicit val verifyEmailResponseFormat: Format[Response] = Json.format[Response]
 
-  implicit val verifyEmailRequestSchema: Schema[Request] =
-    Schema.derived[Request].name(Schema.SName("VerifyEmailRequest"))
-  implicit val verifyEmailResponseSchema: Schema[Response] =
-    Schema.derived[Response].name(Schema.SName("VerifyEmailResponse"))
+  implicit val verifyEmailRequestSchema: Schema[Request] = Schema
+    .derived[Request]
+    .name(Schema.SName("VerifyEmailRequest"))
+    .description("Request to verify an email")
+  implicit val verifyEmailResponseSchema: Schema[Response] = Schema
+    .derived[Response]
+    .name(Schema.SName("VerifyEmailResponse"))
+    .description("Response after verifying an email")
 }

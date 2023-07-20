@@ -13,8 +13,12 @@ object UpdateUser {
   implicit val updateUserRequestFormat: Format[Request] = Json.format[Request]
   implicit val updateUserResponseFormat: Format[Response] = Json.format[Response]
 
-  implicit val updateUserRequestSchema: Schema[Request] =
-    Schema.derived[Request].name(Schema.SName("UpdateUserRequest"))
-  implicit val updateUserResponseSchema: Schema[Response] =
-    Schema.derived[Response].name(Schema.SName("UpdateUserResponse"))
+  implicit val updateUserRequestSchema: Schema[Request] = Schema
+    .derived[Request]
+    .name(Schema.SName("UpdateUserRequest"))
+    .description("Request to update user details")
+  implicit val updateUserResponseSchema: Schema[Response] = Schema
+    .derived[Response]
+    .name(Schema.SName("UpdateUserResponse"))
+    .description("Response after updating the user details")
 }
