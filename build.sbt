@@ -317,7 +317,8 @@ lazy val tapirServerPlay = (project in file("tapir/tapir-play"))
     scalaVersion := "3.3.0-RC3",
     libraryDependencies ++= Seq(
       "com.typesafe.play" %% "play-akka-http-server" % "2.9.0-M5",
-      "com.softwaremill.sttp.shared" %% "akka" % "1.3.14"
+      "com.softwaremill.sttp.shared" %% "akka" % "1.3.14",
+      "org.scala-lang.modules" %% "scala-collection-compat" % "2.11.0"
     )
   )
   .dependsOn(tapirServerCore)
