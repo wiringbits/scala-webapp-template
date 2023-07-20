@@ -3,6 +3,8 @@
 # https://www.playframework.com/documentation/latest/ScalaRouting
 # ~~~~
 
+# TODO: handle all routes with tapir
+
 GET /health controllers.HealthController.check()
 GET /swagger.json        controllers.Assets.at(path="/public", file="swagger.json")
 
