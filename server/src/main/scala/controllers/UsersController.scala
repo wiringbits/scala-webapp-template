@@ -96,12 +96,14 @@ class UsersController @Inject() (
 }
 
 object UsersController {
-  import sttp.model.StatusCode
   import sttp.tapir.*
   import sttp.tapir.json.play.*
 
-  private val create = endpoint.post
+  private val baseEndpoint = endpoint
     .in("users")
+    .tag("Users")
+
+  private val create = baseEndpoint.post
     .in(
       jsonBody[CreateUser.Request].example(
         CreateUser.Request(
@@ -123,16 +125,12 @@ object UsersController {
           )
         )
     )
-    .errorOut(
-      oneOf[Unit](
-        oneOfVariant(statusCode(StatusCode.BadRequest).description("Invalid or missing arguments"))
-      )
-    )
+    .errorOut(oneOf(HttpErrors.badRequest))
     .summary("Creates a new account")
     .description("Requires a captcha")
 
-  private val verifyEmail = endpoint.post
-    .in("users" / "verify-email")
+  private val verifyEmail = baseEndpoint.post
+    .in("verify-email")
     .in(
       jsonBody[VerifyEmail.Request].example(
         VerifyEmail.Request(
@@ -144,18 +142,14 @@ object UsersController {
       )
     )
     .out(jsonBody[VerifyEmail.Response].description("The account's email was verified").example(VerifyEmail.Response()))
-    .errorOut(
-      oneOf[Unit](
-        oneOfVariant(statusCode(StatusCode.BadRequest).description("Invalid or missing arguments"))
-      )
-    )
+    .errorOut(oneOf(HttpErrors.badRequest))
     .summary("Verify the user's email")
     .description(
       "When an account is created, a verification code is sent to the registered email, this operations take such code and marks the email as verified"
     )
 
-  private val forgotPassword = endpoint.post
-    .in("users" / "forgot-password")
+  private val forgotPassword = baseEndpoint.post
+    .in("forgot-password")
     .in(
       jsonBody[ForgotPassword.Request].example(
         ForgotPassword.Request(
@@ -169,15 +163,11 @@ object UsersController {
         .description("The email to recover the password was sent")
         .example(ForgotPassword.Response())
     )
-    .errorOut(
-      oneOf[Unit](
-        oneOfVariant(statusCode(StatusCode.BadRequest).description("Invalid or missing arguments"))
-      )
-    )
+    .errorOut(oneOf(HttpErrors.badRequest))
     .summary("Requests an email to reset a user password")
 
-  private val resetPassword = endpoint.post
-    .in("users" / "reset-password")
+  private val resetPassword = baseEndpoint.post
+    .in("reset-password")
     .in(
       jsonBody[ResetPassword.Request]
         .example(
@@ -200,15 +190,11 @@ object UsersController {
           )
         )
     )
-    .errorOut(
-      oneOf[Unit](
-        oneOfVariant(statusCode(StatusCode.BadRequest).description("Invalid or missing arguments"))
-      )
-    )
+    .errorOut(oneOf[Unit](HttpErrors.badRequest))
     .summary("Resets a user password")
 
-  private val sendEmailVerificationToken = endpoint.post
-    .in("users" / "email-verification-token")
+  private val sendEmailVerificationToken = baseEndpoint.post
+    .in("email-verification-token")
     .in(
       jsonBody[SendEmailVerificationToken.Request].example(
         SendEmailVerificationToken.Request(
@@ -226,18 +212,14 @@ object UsersController {
           )
         )
     )
-    .errorOut(
-      oneOf[Unit](
-        oneOfVariant(statusCode(StatusCode.BadRequest).description("Invalid or missing arguments"))
-      )
-    )
+    .errorOut(oneOf(HttpErrors.badRequest))
     .summary("Sends the email verification token")
     .description(
       "The user's email should be unconfirmed, this is intended to re-send a token in case the previous one did not arrive"
     )
 
-  private val update = endpoint.put
-    .in("users" / "me")
+  private val update = baseEndpoint.put
+    .in("me")
     .in(
       jsonBody[UpdateUser.Request].example(
         UpdateUser.Request(
@@ -246,15 +228,11 @@ object UsersController {
       )
     )
     .out(jsonBody[UpdateUser.Response].description("The user details were updated").example(UpdateUser.Response()))
-    .errorOut(
-      oneOf[Unit](
-        oneOfVariant(statusCode(StatusCode.BadRequest).description("Invalid or missing arguments"))
-      )
-    )
+    .errorOut(oneOf(HttpErrors.badRequest))
     .summary("Updates the authenticated user details")
 
-  private val updatePassword = endpoint.put
-    .in("users" / "me" / "password")
+  private val updatePassword = baseEndpoint.put
+    .in("me" / "password")
     .in(
       jsonBody[UpdatePassword.Request]
         .description("The user password was updated")
@@ -266,15 +244,11 @@ object UsersController {
         )
     )
     .out(jsonBody[UpdatePassword.Response])
-    .errorOut(
-      oneOf[Unit](
-        oneOfVariant(statusCode(StatusCode.BadRequest).description("Invalid or missing arguments"))
-      )
-    )
+    .errorOut(oneOf(HttpErrors.badRequest))
     .summary("Updates the authenticated user password")
 
-  private val getLogs = endpoint.get
-    .in("users" / "me" / "logs")
+  private val getLogs = baseEndpoint.get
+    .in("me" / "logs")
     .in(jsonBody[GetUserLogs.Request].example(GetUserLogs.Request()))
     .out(
       jsonBody[GetUserLogs.Response]
@@ -291,14 +265,10 @@ object UsersController {
           )
         )
     )
-    .errorOut(
-      oneOf[Unit](
-        oneOfVariant(statusCode(StatusCode.BadRequest).description("Invalid or missing arguments"))
-      )
-    )
+    .errorOut(oneOf(HttpErrors.badRequest))
     .summary("Get the logs for the authenticated user")
 
-  val routes: List[PublicEndpoint[_, _, _, _]] = List(
+  val routes: List[Endpoint[_, _, _, _, _]] = List(
     create,
     verifyEmail,
     forgotPassword,
@@ -307,5 +277,5 @@ object UsersController {
     update,
     updatePassword,
     getLogs
-  ).map(_.tag("Users"))
+  )
 }

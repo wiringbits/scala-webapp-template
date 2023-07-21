@@ -57,7 +57,6 @@ class AdminController @Inject() (
 }
 
 object AdminController {
-  import sttp.model.StatusCode
   import sttp.tapir.*
   import sttp.tapir.json.play.*
 

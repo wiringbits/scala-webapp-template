@@ -32,7 +32,6 @@ class EnvironmentConfigController @Inject() (
 }
 
 object EnvironmentConfigController {
-  import sttp.model.Header
   import sttp.tapir.*
   import sttp.tapir.json.play.*
 

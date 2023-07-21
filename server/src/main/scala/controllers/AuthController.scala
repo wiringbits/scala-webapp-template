@@ -47,7 +47,6 @@ class AuthController @Inject() (
 }
 
 object AuthController {
-  import sttp.model.StatusCode
   import sttp.tapir.*
   import sttp.tapir.json.play.*
 
@@ -73,11 +72,7 @@ object AuthController {
           )
         )
     )
-    .errorOut(
-      oneOf[Unit](
-        oneOfVariant(statusCode(StatusCode.BadRequest).description("Invalid or missing arguments"))
-      )
-    )
+    .errorOut(oneOf(HttpErrors.badRequest))
     .summary("Log into the app")
     .description("Sets a session cookie to authenticate the following requests")
 
@@ -85,17 +80,12 @@ object AuthController {
     .in("auth" / "logout")
     .in(jsonBody[Logout.Request].example(Logout.Request()))
     .out(jsonBody[Logout.Response].description("Successful logout").example(Logout.Response()))
-    .errorOut(
-      oneOf[Unit](
-        oneOfVariant(statusCode(StatusCode.BadRequest).description("Invalid or missing arguments"))
-      )
-    )
+    .errorOut(oneOf(HttpErrors.badRequest))
     .summary("Logout from the app")
     .description("Clears the session cookie that's stored securely")
 
   private val getCurrentUser = endpoint.get
     .in("auth" / "me")
-    .in(jsonBody[GetCurrentUser.Request].example(GetCurrentUser.Request()))
     .out(
       jsonBody[GetCurrentUser.Response]
         .description("Got user details")
@@ -108,11 +98,7 @@ object AuthController {
           )
         )
     )
-    .errorOut(
-      oneOf[Unit](
-        oneOfVariant(statusCode(StatusCode.BadRequest).description("Invalid or missing arguments"))
-      )
-    )
+    .errorOut(oneOf(HttpErrors.badRequest))
     .summary("Get the details for the authenticated user")
 
   val routes: List[PublicEndpoint[_, _, _, _]] = List(
