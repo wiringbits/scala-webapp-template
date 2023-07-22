@@ -1,20 +1,14 @@
 package controllers
 
-import akka.http.javadsl.model.headers.WWWAuthenticate
-import akka.stream.Materializer
 import controllers.AdminController.getUserLogsEndpoint
-import net.wiringbits.api.models.{AdminGetUserLogs, AdminGetUsers}
+import net.wiringbits.api.models.{AdminGetUserLogs, AdminGetUsers, ErrorResponse}
 import net.wiringbits.common.models.{Email, Name}
 import net.wiringbits.services.AdminService
 import org.slf4j.LoggerFactory
-import play.api.libs.json.Json
-import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
-import play.api.routing.Router.Routes
-import play.api.routing.SimpleRouter
-import sttp.model.headers.WWWAuthenticateChallenge
+import sttp.capabilities.WebSockets
+import sttp.capabilities.akka.AkkaStreams
 import sttp.tapir.Endpoint
 import sttp.tapir.server.ServerEndpoint
-import sttp.tapir.server.play.PlayServerInterpreter
 
 import java.time.Instant
 import java.util.UUID
@@ -23,23 +17,24 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class AdminController @Inject() (
     adminService: AdminService
-)(implicit ec: ExecutionContext, mat: Materializer)
-    extends SimpleRouter {
+)(implicit ec: ExecutionContext) {
   private val logger = LoggerFactory.getLogger(this.getClass)
-  private val interpreter = PlayServerInterpreter()
 
   private def getUserLogs(
+      authBasic: String,
       userId: UUID,
-      adminCookie: String,
-      authBasic: String
-  ): Future[Either[Unit, AdminGetUserLogs.Response]] = {
+      adminCookie: String
+  ): Future[Either[ErrorResponse, AdminGetUserLogs.Response]] = handleRequest {
     logger.info(s"Get user logs: $userId")
     for {
       response <- adminService.userLogs(userId)
     } yield Right(response)
   }
 
-  private def getUsers(adminCookie: String, authBasic: String): Future[Either[Unit, AdminGetUsers.Response]] = {
+  private def getUsers(
+      adminCookie: String,
+      authBasic: String
+  ): Future[Either[ErrorResponse, AdminGetUsers.Response]] = handleRequest {
     logger.info(s"Get users")
     for {
       response <- adminService.users()
@@ -48,11 +43,11 @@ class AdminController @Inject() (
     } yield Right(maskedResponse)
   }
 
-  override def routes: Routes = {
-    // TODO: do this in a better way, fold?
-    interpreter
-      .toRoutes(AdminController.getUserLogsEndpoint.serverLogic(getUserLogs))
-      .orElse(interpreter.toRoutes(AdminController.getUsersEndpoint.serverLogic(getUsers)))
+  def routes: List[ServerEndpoint[AkkaStreams with WebSockets, Future]] = {
+    List(
+      AdminController.getUserLogsEndpoint.serverLogic(getUserLogs),
+      AdminController.getUsersEndpoint.serverLogic(getUsers)
+    )
   }
 }
 
@@ -63,11 +58,12 @@ object AdminController {
   private val baseEndpoint = endpoint
     .in("admin")
     .tag("Admin")
+    .in(adminAuth)
+    .errorOut(errorResponseErrorOut)
 
   private val getUserLogsEndpoint = baseEndpoint.get
     .in("users" / path[UUID]("userId") / "logs")
     .in(adminCookie)
-    .in(adminAuth)
     .out(
       jsonBody[AdminGetUserLogs.Response].example(
         AdminGetUserLogs.Response(
@@ -88,7 +84,6 @@ object AdminController {
   private val getUsersEndpoint = baseEndpoint.get
     .in("users")
     .in(adminCookie)
-    .in(adminAuth)
     .out(
       jsonBody[AdminGetUsers.Response].example(
         AdminGetUsers.Response(

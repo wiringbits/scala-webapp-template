@@ -2,15 +2,16 @@ package controllers
 
 import net.wiringbits.actions.*
 import net.wiringbits.api.models.*
-import net.wiringbits.common.models.{Captcha, Email, Name, Password, UserToken}
+import net.wiringbits.common.models.*
 import org.slf4j.LoggerFactory
-import play.api.libs.json.Json
-import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
+import sttp.capabilities.WebSockets
+import sttp.capabilities.akka.AkkaStreams
+import sttp.tapir.server.ServerEndpoint
 
 import java.time.Instant
 import java.util.UUID
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class UsersController @Inject() (
     createUserAction: CreateUserAction,
@@ -21,77 +22,95 @@ class UsersController @Inject() (
     updatePasswordAction: UpdatePasswordAction,
     getUserLogsAction: GetUserLogsAction,
     sendEmailVerificationTokenAction: SendEmailVerificationTokenAction
-)(implicit cc: ControllerComponents, ec: ExecutionContext)
-    extends AbstractController(cc) {
+)(implicit ec: ExecutionContext) {
   private val logger = LoggerFactory.getLogger(this.getClass)
 
-  def create: Action[CreateUser.Request] = handleJsonBody[CreateUser.Request] { request =>
-    val body = request.body
-    logger.info(s"Create user: ${body.email.string}")
+  private def create(request: CreateUser.Request): Future[Either[ErrorResponse, CreateUser.Response]] = handleRequest {
+    logger.info(s"Create user: ${request.email.string}")
     for {
-      response <- createUserAction(body)
-    } yield Ok(Json.toJson(response))
+      response <- createUserAction(request)
+    } yield Right(response)
   }
 
-  def verifyEmail: Action[VerifyEmail.Request] = handleJsonBody[VerifyEmail.Request] { request =>
-    val token = request.body.token
+  private def verifyEmail(request: VerifyEmail.Request) = handleRequest {
+    val token = request.token
     logger.info(s"Verify user's email: ${token.userId}")
     for {
       response <- verifyUserEmailAction(token.userId, token.token)
-    } yield Ok(Json.toJson(response))
+    } yield Right(response)
   }
 
-  def forgotPassword: Action[ForgotPassword.Request] = handleJsonBody[ForgotPassword.Request] { request =>
-    val body = request.body
-    logger.info(s"Send a link to reset password for user with email: ${body.email}")
+  private def forgotPassword(
+      request: ForgotPassword.Request
+  ): Future[Either[ErrorResponse, ForgotPassword.Response]] = handleRequest {
+    logger.info(s"Send a link to reset password for user with email: ${request.email}")
     for {
-      response <- forgotPasswordAction(body)
-    } yield Ok(Json.toJson(response))
+      response <- forgotPasswordAction(request)
+    } yield Right(response)
   }
 
-  def resetPassword: Action[ResetPassword.Request] = handleJsonBody[ResetPassword.Request] { request =>
-    val body = request.body
-    logger.info(s"Reset user's password: ${body.token.userId}")
+  private def resetPassword(
+      request: ResetPassword.Request
+  ): Future[Either[ErrorResponse, ResetPassword.Response]] = handleRequest {
+    logger.info(s"Reset user's password: ${request.token.userId}")
     for {
-      response <- resetPasswordAction(body.token.userId, body.token.token, body.password)
-    } yield Ok(Json.toJson(response))
+      response <- resetPasswordAction(request.token.userId, request.token.token, request.password)
+    } yield Right(response)
   }
 
-  def sendEmailVerificationToken: Action[SendEmailVerificationToken.Request] =
-    handleJsonBody[SendEmailVerificationToken.Request] { request =>
-      val body = request.body
-      logger.info(s"Send email to: ${body.email}")
+  private def sendEmailVerificationToken(
+      request: SendEmailVerificationToken.Request
+  ): Future[Either[ErrorResponse, SendEmailVerificationToken.Response]] =
+    handleRequest {
+      logger.info(s"Send email to: ${request.email}")
       for {
-        response <- sendEmailVerificationTokenAction(body)
-      } yield Ok(Json.toJson(response))
+        response <- sendEmailVerificationTokenAction(request)
+      } yield Right(response)
     }
 
-  def update: Action[UpdateUser.Request] = handleJsonBody[UpdateUser.Request] { request =>
-    val body = request.body
-    logger.info(s"Update user: $body")
+  private def update(
+      request: UpdateUser.Request,
+      userIdMaybe: Option[UUID]
+  ): Future[Either[ErrorResponse, UpdateUser.Response]] = handleRequest {
+    logger.info(s"Update user: $request")
     for {
-      userId <- authenticate(request)
-      _ <- updateUserAction(userId, body)
+      userId <- authenticate(userIdMaybe)
+      _ <- updateUserAction(userId, request)
       response = UpdateUser.Response()
-    } yield Ok(Json.toJson(response))
+    } yield Right(response)
   }
 
-  def updatePassword: Action[UpdatePassword.Request] = handleJsonBody[UpdatePassword.Request] { request =>
-    val body = request.body
+  private def updatePassword(
+      request: UpdatePassword.Request,
+      userIdMaybe: Option[UUID]
+  ): Future[Either[ErrorResponse, UpdatePassword.Response]] = handleRequest {
     for {
-      userId <- authenticate(request)
+      userId <- authenticate(userIdMaybe)
       _ = logger.info(s"Update password for: $userId")
-      _ <- updatePasswordAction(userId, body)
-      response = UpdateUser.Response()
-    } yield Ok(Json.toJson(response))
+      _ <- updatePasswordAction(userId, request)
+      response = UpdatePassword.Response()
+    } yield Right(response)
   }
 
-  def getLogs: Action[AnyContent] = handleGET { request =>
+  private def getLogs(userIdMaybe: Option[UUID]): Future[Either[ErrorResponse, GetUserLogs.Response]] = handleRequest {
     for {
-      userId <- authenticate(request)
+      userId <- authenticate(userIdMaybe)
       _ = logger.info(s"Get user logs: $userId")
       response <- getUserLogsAction(userId)
-    } yield Ok(Json.toJson(response))
+    } yield Right(response)
+  }
+
+  def routes: List[ServerEndpoint[AkkaStreams with WebSockets, Future]] = {
+    List(
+      UsersController.create.serverLogic(create),
+      UsersController.verifyEmail.serverLogic(verifyEmail),
+      UsersController.forgotPassword.serverLogic(forgotPassword),
+      UsersController.resetPassword.serverLogic(resetPassword),
+      UsersController.sendEmailVerificationToken.serverLogic(sendEmailVerificationToken),
+      UsersController.update.serverLogic(update),
+      UsersController.updatePassword.serverLogic(updatePassword),
+      UsersController.getLogs.serverLogic(getLogs)
+    )
   }
 }
 
@@ -102,6 +121,7 @@ object UsersController {
   private val baseEndpoint = endpoint
     .in("users")
     .tag("Users")
+    .errorOut(errorResponseErrorOut)
 
   private val create = baseEndpoint.post
     .in(
@@ -227,6 +247,7 @@ object UsersController {
         )
       )
     )
+    .in(userIdCookie)
     .out(jsonBody[UpdateUser.Response].description("The user details were updated").example(UpdateUser.Response()))
     .errorOut(oneOf(HttpErrors.badRequest))
     .summary("Updates the authenticated user details")
@@ -243,13 +264,14 @@ object UsersController {
           )
         )
     )
+    .in(userIdCookie)
     .out(jsonBody[UpdatePassword.Response])
     .errorOut(oneOf(HttpErrors.badRequest))
     .summary("Updates the authenticated user password")
 
   private val getLogs = baseEndpoint.get
     .in("me" / "logs")
-    .in(jsonBody[GetUserLogs.Request].example(GetUserLogs.Request()))
+    .in(userIdCookie)
     .out(
       jsonBody[GetUserLogs.Response]
         .description("Got user logs")

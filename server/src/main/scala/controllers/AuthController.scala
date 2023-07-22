@@ -1,20 +1,17 @@
 package controllers
 
-import akka.stream.Materializer
 import net.wiringbits.actions.*
 import net.wiringbits.api.models.*
-import net.wiringbits.common.models.{Captcha, Email, Name, Password}
+import net.wiringbits.common.models.*
 import org.slf4j.LoggerFactory
-import play.api.libs.json.Json
-import play.api.mvc.Results.InternalServerError
-import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
-import play.api.routing.Router.Routes
-import play.api.routing.SimpleRouter
+import sttp.capabilities.WebSockets
+import sttp.capabilities.akka.AkkaStreams
 import sttp.model.StatusCode
 import sttp.model.headers.CookieValueWithMeta
-import sttp.tapir.server.play.PlayServerInterpreter
+import sttp.tapir.server.ServerEndpoint
 
 import java.time.Instant
+import java.time.temporal.ChronoUnit
 import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -23,10 +20,8 @@ import scala.util.control.NonFatal
 class AuthController @Inject() (
     loginAction: LoginAction,
     getUserAction: GetUserAction
-)(implicit ec: ExecutionContext, mat: Materializer)
-    extends SimpleRouter {
+)(implicit ec: ExecutionContext) {
   private val logger = LoggerFactory.getLogger(this.getClass)
-  private val interpreter = PlayServerInterpreter()
 
   private def login(body: Login.Request): Future[Either[ErrorResponse, (Login.Response, CookieValueWithMeta)]] =
     handleRequest {
@@ -34,9 +29,10 @@ class AuthController @Inject() (
       for {
         response <- loginAction(body)
         // TODO: shorter way?
+        // TODO: config the cookie
         cookie = CookieValueWithMeta(
           value = response.id.toString,
-          expires = None,
+          expires = Some(Instant.now().plus(1L, ChronoUnit.DAYS)),
           maxAge = None,
           domain = None,
           path = None,
@@ -49,11 +45,8 @@ class AuthController @Inject() (
     }
 
   private def me(userIdMaybe: Option[UUID]): Future[Either[ErrorResponse, GetCurrentUser.Response]] = handleRequest {
-    // TODO: handle userId not found
     for {
-      userId <- Future {
-        userIdMaybe.getOrElse(throw new RuntimeException("Unauthorized: Invalid or missing authentication"))
-      }
+      userId <- authenticate(userIdMaybe)
       _ = logger.info(s"Get user info: $userId")
       response <- getUserAction(userId)
     } yield Right(response)
@@ -63,9 +56,7 @@ class AuthController @Inject() (
       userIdMaybe: Option[UUID]
   ): Future[Either[ErrorResponse, (Logout.Response, CookieValueWithMeta)]] = handleRequest {
     for {
-      _ <- Future {
-        userIdMaybe.getOrElse(throw new RuntimeException("Unauthorized: Invalid or missing authentication"))
-      }
+      _ <- authenticate(userIdMaybe)
       _ = logger.info(s"Logout")
       cookie = CookieValueWithMeta(
         value = "",
@@ -81,11 +72,12 @@ class AuthController @Inject() (
     } yield Right(Logout.Response(), cookie)
   }
 
-  override def routes: Routes = {
-    interpreter
-      .toRoutes(AuthController.login.serverLogic(login))
-      .orElse(interpreter.toRoutes(AuthController.getCurrentUser.serverLogic(me)))
-      .orElse(interpreter.toRoutes(AuthController.logout.serverLogic(logout)))
+  def routes: List[ServerEndpoint[AkkaStreams with WebSockets, Future]] = {
+    List(
+      AuthController.login.serverLogic(login),
+      AuthController.getCurrentUser.serverLogic(me),
+      AuthController.logout.serverLogic(logout)
+    )
   }
 }
 

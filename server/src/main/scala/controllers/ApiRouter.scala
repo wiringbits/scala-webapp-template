@@ -5,18 +5,26 @@ import play.api.libs.ws.StandaloneWSClient
 import play.api.routing.Router.Routes
 import play.api.routing.SimpleRouter
 import sttp.apispec.openapi.Info
+import sttp.capabilities.WebSockets
+import sttp.capabilities.akka.AkkaStreams
 import sttp.tapir.Endpoint
+import sttp.tapir.server.ServerEndpoint
 import sttp.tapir.server.play.PlayServerInterpreter
 import sttp.tapir.swagger.bundle.SwaggerInterpreter
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class ApiRoutes @Inject() (implicit materializer: Materializer, wsClient: StandaloneWSClient, ec: ExecutionContext)
+class ApiRouter @Inject()(
+    adminController: AdminController,
+    authController: AuthController,
+    healthController: HealthController,
+    usersController: UsersController
+)(implicit materializer: Materializer, wsClient: StandaloneWSClient, ec: ExecutionContext)
     extends SimpleRouter {
   private val swagger = SwaggerInterpreter()
     .fromEndpoints[Future](
-      ApiRoutes.routes,
+      ApiRouter.routes,
       Info(
         title = "Scala webapp template's API",
         version = "beta",
@@ -25,10 +33,18 @@ class ApiRoutes @Inject() (implicit materializer: Materializer, wsClient: Standa
     )
 
   override def routes: Routes = PlayServerInterpreter()
-    .toRoutes(swagger)
+    .toRoutes(
+      List(
+        swagger,
+        usersController.routes,
+        authController.routes,
+        healthController.routes,
+        adminController.routes
+      ).flatten
+    )
 }
 
-object ApiRoutes {
+object ApiRouter {
   private val routes: List[Endpoint[_, _, _, _, _]] = List(
     HealthController.routes,
     AdminController.routes,
