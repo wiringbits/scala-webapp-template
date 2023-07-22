@@ -64,19 +64,10 @@ object AdminController {
     .in("admin")
     .tag("Admin")
 
-  private val authBasic = auth
-    .basic[String]()
-    .securitySchemeName("Basic authorization")
-    .description("Admin credentials")
-
-  private val adminCookie = cookie[String]("X-Forwarded-User")
-    .default("Unknown")
-    .schema(_.hidden(true))
-
   private val getUserLogsEndpoint = baseEndpoint.get
     .in("users" / path[UUID]("userId") / "logs")
     .in(adminCookie)
-    .in(authBasic)
+    .in(adminAuth)
     .out(
       jsonBody[AdminGetUserLogs.Response].example(
         AdminGetUserLogs.Response(
@@ -97,7 +88,7 @@ object AdminController {
   private val getUsersEndpoint = baseEndpoint.get
     .in("users")
     .in(adminCookie)
-    .in(authBasic)
+    .in(adminAuth)
     .out(
       jsonBody[AdminGetUsers.Response].example(
         AdminGetUsers.Response(

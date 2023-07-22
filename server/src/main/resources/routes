@@ -5,12 +5,12 @@
 
 # TODO: handle all routes with tapir
 
-# login user
-POST /auth/login controllers.AuthController.login()
-# logout
-POST /auth/logout controllers.AuthController.logout()
-# get the current user details
-GET  /auth/me controllers.AuthController.getCurrentUser()
+## login user
+#POST /auth/login controllers.AuthController.login()
+## logout
+#POST /auth/logout controllers.AuthController.logout()
+## get the current user details
+#GET  /auth/me controllers.AuthController.getCurrentUser()
 
 # create new user (public)
 POST /users controllers.UsersController.create()
@@ -40,6 +40,8 @@ GET /users/me/logs controllers.UsersController.getLogs()
 -> / controllers.AdminController
 
 -> / controllers.EnvironmentConfigController
+
+-> / controllers.AuthController
 
 # routes for admin tables (GET, POST, PUT and DELETE)
 #-> / net.wiringbits.webapp.utils.admin.AppRouter
