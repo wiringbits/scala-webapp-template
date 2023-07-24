@@ -1,6 +1,13 @@
 package controllers
 
 import akka.stream.Materializer
+import net.wiringbits.api.endpoints.{
+  AdminEndpoints,
+  AuthEndpoints,
+  EnvironmentConfigEndpoints,
+  HealthEndpoints,
+  UsersEndpoints
+}
 import play.api.libs.ws.StandaloneWSClient
 import play.api.routing.Router.Routes
 import play.api.routing.SimpleRouter
@@ -15,7 +22,7 @@ import sttp.tapir.swagger.bundle.SwaggerInterpreter
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class ApiRouter @Inject()(
+class ApiRouter @Inject() (
     adminController: AdminController,
     authController: AuthController,
     healthController: HealthController,
@@ -46,10 +53,10 @@ class ApiRouter @Inject()(
 
 object ApiRouter {
   private val routes: List[Endpoint[_, _, _, _, _]] = List(
-    HealthController.routes,
-    AdminController.routes,
-    AuthController.routes,
-    UsersController.routes,
-    EnvironmentConfigController.routes
+    HealthEndpoints.routes,
+    AdminEndpoints.routes,
+    AuthEndpoints.routes,
+    UsersEndpoints.routes,
+    EnvironmentConfigEndpoints.routes
   ).flatten
 }

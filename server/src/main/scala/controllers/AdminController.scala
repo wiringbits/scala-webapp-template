@@ -1,6 +1,6 @@
 package controllers
 
-import controllers.AdminController.getUserLogsEndpoint
+import net.wiringbits.api.endpoints.AdminEndpoints
 import net.wiringbits.api.models.{AdminGetUserLogs, AdminGetUsers, ErrorResponse}
 import net.wiringbits.common.models.{Email, Name}
 import net.wiringbits.services.AdminService
@@ -45,64 +45,8 @@ class AdminController @Inject() (
 
   def routes: List[ServerEndpoint[AkkaStreams with WebSockets, Future]] = {
     List(
-      AdminController.getUserLogsEndpoint.serverLogic(getUserLogs),
-      AdminController.getUsersEndpoint.serverLogic(getUsers)
+      AdminEndpoints.getUserLogsEndpoint.serverLogic(getUserLogs),
+      AdminEndpoints.getUsersEndpoint.serverLogic(getUsers)
     )
   }
-}
-
-object AdminController {
-  import sttp.tapir.*
-  import sttp.tapir.json.play.*
-
-  private val baseEndpoint = endpoint
-    .in("admin")
-    .tag("Admin")
-    .in(adminAuth)
-    .errorOut(errorResponseErrorOut)
-
-  private val getUserLogsEndpoint = baseEndpoint.get
-    .in("users" / path[UUID]("userId") / "logs")
-    .in(adminCookie)
-    .out(
-      jsonBody[AdminGetUserLogs.Response].example(
-        AdminGetUserLogs.Response(
-          List(
-            AdminGetUserLogs.Response
-              .UserLog(
-                id = UUID.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6"),
-                message = "Message",
-                createdAt = Instant.parse("2021-01-01T00:00:00Z")
-              )
-          )
-        )
-      )
-    )
-    .errorOut(oneOf(HttpErrors.badRequest, HttpErrors.unauthorized))
-    .summary("Get the logs for a specific user")
-
-  private val getUsersEndpoint = baseEndpoint.get
-    .in("users")
-    .in(adminCookie)
-    .out(
-      jsonBody[AdminGetUsers.Response].example(
-        AdminGetUsers.Response(
-          List(
-            AdminGetUsers.Response.User(
-              id = UUID.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6"),
-              name = Name.trusted("Alexis"),
-              email = Email.trusted("alexis@wiringbits.net"),
-              createdAt = Instant.parse("2021-01-01T00:00:00Z")
-            )
-          )
-        )
-      )
-    )
-    .errorOut(oneOf(HttpErrors.badRequest, HttpErrors.unauthorized))
-    .summary("Get the registered users")
-
-  val routes: List[Endpoint[_, _, _, _, _]] = List(
-    getUserLogsEndpoint,
-    getUsersEndpoint
-  )
 }

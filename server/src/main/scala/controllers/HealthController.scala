@@ -1,5 +1,6 @@
 package controllers
 
+import net.wiringbits.api.endpoints.HealthEndpoints
 import sttp.capabilities.WebSockets
 import sttp.capabilities.akka.AkkaStreams
 import sttp.model.headers.{Cookie, CookieValueWithMeta, CookieWithMeta}
@@ -29,24 +30,6 @@ class HealthController @Inject() (implicit ec: ExecutionContext) {
     )
 
   def routes: List[ServerEndpoint[AkkaStreams with WebSockets, Future]] = {
-    List(HealthController.check.serverLogic(_ => check))
+    List(HealthEndpoints.check.serverLogic(_ => check))
   }
-}
-
-object HealthController {
-  import sttp.tapir.*
-  import sttp.tapir.json.circe.*
-
-  private val baseEndpoint = endpoint
-    .tag("Misc")
-    .in("health")
-
-  private val check = baseEndpoint.get
-    .out(emptyOutput.description("The app is healthy"))
-    .out(setCookie("Hello"))
-    .summary("Queries the application's health")
-
-  val routes: List[Endpoint[_, _, _, _, _]] = List(
-    check
-  )
 }
