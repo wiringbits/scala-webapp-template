@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [ master ]
   push:
-    branches: [ master ]
+    branches: [ master, scala3 ]
 
 concurrency:
   # The preview script can't handle concurrent deploys
