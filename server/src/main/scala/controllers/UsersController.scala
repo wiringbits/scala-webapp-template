@@ -275,7 +275,6 @@ object UsersController {
 
   private val getLogs = endpoint.get
     .in("users" / "me" / "logs")
-    .in(jsonBody[GetUserLogs.Request].example(GetUserLogs.Request()))
     .out(
       jsonBody[GetUserLogs.Response]
         .description("Got user logs")

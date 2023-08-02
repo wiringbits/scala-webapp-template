@@ -8,8 +8,6 @@ import java.time.Instant
 import java.util.UUID
 
 object GetUserLogs {
-  case class Request(noData: String = "")
-
   case class Response(data: List[Response.UserLog])
 
   object Response {
@@ -19,12 +17,8 @@ object GetUserLogs {
       Schema.derived[UserLog].name(Schema.SName("GetUserLogsResponseUserLog"))
   }
 
-  implicit val getUserLogsRequestFormat: Format[Request] = Json.format[Request]
   implicit val getUserLogsResponseFormat: Format[Response] = Json.format[Response]
 
-  implicit val getUserLogsRequestSchema: Schema[Request] = Schema
-    .derived[Request]
-    .name(Schema.SName("GetUserLogsRequest"))
   implicit val getUserLogsResponseSchema: Schema[Response] = Schema
     .derived[Response]
     .name(Schema.SName("GetUserLogsResponse"))
