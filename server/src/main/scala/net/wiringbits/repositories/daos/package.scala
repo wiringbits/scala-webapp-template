@@ -1,10 +1,14 @@
 package net.wiringbits.repositories
 
-import anorm._
-import anorm.postgresql._
+import anorm.*
+import anorm.postgresql.*
+import anorm.SqlParser.*
 import net.wiringbits.common.models.{Email, Name}
 import net.wiringbits.models.jobs.{BackgroundJobStatus, BackgroundJobType}
-import net.wiringbits.repositories.models._
+import net.wiringbits.repositories.models.*
+
+import java.time.Instant
+import java.util.UUID
 
 package object daos {
 
@@ -52,8 +56,23 @@ package object daos {
     UserTokenType.withNameInsensitiveOption
   )
 
+  // TODO: Use Macro.parser, for some reason it doesn't work so we have to parse it manually
   implicit val tokenParser: RowParser[UserToken] = {
-    Macro.parser[UserToken]("user_token_id", "token", "token_type", "created_at", "expires_at", "user_id")
+    get[UUID]("user_token_id") ~
+      str("token") ~
+      get[UserTokenType]("token_type") ~
+      get[Instant]("created_at") ~
+      get[Instant]("expires_at") ~
+      get[UUID]("user_id") map { case tokenId ~ token ~ tokenType ~ createdAt ~ expiresAt ~ userId =>
+        UserToken(
+          id = tokenId,
+          tokenType = tokenType,
+          token = token,
+          createdAt = createdAt,
+          expiresAt = expiresAt,
+          userId = userId
+        )
+      }
   }
 
   implicit val backgroundJobStatusColumn: Column[BackgroundJobStatus] = enumColumn(
