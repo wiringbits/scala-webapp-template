@@ -95,7 +95,6 @@ object AuthController {
 
   private val getCurrentUser = endpoint.get
     .in("auth" / "me")
-    .in(jsonBody[GetCurrentUser.Request].example(GetCurrentUser.Request()))
     .out(
       jsonBody[GetCurrentUser.Response]
         .description("Got user details")
