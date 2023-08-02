@@ -58,4 +58,12 @@ class ConfigModule extends AbstractModule {
     logger.info(s"Config loaded: $config")
     config
   }
+
+  @Provides
+  @Singleton
+  def swaggerConfig(global: Configuration): SwaggerConfig = {
+    val config = SwaggerConfig(global.get[Configuration]("swagger"))
+    logger.info(s"Config loaded: $config")
+    config
+  }
 }
