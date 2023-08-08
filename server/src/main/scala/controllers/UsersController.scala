@@ -39,23 +39,21 @@ class UsersController @Inject() (
     } yield Right(response)
   }
 
-  private def forgotPassword(
-      request: ForgotPassword.Request
-  ): Future[Either[ErrorResponse, ForgotPassword.Response]] = handleRequest {
-    logger.info(s"Send a link to reset password for user with email: ${request.email}")
-    for {
-      response <- forgotPasswordAction(request)
-    } yield Right(response)
-  }
+  private def forgotPassword(request: ForgotPassword.Request): Future[Either[ErrorResponse, ForgotPassword.Response]] =
+    handleRequest {
+      logger.info(s"Send a link to reset password for user with email: ${request.email}")
+      for {
+        response <- forgotPasswordAction(request)
+      } yield Right(response)
+    }
 
-  private def resetPassword(
-      request: ResetPassword.Request
-  ): Future[Either[ErrorResponse, ResetPassword.Response]] = handleRequest {
-    logger.info(s"Reset user's password: ${request.token.userId}")
-    for {
-      response <- resetPasswordAction(request.token.userId, request.token.token, request.password)
-    } yield Right(response)
-  }
+  private def resetPassword(request: ResetPassword.Request): Future[Either[ErrorResponse, ResetPassword.Response]] =
+    handleRequest {
+      logger.info(s"Reset user's password: ${request.token.userId}")
+      for {
+        response <- resetPasswordAction(request.token.userId, request.token.token, request.password)
+      } yield Right(response)
+    }
 
   private def sendEmailVerificationToken(
       request: SendEmailVerificationToken.Request
@@ -69,11 +67,11 @@ class UsersController @Inject() (
 
   private def update(
       request: UpdateUser.Request,
-      userIdMaybe: Option[String]
+      sessionCookie: Option[String]
   ): Future[Either[ErrorResponse, UpdateUser.Response]] = handleRequest {
     logger.info(s"Update user: $request")
     for {
-      userId <- playTapirBridge.parseSession(userIdMaybe)
+      userId <- playTapirBridge.parseSession(sessionCookie)
       _ <- updateUserAction(userId, request)
       response = UpdateUser.Response()
     } yield Right(response)
@@ -81,20 +79,20 @@ class UsersController @Inject() (
 
   private def updatePassword(
       request: UpdatePassword.Request,
-      userIdMaybe: Option[String]
+      sessionCookie: Option[String]
   ): Future[Either[ErrorResponse, UpdatePassword.Response]] = handleRequest {
     for {
-      userId <- playTapirBridge.parseSession(userIdMaybe)
+      userId <- playTapirBridge.parseSession(sessionCookie)
       _ = logger.info(s"Update password for: $userId")
       _ <- updatePasswordAction(userId, request)
       response = UpdatePassword.Response()
     } yield Right(response)
   }
 
-  private def getLogs(userIdMaybe: Option[String]): Future[Either[ErrorResponse, GetUserLogs.Response]] =
+  private def getLogs(sessionCookie: Option[String]): Future[Either[ErrorResponse, GetUserLogs.Response]] =
     handleRequest {
       for {
-        userId <- playTapirBridge.parseSession(userIdMaybe)
+        userId <- playTapirBridge.parseSession(sessionCookie)
         _ = logger.info(s"Get user logs: $userId")
         response <- getUserLogsAction(userId)
       } yield Right(response)

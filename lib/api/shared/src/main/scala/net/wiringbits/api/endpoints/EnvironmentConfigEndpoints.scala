@@ -1,7 +1,7 @@
 package net.wiringbits.api.endpoints
 
 import net.wiringbits.api.models
-import net.wiringbits.api.models.GetEnvironmentConfig
+import net.wiringbits.api.models.{ErrorResponse, GetEnvironmentConfig}
 import sttp.tapir.*
 import sttp.tapir.json.play.*
 
@@ -11,7 +11,7 @@ object EnvironmentConfigEndpoints {
     .tag("Misc")
     .errorOut(errorResponseErrorOut)
 
-  val getEnvironmentConfig: Endpoint[Unit, Unit, models.ErrorResponse, GetEnvironmentConfig.Response, Any] =
+  val getEnvironmentConfig: Endpoint[Unit, Unit, ErrorResponse, GetEnvironmentConfig.Response, Any] =
     baseEndpoint.get
       .out(
         jsonBody[GetEnvironmentConfig.Response]

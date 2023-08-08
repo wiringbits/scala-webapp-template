@@ -1,7 +1,7 @@
 package net.wiringbits.api.endpoints
 
 import net.wiringbits.api.models
-import net.wiringbits.api.models.{GetCurrentUser, Login, Logout}
+import net.wiringbits.api.models.{ErrorResponse, GetCurrentUser, Login, Logout}
 import net.wiringbits.common.models.{Captcha, Email, Name, Password}
 import sttp.tapir.*
 import sttp.tapir.json.play.*
@@ -15,7 +15,7 @@ object AuthEndpoints {
     .tag("Auth")
     .errorOut(errorResponseErrorOut)
 
-  val login: Endpoint[Unit, Login.Request, models.ErrorResponse, (Login.Response, String), Any] =
+  val login: Endpoint[Unit, Login.Request, ErrorResponse, (Login.Response, String), Any] =
     baseEndpoint.post
       .in("login")
       .in(
@@ -43,7 +43,7 @@ object AuthEndpoints {
       .summary("Log into the app")
       .description("Sets a session cookie to authenticate the following requests")
 
-  val logout: Endpoint[Unit, Option[String], models.ErrorResponse, (Logout.Response, String), Any] =
+  val logout: Endpoint[Unit, Option[String], ErrorResponse, (Logout.Response, String), Any] =
     baseEndpoint.post
       .in("logout")
       .in(userIdCookie)
@@ -53,7 +53,7 @@ object AuthEndpoints {
       .summary("Logout from the app")
       .description("Clears the session cookie that's stored securely")
 
-  val getCurrentUser: Endpoint[Unit, Option[String], models.ErrorResponse, GetCurrentUser.Response, Any] =
+  val getCurrentUser: Endpoint[Unit, Option[String], ErrorResponse, GetCurrentUser.Response, Any] =
     baseEndpoint.get
       .in("me")
       .in(userIdCookie)

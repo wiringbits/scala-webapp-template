@@ -27,23 +27,23 @@ class AuthController @Inject() (
       } yield Right(response, cookieEncoded)
     }
 
-  private def me(userIdMaybe: Option[String]): Future[Either[ErrorResponse, GetCurrentUser.Response]] = handleRequest {
-    for {
-      userId <- playTapirBridge.parseSession(userIdMaybe)
-      _ = logger.info(s"Get user info: $userId")
-      response <- getUserAction(userId)
-    } yield Right(response)
-  }
+  private def me(sessionCookie: Option[String]): Future[Either[ErrorResponse, GetCurrentUser.Response]] =
+    handleRequest {
+      for {
+        userId <- playTapirBridge.parseSession(sessionCookie)
+        _ = logger.info(s"Get user info: $userId")
+        response <- getUserAction(userId)
+      } yield Right(response)
+    }
 
-  private def logout(
-      cookie: Option[String]
-  ): Future[Either[ErrorResponse, (Logout.Response, String)]] = handleRequest {
-    for {
-      _ <- playTapirBridge.parseSession(cookie)
-      _ = logger.info(s"Logout")
-      header <- playTapirBridge.clearSession()
-    } yield Right(Logout.Response(), header)
-  }
+  private def logout(sessionCookie: Option[String]): Future[Either[ErrorResponse, (Logout.Response, String)]] =
+    handleRequest {
+      for {
+        _ <- playTapirBridge.parseSession(sessionCookie)
+        _ = logger.info(s"Logout")
+        header <- playTapirBridge.clearSession()
+      } yield Right(Logout.Response(), header)
+    }
 
   def routes: List[ServerEndpoint[AkkaStreams with WebSockets, Future]] = {
     List(
