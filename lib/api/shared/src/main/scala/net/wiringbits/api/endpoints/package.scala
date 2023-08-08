@@ -5,7 +5,7 @@ import sttp.model.StatusCode
 import sttp.model.headers.CookieValueWithMeta
 import sttp.tapir.EndpointInput.AuthType
 import sttp.tapir.json.play.*
-import sttp.tapir.*
+import sttp.tapir.{EndpointIO, *}
 import sttp.tapir.generic.auto.*
 
 import java.util.UUID
@@ -31,13 +31,16 @@ package object endpoints {
     .securitySchemeName("Basic authorization")
     .description("Admin credentials")
 
-  val userIdCookie: EndpointInput.Cookie[Option[UUID]] = cookie[Option[UUID]]("userId")
+  val userIdCookie: EndpointIO.Header[Option[String]] = header[Option[String]]("Cookie")
     .description("User session")
     .schema(_.hidden(true))
 
-  val setUserIdCookie: EndpointIO.Header[CookieValueWithMeta] = setCookie("userId")
+  val setUserIdCookie: EndpointIO.Header[String] = header[String]("Set-Cookie")
     .description("User session")
     .schema(_.hidden(true))
+//    setCookie("userId")
+//    .description("User session")
+//    .schema(_.hidden(true))
 
   val errorResponseErrorOut: EndpointIO.Body[String, ErrorResponse] = jsonBody[ErrorResponse]
     .description("Error response")

@@ -3,14 +3,11 @@ package controllers
 import net.wiringbits.actions.*
 import net.wiringbits.api.endpoints.UsersEndpoints
 import net.wiringbits.api.models.*
-import net.wiringbits.common.models.*
 import org.slf4j.LoggerFactory
 import sttp.capabilities.WebSockets
 import sttp.capabilities.akka.AkkaStreams
 import sttp.tapir.server.ServerEndpoint
 
-import java.time.Instant
-import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -22,7 +19,8 @@ class UsersController @Inject() (
     updateUserAction: UpdateUserAction,
     updatePasswordAction: UpdatePasswordAction,
     getUserLogsAction: GetUserLogsAction,
-    sendEmailVerificationTokenAction: SendEmailVerificationTokenAction
+    sendEmailVerificationTokenAction: SendEmailVerificationTokenAction,
+    playTapirBridge: PlayTapirBridge
 )(implicit ec: ExecutionContext) {
   private val logger = LoggerFactory.getLogger(this.getClass)
 
@@ -71,11 +69,11 @@ class UsersController @Inject() (
 
   private def update(
       request: UpdateUser.Request,
-      userIdMaybe: Option[UUID]
+      userIdMaybe: Option[String]
   ): Future[Either[ErrorResponse, UpdateUser.Response]] = handleRequest {
     logger.info(s"Update user: $request")
     for {
-      userId <- authenticate(userIdMaybe)
+      userId <- playTapirBridge.parseSession(userIdMaybe)
       _ <- updateUserAction(userId, request)
       response = UpdateUser.Response()
     } yield Right(response)
@@ -83,23 +81,24 @@ class UsersController @Inject() (
 
   private def updatePassword(
       request: UpdatePassword.Request,
-      userIdMaybe: Option[UUID]
+      userIdMaybe: Option[String]
   ): Future[Either[ErrorResponse, UpdatePassword.Response]] = handleRequest {
     for {
-      userId <- authenticate(userIdMaybe)
+      userId <- playTapirBridge.parseSession(userIdMaybe)
       _ = logger.info(s"Update password for: $userId")
       _ <- updatePasswordAction(userId, request)
       response = UpdatePassword.Response()
     } yield Right(response)
   }
 
-  private def getLogs(userIdMaybe: Option[UUID]): Future[Either[ErrorResponse, GetUserLogs.Response]] = handleRequest {
-    for {
-      userId <- authenticate(userIdMaybe)
-      _ = logger.info(s"Get user logs: $userId")
-      response <- getUserLogsAction(userId)
-    } yield Right(response)
-  }
+  private def getLogs(userIdMaybe: Option[String]): Future[Either[ErrorResponse, GetUserLogs.Response]] =
+    handleRequest {
+      for {
+        userId <- playTapirBridge.parseSession(userIdMaybe)
+        _ = logger.info(s"Get user logs: $userId")
+        response <- getUserLogsAction(userId)
+      } yield Right(response)
+    }
 
   def routes: List[ServerEndpoint[AkkaStreams with WebSockets, Future]] = {
     List(

@@ -1,5 +1,7 @@
 import net.wiringbits.api.models.{ErrorResponse, errorResponseFormat}
 import org.slf4j.LoggerFactory
+import play.api.mvc.CookieHeaderEncoding
+import play.api.mvc.request.DefaultRequestFactory
 import sttp.model.StatusCode
 import sttp.model.headers.CookieValueWithMeta
 import sttp.tapir.*
@@ -8,11 +10,35 @@ import sttp.tapir.generic.auto.*
 import sttp.tapir.json.play.*
 
 import java.util.UUID
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
 import scala.util.control.NonFatal
 
 package object controllers {
   private val logger = LoggerFactory.getLogger(this.getClass)
+
+  class PlayTapirBridge @Inject() (
+      requestFactory: DefaultRequestFactory,
+      cookieHeaderEncoding: CookieHeaderEncoding
+  )(implicit ec: ExecutionContext) {
+    def parseSession(cookie: Option[String]): Future[UUID] = {
+      val cookies = cookieHeaderEncoding.fromCookieHeader(cookie)
+      val session = requestFactory.sessionBaker.decodeFromCookie(cookies.get(requestFactory.sessionBaker.COOKIE_NAME))
+
+      def userIdFromSession = Future {
+        session
+          .get("id")
+          .flatMap(str => Try(UUID.fromString(str)).toOption)
+          .getOrElse(throw new RuntimeException("Invalid or missing authentication"))
+      }
+
+      userIdFromSession
+        .recover { case NonFatal(_) =>
+          throw new RuntimeException("Unauthorized: Invalid or missing authentication")
+        }
+    }
+  }
 
   def authenticate(userIdMaybe: Option[UUID])(implicit ec: ExecutionContext): Future[UUID] = {
     def userIdFromSession: Future[UUID] = Future {

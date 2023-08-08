@@ -16,7 +16,7 @@ object AuthEndpoints {
     .tag("Auth")
     .errorOut(errorResponseErrorOut)
 
-  val login: Endpoint[Unit, Login.Request, models.ErrorResponse, (Login.Response, CookieValueWithMeta), Any] =
+  val login: Endpoint[Unit, Login.Request, models.ErrorResponse, (Login.Response, String), Any] =
     baseEndpoint.post
       .in("login")
       .in(
@@ -44,7 +44,7 @@ object AuthEndpoints {
       .summary("Log into the app")
       .description("Sets a session cookie to authenticate the following requests")
 
-  val logout: Endpoint[Unit, Option[UUID], models.ErrorResponse, (Logout.Response, CookieValueWithMeta), Any] =
+  val logout: Endpoint[Unit, Option[String], models.ErrorResponse, (Logout.Response, String), Any] =
     baseEndpoint.post
       .in("logout")
       .in(userIdCookie)
@@ -54,7 +54,7 @@ object AuthEndpoints {
       .summary("Logout from the app")
       .description("Clears the session cookie that's stored securely")
 
-  val getCurrentUser: Endpoint[Unit, Option[UUID], models.ErrorResponse, GetCurrentUser.Response, Any] =
+  val getCurrentUser: Endpoint[Unit, Option[String], models.ErrorResponse, GetCurrentUser.Response, Any] =
     baseEndpoint.get
       .in("me")
       .in(userIdCookie)

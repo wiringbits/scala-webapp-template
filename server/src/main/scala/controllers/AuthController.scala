@@ -3,74 +3,67 @@ package controllers
 import net.wiringbits.actions.*
 import net.wiringbits.api.endpoints.AuthEndpoints
 import net.wiringbits.api.models.*
-import net.wiringbits.common.models.*
 import org.slf4j.LoggerFactory
+import play.api.mvc.request.DefaultRequestFactory
+import play.api.mvc.{CookieHeaderEncoding, Session}
 import sttp.capabilities.WebSockets
 import sttp.capabilities.akka.AkkaStreams
-import sttp.model.StatusCode
-import sttp.model.headers.CookieValueWithMeta
 import sttp.tapir.server.ServerEndpoint
 
-import java.time.Instant
-import java.time.temporal.ChronoUnit
-import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.control.NonFatal
 
 class AuthController @Inject() (
     loginAction: LoginAction,
-    getUserAction: GetUserAction
+    getUserAction: GetUserAction,
+    requestFactory: DefaultRequestFactory,
+    cookieHeaderEncoding: CookieHeaderEncoding,
+    playTapirBridge: PlayTapirBridge
 )(implicit ec: ExecutionContext) {
   private val logger = LoggerFactory.getLogger(this.getClass)
 
-  private def login(body: Login.Request): Future[Either[ErrorResponse, (Login.Response, CookieValueWithMeta)]] =
+  private def login(body: Login.Request): Future[Either[ErrorResponse, (Login.Response, String)]] =
     handleRequest {
       logger.info(s"Login API: ${body.email}")
       for {
         response <- loginAction(body)
+        // TODO:
+        session = Session(Map("id" -> response.id.toString))
+        playCookie = requestFactory.sessionBaker.encodeAsCookie(session)
+        cookieEncoded = cookieHeaderEncoding.encodeSetCookieHeader(List(playCookie))
         // TODO: shorter way?
         // TODO: config the cookie
-        cookie = CookieValueWithMeta(
-          value = response.id.toString,
-          expires = Some(Instant.now().plus(1L, ChronoUnit.DAYS)),
-          maxAge = None,
-          domain = None,
-          path = None,
-          secure = false,
-          httpOnly = false,
-          sameSite = None,
-          otherDirectives = Map.empty
-        )
-      } yield Right(response, cookie)
+//        cookie = CookieValueWithMeta(
+//          value = playCookie.value,
+//          expires = None,
+//          maxAge = playCookie.maxAge.map(_.toLong),
+//          domain = playCookie.domain,
+//          path = playCookie.path,
+//          secure = playCookie.secure,
+//          httpOnly = playCookie.httpOnly,
+//          sameSite = playCookie.sameSite,
+//          otherDirectives = Map.empty
+//        )
+      } yield Right(response, cookieEncoded)
     }
 
-  private def me(userIdMaybe: Option[UUID]): Future[Either[ErrorResponse, GetCurrentUser.Response]] = handleRequest {
+  private def me(userIdMaybe: Option[String]): Future[Either[ErrorResponse, GetCurrentUser.Response]] = handleRequest {
     for {
-      userId <- authenticate(userIdMaybe)
+      userId <- playTapirBridge.parseSession(userIdMaybe)
       _ = logger.info(s"Get user info: $userId")
       response <- getUserAction(userId)
     } yield Right(response)
   }
 
   private def logout(
-      userIdMaybe: Option[UUID]
-  ): Future[Either[ErrorResponse, (Logout.Response, CookieValueWithMeta)]] = handleRequest {
+      cookie: Option[String]
+  ): Future[Either[ErrorResponse, (Logout.Response, String)]] = handleRequest {
     for {
-      _ <- authenticate(userIdMaybe)
+      _ <- playTapirBridge.parseSession(cookie)
       _ = logger.info(s"Logout")
-      cookie = CookieValueWithMeta(
-        value = "",
-        expires = Some(Instant.now()),
-        maxAge = None,
-        domain = None,
-        path = None,
-        secure = false,
-        httpOnly = false,
-        sameSite = None,
-        otherDirectives = Map.empty
-      )
-    } yield Right(Logout.Response(), cookie)
+      encoded = requestFactory.sessionBaker.discard.toCookie
+      header = cookieHeaderEncoding.encodeSetCookieHeader(List(encoded))
+    } yield Right(Logout.Response(), header)
   }
 
   def routes: List[ServerEndpoint[AkkaStreams with WebSockets, Future]] = {

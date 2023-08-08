@@ -133,7 +133,7 @@ object UsersEndpoints {
         "The user's email should be unconfirmed, this is intended to re-send a token in case the previous one did not arrive"
       )
 
-  val update: Endpoint[Unit, (UpdateUser.Request, Option[UUID]), ErrorResponse, UpdateUser.Response, Any] =
+  val update: Endpoint[Unit, (UpdateUser.Request, Option[String]), ErrorResponse, UpdateUser.Response, Any] =
     baseEndpoint.put
       .in("me")
       .in(
@@ -149,7 +149,7 @@ object UsersEndpoints {
       .summary("Updates the authenticated user details")
 
   val updatePassword
-      : Endpoint[Unit, (UpdatePassword.Request, Option[UUID]), ErrorResponse, UpdatePassword.Response, Any] =
+      : Endpoint[Unit, (UpdatePassword.Request, Option[String]), ErrorResponse, UpdatePassword.Response, Any] =
     baseEndpoint.put
       .in("me" / "password")
       .in(
@@ -167,7 +167,7 @@ object UsersEndpoints {
       .errorOut(oneOf(HttpErrors.badRequest))
       .summary("Updates the authenticated user password")
 
-  val getLogs: Endpoint[Unit, Option[UUID], ErrorResponse, GetUserLogs.Response, Any] = baseEndpoint.get
+  val getLogs: Endpoint[Unit, Option[String], ErrorResponse, GetUserLogs.Response, Any] = baseEndpoint.get
     .in("me" / "logs")
     .in(userIdCookie)
     .out(

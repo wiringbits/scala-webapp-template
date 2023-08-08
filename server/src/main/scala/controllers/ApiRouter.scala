@@ -26,7 +26,8 @@ class ApiRouter @Inject() (
     adminController: AdminController,
     authController: AuthController,
     healthController: HealthController,
-    usersController: UsersController
+    usersController: UsersController,
+    environmentConfigController: EnvironmentConfigController
 )(implicit materializer: Materializer, wsClient: StandaloneWSClient, ec: ExecutionContext)
     extends SimpleRouter {
   private val swagger = SwaggerInterpreter()
@@ -46,7 +47,8 @@ class ApiRouter @Inject() (
         usersController.routes,
         authController.routes,
         healthController.routes,
-        adminController.routes
+        adminController.routes,
+        environmentConfigController.routes
       ).flatten
     )
 }
