@@ -2,15 +2,13 @@ package controllers
 
 import net.wiringbits.api.endpoints.AdminEndpoints
 import net.wiringbits.api.models.{AdminGetUserLogs, AdminGetUsers, ErrorResponse}
-import net.wiringbits.common.models.{Email, Name}
+import net.wiringbits.common.models.Email
 import net.wiringbits.services.AdminService
 import org.slf4j.LoggerFactory
 import sttp.capabilities.WebSockets
 import sttp.capabilities.akka.AkkaStreams
-import sttp.tapir.Endpoint
 import sttp.tapir.server.ServerEndpoint
 
-import java.time.Instant
 import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}

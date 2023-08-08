@@ -4,8 +4,6 @@ import net.wiringbits.actions.*
 import net.wiringbits.api.endpoints.AuthEndpoints
 import net.wiringbits.api.models.*
 import org.slf4j.LoggerFactory
-import play.api.mvc.request.DefaultRequestFactory
-import play.api.mvc.{CookieHeaderEncoding, Session}
 import sttp.capabilities.WebSockets
 import sttp.capabilities.akka.AkkaStreams
 import sttp.tapir.server.ServerEndpoint
@@ -16,8 +14,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class AuthController @Inject() (
     loginAction: LoginAction,
     getUserAction: GetUserAction,
-    requestFactory: DefaultRequestFactory,
-    cookieHeaderEncoding: CookieHeaderEncoding,
     playTapirBridge: PlayTapirBridge
 )(implicit ec: ExecutionContext) {
   private val logger = LoggerFactory.getLogger(this.getClass)
@@ -27,23 +23,7 @@ class AuthController @Inject() (
       logger.info(s"Login API: ${body.email}")
       for {
         response <- loginAction(body)
-        // TODO:
-        session = Session(Map("id" -> response.id.toString))
-        playCookie = requestFactory.sessionBaker.encodeAsCookie(session)
-        cookieEncoded = cookieHeaderEncoding.encodeSetCookieHeader(List(playCookie))
-        // TODO: shorter way?
-        // TODO: config the cookie
-//        cookie = CookieValueWithMeta(
-//          value = playCookie.value,
-//          expires = None,
-//          maxAge = playCookie.maxAge.map(_.toLong),
-//          domain = playCookie.domain,
-//          path = playCookie.path,
-//          secure = playCookie.secure,
-//          httpOnly = playCookie.httpOnly,
-//          sameSite = playCookie.sameSite,
-//          otherDirectives = Map.empty
-//        )
+        cookieEncoded <- playTapirBridge.setSession(response.id)
       } yield Right(response, cookieEncoded)
     }
 
@@ -61,8 +41,7 @@ class AuthController @Inject() (
     for {
       _ <- playTapirBridge.parseSession(cookie)
       _ = logger.info(s"Logout")
-      encoded = requestFactory.sessionBaker.discard.toCookie
-      header = cookieHeaderEncoding.encodeSetCookieHeader(List(encoded))
+      header <- playTapirBridge.clearSession()
     } yield Right(Logout.Response(), header)
   }
 

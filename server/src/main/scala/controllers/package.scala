@@ -1,13 +1,7 @@
-import net.wiringbits.api.models.{ErrorResponse, errorResponseFormat}
+import net.wiringbits.api.models.ErrorResponse
 import org.slf4j.LoggerFactory
-import play.api.mvc.CookieHeaderEncoding
 import play.api.mvc.request.DefaultRequestFactory
-import sttp.model.StatusCode
-import sttp.model.headers.CookieValueWithMeta
-import sttp.tapir.*
-import sttp.tapir.EndpointInput.AuthType
-import sttp.tapir.generic.auto.*
-import sttp.tapir.json.play.*
+import play.api.mvc.{CookieHeaderEncoding, Session}
 
 import java.util.UUID
 import javax.inject.Inject
@@ -38,16 +32,17 @@ package object controllers {
           throw new RuntimeException("Unauthorized: Invalid or missing authentication")
         }
     }
-  }
 
-  def authenticate(userIdMaybe: Option[UUID])(implicit ec: ExecutionContext): Future[UUID] = {
-    def userIdFromSession: Future[UUID] = Future {
-      userIdMaybe.getOrElse(throw new RuntimeException("Invalid or missing authentication"))
+    def setSession(userId: UUID): Future[String] = Future {
+      val session = Session(Map("id" -> userId.toString))
+      val playCookie = requestFactory.sessionBaker.encodeAsCookie(session)
+      cookieHeaderEncoding.encodeSetCookieHeader(List(playCookie))
     }
-    userIdFromSession
-      .recover { case NonFatal(_) =>
-        throw new RuntimeException("Unauthorized: Invalid or missing authentication")
-      }
+
+    def clearSession(): Future[String] = Future {
+      val encoded = requestFactory.sessionBaker.discard.toCookie
+      cookieHeaderEncoding.encodeSetCookieHeader(List(encoded))
+    }
   }
 
   def handleRequest[R](

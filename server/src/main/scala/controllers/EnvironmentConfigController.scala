@@ -6,7 +6,6 @@ import net.wiringbits.api.models.{ErrorResponse, GetEnvironmentConfig}
 import org.slf4j.LoggerFactory
 import sttp.capabilities.WebSockets
 import sttp.capabilities.akka.AkkaStreams
-import sttp.model.MediaType
 import sttp.tapir.server.ServerEndpoint
 
 import javax.inject.Inject

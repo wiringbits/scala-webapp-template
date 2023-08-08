@@ -1,21 +1,12 @@
 package controllers
 
 import akka.stream.Materializer
-import net.wiringbits.api.endpoints.{
-  AdminEndpoints,
-  AuthEndpoints,
-  EnvironmentConfigEndpoints,
-  HealthEndpoints,
-  UsersEndpoints
-}
+import net.wiringbits.api.endpoints.*
 import play.api.libs.ws.StandaloneWSClient
 import play.api.routing.Router.Routes
 import play.api.routing.SimpleRouter
 import sttp.apispec.openapi.Info
-import sttp.capabilities.WebSockets
-import sttp.capabilities.akka.AkkaStreams
 import sttp.tapir.Endpoint
-import sttp.tapir.server.ServerEndpoint
 import sttp.tapir.server.play.PlayServerInterpreter
 import sttp.tapir.swagger.bundle.SwaggerInterpreter
 
