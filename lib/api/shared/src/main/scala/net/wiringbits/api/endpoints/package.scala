@@ -28,11 +28,11 @@ package object endpoints {
     .securitySchemeName("Basic authorization")
     .description("Admin credentials")
 
-  val userIdCookie: EndpointIO.Header[Option[String]] = header[Option[String]]("Cookie")
+  val sessionHeader: EndpointIO.Header[Option[String]] = header[Option[String]]("Cookie")
     .description("User session")
     .schema(_.hidden(true))
 
-  val setUserIdCookie: EndpointIO.Header[String] = header[String]("Set-Cookie")
+  val setSessionHeader: EndpointIO.Header[String] = header[String]("Set-Cookie")
     .description("Set user session")
     .schema(_.hidden(true))
 

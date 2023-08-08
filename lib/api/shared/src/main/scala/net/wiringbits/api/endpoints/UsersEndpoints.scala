@@ -143,7 +143,7 @@ object UsersEndpoints {
           )
         )
       )
-      .in(userIdCookie)
+      .in(sessionHeader)
       .out(jsonBody[UpdateUser.Response].description("The user details were updated").example(UpdateUser.Response()))
       .errorOut(oneOf(HttpErrors.badRequest))
       .summary("Updates the authenticated user details")
@@ -162,14 +162,14 @@ object UsersEndpoints {
             )
           )
       )
-      .in(userIdCookie)
+      .in(sessionHeader)
       .out(jsonBody[UpdatePassword.Response])
       .errorOut(oneOf(HttpErrors.badRequest))
       .summary("Updates the authenticated user password")
 
   val getLogs: Endpoint[Unit, Option[String], ErrorResponse, GetUserLogs.Response, Any] = baseEndpoint.get
     .in("me" / "logs")
-    .in(userIdCookie)
+    .in(sessionHeader)
     .out(
       jsonBody[GetUserLogs.Response]
         .description("Got user logs")

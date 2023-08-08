@@ -38,7 +38,7 @@ object AuthEndpoints {
             )
           )
       )
-      .out(setUserIdCookie)
+      .out(setSessionHeader)
       .errorOut(oneOf(HttpErrors.badRequest))
       .summary("Log into the app")
       .description("Sets a session cookie to authenticate the following requests")
@@ -46,9 +46,9 @@ object AuthEndpoints {
   val logout: Endpoint[Unit, Option[String], ErrorResponse, (Logout.Response, String), Any] =
     baseEndpoint.post
       .in("logout")
-      .in(userIdCookie)
+      .in(sessionHeader)
       .out(jsonBody[Logout.Response].description("Successful logout").example(Logout.Response()))
-      .out(setUserIdCookie)
+      .out(setSessionHeader)
       .errorOut(oneOf(HttpErrors.badRequest))
       .summary("Logout from the app")
       .description("Clears the session cookie that's stored securely")
@@ -56,7 +56,7 @@ object AuthEndpoints {
   val getCurrentUser: Endpoint[Unit, Option[String], ErrorResponse, GetCurrentUser.Response, Any] =
     baseEndpoint.get
       .in("me")
-      .in(userIdCookie)
+      .in(sessionHeader)
       .out(
         jsonBody[GetCurrentUser.Response]
           .description("Got user details")
