@@ -252,7 +252,8 @@ lazy val api = (crossProject(JSPlatform, JVMPlatform) in file("lib/api"))
   .jvmSettings(
     libraryDependencies ++= Seq(
       "com.typesafe.play" %% "play-json" % playJson,
-      "com.softwaremill.sttp.client3" %% "core" % sttp
+      "com.softwaremill.sttp.client3" %% "core" % sttp,
+      "com.softwaremill.sttp.tapir" %% "tapir-core" % tapir
     )
   )
   .jsSettings(
@@ -264,7 +265,8 @@ lazy val api = (crossProject(JSPlatform, JVMPlatform) in file("lib/api"))
       "com.typesafe.play" %%% "play-json" % playJson,
       "com.softwaremill.sttp.client3" %%% "core" % sttp,
       "org.scalatest" %%% "scalatest" % "3.2.16" % Test,
-      "com.beachape" %%% "enumeratum" % enumeratum
+      "com.beachape" %%% "enumeratum" % enumeratum,
+      "com.softwaremill.sttp.tapir" %%% "tapir-core" % tapir
     )
   )
 
