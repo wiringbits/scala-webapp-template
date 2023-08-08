@@ -188,7 +188,7 @@ object UsersEndpoints {
     .errorOut(oneOf(HttpErrors.badRequest))
     .summary("Get the logs for the authenticated user")
 
-  val routes: List[Endpoint[_, _, _, _, _]] = List(
+  val routes: List[AnyEndpoint] = List(
     create,
     verifyEmail,
     forgotPassword,

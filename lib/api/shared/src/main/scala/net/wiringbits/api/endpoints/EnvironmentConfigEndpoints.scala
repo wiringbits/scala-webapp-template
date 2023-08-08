@@ -21,7 +21,7 @@ object EnvironmentConfigEndpoints {
       .summary("Get the config values for the current environment")
       .description("These values are required by the frontend app to interact with the backend")
 
-  val routes: List[Endpoint[_, _, _, _, _]] = List(
+  val routes: List[AnyEndpoint] = List(
     getEnvironmentConfig
   )
 }

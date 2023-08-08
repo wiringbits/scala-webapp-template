@@ -3,7 +3,6 @@ package net.wiringbits.api.endpoints
 import net.wiringbits.api.models
 import net.wiringbits.api.models.{GetCurrentUser, Login, Logout}
 import net.wiringbits.common.models.{Captcha, Email, Name, Password}
-import sttp.model.headers.CookieValueWithMeta
 import sttp.tapir.*
 import sttp.tapir.json.play.*
 
@@ -72,7 +71,7 @@ object AuthEndpoints {
       )
       .summary("Get the details for the authenticated user")
 
-  val routes: List[Endpoint[_, _, _, _, _]] = List(
+  val routes: List[AnyEndpoint] = List(
     login,
     logout,
     getCurrentUser

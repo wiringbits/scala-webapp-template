@@ -2,13 +2,10 @@ package net.wiringbits.api
 
 import net.wiringbits.api.models.{ErrorResponse, errorResponseFormat}
 import sttp.model.StatusCode
-import sttp.model.headers.CookieValueWithMeta
+import sttp.tapir.*
 import sttp.tapir.EndpointInput.AuthType
-import sttp.tapir.json.play.*
-import sttp.tapir.{EndpointIO, *}
 import sttp.tapir.generic.auto.*
-
-import java.util.UUID
+import sttp.tapir.json.play.*
 
 package object endpoints {
   // TODO: better name?
@@ -36,11 +33,8 @@ package object endpoints {
     .schema(_.hidden(true))
 
   val setUserIdCookie: EndpointIO.Header[String] = header[String]("Set-Cookie")
-    .description("User session")
+    .description("Set user session")
     .schema(_.hidden(true))
-//    setCookie("userId")
-//    .description("User session")
-//    .schema(_.hidden(true))
 
   val errorResponseErrorOut: EndpointIO.Body[String, ErrorResponse] = jsonBody[ErrorResponse]
     .description("Error response")

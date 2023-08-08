@@ -58,7 +58,7 @@ object AdminEndpoints {
       .errorOut(oneOf(HttpErrors.badRequest, HttpErrors.unauthorized))
       .summary("Get the registered users")
 
-  val routes: List[Endpoint[_, _, _, _, _]] = List(
+  val routes: List[AnyEndpoint] = List(
     getUserLogsEndpoint,
     getUsersEndpoint
   )

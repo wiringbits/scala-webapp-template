@@ -1,6 +1,5 @@
 package net.wiringbits.api.endpoints
 
-import sttp.model.headers.CookieValueWithMeta
 import sttp.tapir.*
 
 object HealthEndpoints {
@@ -8,12 +7,11 @@ object HealthEndpoints {
     .tag("Misc")
     .in("health")
 
-  val check: Endpoint[Unit, Unit, Unit, CookieValueWithMeta, Any] = baseEndpoint.get
+  val check: Endpoint[Unit, Unit, Unit, Unit, Any] = baseEndpoint.get
     .out(emptyOutput.description("The app is healthy"))
-    .out(setCookie("Hello"))
     .summary("Queries the application's health")
 
-  val routes: List[Endpoint[_, _, _, _, _]] = List(
+  val routes: List[AnyEndpoint] = List(
     check
   )
 }
