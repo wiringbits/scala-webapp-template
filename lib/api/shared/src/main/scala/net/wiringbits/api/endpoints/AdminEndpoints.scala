@@ -19,7 +19,7 @@ object AdminEndpoints {
   val getUserLogsEndpoint
       : Endpoint[Unit, (String, UUID, String), ErrorResponse, AdminGetUserLogs.Response, Any] = baseEndpoint.get
     .in("users" / path[UUID]("userId") / "logs")
-    .in(adminCookie)
+    .in(adminHeader)
     .out(
       jsonBody[AdminGetUserLogs.Response].example(
         AdminGetUserLogs.Response(
@@ -40,7 +40,7 @@ object AdminEndpoints {
   val getUsersEndpoint: Endpoint[Unit, (String, String), ErrorResponse, AdminGetUsers.Response, Any] =
     baseEndpoint.get
       .in("users")
-      .in(adminCookie)
+      .in(adminHeader)
       .out(
         jsonBody[AdminGetUsers.Response].example(
           AdminGetUsers.Response(

@@ -19,7 +19,7 @@ package object endpoints {
     )
   }
 
-  val adminCookie: EndpointInput.Cookie[String] = cookie[String]("X-Forwarded-User")
+  val adminHeader: EndpointIO.Header[String] = header[String]("X-Forwarded-User")
     .default("Unknown")
     .schema(_.hidden(true))
 
