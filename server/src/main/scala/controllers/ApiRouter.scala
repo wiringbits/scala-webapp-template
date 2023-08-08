@@ -2,12 +2,14 @@ package controllers
 
 import akka.stream.Materializer
 import net.wiringbits.api.endpoints.*
+import net.wiringbits.config.SwaggerConfig
 import play.api.libs.ws.StandaloneWSClient
 import play.api.routing.Router.Routes
 import play.api.routing.SimpleRouter
 import sttp.apispec.openapi.Info
-import sttp.tapir.{AnyEndpoint, Endpoint}
+import sttp.tapir.AnyEndpoint
 import sttp.tapir.server.play.PlayServerInterpreter
+import sttp.tapir.swagger.SwaggerUIOptions
 import sttp.tapir.swagger.bundle.SwaggerInterpreter
 
 import javax.inject.Inject
@@ -18,16 +20,19 @@ class ApiRouter @Inject() (
     authController: AuthController,
     healthController: HealthController,
     usersController: UsersController,
-    environmentConfigController: EnvironmentConfigController
+    environmentConfigController: EnvironmentConfigController,
+    swaggerConfig: SwaggerConfig
 )(implicit materializer: Materializer, wsClient: StandaloneWSClient, ec: ExecutionContext)
     extends SimpleRouter {
-  private val swagger = SwaggerInterpreter()
+  private val swagger = SwaggerInterpreter(
+    swaggerUIOptions = SwaggerUIOptions.default.copy(contextPath = List(swaggerConfig.basePath))
+  )
     .fromEndpoints[Future](
       ApiRouter.routes,
       Info(
-        title = "Scala webapp template's API",
-        version = "beta",
-        description = Some("The API for the Scala webapp template app")
+        title = swaggerConfig.info.title,
+        version = swaggerConfig.info.version,
+        description = Some(swaggerConfig.info.description)
       )
     )
 
