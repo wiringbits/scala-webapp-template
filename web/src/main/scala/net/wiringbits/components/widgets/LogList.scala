@@ -1,8 +1,8 @@
 package net.wiringbits.components.widgets
 
+import com.alexitc.materialui.facade.materialUiCore.components as mui
 import com.alexitc.materialui.facade.materialUiCore.createMuiThemeMod.Theme
 import com.alexitc.materialui.facade.materialUiCore.mod.PropTypes.Color
-import com.alexitc.materialui.facade.materialUiCore.{components => mui}
 import com.alexitc.materialui.facade.materialUiStyles.makeStylesMod.StylesHook
 import com.alexitc.materialui.facade.materialUiStyles.mod.makeStyles
 import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
@@ -44,7 +44,8 @@ object LogList {
             .secondary(Formatter.instant(item.createdAt))
         )
         .divider(true)
-        .withKey(item.id.toString).build
+        .withKey(item.id.toString)
+        .build
     }
 
     Container(

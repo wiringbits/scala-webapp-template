@@ -13,7 +13,7 @@
 package java.security
 
 import scala.scalajs.js
-import scala.scalajs.js.typedarray._
+import scala.scalajs.js.typedarray.*
 
 // DISCLAIMER: This is almost identical to the official library https://github.com/scala-js/scala-js-fake-insecure-java-securerandom
 // There was the need to apply a patch that won't be accepted by the upstream library, given that this is used

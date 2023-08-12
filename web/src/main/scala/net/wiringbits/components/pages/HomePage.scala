@@ -2,7 +2,7 @@ package net.wiringbits.components.pages
 
 import com.alexitc.materialui.facade.csstype.mod.TextAlignProperty
 import com.alexitc.materialui.facade.materialUiCore.createMuiThemeMod.Theme
-import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
+import com.alexitc.materialui.facade.materialUiCore.{components as mui, materialUiCoreStrings as muiStrings}
 import com.alexitc.materialui.facade.materialUiStyles.makeStylesMod.StylesHook
 import com.alexitc.materialui.facade.materialUiStyles.mod.makeStyles
 import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
@@ -13,12 +13,12 @@ import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
 }
 import net.wiringbits.AppContext
 import net.wiringbits.core.I18nHooks
+import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.*
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.Alignment
-import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets._
 import org.scalablytyped.runtime.StringDictionary
 import slinky.core.FunctionalComponent
 import slinky.core.facade.{Fragment, ReactElement}
-import slinky.web.html._
+import slinky.web.html.*
 
 object HomePage {
   case class Props(ctx: AppContext)

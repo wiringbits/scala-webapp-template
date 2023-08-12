@@ -1,8 +1,8 @@
 package net.wiringbits.repositories
 
 import anorm.*
-import anorm.postgresql.*
 import anorm.SqlParser.*
+import anorm.postgresql.*
 import net.wiringbits.common.models.{Email, Name}
 import net.wiringbits.models.jobs.{BackgroundJobStatus, BackgroundJobType}
 import net.wiringbits.repositories.models.*
