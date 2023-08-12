@@ -1,7 +1,7 @@
 package net.wiringbits.actions.internal
 
 import akka.actor.ActorSystem
-import akka.stream.scaladsl._
+import akka.stream.scaladsl.*
 import net.wiringbits.repositories.BackgroundJobsRepository
 import net.wiringbits.repositories.models.BackgroundJobData
 import org.slf4j.LoggerFactory

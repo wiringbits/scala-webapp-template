@@ -1,15 +1,15 @@
 package net.wiringbits.components.pages
 
-import com.alexitc.materialui.facade.materialUiCore.{components => mui}
+import com.alexitc.materialui.facade.materialUiCore.components as mui
+import net.wiringbits.AppContext
 import net.wiringbits.components.widgets.{EditPasswordForm, UserInfo}
+import net.wiringbits.core.I18nHooks
 import net.wiringbits.models.UserMenuOption.{EditPassword, EditSummary}
 import net.wiringbits.models.{User, UserMenuOption}
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{Container, Title}
-import net.wiringbits.AppContext
-import net.wiringbits.core.I18nHooks
 import slinky.core.FunctionalComponent
-import slinky.core.facade.{Fragment, Hooks}
 import slinky.core.facade.ReactElement.*
+import slinky.core.facade.{Fragment, Hooks}
 object UserEditPage {
   case class Props(ctx: AppContext, user: User)
 

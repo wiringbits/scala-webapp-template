@@ -2,7 +2,7 @@ package controllers
 
 import net.wiringbits.actions.*
 import net.wiringbits.api.models.*
-import net.wiringbits.common.models.{Captcha, Email, Name, Password, UserToken}
+import net.wiringbits.common.models.*
 import org.slf4j.LoggerFactory
 import play.api.libs.json.Json
 import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}

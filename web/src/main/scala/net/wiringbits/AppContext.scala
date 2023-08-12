@@ -14,8 +14,8 @@ case class AppContext(
     $lang: Var[I18nLang],
     contactEmail: Email,
     contactPhone: String,
-    executionContext: ExecutionContext)
-{
+    executionContext: ExecutionContext
+) {
 
   // TODO: This is hacky but it works while preventing to pollute all components from depending on the Texts
   //       still, it would be ideal to keep a Var with the current Texts instance

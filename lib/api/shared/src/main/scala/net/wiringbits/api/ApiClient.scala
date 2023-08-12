@@ -1,9 +1,9 @@
 package net.wiringbits.api
 
-import net.wiringbits.api.models._
-import play.api.libs.json._
-import sttp.client3._
-import sttp.model._
+import net.wiringbits.api.models.*
+import play.api.libs.json.*
+import sttp.client3.*
+import sttp.model.*
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}

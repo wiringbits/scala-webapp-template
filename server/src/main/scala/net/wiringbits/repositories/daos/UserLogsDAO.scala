@@ -7,7 +7,7 @@ import java.util.UUID
 
 object UserLogsDAO {
 
-  import anorm._
+  import anorm.*
 
   def create(request: UserLog.CreateUserLog)(implicit conn: Connection): Unit = {
     val _ = SQL"""

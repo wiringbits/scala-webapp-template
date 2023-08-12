@@ -1,15 +1,13 @@
-import net.wiringbits.api.models.ErrorResponse
+import net.wiringbits.api.models.{ErrorResponse, errorResponseFormat}
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{JsValue, Json, Reads}
-import play.api.mvc.Results._
-import play.api.mvc._
+import play.api.mvc.*
+import play.api.mvc.Results.*
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 import scala.util.control.NonFatal
-
-import net.wiringbits.api.models.errorResponseFormat
 
 package object controllers {
   private val logger = LoggerFactory.getLogger(this.getClass)
@@ -21,7 +19,7 @@ package object controllers {
   }
 
   def authenticate(request: Request[_])(implicit ec: ExecutionContext): Future[UUID] = {
-    def userIdFromSession :Future[UUID]= Future {
+    def userIdFromSession: Future[UUID] = Future {
       request.session
         .get("id")
         .flatMap(str => Try(UUID.fromString(str)).toOption)

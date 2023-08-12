@@ -1,16 +1,16 @@
 package net.wiringbits.repositories
 
 import akka.actor.ActorSystem
-import akka.stream.scaladsl._
+import akka.stream.scaladsl.*
 import net.wiringbits.common.models.Email
 import net.wiringbits.core.RepositorySpec
 import net.wiringbits.models.jobs.{BackgroundJobPayload, BackgroundJobStatus, BackgroundJobType}
 import net.wiringbits.repositories.daos.BackgroundJobDAO
 import net.wiringbits.repositories.models.BackgroundJobData
 import org.scalatest.BeforeAndAfterAll
-import org.scalatest.OptionValues._
-import org.scalatest.concurrent.ScalaFutures._
-import org.scalatest.matchers.must.Matchers._
+import org.scalatest.OptionValues.*
+import org.scalatest.concurrent.ScalaFutures.*
+import org.scalatest.matchers.must.Matchers.*
 import play.api.libs.json.Json
 
 import java.time.Instant

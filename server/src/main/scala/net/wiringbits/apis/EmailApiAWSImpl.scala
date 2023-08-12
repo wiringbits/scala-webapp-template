@@ -5,7 +5,7 @@ import net.wiringbits.config.{AWSConfig, EmailConfig}
 import org.slf4j.LoggerFactory
 import software.amazon.awssdk.auth.credentials.{AwsBasicCredentials, StaticCredentialsProvider}
 import software.amazon.awssdk.services.ses.SesAsyncClient
-import software.amazon.awssdk.services.ses.model._
+import software.amazon.awssdk.services.ses.model.*
 
 import javax.inject.Inject
 import scala.compat.java8.FutureConverters.CompletionStageOps
