@@ -4,14 +4,19 @@ import com.alexitc.materialui.facade.materialUiCore.createMuiThemeMod.Theme
 import com.alexitc.materialui.facade.materialUiCore.{components as mui, materialUiCoreStrings as muiStrings}
 import com.alexitc.materialui.facade.materialUiStyles.makeStylesMod.StylesHook
 import com.alexitc.materialui.facade.materialUiStyles.mod.makeStyles
-import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{CSSProperties, StyleRulesCallback, Styles, WithStylesOptions}
+import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
+  CSSProperties,
+  StyleRulesCallback,
+  Styles,
+  WithStylesOptions
+}
 import net.wiringbits.components.widgets.{AppCard, ForgotPasswordForm}
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.Alignment
 import net.wiringbits.AppContext
 import net.wiringbits.core.I18nHooks
 import org.scalablytyped.runtime.StringDictionary
-import slinky.core.FunctionalComponent
+import slinky.core.{FunctionalComponent, KeyAddingStage}
 import slinky.core.facade.Fragment
 import slinky.web.html.{className, div}
 import typings.reactRouterDom.mod.useHistory
@@ -19,6 +24,9 @@ import slinky.core.facade.ReactElement.jsUndefOrToElement
 
 import scala.scalajs.js
 object ForgotPasswordPage {
+  def apply(ctx: AppContext): KeyAddingStage =
+    component(Props(ctx = ctx))
+
   case class Props(ctx: AppContext)
 
   private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {
@@ -41,13 +49,13 @@ object ForgotPasswordPage {
       justifyContent = Alignment.center,
       alignItems = Alignment.center,
       child = div(className := classes("forgotPasswordFormContainer"))(
-        AppCard.component(AppCard.Props(
+        AppCard(
           Fragment(
             Container(
               alignItems = Alignment.center,
               child = mui.Typography(texts.recoverYourPassword).variant(muiStrings.h5)
             ),
-            ForgotPasswordForm.component(ForgotPasswordForm.Props(props.ctx)),
+            ForgotPasswordForm(props.ctx),
             Container(
               margin = Container.EdgeInsets.top(8),
               flexDirection = Container.FlexDirection.row,
@@ -63,8 +71,8 @@ object ForgotPasswordPage {
               )
             )
           )
+        )
       )
     )
-    ))
   }
 }

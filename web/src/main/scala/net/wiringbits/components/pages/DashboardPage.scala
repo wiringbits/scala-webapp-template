@@ -5,10 +5,13 @@ import net.wiringbits.components.widgets.Logs
 import net.wiringbits.core.I18nHooks
 import net.wiringbits.models.User
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{Container, Subtitle, Title}
-import slinky.core.FunctionalComponent
+import slinky.core.{FunctionalComponent, KeyAddingStage}
 import slinky.core.facade.Fragment
 
 object DashboardPage {
+  def apply(ctx: AppContext, user: User): KeyAddingStage =
+    component(Props(ctx = ctx, user = user))
+  
   case class Props(ctx: AppContext, user: User)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
@@ -21,7 +24,7 @@ object DashboardPage {
           Subtitle(texts.welcome(props.user.name))
         )
       ),
-      Logs.component(Logs.Props(props.ctx, props.user))
+      Logs(props.ctx, props.user)
     )
   }
 }

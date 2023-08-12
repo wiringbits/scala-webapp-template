@@ -1,6 +1,6 @@
 package net.wiringbits.components.widgets
 
-import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
+import com.alexitc.materialui.facade.materialUiCore.{components as mui, materialUiCoreStrings as muiStrings}
 import net.wiringbits.core.I18nHooks
 import net.wiringbits.forms.UpdatePasswordFormData
 import net.wiringbits.models.User
@@ -13,12 +13,15 @@ import net.wiringbits.AppContext
 import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 import slinky.core.facade.{Fragment, Hooks}
-import slinky.core.{FunctionalComponent, SyntheticEvent}
+import slinky.core.{FunctionalComponent, KeyAddingStage, SyntheticEvent}
 import slinky.web.html.{form, onSubmit}
 
 import scala.util.{Failure, Success}
 
 object EditPasswordForm {
+  def apply(ctx: AppContext, user: User): KeyAddingStage =
+    component(Props(ctx = ctx, user = user))
+
   case class Props(ctx: AppContext, user: User)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>

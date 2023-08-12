@@ -2,15 +2,10 @@ package net.wiringbits.components.pages
 
 import com.alexitc.materialui.facade.csstype.mod.{FlexDirectionProperty, TextAlignProperty}
 import com.alexitc.materialui.facade.materialUiCore.createMuiThemeMod.Theme
-import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
+import com.alexitc.materialui.facade.materialUiCore.{components as mui, materialUiCoreStrings as muiStrings}
 import com.alexitc.materialui.facade.materialUiStyles.makeStylesMod.StylesHook
 import com.alexitc.materialui.facade.materialUiStyles.mod.makeStyles
-import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
-  CSSProperties,
-  StyleRulesCallback,
-  Styles,
-  WithStylesOptions
-}
+import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{CSSProperties, StyleRulesCallback, Styles, WithStylesOptions}
 import net.wiringbits.api.models.VerifyEmail
 import net.wiringbits.common.models.UserToken
 import net.wiringbits.core.I18nHooks
@@ -18,7 +13,7 @@ import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{Circular
 import net.wiringbits.AppContext
 import org.scalablytyped.runtime.StringDictionary
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
-import slinky.core.FunctionalComponent
+import slinky.core.{FunctionalComponent, KeyAddingStage}
 import slinky.core.facade.{Fragment, Hooks}
 import slinky.web.html.{className, div}
 import typings.reactRouterDom.mod.{useHistory, useParams}
@@ -28,6 +23,9 @@ import scala.scalajs.js.timers.setTimeout
 import scala.util.{Failure, Success}
 
 object VerifyEmailWithTokenPage {
+  def apply(ctx: AppContext): KeyAddingStage = 
+    component(Props(ctx = ctx))
+  
   case class Props(ctx: AppContext)
 
   private case class State(

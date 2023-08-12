@@ -1,7 +1,7 @@
 package net.wiringbits.components.pages
 
 import com.alexitc.materialui.facade.materialUiCore.createMuiThemeMod.Theme
-import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
+import com.alexitc.materialui.facade.materialUiCore.{components as mui, materialUiCoreStrings as muiStrings}
 import com.alexitc.materialui.facade.materialUiStyles.makeStylesMod.StylesHook
 import com.alexitc.materialui.facade.materialUiStyles.mod.makeStyles
 import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
@@ -16,7 +16,7 @@ import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container
 import net.wiringbits.AppContext
 import net.wiringbits.core.I18nHooks
 import org.scalablytyped.runtime.StringDictionary
-import slinky.core.FunctionalComponent
+import slinky.core.{FunctionalComponent, KeyAddingStage}
 import slinky.core.facade.Fragment
 import slinky.web.html.{className, div}
 import typings.reactRouter.mod.{useHistory, useParams}
@@ -24,6 +24,9 @@ import typings.reactRouter.mod.{useHistory, useParams}
 import scala.scalajs.js
 
 object ResetPasswordPage {
+  def apply(ctx: AppContext): KeyAddingStage =
+    component(Props(ctx = ctx))
+
   case class Props(ctx: AppContext)
 
   private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {
@@ -49,14 +52,14 @@ object ResetPasswordPage {
       justifyContent = Container.Alignment.center,
       alignItems = Container.Alignment.center,
       child = div(className := classes("resetPasswordFormContainer"))(
-        AppCard.component(AppCard.Props(
+        AppCard(
           Fragment(
             Container(
               alignItems = Container.Alignment.center,
               justifyContent = Container.Alignment.center,
               child = mui.Typography(texts.enterNewPassword).variant(muiStrings.h5)
             ),
-            ResetPasswordForm.component(ResetPasswordForm.Props(props.ctx, userToken)),
+            ResetPasswordForm(props.ctx, userToken),
             Container(
               margin = Container.EdgeInsets.top(8),
               flexDirection = Container.FlexDirection.row,
@@ -74,6 +77,6 @@ object ResetPasswordPage {
           )
         )
       )
-    ))
+    )
   }
 }

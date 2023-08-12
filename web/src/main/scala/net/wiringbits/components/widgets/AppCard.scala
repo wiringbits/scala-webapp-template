@@ -2,7 +2,7 @@ package net.wiringbits.components.widgets
 
 import com.alexitc.materialui.facade.csstype.mod.FlexDirectionProperty
 import com.alexitc.materialui.facade.materialUiCore.createMuiThemeMod.Theme
-import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
+import com.alexitc.materialui.facade.materialUiCore.{components as mui, materialUiCoreStrings as muiStrings}
 import com.alexitc.materialui.facade.materialUiStyles.makeStylesMod.StylesHook
 import com.alexitc.materialui.facade.materialUiStyles.mod.makeStyles
 import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
@@ -12,13 +12,16 @@ import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
   WithStylesOptions
 }
 import org.scalablytyped.runtime.StringDictionary
-import slinky.core.FunctionalComponent
+import slinky.core.{FunctionalComponent, KeyAddingStage}
 import slinky.core.facade.{Fragment, ReactElement}
-import slinky.web.html._
+import slinky.web.html.*
 
 import scala.scalajs.js
 
 object AppCard {
+  def apply(child: ReactElement, title: Option[String] = None, centerTitle: Boolean = false): KeyAddingStage =
+    component(Props(child = child, title = title, centerTitle = centerTitle))
+
   case class Props(child: ReactElement, title: Option[String] = None, centerTitle: Boolean = false)
 
   private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {

@@ -1,6 +1,6 @@
 package net.wiringbits.components.widgets
 
-import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
+import com.alexitc.materialui.facade.materialUiCore.{components as mui, materialUiCoreStrings as muiStrings}
 import net.wiringbits.AppContext
 import net.wiringbits.api.models.GetCurrentUser
 import net.wiringbits.api.utils.Formatter
@@ -14,12 +14,15 @@ import net.wiringbits.webapp.utils.slinkyUtils.forms.StatefulFormData
 import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 import slinky.core.facade.{Fragment, Hooks}
-import slinky.core.{FunctionalComponent, SyntheticEvent}
-import slinky.web.html._
+import slinky.core.{FunctionalComponent, KeyAddingStage, SyntheticEvent}
+import slinky.web.html.*
 
 import scala.util.{Failure, Success}
 
 object EditUserForm {
+  def apply(ctx: AppContext, user: User, response: GetCurrentUser.Response, onSave: () => Unit): KeyAddingStage =
+    component(Props(ctx = ctx, user = user, response = response, onSave = onSave))
+
   case class Props(ctx: AppContext, user: User, response: GetCurrentUser.Response, onSave: () => Unit)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>

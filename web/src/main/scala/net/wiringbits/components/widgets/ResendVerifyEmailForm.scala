@@ -15,7 +15,7 @@ import net.wiringbits.webapp.utils.slinkyUtils.forms.StatefulFormData
 import org.scalajs.dom
 import org.scalajs.dom.URLSearchParams
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
-import slinky.core.{FunctionalComponent, SyntheticEvent}
+import slinky.core.{FunctionalComponent, KeyAddingStage, SyntheticEvent}
 import slinky.core.facade.Hooks
 import slinky.web.html.*
 import typings.reactRouterDom.mod.useLocation
@@ -25,6 +25,9 @@ import scala.scalajs.js
 import scala.util.{Failure, Success}
 
 object ResendVerifyEmailForm {
+  def apply(ctx: AppContext): KeyAddingStage =
+    component(Props(ctx = ctx))
+
   case class Props(ctx: AppContext)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
@@ -95,7 +98,7 @@ object ResendVerifyEmailForm {
       )
     }
 
-    val recaptcha = ReCaptcha.component(ReCaptcha.Props(props.ctx, onChange = captchaOpt => onDataChanged(x => x.copy(captcha = captchaOpt))))
+    val recaptcha = ReCaptcha(props.ctx, onChange = captchaOpt => onDataChanged(x => x.copy(captcha = captchaOpt)))
 
     val resendVerifyEmailButton = {
       val text =

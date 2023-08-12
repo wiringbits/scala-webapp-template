@@ -1,7 +1,7 @@
 package net.wiringbits.components.widgets
 
 import com.alexitc.materialui.facade.materialUiCore.mod.PropTypes.Color
-import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
+import com.alexitc.materialui.facade.materialUiCore.{components as mui, materialUiCoreStrings as muiStrings}
 import net.wiringbits.core.I18nHooks
 import net.wiringbits.forms.SignUpFormData
 import net.wiringbits.ui.components.inputs.{EmailInput, NameInput, PasswordInput}
@@ -13,14 +13,17 @@ import net.wiringbits.AppContext
 import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 import slinky.core.facade.{Fragment, Hooks}
-import slinky.core.{FunctionalComponent, SyntheticEvent}
-import slinky.web.html._
+import slinky.core.{FunctionalComponent, KeyAddingStage, SyntheticEvent}
+import slinky.web.html.*
 import typings.reactRouterDom
-import scala.scalajs.js
 
+import scala.scalajs.js
 import scala.util.{Failure, Success}
 
 object SignUpForm {
+  def apply(ctx: AppContext): KeyAddingStage =
+    component(Props(ctx = ctx))
+
   case class Props(ctx: AppContext)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
@@ -128,7 +131,7 @@ object SignUpForm {
       )
     }
 
-    val recaptcha = ReCaptcha.component(ReCaptcha.Props(props.ctx, onChange = captchaOpt => onDataChanged(x => x.copy(captcha = captchaOpt))))
+    val recaptcha = ReCaptcha(props.ctx, onChange = captchaOpt => onDataChanged(x => x.copy(captcha = captchaOpt)))
 
     val signUpButton = {
       val text =

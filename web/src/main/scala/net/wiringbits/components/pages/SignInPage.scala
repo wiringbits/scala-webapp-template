@@ -4,14 +4,19 @@ import com.alexitc.materialui.facade.materialUiCore.createMuiThemeMod.Theme
 import com.alexitc.materialui.facade.materialUiCore.{components as mui, materialUiCoreStrings as muiStrings}
 import com.alexitc.materialui.facade.materialUiStyles.makeStylesMod.StylesHook
 import com.alexitc.materialui.facade.materialUiStyles.mod.makeStyles
-import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{CSSProperties, StyleRulesCallback, Styles, WithStylesOptions}
+import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
+  CSSProperties,
+  StyleRulesCallback,
+  Styles,
+  WithStylesOptions
+}
 import net.wiringbits.components.widgets.*
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.{Alignment, EdgeInsets}
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{Container, Title}
 import net.wiringbits.AppContext
 import net.wiringbits.core.I18nHooks
 import org.scalablytyped.runtime.StringDictionary
-import slinky.core.FunctionalComponent
+import slinky.core.{FunctionalComponent, KeyAddingStage}
 import slinky.core.facade.Fragment
 import slinky.web.html.{className, div}
 import typings.reactRouterDom.mod.useHistory
@@ -20,6 +25,9 @@ import typings.reactRouterDom.mod as reactRouterDom
 import scala.scalajs.js
 
 object SignInPage {
+  def apply(ctx: AppContext): KeyAddingStage =
+    component(Props(ctx = ctx))
+
   case class Props(ctx: AppContext)
 
   private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {
@@ -42,7 +50,7 @@ object SignInPage {
       justifyContent = Alignment.center,
       alignItems = Alignment.center,
       child = div(className := classes("signInPageFormContainer"))(
-        AppCard.component(AppCard.Props(
+        AppCard(
           Fragment(
             Container(
               justifyContent = Alignment.center,
@@ -54,7 +62,7 @@ object SignInPage {
               alignItems = Alignment.center,
               justifyContent = Alignment.center,
               padding = EdgeInsets.top(16),
-              child = SignInForm.component(SignInForm.Props(props.ctx))
+              child = SignInForm(props.ctx)
             ),
             Container(
               margin = Container.EdgeInsets.top(8),
@@ -86,6 +94,6 @@ object SignInPage {
           )
         )
       )
-    ))
+    )
   }
 }
