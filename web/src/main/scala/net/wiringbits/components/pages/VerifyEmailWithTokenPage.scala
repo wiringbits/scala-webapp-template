@@ -76,7 +76,7 @@ object VerifyEmailWithTokenPage {
       setState(_.copy(loading = true))
       emailCodeOpt match {
         case Some(emailCode) =>
-          props.ctx.api.client.verifyEmail(VerifyEmail.Request(emailCode)).onComplete {
+          props.ctx.api.tapirClient.verifyEmail(VerifyEmail.Request(emailCode)).onComplete {
             case Success(_) =>
               val title = texts.successfulEmailVerification
               val message = texts.goingToBeRedirected

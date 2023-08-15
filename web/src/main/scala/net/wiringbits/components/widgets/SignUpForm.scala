@@ -54,7 +54,7 @@ object SignUpForm {
               setFormData(_.submissionFailed(texts.completeData))
               None
             }
-        } yield props.ctx.api.client
+        } yield props.ctx.api.tapirClient
           .createUser(request)
           .onComplete {
             case Success(_) =>

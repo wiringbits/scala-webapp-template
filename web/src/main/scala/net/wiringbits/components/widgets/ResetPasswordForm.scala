@@ -54,7 +54,7 @@ object ResetPasswordForm {
               setFormData(_.submissionFailed(texts.completeData))
               None
             }
-        } yield props.ctx.api.client
+        } yield props.ctx.api.tapirClient
           .resetPassword(request)
           .onComplete {
             case Success(res) =>

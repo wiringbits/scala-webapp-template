@@ -9,9 +9,14 @@ import sttp.tapir.client.sttp.SttpClientInterpreter
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
-case class Config(serverUrl: String)
+object SttpTapirApiClient {
+  case class Config(serverUrl: String)
+}
 
-class SttpTapirApiClient(config: Config)(implicit ex: ExecutionContext, sttpBackend: SttpBackend[Future, _]) {
+class SttpTapirApiClient(config: SttpTapirApiClient.Config)(implicit
+    ex: ExecutionContext,
+    sttpBackend: SttpBackend[Future, _]
+) {
   private val ServerAPI = sttp.model.Uri
     .parse(config.serverUrl)
     .getOrElse(throw new RuntimeException("Invalid server url"))
@@ -52,6 +57,9 @@ class SttpTapirApiClient(config: Config)(implicit ex: ExecutionContext, sttpBack
 
   def updateUser(request: UpdateUser.Request, sessionCookie: Option[String]): Future[UpdateUser.Response] =
     handleRequest(UsersEndpoints.update, request, sessionCookie)
+
+  def updatePassword(request: UpdatePassword.Request, sessionCookie: Option[String]): Future[UpdatePassword.Response] =
+    handleRequest(UsersEndpoints.updatePassword, request, sessionCookie)
 
   def getUserLogs(sessionCookie: Option[String]): Future[GetUserLogs.Response] =
     handleRequest(UsersEndpoints.getLogs, sessionCookie)

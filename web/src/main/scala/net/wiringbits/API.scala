@@ -1,6 +1,6 @@
 package net.wiringbits
 
-import net.wiringbits.api.{ApiClient, Config, SttpTapirApiClient}
+import net.wiringbits.api.{ApiClient, SttpTapirApiClient}
 import net.wiringbits.services.StorageService
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 import sttp.client3.SttpBackend
@@ -22,7 +22,7 @@ object API {
     println(s"Server API expected at: $apiUrl")
 
     implicit val sttpBackend: SttpBackend[Future, _] = sttp.client3.FetchBackend()
-    val tapirClient = new SttpTapirApiClient(Config(apiUrl))
+    val tapirClient = new SttpTapirApiClient(SttpTapirApiClient.Config(apiUrl))
     val client = new ApiClient.DefaultImpl(ApiClient.Config(apiUrl))
     val storage = new StorageService
 
