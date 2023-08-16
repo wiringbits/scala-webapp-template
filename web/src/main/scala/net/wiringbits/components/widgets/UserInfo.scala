@@ -33,7 +33,7 @@ object UserInfo {
       val form = {
         AsyncComponent.component[GetCurrentUser.Response](
           AsyncComponent.Props(
-            fetch = () => props.ctx.api.client.currentUser(),
+            fetch = () => props.ctx.api.tapirClient.currentUser,
             render =
               response => EditUserForm.component(EditUserForm.Props(props.ctx, props.user, response, onSaveClick)),
             progressIndicator = () => loader

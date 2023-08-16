@@ -27,7 +27,7 @@ object AppSplash {
           .findLang()
           .foreach(lang => props.ctx.$lang := lang)
 
-        props.ctx.api.client.currentUser().onComplete {
+        props.ctx.api.tapirClient.currentUser.onComplete {
           case Success(res) =>
             props.ctx.loggedIn(User(name = res.name, email = res.email))
             setInitialized(true)

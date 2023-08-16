@@ -2,12 +2,14 @@ package net.wiringbits.api
 
 import net.wiringbits.api.endpoints.*
 import net.wiringbits.api.models.*
-import sttp.client3.SttpBackend
+import play.api.libs.json.{Json, Reads}
+import sttp.client3.*
 import sttp.tapir.PublicEndpoint
 import sttp.tapir.client.sttp.SttpClientInterpreter
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success, Try}
 
 object SttpTapirApiClient {
   case class Config(serverUrl: String)
@@ -23,21 +25,32 @@ class SttpTapirApiClient(config: SttpTapirApiClient.Config)(implicit
 
   private val client = SttpClientInterpreter()
 
-  private def handleRequest[I, O](endpoint: PublicEndpoint[I, _, O, Any], request: I): Future[O] = {
-    client
-      .toRequestThrowErrors(endpoint, Some(ServerAPI))
-      .apply(request)
-      .send(sttpBackend)
-      .map(_.body)
+  /** This is necessary for non-browser clients, this way, the cookies from the last authentication response are
+    * propagated to the next requests
+    */
+  private var lastAuthResponse = Option.empty[Response[_]]
+
+  private def unsafeSetLoginResponse(response: Response[_]): Unit = synchronized {
+    lastAuthResponse = Some(response)
   }
 
-  private def handleRequest[I, O](
-      endpoint: PublicEndpoint[(I, Option[String]), _, O, Any],
-      request: I,
-      cookie: Option[String]
-  ): Future[O] = {
-    // TODO: find a way to handle cookies in a better way
-    handleRequest(endpoint, (request, cookie))
+  private def unsafeRemoveLoginResponse(): Unit = synchronized {
+    lastAuthResponse = None
+  }
+
+  private def handleRequest[I, O](endpoint: PublicEndpoint[I, ErrorResponse, O, Any], request: I): Future[O] = {
+    val savedCookies = lastAuthResponse.map(_.unsafeCookies).getOrElse(Seq.empty)
+
+    client
+      .toRequestThrowDecodeFailures(endpoint, Some(ServerAPI))
+      .apply(request)
+      .cookies(savedCookies)
+      .send(sttpBackend)
+      .map(_.body)
+      .map {
+        case Left(error) => throw new RuntimeException(error.error)
+        case Right(response) => response
+      }
   }
 
   def createUser(request: CreateUser.Request): Future[CreateUser.Response] =
@@ -52,23 +65,23 @@ class SttpTapirApiClient(config: SttpTapirApiClient.Config)(implicit
   def resetPassword(request: ResetPassword.Request): Future[ResetPassword.Response] =
     handleRequest(UsersEndpoints.resetPassword, request)
 
-  def currentUser(sessionCookie: Option[String]): Future[GetCurrentUser.Response] =
-    handleRequest(AuthEndpoints.getCurrentUser, sessionCookie)
+  def currentUser: Future[GetCurrentUser.Response] =
+    handleRequest(AuthEndpoints.getCurrentUser, Some(""))
 
-  def updateUser(request: UpdateUser.Request, sessionCookie: Option[String]): Future[UpdateUser.Response] =
-    handleRequest(UsersEndpoints.update, request, sessionCookie)
+  def updateUser(request: UpdateUser.Request): Future[UpdateUser.Response] =
+    handleRequest(UsersEndpoints.update, (request, Some("")))
 
-  def updatePassword(request: UpdatePassword.Request, sessionCookie: Option[String]): Future[UpdatePassword.Response] =
-    handleRequest(UsersEndpoints.updatePassword, request, sessionCookie)
+  def updatePassword(request: UpdatePassword.Request): Future[UpdatePassword.Response] =
+    handleRequest(UsersEndpoints.updatePassword, (request, Some("")))
 
-  def getUserLogs(sessionCookie: Option[String]): Future[GetUserLogs.Response] =
-    handleRequest(UsersEndpoints.getLogs, sessionCookie)
+  def getUserLogs: Future[GetUserLogs.Response] =
+    handleRequest(UsersEndpoints.getLogs, Some(""))
 
-  def adminGetUserLogs(adminAuth: String, userId: UUID, adminHeader: String): Future[AdminGetUserLogs.Response] =
-    handleRequest(AdminEndpoints.getUserLogsEndpoint, (adminAuth, userId, adminHeader))
+  def adminGetUserLogs(userId: UUID): Future[AdminGetUserLogs.Response] =
+    handleRequest(AdminEndpoints.getUserLogsEndpoint, ("_", userId, ""))
 
-  def adminGetUsers(adminAuth: String, adminHeader: String): Future[AdminGetUsers.Response] =
-    handleRequest(AdminEndpoints.getUsersEndpoint, (adminAuth, adminHeader))
+  def adminGetUsers: Future[AdminGetUsers.Response] =
+    handleRequest(AdminEndpoints.getUsersEndpoint, ("_", ""))
 
   def getEnvironmentConfig: Future[GetEnvironmentConfig.Response] =
     handleRequest(EnvironmentConfigEndpoints.getEnvironmentConfig, ())
@@ -77,4 +90,52 @@ class SttpTapirApiClient(config: SttpTapirApiClient.Config)(implicit
       request: SendEmailVerificationToken.Request
   ): Future[SendEmailVerificationToken.Response] =
     handleRequest(UsersEndpoints.sendEmailVerificationToken, request)
+
+  def login(request: Login.Request): Future[Login.Response] =
+    client
+      .toRequestThrowDecodeFailures(AuthEndpoints.login, Some(ServerAPI))
+      .apply(request)
+      .response(asStringAlways)
+      .send(sttpBackend)
+      .map { response =>
+        unsafeSetLoginResponse(response)
+        response.body
+      }
+      .map { str =>
+        Try {
+          Json.parse(str).as[ErrorResponse]
+        } match {
+          case Success(error) => throw new RuntimeException(error.error)
+          case Failure(_) => Try {
+            Json.parse(str).as[Login.Response]
+          } match {
+            case Success(response) => response
+            case Failure(error) => throw new RuntimeException(s"Unexpected response ${error.getMessage}")
+          }
+        }
+      }
+
+  def logout: Future[Logout.Response] =
+    client
+      .toRequestThrowDecodeFailures(AuthEndpoints.logout, Some(ServerAPI))
+      .apply(Some(""))
+      .response(asStringAlways)
+      .send(sttpBackend)
+      .map { response =>
+        unsafeRemoveLoginResponse()
+        response.body
+      }
+      .map { str =>
+        Try {
+          Json.parse(str).as[ErrorResponse]
+        } match {
+          case Success(error) => throw new RuntimeException(error.error)
+          case Failure(_) => Try {
+            Json.parse(str).as[Logout.Response]
+          } match {
+            case Success(response) => response
+            case Failure(error) => throw new RuntimeException(s"Unexpected response ${error.getMessage}")
+          }
+        }
+      }
 }

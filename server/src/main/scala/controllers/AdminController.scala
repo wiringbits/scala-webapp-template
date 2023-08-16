@@ -30,8 +30,8 @@ class AdminController @Inject() (
   }
 
   private def getUsers(
-      adminCookie: String,
-      authBasic: String
+      authBasic: String,
+      adminCookie: String
   ): Future[Either[ErrorResponse, AdminGetUsers.Response]] = handleRequest {
     logger.info(s"Get users")
     for {

@@ -54,7 +54,7 @@ object SignInForm {
               setFormData(_.submissionFailed(texts.completeData))
               None
             }
-        } yield props.ctx.api.client
+        } yield props.ctx.api.tapirClient
           .login(request)
           .onComplete {
             case Success(res) =>
@@ -122,9 +122,8 @@ object SignInForm {
       )
     }
 
-    val recaptcha = ReCaptcha.component(ReCaptcha.Props(
-      props.ctx,
-      onChange = captchaOpt => onDataChanged(x => x.copy(captcha = captchaOpt)))
+    val recaptcha = ReCaptcha.component(
+      ReCaptcha.Props(props.ctx, onChange = captchaOpt => onDataChanged(x => x.copy(captcha = captchaOpt)))
     )
 
     val loginButton = {

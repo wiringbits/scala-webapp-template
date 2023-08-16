@@ -2,7 +2,8 @@ package controllers.common
 
 import com.dimafeng.testcontainers.PostgreSQLContainer
 import com.dimafeng.testcontainers.scalatest.TestContainerForEach
-import net.wiringbits.api.ApiClient
+import net.wiringbits.api
+import net.wiringbits.api.SttpTapirApiClient
 import org.scalatest.TestData
 import org.scalatest.time.SpanSugar.convertIntToGrainOfTime
 import org.scalatestplus.play.guice.GuiceOneServerPerTest
@@ -54,11 +55,11 @@ trait PlayPostgresSpec extends PlayAPISpec with TestContainerForEach with GuiceO
     }
   }
 
-  def withApiClient[A](runTest: ApiClient => A): A = {
-    implicit val sttpBackend : sttp.client3.SttpBackend[concurrent.Future, ?]  = HttpClientFutureBackend()
+  def withApiClient[A](runTest: SttpTapirApiClient => A): A = {
+    implicit val sttpBackend: sttp.client3.SttpBackend[concurrent.Future, _] = HttpClientFutureBackend()
 
-    val config = ApiClient.Config(s"http://localhost:$port")
-    val client = new ApiClient.DefaultImpl(config)
+    val config = SttpTapirApiClient.Config(s"http://localhost:$port")
+    val client = new SttpTapirApiClient(config)
     runTest(client)
   }
 

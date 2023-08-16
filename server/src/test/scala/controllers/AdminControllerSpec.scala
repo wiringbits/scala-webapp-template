@@ -57,12 +57,12 @@ class AdminControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoS
         ).futureValue
       }
 
-      val response = client.adminGetUsers().futureValue
+      val response = client.adminGetUsers.futureValue
       response.data.length must be(list.length)
     }
 
     "return no results" in withApiClient { client =>
-      val response = client.adminGetUsers().futureValue
+      val response = client.adminGetUsers.futureValue
       response.data.isEmpty must be(true)
     }
   }

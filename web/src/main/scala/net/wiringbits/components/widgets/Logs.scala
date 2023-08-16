@@ -15,7 +15,7 @@ object Logs {
 
     AsyncComponent.component[GetUserLogs.Response](
       AsyncComponent.Props(
-        fetch = () => props.ctx.api.client.getUserLogs(),
+        fetch = () => props.ctx.api.tapirClient.getUserLogs,
         render = response => LogList.component(LogList.Props(props.ctx, response, () => forceRefresh())),
         progressIndicator = () => Loader.component(Loader.Props(props.ctx)),
         watchedObjects = List(timesRefreshingData)

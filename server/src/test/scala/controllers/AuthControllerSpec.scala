@@ -259,14 +259,14 @@ class AuthControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoSu
       )
       client.login(loginRequest).futureValue
 
-      val currentUser = client.currentUser().futureValue
+      val currentUser = client.currentUser.futureValue
       currentUser.id must be(user.id)
       currentUser.name must be(user.name)
       currentUser.email must be(user.email)
     }
 
     "fail if user isn't logged in" in withApiClient { client =>
-      val error = client.currentUser().expectError
+      val error = client.currentUser.expectError
       error must be("Unauthorized: Invalid or missing authentication")
     }
   }
