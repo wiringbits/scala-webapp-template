@@ -1,7 +1,9 @@
 package net.wiringbits.components.pages
 
 import com.alexitc.materialui.facade.materialUiCore.components as mui
+import net.wiringbits.AppContext
 import net.wiringbits.components.widgets.{EditPasswordForm, UserInfo}
+import net.wiringbits.core.I18nHooks
 import net.wiringbits.models.UserMenuOption.{EditPassword, EditSummary}
 import net.wiringbits.models.{User, UserMenuOption}
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{Container, Title}
@@ -10,6 +12,7 @@ import net.wiringbits.core.I18nHooks
 import slinky.core.{FunctionalComponent, KeyAddingStage}
 import slinky.core.facade.{Fragment, Hooks}
 import slinky.core.facade.ReactElement.*
+
 object UserEditPage {
   def apply(ctx: AppContext, user: User): KeyAddingStage =
     component(Props(ctx = ctx, user = user))

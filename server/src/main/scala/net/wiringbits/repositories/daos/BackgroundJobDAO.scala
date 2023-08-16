@@ -1,6 +1,6 @@
 package net.wiringbits.repositories.daos
 
-import anorm.postgresql._
+import anorm.postgresql.*
 import net.wiringbits.models.jobs.BackgroundJobStatus
 import net.wiringbits.repositories.models.BackgroundJobData
 import play.api.libs.json.Json
@@ -12,7 +12,7 @@ import scala.concurrent.Future
 
 object BackgroundJobDAO {
 
-  import anorm._
+  import anorm.*
 
   def create(request: BackgroundJobData.Create)(implicit conn: Connection): Unit = {
     val _ = SQL"""

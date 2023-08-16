@@ -253,7 +253,8 @@ lazy val api = (crossProject(JSPlatform, JVMPlatform) in file("lib/api"))
     libraryDependencies ++= Seq(
       "com.typesafe.play" %% "play-json" % playJson,
       "com.softwaremill.sttp.client3" %% "core" % sttp,
-      "com.softwaremill.sttp.tapir" %% "tapir-core" % tapir
+      "com.softwaremill.sttp.tapir" %% "tapir-core" % tapir,
+      "com.softwaremill.sttp.tapir" %% "tapir-sttp-client" % tapir
     )
   )
   .jsSettings(
@@ -266,7 +267,8 @@ lazy val api = (crossProject(JSPlatform, JVMPlatform) in file("lib/api"))
       "com.softwaremill.sttp.client3" %%% "core" % sttp,
       "org.scalatest" %%% "scalatest" % "3.2.16" % Test,
       "com.beachape" %%% "enumeratum" % enumeratum,
-      "com.softwaremill.sttp.tapir" %%% "tapir-core" % tapir
+      "com.softwaremill.sttp.tapir" %%% "tapir-core" % tapir,
+      "com.softwaremill.sttp.tapir" %%% "tapir-sttp-client" % tapir
     )
   )
 
@@ -366,8 +368,7 @@ lazy val server = (project in file("server"))
       "javax.el" % "javax.el-api" % "3.0.0",
       "org.glassfish" % "javax.el" % "3.0.0",
       "com.beachape" %% "enumeratum" % enumeratum,
-      "com.softwaremill.sttp.tapir" %% "tapir-swagger-ui-bundle" % tapir,
-      "com.softwaremill.sttp.tapir" %% "tapir-json-circe" % tapir
+      "com.softwaremill.sttp.tapir" %% "tapir-swagger-ui-bundle" % tapir
     )
   )
 
@@ -428,7 +429,8 @@ lazy val web = (project in file("web"))
       "org.scala-js" %%% "scala-js-macrotask-executor" % "1.1.1",
       "com.alexitc" %%% "sjs-material-ui-facade" % "0.2.0",
       "net.wiringbits" %%% "scalablytyped-facades" % webappUtils,
-      "io.monix" %%% "monix-reactive" % "3.4.1"
+      "io.monix" %%% "monix-reactive" % "3.4.1",
+      "com.softwaremill.sttp.tapir" %%% "tapir-sttp-client" % tapir
     ),
     libraryDependencies ++= Seq(
       "org.scalatest" %%% "scalatest" % "3.2.16" % Test

@@ -10,7 +10,7 @@ case class UserTokensConfig(
     hmacSecret: String
 ) {
   override def toString: String = {
-    import net.wiringbits.util.StringUtils.Implicits._
+    import net.wiringbits.util.StringUtils.Implicits.*
 
     s"UserTokensConfig(emailVerificationExp = $emailVerificationExp, resetPasswordExp = $resetPasswordExp, hmacSecret = ${hmacSecret.mask()})"
   }

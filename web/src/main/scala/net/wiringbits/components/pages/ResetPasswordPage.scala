@@ -10,11 +10,11 @@ import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
   Styles,
   WithStylesOptions
 }
+import net.wiringbits.AppContext
 import net.wiringbits.common.models.UserToken
 import net.wiringbits.components.widgets.{AppCard, ResetPasswordForm}
-import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container
-import net.wiringbits.AppContext
 import net.wiringbits.core.I18nHooks
+import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container
 import org.scalablytyped.runtime.StringDictionary
 import slinky.core.{FunctionalComponent, KeyAddingStage}
 import slinky.core.facade.Fragment

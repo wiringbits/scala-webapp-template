@@ -10,17 +10,17 @@ import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
   Styles,
   WithStylesOptions
 }
+import net.wiringbits.AppContext
 import net.wiringbits.components.widgets.{AppCard, ForgotPasswordForm}
+import net.wiringbits.core.I18nHooks
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.Alignment
-import net.wiringbits.AppContext
-import net.wiringbits.core.I18nHooks
 import org.scalablytyped.runtime.StringDictionary
 import slinky.core.{FunctionalComponent, KeyAddingStage}
 import slinky.core.facade.Fragment
+import slinky.core.facade.ReactElement.jsUndefOrToElement
 import slinky.web.html.{className, div}
 import typings.reactRouterDom.mod.useHistory
-import slinky.core.facade.ReactElement.jsUndefOrToElement
 
 import scala.scalajs.js
 object ForgotPasswordPage {

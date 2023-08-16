@@ -5,7 +5,7 @@ import net.wiringbits.config.UserTokensConfig
 import net.wiringbits.executors.DatabaseExecutionContext
 import net.wiringbits.models.jobs.{BackgroundJobPayload, BackgroundJobStatus, BackgroundJobType}
 import net.wiringbits.repositories.daos.{BackgroundJobDAO, UserLogsDAO, UserTokensDAO, UsersDAO}
-import net.wiringbits.repositories.models._
+import net.wiringbits.repositories.models.*
 import net.wiringbits.util.EmailMessage
 import play.api.db.Database
 

@@ -1,45 +1,29 @@
 package controllers
 
 import net.wiringbits.actions.GetEnvironmentConfigAction
-import net.wiringbits.api.models.GetEnvironmentConfig
+import net.wiringbits.api.endpoints.EnvironmentConfigEndpoints
+import net.wiringbits.api.models.{ErrorResponse, GetEnvironmentConfig}
 import org.slf4j.LoggerFactory
-import play.api.libs.json.Json
-import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
-import sttp.model.MediaType
+import sttp.capabilities.WebSockets
+import sttp.capabilities.akka.AkkaStreams
+import sttp.tapir.server.ServerEndpoint
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class EnvironmentConfigController @Inject() (
     getEnvironmentConfigAction: GetEnvironmentConfigAction
-)(implicit cc: ControllerComponents, ec: ExecutionContext)
-    extends AbstractController(cc) {
+)(implicit ec: ExecutionContext) {
   private val logger = LoggerFactory.getLogger(this.getClass)
 
-  def getEnvironmentConfig: Action[AnyContent] = handleGET { _ =>
+  private def getEnvironmentConfig: Future[Either[ErrorResponse, GetEnvironmentConfig.Response]] = handleRequest {
     logger.info("Get frontend config")
     for {
       response <- getEnvironmentConfigAction()
-    } yield Ok(Json.toJson(response))
+    } yield Right(response)
   }
-}
 
-object EnvironmentConfigController {
-  import sttp.model.Header
-  import sttp.tapir.*
-  import sttp.tapir.json.play.*
-
-  private val getEnvironmentConfig = endpoint.get
-    .in("environment-config")
-    .out(
-      jsonBody[GetEnvironmentConfig.Response]
-        .description("Got the config values")
-        .example(GetEnvironmentConfig.Response("siteKey"))
-    )
-    .summary("Get the config values for the current environment")
-    .description("These values are required by the frontend app to interact with the backend")
-
-  val routes: List[PublicEndpoint[_, _, _, _]] = List(
-    getEnvironmentConfig
-  ).map(_.tag("Misc"))
+  def routes: List[ServerEndpoint[AkkaStreams with WebSockets, Future]] = {
+    List(EnvironmentConfigEndpoints.getEnvironmentConfig.serverLogic(_ => getEnvironmentConfig))
+  }
 }

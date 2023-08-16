@@ -12,17 +12,17 @@ import net.wiringbits.util.TokenGenerator
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
 import org.mockito.stubbing.Answer
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject
 import play.api.inject.guice.GuiceApplicationBuilder
 import utils.LoginUtils
-import org.scalatestplus.mockito.MockitoSugar
 
 import java.time.temporal.ChronoUnit
 import java.time.{Clock, Instant}
 import java.util.UUID
 import scala.concurrent.Future
 
-class AuthControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoSugar{
+class AuthControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoSugar {
 
   def userTokensRepository: UserTokensRepository = app.injector.instanceOf(classOf[UserTokensRepository])
 
@@ -116,7 +116,7 @@ class AuthControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoSu
     }
 
     "fail when the user tries to verify with an expired token" in withApiClient { client =>
-      when(clock.instant).thenAnswer( _ =>Instant.now())
+      when(clock.instant).thenAnswer(_ => Instant.now())
       val request = CreateUser.Request(
         name = Name.trusted("wiringbits"),
         email = Email.trusted("test1@email.com"),
@@ -130,8 +130,9 @@ class AuthControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoSu
 
       when(clock.instant).thenAnswer(new Answer[Instant] {
         override def answer(invocation: org.mockito.invocation.InvocationOnMock): Instant = {
-        Instant.now().plus(2, ChronoUnit.DAYS)}}
-      )
+          Instant.now().plus(2, ChronoUnit.DAYS)
+        }
+      })
 
       val error = client
         .verifyEmail(VerifyEmail.Request(UserToken(user.id, verificationToken)))
@@ -259,14 +260,14 @@ class AuthControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoSu
       )
       client.login(loginRequest).futureValue
 
-      val currentUser = client.currentUser().futureValue
+      val currentUser = client.currentUser.futureValue
       currentUser.id must be(user.id)
       currentUser.name must be(user.name)
       currentUser.email must be(user.email)
     }
 
     "fail if user isn't logged in" in withApiClient { client =>
-      val error = client.currentUser().expectError
+      val error = client.currentUser.expectError
       error must be("Unauthorized: Invalid or missing authentication")
     }
   }

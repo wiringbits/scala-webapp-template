@@ -1,7 +1,7 @@
 package net.wiringbits.ui.components.core.widgets
 
 import com.alexitc.materialui.facade.materialUiCore.mod.PropTypes
-import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
+import com.alexitc.materialui.facade.materialUiCore.{components as mui, materialUiCoreStrings as muiStrings}
 import net.wiringbits.webapp.common.validators.{TextValidator, ValidationResult}
 import net.wiringbits.webapp.utils.slinkyUtils.forms.FormField
 import org.scalajs.dom

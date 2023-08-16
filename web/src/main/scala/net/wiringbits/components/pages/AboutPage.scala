@@ -1,7 +1,11 @@
 package net.wiringbits.components.pages
 
 import com.alexitc.materialui.facade.materialUiCore.createMuiThemeMod.Theme
-import com.alexitc.materialui.facade.materialUiCore.{typographyTypographyMod, components as mui, materialUiCoreStrings as muiStrings}
+import com.alexitc.materialui.facade.materialUiCore.{
+  typographyTypographyMod,
+  components as mui,
+  materialUiCoreStrings as muiStrings
+}
 import com.alexitc.materialui.facade.materialUiStyles.makeStylesMod.StylesHook
 import com.alexitc.materialui.facade.materialUiStyles.mod.makeStyles
 import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{CSSProperties, StyleRulesCallback, Styles, WithStylesOptions}
