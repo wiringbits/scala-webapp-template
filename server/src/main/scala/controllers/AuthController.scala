@@ -1,122 +1,55 @@
 package controllers
 
 import net.wiringbits.actions.*
+import net.wiringbits.api.endpoints.AuthEndpoints
 import net.wiringbits.api.models.*
-import net.wiringbits.common.models.{Captcha, Email, Name, Password}
 import org.slf4j.LoggerFactory
-import play.api.libs.json.Json
-import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
+import sttp.capabilities.WebSockets
+import sttp.capabilities.akka.AkkaStreams
+import sttp.tapir.server.ServerEndpoint
 
-import java.time.Instant
-import java.util.UUID
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class AuthController @Inject() (
     loginAction: LoginAction,
-    getUserAction: GetUserAction
-)(implicit cc: ControllerComponents, ec: ExecutionContext)
-    extends AbstractController(cc) {
+    getUserAction: GetUserAction,
+    playTapirBridge: PlayTapirBridge
+)(implicit ec: ExecutionContext) {
   private val logger = LoggerFactory.getLogger(this.getClass)
 
-  def login: Action[Login.Request] = handleJsonBody[Login.Request] { request =>
-    val body = request.body
-    logger.info(s"Login API: ${body.email}")
-    for {
-      response <- loginAction(body)
-    } yield Ok(Json.toJson(response)).withSession("id" -> response.id.toString)
-  }
-
-  def logout: Action[Logout.Request] = handleJsonBody[Logout.Request] { request =>
-    for {
-      userId <- authenticate(request)
-      user <- getUserAction(userId)
-    } yield {
-      logger.info(s"Logout - ${user.email}")
-      Ok(Json.toJson(Logout.Response())).withNewSession
+  private def login(body: Login.Request): Future[Either[ErrorResponse, (Login.Response, String)]] =
+    handleRequest {
+      logger.info(s"Login API: ${body.email}")
+      for {
+        response <- loginAction(body)
+        cookieEncoded <- playTapirBridge.setSession(response.id)
+      } yield Right(response, cookieEncoded)
     }
+
+  private def me(sessionCookie: Option[String]): Future[Either[ErrorResponse, GetCurrentUser.Response]] =
+    handleRequest {
+      for {
+        userId <- playTapirBridge.parseSession(sessionCookie)
+        _ = logger.info(s"Get user info: $userId")
+        response <- getUserAction(userId)
+      } yield Right(response)
+    }
+
+  private def logout(sessionCookie: Option[String]): Future[Either[ErrorResponse, (Logout.Response, String)]] =
+    handleRequest {
+      for {
+        _ <- playTapirBridge.parseSession(sessionCookie)
+        _ = logger.info(s"Logout")
+        header <- playTapirBridge.clearSession()
+      } yield Right(Logout.Response(), header)
+    }
+
+  def routes: List[ServerEndpoint[AkkaStreams with WebSockets, Future]] = {
+    List(
+      AuthEndpoints.login.serverLogic(login),
+      AuthEndpoints.getCurrentUser.serverLogic(me),
+      AuthEndpoints.logout.serverLogic(logout)
+    )
   }
-
-  def getCurrentUser: Action[AnyContent] = handleGET { request =>
-    for {
-      userId <- authenticate(request)
-      _ = logger.info(s"Get user info: $userId")
-      response <- getUserAction(userId)
-    } yield Ok(Json.toJson(response))
-  }
-}
-
-object AuthController {
-  import sttp.model.StatusCode
-  import sttp.tapir.*
-  import sttp.tapir.json.play.*
-
-  private val login = endpoint.post
-    .in("auth" / "login")
-    .in(
-      jsonBody[Login.Request].example(
-        Login.Request(
-          email = Email.trusted("alexis@wiringbits.net"),
-          password = Password.trusted("notSoWeakPassword"),
-          captcha = Captcha.trusted("captcha")
-        )
-      )
-    )
-    .out(
-      jsonBody[Login.Response]
-        .description("Successful login")
-        .example(
-          Login.Response(
-            id = UUID.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6"),
-            name = Name.trusted("Alexis"),
-            email = Email.trusted("alexis@wiringbits.net")
-          )
-        )
-    )
-    .errorOut(
-      oneOf[Unit](
-        oneOfVariant(statusCode(StatusCode.BadRequest).description("Invalid or missing arguments"))
-      )
-    )
-    .summary("Log into the app")
-    .description("Sets a session cookie to authenticate the following requests")
-
-  private val logout = endpoint.post
-    .in("auth" / "logout")
-    .in(jsonBody[Logout.Request].example(Logout.Request()))
-    .out(jsonBody[Logout.Response].description("Successful logout").example(Logout.Response()))
-    .errorOut(
-      oneOf[Unit](
-        oneOfVariant(statusCode(StatusCode.BadRequest).description("Invalid or missing arguments"))
-      )
-    )
-    .summary("Logout from the app")
-    .description("Clears the session cookie that's stored securely")
-
-  private val getCurrentUser = endpoint.get
-    .in("auth" / "me")
-    .out(
-      jsonBody[GetCurrentUser.Response]
-        .description("Got user details")
-        .example(
-          GetCurrentUser.Response(
-            id = UUID.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6"),
-            name = Name.trusted("Alexis"),
-            email = Email.trusted("alexis@wiringbits.net"),
-            createdAt = Instant.parse("2021-01-01T00:00:00Z")
-          )
-        )
-    )
-    .errorOut(
-      oneOf[Unit](
-        oneOfVariant(statusCode(StatusCode.BadRequest).description("Invalid or missing arguments"))
-      )
-    )
-    .summary("Get the details for the authenticated user")
-
-  val routes: List[PublicEndpoint[_, _, _, _]] = List(
-    login,
-    logout,
-    getCurrentUser
-  ).map(_.tag("Auth"))
 }

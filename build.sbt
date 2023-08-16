@@ -366,8 +366,7 @@ lazy val server = (project in file("server"))
       "javax.el" % "javax.el-api" % "3.0.0",
       "org.glassfish" % "javax.el" % "3.0.0",
       "com.beachape" %% "enumeratum" % enumeratum,
-      "com.softwaremill.sttp.tapir" %% "tapir-swagger-ui-bundle" % tapir,
-      "com.softwaremill.sttp.tapir" %% "tapir-json-circe" % tapir
+      "com.softwaremill.sttp.tapir" %% "tapir-swagger-ui-bundle" % tapir
     )
   )
 

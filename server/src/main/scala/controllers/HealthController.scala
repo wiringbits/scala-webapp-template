@@ -1,27 +1,21 @@
 package controllers
 
-import play.api.libs.json.Json
-import play.api.mvc.*
+import net.wiringbits.api.endpoints.HealthEndpoints
+import sttp.capabilities.WebSockets
+import sttp.capabilities.akka.AkkaStreams
+import sttp.model.headers.{Cookie, CookieValueWithMeta, CookieWithMeta}
+import sttp.tapir.server.ServerEndpoint
 
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
 
-class HealthController @Inject() (cc: ControllerComponents) extends AbstractController(cc) {
+class HealthController @Inject() (implicit ec: ExecutionContext) {
+  private def check: Future[Either[Unit, Unit]] =
+    Future.successful(Right(()))
 
-  def check: Action[AnyContent] = Action { _ =>
-    Ok(Json.obj())
+  def routes: List[ServerEndpoint[AkkaStreams with WebSockets, Future]] = {
+    List(HealthEndpoints.check.serverLogic(_ => check))
   }
-}
-
-object HealthController {
-  import sttp.tapir.*
-  import sttp.tapir.json.circe.*
-
-  private val check = endpoint.get
-    .in("health")
-    .out(emptyOutput.description("The app is healthy"))
-    .summary("Queries the application's health")
-
-  val routes: List[PublicEndpoint[_, _, _, _]] = List(
-    check
-  ).map(_.tag("Misc"))
 }

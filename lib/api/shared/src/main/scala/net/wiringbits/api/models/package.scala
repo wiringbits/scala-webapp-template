@@ -22,6 +22,9 @@ package object models {
 
   case class ErrorResponse(error: String)
   implicit val errorResponseFormat: Format[ErrorResponse] = Json.format[ErrorResponse]
+  implicit val errorResponseSchema: Schema[ErrorResponse] = Schema
+    .derived[ErrorResponse]
+    .name(Schema.SName("ErrorResponse"))
 
   implicit def wrappedStringSchema[T <: WrappedString]: Schema[T] = Schema(SchemaType.SString())
 }
