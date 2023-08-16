@@ -53,7 +53,7 @@ object EditUserForm {
               setFormData(_.submissionFailed(texts.completeData))
               None
             }
-        } yield props.ctx.api.tapirClient
+        } yield props.ctx.api.client
           .updateUser(request)
           .onComplete {
             case Success(_) =>

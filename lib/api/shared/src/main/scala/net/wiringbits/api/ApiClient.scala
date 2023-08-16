@@ -1,111 +1,143 @@
 package net.wiringbits.api
 
-import net.wiringbits.api.models._
-import play.api.libs.json._
-import sttp.client3._
-import sttp.model._
+import net.wiringbits.api.endpoints.*
+import net.wiringbits.api.models.*
+import play.api.libs.json.Json
+import sttp.client3.*
+import sttp.tapir.PublicEndpoint
+import sttp.tapir.client.sttp.SttpClientInterpreter
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
 
-trait ApiClient {
-  def login(request: Login.Request): Future[Login.Response]
-  def logout(): Future[Logout.Response]
-}
-
 object ApiClient {
   case class Config(serverUrl: String)
+}
 
-  private def asJson[R: Reads] = {
-    asString
+class ApiClient(config: ApiClient.Config)(implicit
+    ex: ExecutionContext,
+    sttpBackend: SttpBackend[Future, _]
+) {
+  private val ServerAPI = sttp.model.Uri
+    .parse(config.serverUrl)
+    .getOrElse(throw new RuntimeException("Invalid server url"))
+
+  private val client = SttpClientInterpreter()
+
+  /** This is necessary for non-browser clients, this way, the cookies from the last authentication response are
+    * propagated to the next requests
+    */
+  private var lastAuthResponse = Option.empty[Response[_]]
+
+  private def unsafeSetLoginResponse(response: Response[_]): Unit = synchronized {
+    lastAuthResponse = Some(response)
+  }
+
+  private def unsafeRemoveLoginResponse(): Unit = synchronized {
+    lastAuthResponse = None
+  }
+
+  private def handleRequest[I, O](endpoint: PublicEndpoint[I, ErrorResponse, O, Any], request: I): Future[O] = {
+    val savedCookies = lastAuthResponse.map(_.unsafeCookies).getOrElse(Seq.empty)
+
+    client
+      .toRequestThrowDecodeFailures(endpoint, Some(ServerAPI))
+      .apply(request)
+      .cookies(savedCookies)
+      .send(sttpBackend)
+      .map(_.body)
       .map {
-        case Right(response) =>
-          // handles 2xx responses
-          Success(response)
-        case Left(response) =>
-          // handles non 2xx responses
-          Try {
-            val json = Json.parse(response)
-            // TODO: Unify responses to match the play error format
-            json
-              .asOpt[ErrorResponse]
-              .orElse {
-                json
-                  .asOpt[PlayErrorResponse]
-                  .map(model => ErrorResponse(model.error.message))
-              }
-              .getOrElse(throw new RuntimeException(s"Unexpected JSON response: $response"))
-          } match {
-            case Failure(exception) =>
-              println(s"Unexpected response: ${exception.getMessage}")
-              exception.printStackTrace()
-              Failure(new RuntimeException(s"Unexpected response, please try again in a minute"))
-            case Success(value) =>
-              Failure(new RuntimeException(value.error))
-          }
-      }
-      .map { t =>
-        t.map(Json.parse).map(_.as[R])
+        case Left(error) => throw new RuntimeException(error.error)
+        case Right(response) => response
       }
   }
 
-  // TODO: X-Authorization header is being used to keep the nginx basic-authentication
-  // once that's removed, Authorization header can be used instead.
-  class DefaultImpl(config: Config)(implicit
-      backend: SttpBackend[Future, _],
-      ec: ExecutionContext
-  ) extends ApiClient {
+  def createUser(request: CreateUser.Request): Future[CreateUser.Response] =
+    handleRequest(UsersEndpoints.create, request)
 
-    private val ServerAPI = sttp.model.Uri
-      .parse(config.serverUrl)
-      .getOrElse(throw new RuntimeException("Invalid server url"))
+  def verifyEmail(request: VerifyEmail.Request): Future[VerifyEmail.Response] =
+    handleRequest(UsersEndpoints.verifyEmail, request)
 
-    /** This is necessary for non-browser clients, this way, the cookies from the last authentication response are
-      * propagated to the next requests
-      */
-    private var lastAuthResponse = Option.empty[Response[_]]
+  def forgotPassword(request: ForgotPassword.Request): Future[ForgotPassword.Response] =
+    handleRequest(UsersEndpoints.forgotPassword, request)
 
-    private def unsafeSetLoginResponse(response: Response[_]): Unit = synchronized {
-      lastAuthResponse = Some(response)
-    }
+  def resetPassword(request: ResetPassword.Request): Future[ResetPassword.Response] =
+    handleRequest(UsersEndpoints.resetPassword, request)
 
-    private def prepareRequest[R: Reads] = {
-      val base = basicRequest
-        .contentType(MediaType.ApplicationJson)
-        .response(asJson[R])
+  def currentUser: Future[GetCurrentUser.Response] =
+    handleRequest(AuthEndpoints.getCurrentUser, Some(""))
 
-      lastAuthResponse
-        .map(base.cookies)
-        .getOrElse(base)
-    }
+  def updateUser(request: UpdateUser.Request): Future[UpdateUser.Response] =
+    handleRequest(UsersEndpoints.update, (request, Some("")))
 
-    override def login(request: Login.Request): Future[Login.Response] = {
-      val path = ServerAPI.path :+ "auth" :+ "login"
-      val uri = ServerAPI.withPath(path)
+  def updatePassword(request: UpdatePassword.Request): Future[UpdatePassword.Response] =
+    handleRequest(UsersEndpoints.updatePassword, (request, Some("")))
 
-      prepareRequest[Login.Response]
-        .post(uri)
-        .body(Json.toJson(request).toString())
-        .send(backend)
-        .map { response =>
-          // non-browser clients require the auth cookie to be set manually, hence, we need to store it
-          unsafeSetLoginResponse(response)
-          response.body
+  def getUserLogs: Future[GetUserLogs.Response] =
+    handleRequest(UsersEndpoints.getLogs, Some(""))
+
+  def adminGetUserLogs(userId: UUID): Future[AdminGetUserLogs.Response] =
+    handleRequest(AdminEndpoints.getUserLogsEndpoint, ("_", userId, ""))
+
+  def adminGetUsers: Future[AdminGetUsers.Response] =
+    handleRequest(AdminEndpoints.getUsersEndpoint, ("_", ""))
+
+  def getEnvironmentConfig: Future[GetEnvironmentConfig.Response] =
+    handleRequest(EnvironmentConfigEndpoints.getEnvironmentConfig, ())
+
+  def sendEmailVerificationToken(
+      request: SendEmailVerificationToken.Request
+  ): Future[SendEmailVerificationToken.Response] =
+    handleRequest(UsersEndpoints.sendEmailVerificationToken, request)
+
+  def login(request: Login.Request): Future[Login.Response] =
+    client
+      .toRequestThrowDecodeFailures(AuthEndpoints.login, Some(ServerAPI))
+      .apply(request)
+      .response(asStringAlways)
+      .send(sttpBackend)
+      .map { response =>
+        unsafeSetLoginResponse(response)
+        response.body
+      }
+      .map { str =>
+        Try {
+          Json.parse(str).as[ErrorResponse]
+        } match {
+          case Success(error) => throw new RuntimeException(error.error)
+          case Failure(_) =>
+            Try {
+              Json.parse(str).as[Login.Response]
+            } match {
+              case Success(response) => response
+              case Failure(error) => throw new RuntimeException(s"Unexpected response ${error.getMessage}")
+            }
         }
-        .flatMap(Future.fromTry)
-    }
+      }
 
-    override def logout(): Future[Logout.Response] = {
-      val path = ServerAPI.path :+ "auth" :+ "logout"
-      val uri = ServerAPI.withPath(path)
-
-      prepareRequest[Logout.Response]
-        .post(uri)
-        .body(Json.toJson(Logout.Request()).toString())
-        .send(backend)
-        .map(_.body)
-        .flatMap(Future.fromTry)
-    }
-  }
+  def logout: Future[Logout.Response] =
+    client
+      .toRequestThrowDecodeFailures(AuthEndpoints.logout, Some(ServerAPI))
+      .apply(Some(""))
+      .response(asStringAlways)
+      .send(sttpBackend)
+      .map { response =>
+        unsafeRemoveLoginResponse()
+        response.body
+      }
+      .map { str =>
+        Try {
+          Json.parse(str).as[ErrorResponse]
+        } match {
+          case Success(error) => throw new RuntimeException(error.error)
+          case Failure(_) =>
+            Try {
+              Json.parse(str).as[Logout.Response]
+            } match {
+              case Success(response) => response
+              case Failure(error) => throw new RuntimeException(s"Unexpected response ${error.getMessage}")
+            }
+        }
+      }
 }

@@ -1,22 +1,19 @@
 package utils
 
-import net.wiringbits.api.{ApiClient, SttpTapirApiClient}
+import net.wiringbits.api.ApiClient
 import net.wiringbits.api.models.{CreateUser, Login, VerifyEmail}
 import net.wiringbits.common.models.{Captcha, Password, UserToken}
 import net.wiringbits.util.TokenGenerator
-import org.scalatestplus.mockito.MockitoSugar
-import org.scalatest.*
-import org.scalatest.matchers.should.Matchers
+import org.mockito.Mockito.*
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
-import org.mockito.Mockito.*
 
 trait LoginUtils {
 
   def createVerifyLoginUser(
       request: CreateUser.Request,
-      client: SttpTapirApiClient,
+      client: ApiClient,
       tokenGenerator: TokenGenerator
   )(implicit ec: ExecutionContext): Future[Login.Response] = {
 

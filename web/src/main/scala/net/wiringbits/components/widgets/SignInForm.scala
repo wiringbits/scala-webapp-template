@@ -54,7 +54,7 @@ object SignInForm {
               setFormData(_.submissionFailed(texts.completeData))
               None
             }
-        } yield props.ctx.api.tapirClient
+        } yield props.ctx.api.client
           .login(request)
           .onComplete {
             case Success(res) =>

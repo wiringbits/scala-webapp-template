@@ -59,7 +59,7 @@ object ResendVerifyEmailForm {
               setFormData(_.submissionFailed(texts.completeData))
               None
             }
-        } yield props.ctx.api.tapirClient
+        } yield props.ctx.api.client
           .sendEmailVerificationToken(request)
           .onComplete {
             case Success(_) =>

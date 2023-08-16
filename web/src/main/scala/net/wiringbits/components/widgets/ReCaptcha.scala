@@ -18,7 +18,7 @@ object ReCaptcha {
       () =>
         AsyncComponent.component[String](
           AsyncComponent.Props(
-            fetch = () => props.ctx.api.tapirClient.getEnvironmentConfig.map(_.recaptchaSiteKey),
+            fetch = () => props.ctx.api.client.getEnvironmentConfig.map(_.recaptchaSiteKey),
             render = recaptchaSiteKey =>
               ReactGoogleRecaptcha(recaptchaSiteKey)
                 .onChange(x => props.onChange(Captcha.validate(x.asInstanceOf[String]).toOption))
