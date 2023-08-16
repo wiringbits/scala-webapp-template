@@ -22,7 +22,7 @@ object API {
     println(s"Server API expected at: $apiUrl")
 
     implicit val sttpBackend: SttpBackend[Future, _] = sttp.client3.FetchBackend()
-    val client = new ApiClient.DefaultImpl(ApiClient.Config(apiUrl))
+    val client = new ApiClient(ApiClient.Config(apiUrl))
     val storage = new StorageService
 
     API(client, storage)

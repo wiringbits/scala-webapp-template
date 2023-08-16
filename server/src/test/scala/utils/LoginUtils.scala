@@ -5,9 +5,6 @@ import net.wiringbits.api.models.{CreateUser, Login, VerifyEmail}
 import net.wiringbits.common.models.{Captcha, Password, UserToken}
 import net.wiringbits.util.TokenGenerator
 import org.mockito.Mockito.*
-import org.scalatest.*
-import org.scalatest.matchers.should.Matchers
-import org.scalatestplus.mockito.MockitoSugar
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
