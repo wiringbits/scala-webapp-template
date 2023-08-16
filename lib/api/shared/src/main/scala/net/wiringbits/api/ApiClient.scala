@@ -2,7 +2,7 @@ package net.wiringbits.api
 
 import net.wiringbits.api.endpoints.*
 import net.wiringbits.api.models.*
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, Reads}
 import sttp.client3.*
 import sttp.tapir.PublicEndpoint
 import sttp.tapir.client.sttp.SttpClientInterpreter
@@ -19,6 +19,21 @@ class ApiClient(config: ApiClient.Config)(implicit
     ex: ExecutionContext,
     sttpBackend: SttpBackend[Future, _]
 ) {
+  private def asJson[R: Reads](strBody: String) = {
+    Try {
+      Json.parse(strBody).as[ErrorResponse]
+    } match {
+      case Success(error) => throw new RuntimeException(error.error)
+      case Failure(_) =>
+        Try {
+          Json.parse(strBody).as[R]
+        } match {
+          case Success(response) => response
+          case Failure(error) => throw new RuntimeException(s"Unexpected response ${error.getMessage}")
+        }
+    }
+  }
+
   private val ServerAPI = sttp.model.Uri
     .parse(config.serverUrl)
     .getOrElse(throw new RuntimeException("Invalid server url"))
@@ -91,6 +106,8 @@ class ApiClient(config: ApiClient.Config)(implicit
   ): Future[SendEmailVerificationToken.Response] =
     handleRequest(UsersEndpoints.sendEmailVerificationToken, request)
 
+  // login and logout are special cases, since they return a cookie, sttp-client can not decode them correctly, so we have
+  // to do it manually
   def login(request: Login.Request): Future[Login.Response] =
     client
       .toRequestThrowDecodeFailures(AuthEndpoints.login, Some(ServerAPI))
@@ -101,20 +118,7 @@ class ApiClient(config: ApiClient.Config)(implicit
         unsafeSetLoginResponse(response)
         response.body
       }
-      .map { str =>
-        Try {
-          Json.parse(str).as[ErrorResponse]
-        } match {
-          case Success(error) => throw new RuntimeException(error.error)
-          case Failure(_) =>
-            Try {
-              Json.parse(str).as[Login.Response]
-            } match {
-              case Success(response) => response
-              case Failure(error) => throw new RuntimeException(s"Unexpected response ${error.getMessage}")
-            }
-        }
-      }
+      .map(asJson[Login.Response])
 
   def logout: Future[Logout.Response] =
     client
@@ -126,18 +130,5 @@ class ApiClient(config: ApiClient.Config)(implicit
         unsafeRemoveLoginResponse()
         response.body
       }
-      .map { str =>
-        Try {
-          Json.parse(str).as[ErrorResponse]
-        } match {
-          case Success(error) => throw new RuntimeException(error.error)
-          case Failure(_) =>
-            Try {
-              Json.parse(str).as[Logout.Response]
-            } match {
-              case Success(response) => response
-              case Failure(error) => throw new RuntimeException(s"Unexpected response ${error.getMessage}")
-            }
-        }
-      }
+      .map(asJson[Logout.Response])
 }
