@@ -12,13 +12,16 @@ import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
   WithStylesOptions
 }
 import org.scalablytyped.runtime.StringDictionary
-import slinky.core.FunctionalComponent
+import slinky.core.{FunctionalComponent, KeyAddingStage}
 import slinky.core.facade.{Fragment, ReactElement}
 import slinky.web.html.*
 
 import scala.scalajs.js
 
 object AppCard {
+  def apply(child: ReactElement, title: Option[String] = None, centerTitle: Boolean = false): KeyAddingStage =
+    component(Props(child = child, title = title, centerTitle = centerTitle))
+
   case class Props(child: ReactElement, title: Option[String] = None, centerTitle: Boolean = false)
 
   private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {

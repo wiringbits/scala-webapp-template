@@ -17,7 +17,7 @@ import net.wiringbits.core.I18nHooks
 import org.scalablytyped.runtime.StringDictionary
 import org.scalajs.dom
 import org.scalajs.dom.URLSearchParams
-import slinky.core.FunctionalComponent
+import slinky.core.{FunctionalComponent, KeyAddingStage}
 import slinky.core.facade.Fragment
 import slinky.web.html.{br, className, div}
 import typings.reactRouterDom.mod as reactRouterDom
@@ -26,6 +26,9 @@ import typings.reactRouterDom.mod.useLocation
 import scala.scalajs.js
 
 object VerifyEmailPage {
+  def apply(ctx: AppContext): KeyAddingStage = 
+    component(Props(ctx = ctx))
+  
   case class Props(ctx: AppContext)
 
   private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {

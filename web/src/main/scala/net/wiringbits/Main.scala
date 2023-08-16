@@ -32,7 +32,7 @@ object Main {
     )
     val app = ErrorBoundaryComponent(
       ErrorBoundaryComponent.Props(
-        child = App.component(App.Props(ctx)),
+        child = App(ctx),
         renderError = e => ErrorBoundaryInfo(e)
       )
     )

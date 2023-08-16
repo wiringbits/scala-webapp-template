@@ -3,11 +3,14 @@ package net.wiringbits.components.widgets
 import net.wiringbits.AppContext
 import net.wiringbits.common.models.Captcha
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.AsyncComponent
-import slinky.core.FunctionalComponent
+import slinky.core.{FunctionalComponent, KeyAddingStage}
 import slinky.core.facade.Hooks
 import typings.reactGoogleRecaptcha.components.ReactGoogleRecaptcha
 
 object ReCaptcha {
+  def apply(ctx: AppContext, onChange: Option[Captcha] => Unit): KeyAddingStage = 
+    component(Props(ctx = ctx, onChange = onChange))
+  
   case class Props(ctx: AppContext, onChange: Option[Captcha] => Unit)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>

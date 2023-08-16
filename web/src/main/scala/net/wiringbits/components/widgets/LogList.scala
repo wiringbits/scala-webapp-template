@@ -17,10 +17,13 @@ import net.wiringbits.api.utils.Formatter
 import net.wiringbits.core.I18nHooks
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{Container, Subtitle}
 import org.scalablytyped.runtime.StringDictionary
-import slinky.core.FunctionalComponent
+import slinky.core.{FunctionalComponent, KeyAddingStage}
 import slinky.core.facade.Fragment
 
 object LogList {
+  def apply(ctx: AppContext, response: GetUserLogs.Response, forceRefresh: () => Unit): KeyAddingStage =
+    component(Props(ctx = ctx, response = response, forceRefresh = forceRefresh))
+
   case class Props(ctx: AppContext, response: GetUserLogs.Response, forceRefresh: () => Unit)
 
   private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {

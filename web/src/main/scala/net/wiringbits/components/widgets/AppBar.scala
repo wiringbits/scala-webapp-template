@@ -7,12 +7,7 @@ import com.alexitc.materialui.facade.materialUiCore.{components as mui, material
 import com.alexitc.materialui.facade.materialUiIcons.components as muiIcons
 import com.alexitc.materialui.facade.materialUiStyles.makeStylesMod.StylesHook
 import com.alexitc.materialui.facade.materialUiStyles.mod.makeStyles
-import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
-  CSSProperties,
-  StyleRulesCallback,
-  Styles,
-  WithStylesOptions
-}
+import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{CSSProperties, StyleRulesCallback, Styles, WithStylesOptions}
 import net.wiringbits.AppContext
 import net.wiringbits.core.{I18nHooks, ReactiveHooks}
 import net.wiringbits.models.AuthState
@@ -20,11 +15,14 @@ import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{Container, NavLinkButton, Subtitle, Title}
 import net.wiringbits.webapp.utils.slinkyUtils.core.MediaQueryHooks
 import org.scalablytyped.runtime.StringDictionary
-import slinky.core.FunctionalComponent
-import slinky.core.facade.{Fragment, Hooks}
+import slinky.core.{FunctionalComponent, KeyAddingStage}
+import slinky.core.facade.{Fragment, Hooks, ReactElement}
 import slinky.web.html.*
 
 object AppBar {
+  def apply(ctx: AppContext): KeyAddingStage =
+    component(Props(ctx))
+    
   case class Props(ctx: AppContext)
 
   private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {

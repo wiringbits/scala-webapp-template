@@ -16,7 +16,7 @@ import net.wiringbits.core.I18nHooks
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.{Alignment, EdgeInsets}
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{Container, Title}
 import org.scalablytyped.runtime.StringDictionary
-import slinky.core.FunctionalComponent
+import slinky.core.{FunctionalComponent, KeyAddingStage}
 import slinky.core.facade.Fragment
 import slinky.web.html.{className, div}
 import typings.reactRouterDom.mod as reactRouterDom
@@ -25,6 +25,9 @@ import typings.reactRouterDom.mod.useHistory
 import scala.scalajs.js
 
 object SignInPage {
+  def apply(ctx: AppContext): KeyAddingStage =
+    component(Props(ctx = ctx))
+
   case class Props(ctx: AppContext)
 
   private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {
@@ -47,47 +50,45 @@ object SignInPage {
       justifyContent = Alignment.center,
       alignItems = Alignment.center,
       child = div(className := classes("signInPageFormContainer"))(
-        AppCard.component(
-          AppCard.Props(
-            Fragment(
-              Container(
-                justifyContent = Alignment.center,
-                alignItems = Alignment.center,
-                child = Title(texts.signIn)
-              ),
-              Container(
-                flex = Some(1),
-                alignItems = Alignment.center,
-                justifyContent = Alignment.center,
-                padding = EdgeInsets.top(16),
-                child = SignInForm.component(SignInForm.Props(props.ctx))
-              ),
-              Container(
-                margin = Container.EdgeInsets.top(8),
-                flexDirection = Container.FlexDirection.row,
-                alignItems = Container.Alignment.center,
-                justifyContent = Container.Alignment.center,
-                child = Fragment(
-                  mui.Typography(texts.dontHaveAccountYet),
-                  mui
-                    .Button(texts.signUp)
-                    .variant(muiStrings.text)
-                    .color(muiStrings.primary)
-                    .onClick(_ => history.push("/signUp"))
-                )
-              ),
-              Container(
-                flexDirection = Container.FlexDirection.row,
-                alignItems = Container.Alignment.center,
-                justifyContent = Container.Alignment.center,
-                child = Fragment(
-                  mui.Typography(texts.forgotYourPassword),
-                  mui
-                    .Button(texts.recoverIt)
-                    .variant(muiStrings.text)
-                    .color(muiStrings.primary)
-                    .onClick(_ => history.push("/forgot-password"))
-                )
+        AppCard(
+          Fragment(
+            Container(
+              justifyContent = Alignment.center,
+              alignItems = Alignment.center,
+              child = Title(texts.signIn)
+            ),
+            Container(
+              flex = Some(1),
+              alignItems = Alignment.center,
+              justifyContent = Alignment.center,
+              padding = EdgeInsets.top(16),
+              child = SignInForm(props.ctx)
+            ),
+            Container(
+              margin = Container.EdgeInsets.top(8),
+              flexDirection = Container.FlexDirection.row,
+              alignItems = Container.Alignment.center,
+              justifyContent = Container.Alignment.center,
+              child = Fragment(
+                mui.Typography(texts.dontHaveAccountYet),
+                mui
+                  .Button(texts.signUp)
+                  .variant(muiStrings.text)
+                  .color(muiStrings.primary)
+                  .onClick(_ => history.push("/signUp"))
+              )
+            ),
+            Container(
+              flexDirection = Container.FlexDirection.row,
+              alignItems = Container.Alignment.center,
+              justifyContent = Container.Alignment.center,
+              child = Fragment(
+                mui.Typography(texts.forgotYourPassword),
+                mui
+                  .Button(texts.recoverIt)
+                  .variant(muiStrings.text)
+                  .color(muiStrings.primary)
+                  .onClick(_ => history.push("/forgot-password"))
               )
             )
           )

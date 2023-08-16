@@ -7,10 +7,15 @@ import net.wiringbits.core.I18nHooks
 import net.wiringbits.models.User
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.AsyncComponent
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container}
-import slinky.core.FunctionalComponent
+import net.wiringbits.AppContext
+import net.wiringbits.core.I18nHooks
+import slinky.core.{FunctionalComponent, KeyAddingStage}
 import slinky.core.facade.Fragment
 
 object UserInfo {
+  def apply(ctx: AppContext, user: User): KeyAddingStage =
+    component(Props(ctx = ctx, user = user))
+
   case class Props(ctx: AppContext, user: User)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
@@ -33,9 +38,8 @@ object UserInfo {
       val form = {
         AsyncComponent.component[GetCurrentUser.Response](
           AsyncComponent.Props(
-            fetch = () => props.ctx.api.client.currentUser,
-            render =
-              response => EditUserForm.component(EditUserForm.Props(props.ctx, props.user, response, onSaveClick)),
+            fetch = () => props.ctx.api.client.currentUser(),
+            render = response => EditUserForm(props.ctx, props.user, response, onSaveClick),
             progressIndicator = () => loader
           )
         )

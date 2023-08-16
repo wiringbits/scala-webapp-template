@@ -12,6 +12,8 @@ import slinky.core.facade.{Fragment, Hooks, ReactElement}
 import scala.util.{Failure, Success}
 
 object AppSplash {
+  def apply(ctx: AppContext)(child: ReactElement): ReactElement =
+    component(Props(ctx = ctx, child = child))
 
   case class Props(ctx: AppContext, child: ReactElement)
 

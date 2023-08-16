@@ -11,7 +11,7 @@ import net.wiringbits.webapp.utils.slinkyUtils.forms.StatefulFormData
 import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 import slinky.core.facade.{Fragment, Hooks}
-import slinky.core.{FunctionalComponent, SyntheticEvent}
+import slinky.core.{FunctionalComponent, KeyAddingStage, SyntheticEvent}
 import slinky.web.html.{form, onSubmit}
 import typings.reactRouterDom.mod as reactRouterDom
 
@@ -19,6 +19,9 @@ import scala.scalajs.js
 import scala.util.{Failure, Success}
 
 object ForgotPasswordForm {
+  def apply(ctx: AppContext): KeyAddingStage =
+    component(Props(ctx = ctx))
+
   case class Props(ctx: AppContext)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
@@ -94,9 +97,7 @@ object ForgotPasswordForm {
         )
       )
 
-    val recaptcha = ReCaptcha.component(
-      ReCaptcha.Props(props.ctx, onChange = captchaOpt => onDataChanged(x => x.copy(captcha = captchaOpt)))
-    )
+    val recaptcha = ReCaptcha(props.ctx, onChange = captchaOpt => onDataChanged(x => x.copy(captcha = captchaOpt)))
 
     form(onSubmit := (handleSubmit(_)))(
       Container(

@@ -18,7 +18,7 @@ import net.wiringbits.core.I18nHooks
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container}
 import org.scalablytyped.runtime.StringDictionary
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
-import slinky.core.FunctionalComponent
+import slinky.core.{FunctionalComponent, KeyAddingStage}
 import slinky.core.facade.{Fragment, Hooks}
 import slinky.web.html.{className, div}
 import typings.reactRouterDom.mod.{useHistory, useParams}
@@ -28,6 +28,9 @@ import scala.scalajs.js.timers.setTimeout
 import scala.util.{Failure, Success}
 
 object VerifyEmailWithTokenPage {
+  def apply(ctx: AppContext): KeyAddingStage = 
+    component(Props(ctx = ctx))
+  
   case class Props(ctx: AppContext)
 
   private case class State(
