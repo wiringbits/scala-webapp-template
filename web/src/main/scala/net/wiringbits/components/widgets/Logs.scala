@@ -18,7 +18,7 @@ object Logs {
 
     AsyncComponent.component[GetUserLogs.Response](
       AsyncComponent.Props(
-        fetch = () => props.ctx.api.client.getUserLogs(),
+        fetch = () => props.ctx.api.client.getUserLogs,
         render = response => LogList(props.ctx, response, () => forceRefresh()),
         progressIndicator = () => Loader(props.ctx),
         watchedObjects = List(timesRefreshingData)
