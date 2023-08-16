@@ -2,7 +2,6 @@ package controllers.common
 
 import com.dimafeng.testcontainers.PostgreSQLContainer
 import com.dimafeng.testcontainers.scalatest.TestContainerForEach
-import net.wiringbits.api
 import net.wiringbits.api.ApiClient
 import org.scalatest.TestData
 import org.scalatest.time.SpanSugar.convertIntToGrainOfTime
