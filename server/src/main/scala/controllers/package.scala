@@ -1,4 +1,4 @@
-import net.wiringbits.api.models.ErrorResponse
+import net.wiringbits.api.models.{ErrorResponse, errorResponseFormat}
 import org.slf4j.LoggerFactory
 import play.api.mvc.request.DefaultRequestFactory
 import play.api.mvc.{CookieHeaderEncoding, Session}

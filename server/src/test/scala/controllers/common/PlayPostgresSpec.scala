@@ -55,7 +55,7 @@ trait PlayPostgresSpec extends PlayAPISpec with TestContainerForEach with GuiceO
   }
 
   def withApiClient[A](runTest: ApiClient => A): A = {
-    implicit val sttpBackend : sttp.client3.SttpBackend[concurrent.Future, ?]  = HttpClientFutureBackend()
+    implicit val sttpBackend: sttp.client3.SttpBackend[concurrent.Future, ?] = HttpClientFutureBackend()
 
     val config = ApiClient.Config(s"http://localhost:$port")
     val client = new ApiClient.DefaultImpl(config)

@@ -2,7 +2,7 @@ package net.wiringbits.components.widgets
 
 import com.alexitc.materialui.facade.materialUiCore.createMuiThemeMod.Theme
 import com.alexitc.materialui.facade.materialUiCore.mod.PropTypes.Color
-import com.alexitc.materialui.facade.materialUiCore.{typographyTypographyMod, components => mui}
+import com.alexitc.materialui.facade.materialUiCore.{typographyTypographyMod, components as mui}
 import com.alexitc.materialui.facade.materialUiStyles.makeStylesMod.StylesHook
 import com.alexitc.materialui.facade.materialUiStyles.mod.makeStyles
 import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{

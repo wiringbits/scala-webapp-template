@@ -7,9 +7,9 @@ import net.wiringbits.core.RepositorySpec
 import net.wiringbits.repositories.models.User
 import net.wiringbits.util.EmailMessage
 import org.scalatest.BeforeAndAfterAll
-import org.scalatest.OptionValues._
-import org.scalatest.concurrent.ScalaFutures._
-import org.scalatest.matchers.must.Matchers._
+import org.scalatest.OptionValues.*
+import org.scalatest.concurrent.ScalaFutures.*
+import org.scalatest.matchers.must.Matchers.*
 
 import java.util.UUID
 

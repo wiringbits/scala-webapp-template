@@ -1,6 +1,6 @@
 package net.wiringbits.common.models
 
-import org.scalatest.matchers.must.Matchers._
+import org.scalatest.matchers.must.Matchers.*
 import org.scalatest.wordspec.AnyWordSpec
 
 class PasswordSpec extends AnyWordSpec {

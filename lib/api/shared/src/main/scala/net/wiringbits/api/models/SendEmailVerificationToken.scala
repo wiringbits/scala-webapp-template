@@ -1,11 +1,10 @@
 package net.wiringbits.api.models
 
-import net.wiringbits.common.models.Email
+import net.wiringbits.common.models.{Captcha, Email}
 import play.api.libs.json.{Format, Json}
+import sttp.tapir.Schema
 
 import java.time.Instant
-import net.wiringbits.common.models.Captcha
-import sttp.tapir.Schema
 
 object SendEmailVerificationToken {
 

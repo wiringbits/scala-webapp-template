@@ -122,9 +122,8 @@ object SignInForm {
       )
     }
 
-    val recaptcha = ReCaptcha.component(ReCaptcha.Props(
-      props.ctx,
-      onChange = captchaOpt => onDataChanged(x => x.copy(captcha = captchaOpt)))
+    val recaptcha = ReCaptcha.component(
+      ReCaptcha.Props(props.ctx, onChange = captchaOpt => onDataChanged(x => x.copy(captcha = captchaOpt)))
     )
 
     val loginButton = {

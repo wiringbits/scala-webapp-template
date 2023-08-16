@@ -6,17 +6,22 @@ import com.alexitc.materialui.facade.materialUiCore.mod.PropTypes.Color
 import com.alexitc.materialui.facade.materialUiCore.{components as mui, materialUiCoreStrings as muiStrings}
 import com.alexitc.materialui.facade.materialUiStyles.makeStylesMod.StylesHook
 import com.alexitc.materialui.facade.materialUiStyles.mod.makeStyles
-import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{CSSProperties, StyleRulesCallback, Styles, WithStylesOptions}
+import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
+  CSSProperties,
+  StyleRulesCallback,
+  Styles,
+  WithStylesOptions
+}
 import net.wiringbits.AppContext
 import net.wiringbits.core.I18nHooks
 import org.scalablytyped.runtime.StringDictionary
+import org.scalajs.dom
 import org.scalajs.dom.URLSearchParams
 import slinky.core.FunctionalComponent
 import slinky.core.facade.Fragment
 import slinky.web.html.{br, className, div}
-import typings.reactRouterDom.mod.useLocation
 import typings.reactRouterDom.mod as reactRouterDom
-import org.scalajs.dom
+import typings.reactRouterDom.mod.useLocation
 
 import scala.scalajs.js
 

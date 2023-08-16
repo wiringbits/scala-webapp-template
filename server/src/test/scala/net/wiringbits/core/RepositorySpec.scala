@@ -1,8 +1,8 @@
 package net.wiringbits.core
 
 import net.wiringbits.config.UserTokensConfig
-import net.wiringbits.repositories._
-import org.scalatest.concurrent.ScalaFutures._
+import net.wiringbits.repositories.*
+import org.scalatest.concurrent.ScalaFutures.*
 import org.scalatest.wordspec.AnyWordSpec
 import utils.Executors
 

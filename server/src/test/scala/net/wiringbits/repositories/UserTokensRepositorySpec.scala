@@ -4,8 +4,8 @@ import net.wiringbits.common.models.{Email, Name}
 import net.wiringbits.core.RepositorySpec
 import net.wiringbits.repositories.models.{User, UserToken, UserTokenType}
 import org.scalatest.OptionValues.convertOptionToValuable
-import org.scalatest.concurrent.ScalaFutures._
-import org.scalatest.matchers.must.Matchers._
+import org.scalatest.concurrent.ScalaFutures.*
+import org.scalatest.matchers.must.Matchers.*
 
 import java.time.Instant
 import java.time.temporal.ChronoUnit

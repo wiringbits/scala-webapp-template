@@ -2,6 +2,7 @@ package net.wiringbits
 
 import com.alexitc.materialui.facade.csstype.mod.{BoxSizingProperty, FlexDirectionProperty, PositionProperty}
 import com.alexitc.materialui.facade.materialUiCore.anon.{PartialPaperProps, PartialStyleRulesPaperCla}
+import com.alexitc.materialui.facade.materialUiCore.colorsMod as Colors
 import com.alexitc.materialui.facade.materialUiCore.createMuiThemeMod.{Theme, ThemeOptions}
 import com.alexitc.materialui.facade.materialUiCore.createPaletteMod.{PaletteColorOptions, PaletteOptions}
 import com.alexitc.materialui.facade.materialUiCore.createTypographyMod.TypographyOptions
@@ -10,7 +11,6 @@ import com.alexitc.materialui.facade.materialUiCore.propsMod.ComponentsProps
 import com.alexitc.materialui.facade.materialUiCore.shapeMod.ShapeOptions
 import com.alexitc.materialui.facade.materialUiCore.stylesMod.createMuiTheme
 import com.alexitc.materialui.facade.materialUiCore.withStylesMod.CSSProperties
-import com.alexitc.materialui.facade.materialUiCore.{colorsMod => Colors}
 
 object AppTheme {
   val primaryColor = Colors.teal.`500`

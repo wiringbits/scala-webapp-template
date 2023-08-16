@@ -11,7 +11,7 @@ object ReCaptcha {
   case class Props(ctx: AppContext, onChange: Option[Captcha] => Unit)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
-    implicit val ec=props.ctx.executionContext
+    implicit val ec = props.ctx.executionContext
 
     // Without useMemo, the component gets rendered everytime the captcha is solved
     Hooks.useMemo(

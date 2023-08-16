@@ -23,7 +23,7 @@ object ForgotPasswordForm {
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val texts = I18nHooks.useMessages(props.ctx.$lang)
-    val history= reactRouterDom.useHistory().asInstanceOf[js.Dynamic]
+    val history = reactRouterDom.useHistory().asInstanceOf[js.Dynamic]
 
     val (formData, setFormData) = Hooks.useState(
       StatefulFormData(
@@ -94,9 +94,8 @@ object ForgotPasswordForm {
         )
       )
 
-    val recaptcha = ReCaptcha.component(ReCaptcha.Props(
-      props.ctx,
-      onChange = captchaOpt => onDataChanged(x => x.copy(captcha = captchaOpt)))
+    val recaptcha = ReCaptcha.component(
+      ReCaptcha.Props(props.ctx, onChange = captchaOpt => onDataChanged(x => x.copy(captcha = captchaOpt)))
     )
 
     form(onSubmit := (handleSubmit(_)))(
@@ -122,4 +121,5 @@ object ForgotPasswordForm {
         child = forgotPasswordButton
       )
     )
-}}
+  }
+}

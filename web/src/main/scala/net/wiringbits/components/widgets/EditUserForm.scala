@@ -1,6 +1,6 @@
 package net.wiringbits.components.widgets
 
-import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
+import com.alexitc.materialui.facade.materialUiCore.{components as mui, materialUiCoreStrings as muiStrings}
 import net.wiringbits.AppContext
 import net.wiringbits.api.models.GetCurrentUser
 import net.wiringbits.api.utils.Formatter
@@ -15,7 +15,7 @@ import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 import slinky.core.facade.{Fragment, Hooks}
 import slinky.core.{FunctionalComponent, SyntheticEvent}
-import slinky.web.html._
+import slinky.web.html.*
 
 import scala.util.{Failure, Success}
 
