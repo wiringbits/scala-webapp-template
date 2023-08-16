@@ -5,14 +5,15 @@ import controllers.common.PlayPostgresSpec
 import net.wiringbits.api.models.CreateUser
 import net.wiringbits.apis.models.EmailRequest
 import net.wiringbits.apis.{EmailApi, ReCaptchaApi}
-import net.wiringbits.common.models._
+import net.wiringbits.common.models.*
 import net.wiringbits.util.TokenGenerator
 import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.*
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject
 import play.api.inject.guice.GuiceApplicationBuilder
 import utils.LoginUtils
-import org.mockito.Mockito.*
-import org.scalatestplus.mockito.MockitoSugar
+
 import java.time.{Clock, Instant}
 import java.util.UUID
 import scala.concurrent.Future

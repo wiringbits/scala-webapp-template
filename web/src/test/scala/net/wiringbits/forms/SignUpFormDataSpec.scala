@@ -1,7 +1,7 @@
 package net.wiringbits.forms
 
 import net.wiringbits.common.models.{Captcha, Email, Name, Password}
-import org.scalatest.matchers.must.Matchers._
+import org.scalatest.matchers.must.Matchers.*
 import org.scalatest.wordspec.AnyWordSpec
 
 class SignUpFormDataSpec extends AnyWordSpec {

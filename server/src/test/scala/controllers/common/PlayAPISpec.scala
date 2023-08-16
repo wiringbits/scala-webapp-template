@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.Result
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import play.api.{Application, Mode}
 
 import java.net.URLEncoder

@@ -1,6 +1,6 @@
 package net.wiringbits.core
 
-import net.wiringbits.repositories._
+import net.wiringbits.repositories.*
 import play.api.db.Database
 
 case class RepositoryComponents(

@@ -3,8 +3,8 @@ package net.wiringbits.components.pages
 import com.alexitc.materialui.facade.materialUiCore.createMuiThemeMod.Theme
 import com.alexitc.materialui.facade.materialUiCore.{
   typographyTypographyMod,
-  components => mui,
-  materialUiCoreStrings => muiStrings
+  components as mui,
+  materialUiCoreStrings as muiStrings
 }
 import com.alexitc.materialui.facade.materialUiStyles.makeStylesMod.StylesHook
 import com.alexitc.materialui.facade.materialUiStyles.mod.makeStyles

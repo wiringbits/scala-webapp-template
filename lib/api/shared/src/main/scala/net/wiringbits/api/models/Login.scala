@@ -2,8 +2,8 @@ package net.wiringbits.api.models
 
 import net.wiringbits.common.models.{Captcha, Email, Name, Password}
 import play.api.libs.json.{Format, Json}
-import sttp.tapir.generic.auto.*
 import sttp.tapir.Schema
+import sttp.tapir.generic.auto.*
 
 import java.util.UUID
 

@@ -1,7 +1,7 @@
 package net.wiringbits.components.pages
 
 import com.alexitc.materialui.facade.materialUiCore.createMuiThemeMod.Theme
-import com.alexitc.materialui.facade.materialUiCore.{components => mui, materialUiCoreStrings => muiStrings}
+import com.alexitc.materialui.facade.materialUiCore.{components as mui, materialUiCoreStrings as muiStrings}
 import com.alexitc.materialui.facade.materialUiStyles.makeStylesMod.StylesHook
 import com.alexitc.materialui.facade.materialUiStyles.mod.makeStyles
 import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
@@ -10,11 +10,11 @@ import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
   Styles,
   WithStylesOptions
 }
+import net.wiringbits.AppContext
 import net.wiringbits.common.models.UserToken
 import net.wiringbits.components.widgets.{AppCard, ResetPasswordForm}
-import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container
-import net.wiringbits.AppContext
 import net.wiringbits.core.I18nHooks
+import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container
 import org.scalablytyped.runtime.StringDictionary
 import slinky.core.FunctionalComponent
 import slinky.core.facade.Fragment
@@ -49,31 +49,33 @@ object ResetPasswordPage {
       justifyContent = Container.Alignment.center,
       alignItems = Container.Alignment.center,
       child = div(className := classes("resetPasswordFormContainer"))(
-        AppCard.component(AppCard.Props(
-          Fragment(
-            Container(
-              alignItems = Container.Alignment.center,
-              justifyContent = Container.Alignment.center,
-              child = mui.Typography(texts.enterNewPassword).variant(muiStrings.h5)
-            ),
-            ResetPasswordForm.component(ResetPasswordForm.Props(props.ctx, userToken)),
-            Container(
-              margin = Container.EdgeInsets.top(8),
-              flexDirection = Container.FlexDirection.row,
-              alignItems = Container.Alignment.center,
-              justifyContent = Container.Alignment.center,
-              child = Fragment(
-                mui.Typography(texts.alreadyHaveAccount),
-                mui
-                  .Button(texts.signIn)
-                  .variant(muiStrings.text)
-                  .color(muiStrings.primary)
-                  .onClick(_ => history.push("/signin"))
+        AppCard.component(
+          AppCard.Props(
+            Fragment(
+              Container(
+                alignItems = Container.Alignment.center,
+                justifyContent = Container.Alignment.center,
+                child = mui.Typography(texts.enterNewPassword).variant(muiStrings.h5)
+              ),
+              ResetPasswordForm.component(ResetPasswordForm.Props(props.ctx, userToken)),
+              Container(
+                margin = Container.EdgeInsets.top(8),
+                flexDirection = Container.FlexDirection.row,
+                alignItems = Container.Alignment.center,
+                justifyContent = Container.Alignment.center,
+                child = Fragment(
+                  mui.Typography(texts.alreadyHaveAccount),
+                  mui
+                    .Button(texts.signIn)
+                    .variant(muiStrings.text)
+                    .color(muiStrings.primary)
+                    .onClick(_ => history.push("/signin"))
+                )
               )
             )
           )
         )
       )
-    ))
+    )
   }
 }
