@@ -87,40 +87,7 @@ object HomePage {
       br(),
       br()
     )
-
-    val adminPortalFragment = Fragment(
-      title(texts.easilyExposeDataAdminPortal),
-      paragraph(
-        Fragment(
-          texts.easilyExposeDataAdminPortalDescriptionStart,
-          link(texts.reactAdmin, "https://marmelab.com/react-admin/"),
-          texts.easilyExposeDataAdminPortalDescriptionEnd.toLowerCase
-        )
-      ),
-      paragraph(texts.thisSnippet),
-      image("/img/home/admin-user-table-snippet.png", texts.adminUserTableSnippet, "snippet"),
-      paragraph(texts.rendersAUserList),
-      image("/img/home/admin-user-list.png", texts.adminUserList, "screenshot"),
-      paragraph(texts.allowsViewingUpdatingASingleUser),
-      image("/img/home/admin-user-view.png", texts.adminUserView, "screenshot"),
-      paragraph(
-        Fragment(
-          paragraph(
-            Fragment(
-              link(texts.tryIt, "https://template-demo-admin.wiringbits.net"),
-              " (user=",
-              strong("demo"),
-              ", password=",
-              strong("wiringbits"),
-              ")"
-            )
-          )
-        )
-      ),
-      br(),
-      br()
-    )
-
+    
     val swaggerFragment = Fragment(
       title(texts.swaggerIntegration),
       paragraph(
@@ -161,7 +128,6 @@ object HomePage {
         Fragment(
           homeFragment,
           userProfileFragment,
-          adminPortalFragment,
           swaggerFragment,
           dataLoadingFragment,
           simpleArchitectureFragment
