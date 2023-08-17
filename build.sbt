@@ -1,10 +1,10 @@
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption.REPLACE_EXISTING
 
-ThisBuild / scalaVersion := "3.3.0-RC3"
+ThisBuild / scalaVersion := "3.3.0"
 ThisBuild / organization := "net.wiringbits"
 
-val playJson = "2.10.0-RC7"
+val playJson = "2.10.0-RC9"
 val sttp = "3.8.15"
 val webappUtils = "0.5.16"
 val anorm = "2.7.0"
@@ -318,9 +318,8 @@ lazy val tapirServerCore = (project in file("tapir/core"))
 lazy val tapirServerPlay = (project in file("tapir/tapir-play"))
   .settings(
     name := "tapir-server-play",
-    scalaVersion := "3.3.0-RC3",
     libraryDependencies ++= Seq(
-      "com.typesafe.play" %% "play-akka-http-server" % "2.9.0-M5",
+      "com.typesafe.play" %% "play-akka-http-server" % "2.9.0-M6",
       "com.softwaremill.sttp.shared" %% "akka" % "1.3.14",
       "org.scala-lang.modules" %% "scala-collection-compat" % "2.11.0"
     )
