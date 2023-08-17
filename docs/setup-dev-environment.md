@@ -143,8 +143,7 @@ Update application.conf to set your environment specific values (just avoid comm
 Time to run the app:
 
 1. `sbt server/run` launches the backend, which is started once you launch a request (like `curl localhost:9000`), swagger-ui available at `http://localhost:9000/docs/index.html`.
-2. `sbt dev-web` launches the main web app at `localhost:8080` 
-3. `sbt dev-admin` launches the admin web app at `localhost:8081`
+2. `sbt dev-web` launches the main web app at `localhost:8080`
 
 
 **Hints**:

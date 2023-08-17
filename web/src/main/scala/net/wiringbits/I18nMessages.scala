@@ -69,20 +69,10 @@ class I18nMessages(_lang: I18nLang) {
   def checkoutTheRepo = "Checkout the repository!"
 
   def homePageDescription =
-    "A reusable skeleton to build web applications in Scala/Scala.js, including user registration, login, admin portal, and deployments."
+    "A reusable skeleton to build web applications in Scala/Scala.js, including user registration, login, and deployments."
   def userProfile = "User profile"
   def userProfileDescription = "All the necessary code to create accounts, change passwords, update profile is there, "
   def tryIt = "Try it."
-  def easilyExposeDataAdminPortal = "Easily expose data through the Admin portal"
-  def easilyExposeDataAdminPortalDescriptionStart = "The portal is powered by "
-  def easilyExposeDataAdminPortalDescriptionEnd = " Which allows exposing database tables with a simple config change."
-  def reactAdmin = "react-admin"
-  def thisSnippet = "This snippet:"
-  def rendersAUserList = "Renders a user list:"
-  def allowsViewingUpdatingASingleUser = "Allows viewing/updating a single user:"
-  def adminUserTableSnippet = "Admin user table snippet"
-  def adminUserList = "Admin user list"
-  def adminUserView = "Admin user view"
   def swaggerIntegration = "Swagger integration"
   def swaggerIntegrationDescription =
     "The template already has the necessary boilerplate to expose the application's API through Swagger, "

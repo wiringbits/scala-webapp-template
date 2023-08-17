@@ -437,52 +437,6 @@ lazy val web = (project in file("web"))
     )
   )
 
-lazy val adminBuildInfoSettings: Project => Project = _.enablePlugins(BuildInfoPlugin)
-  .settings(
-    buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
-    buildInfoKeys ++= {
-      val apiUrl = sys.env.get("API_URL")
-      val values = Seq(
-        "apiUrl" -> apiUrl
-      )
-      // Logging these values is useful to make sure that the necessary settings
-      // are being overriden when packaging the app.
-      sLog.value.info(s"BuildInfo settings:\n${values.mkString("\n")}")
-      values.map(t => BuildInfoKey(t._1, t._2))
-    },
-    buildInfoPackage := "net.wiringbits",
-    buildInfoUsePackageAsPath := true
-  )
-
-lazy val admin = (project in file("admin"))
-  .dependsOn(api.js)
-  .enablePlugins(ScalaJSBundlerPlugin)
-  .configure(browserProject, bundlerSettings, adminBuildInfoSettings)
-  .settings(
-    name := "wiringbits-admin",
-    scalaJSUseMainModuleInitializer := true,
-    scalaJSLinkerConfig := scalaJSLinkerConfig.value.withSourceMap(false),
-    webpackDevServerPort := 8081,
-    webpackBundlingMode := BundlingMode.LibraryOnly(),
-    libraryDependencies ++= Seq(
-      "com.softwaremill.sttp.client3" %%% "core" % sttp,
-      "net.wiringbits" %%% "admin-data-explorer-web" % webappUtils
-    ),
-    Compile / npmDependencies ++= Seq(
-      "react" -> "17.0.0",
-      "react-dom" -> "17.0.0",
-      "react-scripts" -> "5.0.0",
-      "react-admin" -> "4.1.0",
-      "ra-ui-materialui" -> "4.1.0",
-      "ra-data-simple-rest" -> "4.1.0",
-      "ra-i18n-polyglot" -> "4.1.0",
-      "ra-language-english" -> "4.1.0",
-      "ra-core" -> "4.1.0",
-      "@mui/material" -> "5.8.1",
-      "@emotion/styled" -> "11.8.1"
-    )
-  )
-
 lazy val root = (project in file("."))
   .aggregate(
     common.jvm,
@@ -491,8 +445,7 @@ lazy val root = (project in file("."))
     api.js,
     ui,
     server,
-    web,
-    admin
+    web
   )
   .settings(
     publish := {},
@@ -500,4 +453,3 @@ lazy val root = (project in file("."))
   )
 
 addCommandAlias("dev-web", ";web/fastOptJS::startWebpackDevServer;~web/fastOptJS")
-addCommandAlias("dev-admin", ";admin/fastOptJS::startWebpackDevServer;~admin/fastOptJS")

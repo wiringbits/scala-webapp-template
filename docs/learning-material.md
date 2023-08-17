@@ -15,5 +15,5 @@ These are the tools used by the template, you don't need to master them all but 
 - [react-router](https://www.npmjs.com/package/react-router) is the frontend routing library.
 - [play-json](https://github.com/playframework/play-json/) is the JSON library.
 - [ansible](https://ansible.com/) as the tool for deploying everything to a VM.
-- [nginx](https://nginx.org/en/) as the reverse proxy for handling the internet traffic, as well as the authentication mechanism for the admin portal.
+- [nginx](https://nginx.org/en/) as the reverse proxy for handling the internet traffic, as well as the authentication mechanism for admin endpoints.
 - [GitHub](https://github.com/features/actions) actions integration so that you have a way to get every commit tested.

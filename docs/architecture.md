@@ -16,7 +16,7 @@ Summary:
 - We recommend a managed database for Postgres.
 - While the diagram shows all components in a single server, we can easily separate nginx as a load balancer + many server instances.
 - Frontend apps are composed by static assets, stored at the server filesystem.
-- `nginx` is the entry point handling user requests, which has a TLS certificate (thanks to LetsEncrypt/CertBot), depending on the domain, it serves the files for the admin or the regular app.
+- `nginx` is the entry point handling user requests, which has a TLS certificate (thanks to LetsEncrypt/CertBot), depending on the domain, it serves the files for the regular app.
 - When the server API is being invoked, `nginx` will route the traffic to the server app.
 - The server app connects to postgres and external services when necessary (like AWS SES).
 - AWS SES is being used to send emails.
@@ -31,7 +31,6 @@ The application modules make sure to share code when possible, some of them cros
 - [LibAPI](../lib/api) has code shared to the `server` (Scala) and the web apps (Scala.js), it includes all the models defining the request/response for the `server` endpoints, it also includes the API client that web apps use to invoke the `server` app.
 - [LibUI](../lib/ui) has code shared between the webapps (Scala.js), while it is mostly empty, it can include reusable components for the UI.
 - [Web](../web) has the web app code for the regular user application (Scala.js).
-- [Admin](../admin) has the admin app code (Scala.js).
 - [Server](../server) has the code for the server app (Scala).
 
 
