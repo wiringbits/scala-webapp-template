@@ -3,7 +3,6 @@ package controllers
 import akka.stream.Materializer
 import net.wiringbits.api.endpoints.*
 import net.wiringbits.config.SwaggerConfig
-import play.api.libs.ws.StandaloneWSClient
 import play.api.routing.Router.Routes
 import play.api.routing.SimpleRouter
 import sttp.apispec.openapi.Info
@@ -22,7 +21,7 @@ class ApiRouter @Inject() (
     usersController: UsersController,
     environmentConfigController: EnvironmentConfigController,
     swaggerConfig: SwaggerConfig
-)(implicit materializer: Materializer, wsClient: StandaloneWSClient, ec: ExecutionContext)
+)(implicit materializer: Materializer, ec: ExecutionContext)
     extends SimpleRouter {
   private val swagger = SwaggerInterpreter(
     swaggerUIOptions = SwaggerUIOptions.default.copy(contextPath = List(swaggerConfig.basePath))
@@ -50,7 +49,7 @@ class ApiRouter @Inject() (
 }
 
 object ApiRouter {
-  private val routes: List[AnyEndpoint] = List(
+  private def routes(implicit ec: ExecutionContext): List[AnyEndpoint] = List(
     HealthEndpoints.routes,
     AdminEndpoints.routes,
     AuthEndpoints.routes,

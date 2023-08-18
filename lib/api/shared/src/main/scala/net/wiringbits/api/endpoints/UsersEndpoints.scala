@@ -1,12 +1,14 @@
 package net.wiringbits.api.endpoints
 
-import net.wiringbits.api.models.{GetUserLogs, UpdatePassword, UpdateUser, *}
+import net.wiringbits.api.models.*
 import net.wiringbits.common.models.*
 import sttp.tapir.*
 import sttp.tapir.json.play.*
+import sttp.tapir.model.ServerRequest
 
 import java.time.Instant
 import java.util.UUID
+import scala.concurrent.Future
 
 object UsersEndpoints {
   private val baseEndpoint = endpoint
@@ -133,7 +135,9 @@ object UsersEndpoints {
         "The user's email should be unconfirmed, this is intended to re-send a token in case the previous one did not arrive"
       )
 
-  val update: Endpoint[Unit, (UpdateUser.Request, Option[String]), ErrorResponse, UpdateUser.Response, Any] =
+  def update(implicit
+      authHandler: ServerRequest => Future[UUID]
+  ): Endpoint[Unit, (UpdateUser.Request, Future[UUID]), ErrorResponse, UpdateUser.Response, Any] =
     baseEndpoint.put
       .in("me")
       .in(
@@ -143,13 +147,14 @@ object UsersEndpoints {
           )
         )
       )
-      .in(sessionHeader)
+      .in(userAuth)
       .out(jsonBody[UpdateUser.Response].description("The user details were updated").example(UpdateUser.Response()))
       .errorOut(oneOf(HttpErrors.badRequest))
       .summary("Updates the authenticated user details")
 
-  val updatePassword
-      : Endpoint[Unit, (UpdatePassword.Request, Option[String]), ErrorResponse, UpdatePassword.Response, Any] =
+  def updatePassword(implicit
+      authHandler: ServerRequest => Future[UUID]
+  ): Endpoint[Unit, (UpdatePassword.Request, Future[UUID]), ErrorResponse, UpdatePassword.Response, Any] =
     baseEndpoint.put
       .in("me" / "password")
       .in(
@@ -162,14 +167,16 @@ object UsersEndpoints {
             )
           )
       )
-      .in(sessionHeader)
+      .in(userAuth)
       .out(jsonBody[UpdatePassword.Response])
       .errorOut(oneOf(HttpErrors.badRequest))
       .summary("Updates the authenticated user password")
 
-  val getLogs: Endpoint[Unit, Option[String], ErrorResponse, GetUserLogs.Response, Any] = baseEndpoint.get
+  def getLogs(implicit
+      authHandler: ServerRequest => Future[UUID]
+  ): Endpoint[Unit, Future[UUID], ErrorResponse, GetUserLogs.Response, Any] = baseEndpoint.get
     .in("me" / "logs")
-    .in(sessionHeader)
+    .in(userAuth)
     .out(
       jsonBody[GetUserLogs.Response]
         .description("Got user logs")
@@ -188,7 +195,7 @@ object UsersEndpoints {
     .errorOut(oneOf(HttpErrors.badRequest))
     .summary("Get the logs for the authenticated user")
 
-  val routes: List[AnyEndpoint] = List(
+  def routes(implicit authHandler: ServerRequest => Future[UUID]): List[AnyEndpoint] = List(
     create,
     verifyEmail,
     forgotPassword,
