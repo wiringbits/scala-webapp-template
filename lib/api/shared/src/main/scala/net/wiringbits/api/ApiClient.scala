@@ -9,9 +9,7 @@ import sttp.tapir.client.sttp.SttpClientInterpreter
 import sttp.tapir.model.ServerRequest
 
 import java.util.UUID
-import scala.annotation.unused
 import scala.concurrent.{ExecutionContext, Future}
-import scala.language.implicitConversions
 import scala.util.{Failure, Success, Try}
 
 object ApiClient {
@@ -22,12 +20,13 @@ class ApiClient(config: ApiClient.Config)(implicit
     ex: ExecutionContext,
     sttpBackend: SttpBackend[Future, _]
 ) {
-  // Instead of using a random UUID, we could use a random string, but this way, we can avoid generating a random UUID
-  // for each endpoint
+  // Instead of using a random UUID we can avoid generating a random UUID mocking a valid UUID,
+  // this UUID is not being used in the server/api client, so it is safe to use it
   private val mockedUserId = Future.successful(UUID.fromString("887a5d77-cb5d-4d9c-b4dc-539c8aae3977"))
 
-  // We need a function to handle endpoints that need authentication
-  private implicit def handleUserId(@unused serverRequest: ServerRequest): Future[UUID] = mockedUserId
+  // We need a function to handle endpoints that need user authentication, this is not being used in the server/api
+  // client, so it is safe to use it
+  private implicit val handleUserId: ServerRequest => Future[UUID] = _ => mockedUserId
 
   private def asJson[R: Reads](strBody: String) = {
     Try {
@@ -132,7 +131,7 @@ class ApiClient(config: ApiClient.Config)(implicit
 
   def logout: Future[Logout.Response] =
     client
-      .toRequestThrowDecodeFailures(AuthEndpoints.logout(handleUserId), Some(ServerAPI))
+      .toRequestThrowDecodeFailures(AuthEndpoints.logout, Some(ServerAPI))
       .apply(mockedUserId)
       .response(asStringAlways)
       .send(sttpBackend)
