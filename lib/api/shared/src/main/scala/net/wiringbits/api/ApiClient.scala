@@ -20,13 +20,13 @@ class ApiClient(config: ApiClient.Config)(implicit
     ex: ExecutionContext,
     sttpBackend: SttpBackend[Future, _]
 ) {
-  // Instead of using a random UUID we can avoid generating a random UUID mocking a valid UUID,
-  // this UUID is not being used in the server/api client, so it is safe to use it
-  private val mockedUserId = Future.successful(UUID.fromString("887a5d77-cb5d-4d9c-b4dc-539c8aae3977"))
+  // While the server requires a userId, it is extracted from the Session cookie, we need a dummy value just to
+  // fulfill the method signatures
+  private val dummyUserId = Future.successful(UUID.fromString("887a5d77-cb5d-4d9c-b4dc-539c8aae3977"))
 
-  // We need a function to handle endpoints that need user authentication, this is not being used in the server/api
-  // client, so it is safe to use it
-  private implicit val handleUserId: ServerRequest => Future[UUID] = _ => mockedUserId
+  // Similarly to the dummy userId, we need a way to derive the userId from a request, which is used only on the
+  // server-side code, this function is helpful to fulfill the method signatures
+  private implicit val handleDummyUserId: ServerRequest => Future[UUID] = _ => dummyUserId
 
   private def asJson[R: Reads](strBody: String) = {
     Try {
@@ -90,16 +90,16 @@ class ApiClient(config: ApiClient.Config)(implicit
     handleRequest(UsersEndpoints.resetPassword, request)
 
   def currentUser: Future[GetCurrentUser.Response] =
-    handleRequest(AuthEndpoints.getCurrentUser, mockedUserId)
+    handleRequest(AuthEndpoints.getCurrentUser, dummyUserId)
 
   def updateUser(request: UpdateUser.Request): Future[UpdateUser.Response] =
-    handleRequest(UsersEndpoints.update, (request, mockedUserId))
+    handleRequest(UsersEndpoints.update, (request, dummyUserId))
 
   def updatePassword(request: UpdatePassword.Request): Future[UpdatePassword.Response] =
-    handleRequest(UsersEndpoints.updatePassword, (request, mockedUserId))
+    handleRequest(UsersEndpoints.updatePassword, (request, dummyUserId))
 
   def getUserLogs: Future[GetUserLogs.Response] =
-    handleRequest(UsersEndpoints.getLogs, mockedUserId)
+    handleRequest(UsersEndpoints.getLogs, dummyUserId)
 
   def adminGetUserLogs(userId: UUID): Future[AdminGetUserLogs.Response] =
     handleRequest(AdminEndpoints.getUserLogsEndpoint, ("_", userId, ""))
@@ -132,7 +132,7 @@ class ApiClient(config: ApiClient.Config)(implicit
   def logout: Future[Logout.Response] =
     client
       .toRequestThrowDecodeFailures(AuthEndpoints.logout, Some(ServerAPI))
-      .apply(mockedUserId)
+      .apply(dummyUserId)
       .response(asStringAlways)
       .send(sttpBackend)
       .map { response =>

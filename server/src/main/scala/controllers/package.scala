@@ -44,6 +44,7 @@ package object controllers {
       Left(ErrorResponse(ex.getMessage))
   }
 
+  // This is the way to access the play request from tapir, we need it to extract the play session
   // UUID has to be future, because we want to handle the exception in the controllers
   implicit def authHandler(serverRequest: ServerRequest)(implicit ec: ExecutionContext): Future[UUID] =
     val session = serverRequest.underlying
