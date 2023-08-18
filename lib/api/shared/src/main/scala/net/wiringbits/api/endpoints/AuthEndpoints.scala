@@ -5,9 +5,11 @@ import net.wiringbits.api.models.{ErrorResponse, GetCurrentUser, Login, Logout}
 import net.wiringbits.common.models.{Captcha, Email, Name, Password}
 import sttp.tapir.*
 import sttp.tapir.json.play.*
+import sttp.tapir.model.ServerRequest
 
 import java.time.Instant
 import java.util.UUID
+import scala.concurrent.{ExecutionContext, Future}
 
 object AuthEndpoints {
   private val baseEndpoint = endpoint
@@ -53,10 +55,12 @@ object AuthEndpoints {
       .summary("Logout from the app")
       .description("Clears the session cookie that's stored securely")
 
-  val getCurrentUser: Endpoint[Unit, Option[String], ErrorResponse, GetCurrentUser.Response, Any] =
+  def getCurrentUser(implicit
+      authHandler: ServerRequest => Future[UUID]
+  ): Endpoint[Unit, Future[UUID], ErrorResponse, GetCurrentUser.Response, Any] =
     baseEndpoint.get
       .in("me")
-      .in(sessionHeader)
+      .in(session)
       .out(
         jsonBody[GetCurrentUser.Response]
           .description("Got user details")
@@ -71,7 +75,7 @@ object AuthEndpoints {
       )
       .summary("Get the details for the authenticated user")
 
-  val routes: List[AnyEndpoint] = List(
+  def routes(implicit authHandler: ServerRequest => Future[UUID], ec: ExecutionContext): List[AnyEndpoint] = List(
     login,
     logout,
     getCurrentUser

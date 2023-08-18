@@ -6,8 +6,10 @@ import play.api.libs.json.{Json, Reads}
 import sttp.client3.*
 import sttp.tapir.PublicEndpoint
 import sttp.tapir.client.sttp.SttpClientInterpreter
+import sttp.tapir.model.ServerRequest
 
 import java.util.UUID
+import scala.annotation.unused
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
 
@@ -19,6 +21,13 @@ class ApiClient(config: ApiClient.Config)(implicit
     ex: ExecutionContext,
     sttpBackend: SttpBackend[Future, _]
 ) {
+  // Instead of using a random UUID, we could use a random string, but this way, we can avoid generating a random UUID
+  // for each endpoint
+  private val mockedUserId = Future.successful(UUID.fromString("56f0bd0d-89e9-436e-97e7-7757d4bf67a6"))
+
+  // We need a function to handle endpoints that need authentication
+  private def handleUserId(@unused serverRequest: ServerRequest) = mockedUserId
+
   private def asJson[R: Reads](strBody: String) = {
     Try {
       Json.parse(strBody).as[ErrorResponse]
@@ -81,7 +90,7 @@ class ApiClient(config: ApiClient.Config)(implicit
     handleRequest(UsersEndpoints.resetPassword, request)
 
   def currentUser: Future[GetCurrentUser.Response] =
-    handleRequest(AuthEndpoints.getCurrentUser, Some(""))
+    handleRequest(AuthEndpoints.getCurrentUser(handleUserId), mockedUserId)
 
   def updateUser(request: UpdateUser.Request): Future[UpdateUser.Response] =
     handleRequest(UsersEndpoints.update, (request, Some("")))

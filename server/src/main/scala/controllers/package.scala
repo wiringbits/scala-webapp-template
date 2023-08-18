@@ -1,11 +1,13 @@
 import net.wiringbits.api.models.{ErrorResponse, errorResponseFormat}
 import org.slf4j.LoggerFactory
 import play.api.mvc.request.DefaultRequestFactory
-import play.api.mvc.{CookieHeaderEncoding, Session}
+import play.api.mvc.{CookieHeaderEncoding, RequestHeader, Session}
+import sttp.tapir.model.ServerRequest
 
 import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.language.implicitConversions
 import scala.util.Try
 import scala.util.control.NonFatal
 
@@ -58,4 +60,22 @@ package object controllers {
       logger.debug(s"Error response while handling a request: ${ex.getMessage}", ex)
       Left(ErrorResponse(ex.getMessage))
   }
+
+  // UUID has to be future, because we want to handle the exception in the controllers
+  implicit def authHandler(serverRequest: ServerRequest)(implicit ec: ExecutionContext): Future[UUID] =
+    val session = serverRequest.underlying
+      .asInstanceOf[RequestHeader]
+      .session
+
+    def userIdFromSession = Future {
+      session
+        .get("id")
+        .flatMap(str => Try(UUID.fromString(str)).toOption)
+        .getOrElse(throw new RuntimeException("Invalid or missing authentication"))
+    }
+
+    userIdFromSession
+      .recover { case NonFatal(_) =>
+        throw new RuntimeException("Unauthorized: Invalid or missing authentication")
+      }
 }

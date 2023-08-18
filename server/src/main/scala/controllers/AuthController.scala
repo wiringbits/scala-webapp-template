@@ -4,10 +4,13 @@ import net.wiringbits.actions.*
 import net.wiringbits.api.endpoints.AuthEndpoints
 import net.wiringbits.api.models.*
 import org.slf4j.LoggerFactory
+import play.api.mvc.RequestHeader
 import sttp.capabilities.WebSockets
 import sttp.capabilities.akka.AkkaStreams
+import sttp.tapir.model.ServerRequest
 import sttp.tapir.server.ServerEndpoint
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -27,10 +30,10 @@ class AuthController @Inject() (
       } yield Right(response, cookieEncoded)
     }
 
-  private def me(sessionCookie: Option[String]): Future[Either[ErrorResponse, GetCurrentUser.Response]] =
+  private def me(userIdF: Future[UUID]): Future[Either[ErrorResponse, GetCurrentUser.Response]] =
     handleRequest {
       for {
-        userId <- playTapirBridge.parseSession(sessionCookie)
+        userId <- userIdF
         _ = logger.info(s"Get user info: $userId")
         response <- getUserAction(userId)
       } yield Right(response)

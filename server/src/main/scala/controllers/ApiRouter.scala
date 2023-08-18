@@ -13,7 +13,7 @@ import sttp.tapir.swagger.SwaggerUIOptions
 import sttp.tapir.swagger.bundle.SwaggerInterpreter
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
 
 class ApiRouter @Inject() (
     adminController: AdminController,
@@ -22,7 +22,7 @@ class ApiRouter @Inject() (
     usersController: UsersController,
     environmentConfigController: EnvironmentConfigController,
     swaggerConfig: SwaggerConfig
-)(implicit materializer: Materializer, wsClient: StandaloneWSClient, ec: ExecutionContext)
+)(implicit materializer: Materializer, ec: ExecutionContext)
     extends SimpleRouter {
   private val swagger = SwaggerInterpreter(
     swaggerUIOptions = SwaggerUIOptions.default.copy(contextPath = List(swaggerConfig.basePath))
@@ -50,7 +50,7 @@ class ApiRouter @Inject() (
 }
 
 object ApiRouter {
-  private val routes: List[AnyEndpoint] = List(
+  private def routes(implicit ec: ExecutionContext): List[AnyEndpoint] = List(
     HealthEndpoints.routes,
     AdminEndpoints.routes,
     AuthEndpoints.routes,
