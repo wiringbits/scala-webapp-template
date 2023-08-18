@@ -32,10 +32,6 @@ package object endpoints {
     .securitySchemeName("Basic authorization")
     .description("Admin credentials")
 
-  val sessionHeader: EndpointIO.Header[Option[String]] = header[Option[String]]("Cookie")
-    .description("User session")
-    .schema(_.hidden(true))
-
   val setSessionHeader: EndpointIO.Header[String] = header[String]("Set-Cookie")
     .description("Set user session")
     .schema(_.hidden(true))
@@ -45,8 +41,6 @@ package object endpoints {
     .example(ErrorResponse("Unauthorized: Invalid or missing authentication"))
     .schema(_.hidden(true))
 
-  def session(implicit handleAuth: ServerRequest => Future[UUID]): EndpointInput.ExtractFromRequest[Future[UUID]] =
-    extractFromRequest(
-      handleAuth
-    )
+  def userAuth(implicit handleAuth: ServerRequest => Future[UUID]): EndpointInput.ExtractFromRequest[Future[UUID]] =
+    extractFromRequest(handleAuth)
 }

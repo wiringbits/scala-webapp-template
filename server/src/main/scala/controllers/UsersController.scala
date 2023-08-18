@@ -8,6 +8,7 @@ import sttp.capabilities.WebSockets
 import sttp.capabilities.akka.AkkaStreams
 import sttp.tapir.server.ServerEndpoint
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -19,8 +20,7 @@ class UsersController @Inject() (
     updateUserAction: UpdateUserAction,
     updatePasswordAction: UpdatePasswordAction,
     getUserLogsAction: GetUserLogsAction,
-    sendEmailVerificationTokenAction: SendEmailVerificationTokenAction,
-    playTapirBridge: PlayTapirBridge
+    sendEmailVerificationTokenAction: SendEmailVerificationTokenAction
 )(implicit ec: ExecutionContext) {
   private val logger = LoggerFactory.getLogger(this.getClass)
 
@@ -67,11 +67,11 @@ class UsersController @Inject() (
 
   private def update(
       request: UpdateUser.Request,
-      sessionCookie: Option[String]
+      userIdF: Future[UUID]
   ): Future[Either[ErrorResponse, UpdateUser.Response]] = handleRequest {
     logger.info(s"Update user: $request")
     for {
-      userId <- playTapirBridge.parseSession(sessionCookie)
+      userId <- userIdF
       _ <- updateUserAction(userId, request)
       response = UpdateUser.Response()
     } yield Right(response)
@@ -79,20 +79,20 @@ class UsersController @Inject() (
 
   private def updatePassword(
       request: UpdatePassword.Request,
-      sessionCookie: Option[String]
+      userIdF: Future[UUID]
   ): Future[Either[ErrorResponse, UpdatePassword.Response]] = handleRequest {
     for {
-      userId <- playTapirBridge.parseSession(sessionCookie)
+      userId <- userIdF
       _ = logger.info(s"Update password for: $userId")
       _ <- updatePasswordAction(userId, request)
       response = UpdatePassword.Response()
     } yield Right(response)
   }
 
-  private def getLogs(sessionCookie: Option[String]): Future[Either[ErrorResponse, GetUserLogs.Response]] =
+  private def getLogs(userIdF: Future[UUID]): Future[Either[ErrorResponse, GetUserLogs.Response]] =
     handleRequest {
       for {
-        userId <- playTapirBridge.parseSession(sessionCookie)
+        userId <- userIdF
         _ = logger.info(s"Get user logs: $userId")
         response <- getUserLogsAction(userId)
       } yield Right(response)

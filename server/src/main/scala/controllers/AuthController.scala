@@ -4,10 +4,8 @@ import net.wiringbits.actions.*
 import net.wiringbits.api.endpoints.AuthEndpoints
 import net.wiringbits.api.models.*
 import org.slf4j.LoggerFactory
-import play.api.mvc.RequestHeader
 import sttp.capabilities.WebSockets
 import sttp.capabilities.akka.AkkaStreams
-import sttp.tapir.model.ServerRequest
 import sttp.tapir.server.ServerEndpoint
 
 import java.util.UUID
@@ -39,11 +37,11 @@ class AuthController @Inject() (
       } yield Right(response)
     }
 
-  private def logout(sessionCookie: Option[String]): Future[Either[ErrorResponse, (Logout.Response, String)]] =
+  private def logout(userIdF: Future[UUID]): Future[Either[ErrorResponse, (Logout.Response, String)]] =
     handleRequest {
       for {
-        _ <- playTapirBridge.parseSession(sessionCookie)
-        _ = logger.info(s"Logout")
+        _ <- userIdF
+        _ = logger.info("Logout")
         header <- playTapirBridge.clearSession()
       } yield Right(Logout.Response(), header)
     }

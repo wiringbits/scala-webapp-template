@@ -9,7 +9,7 @@ import sttp.tapir.model.ServerRequest
 
 import java.time.Instant
 import java.util.UUID
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 object AuthEndpoints {
   private val baseEndpoint = endpoint
@@ -45,10 +45,12 @@ object AuthEndpoints {
       .summary("Log into the app")
       .description("Sets a session cookie to authenticate the following requests")
 
-  val logout: Endpoint[Unit, Option[String], ErrorResponse, (Logout.Response, String), Any] =
+  def logout(implicit
+      authHandler: ServerRequest => Future[UUID]
+  ): Endpoint[Unit, Future[UUID], ErrorResponse, (Logout.Response, String), Any] =
     baseEndpoint.post
       .in("logout")
-      .in(sessionHeader)
+      .in(userAuth)
       .out(jsonBody[Logout.Response].description("Successful logout").example(Logout.Response()))
       .out(setSessionHeader)
       .errorOut(oneOf(HttpErrors.badRequest))
@@ -60,7 +62,7 @@ object AuthEndpoints {
   ): Endpoint[Unit, Future[UUID], ErrorResponse, GetCurrentUser.Response, Any] =
     baseEndpoint.get
       .in("me")
-      .in(session)
+      .in(userAuth)
       .out(
         jsonBody[GetCurrentUser.Response]
           .description("Got user details")
@@ -75,7 +77,7 @@ object AuthEndpoints {
       )
       .summary("Get the details for the authenticated user")
 
-  def routes(implicit authHandler: ServerRequest => Future[UUID], ec: ExecutionContext): List[AnyEndpoint] = List(
+  def routes(implicit authHandler: ServerRequest => Future[UUID]): List[AnyEndpoint] = List(
     login,
     logout,
     getCurrentUser
