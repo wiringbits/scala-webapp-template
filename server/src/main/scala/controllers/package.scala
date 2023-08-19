@@ -1,3 +1,5 @@
+import net.wiringbits.api.endpoints.AuthTest
+import net.wiringbits.api.endpoints.AuthTest.RemoveSession
 import net.wiringbits.api.models.{ErrorResponse, errorResponseFormat}
 import org.slf4j.LoggerFactory
 import play.api.mvc.request.DefaultRequestFactory
@@ -18,15 +20,19 @@ package object controllers {
       requestFactory: DefaultRequestFactory,
       cookieHeaderEncoding: CookieHeaderEncoding
   )(implicit ec: ExecutionContext) {
+    def handleSession(authTest: AuthTest): String = authTest match
+      case AuthTest.SetSession(userId) =>
+        val session = Session(Map("id" -> userId.toString))
+        val playCookie = requestFactory.sessionBaker.encodeAsCookie(session)
+        cookieHeaderEncoding.encodeSetCookieHeader(List(playCookie))
+      case AuthTest.RemoveSession =>
+        val encoded = requestFactory.sessionBaker.discard.toCookie
+        cookieHeaderEncoding.encodeSetCookieHeader(List(encoded))
+
     def setSession(userId: UUID): Future[String] = Future {
       val session = Session(Map("id" -> userId.toString))
       val playCookie = requestFactory.sessionBaker.encodeAsCookie(session)
       cookieHeaderEncoding.encodeSetCookieHeader(List(playCookie))
-    }
-
-    def clearSession(): Future[String] = Future {
-      val encoded = requestFactory.sessionBaker.discard.toCookie
-      cookieHeaderEncoding.encodeSetCookieHeader(List(encoded))
     }
   }
 

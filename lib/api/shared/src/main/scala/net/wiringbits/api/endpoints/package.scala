@@ -43,4 +43,7 @@ package object endpoints {
 
   def userAuth(implicit handleAuth: ServerRequest => Future[UUID]): EndpointInput.ExtractFromRequest[Future[UUID]] =
     extractFromRequest(handleAuth)
+
+  def tests(auth: AuthTest, handler: AuthTest => String): EndpointIO.FixedHeader[Unit] =
+    header("Set-Cookie", handler(auth))
 }

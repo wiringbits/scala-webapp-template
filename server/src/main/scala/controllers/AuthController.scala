@@ -4,6 +4,7 @@ import net.wiringbits.actions.*
 import net.wiringbits.api.endpoints.AuthEndpoints
 import net.wiringbits.api.models.*
 import org.slf4j.LoggerFactory
+import play.api.mvc.ResponseHeader
 import sttp.capabilities.WebSockets
 import sttp.capabilities.akka.AkkaStreams
 import sttp.tapir.server.ServerEndpoint
@@ -20,6 +21,7 @@ class AuthController @Inject() (
   private val logger = LoggerFactory.getLogger(this.getClass)
 
   private def login(body: Login.Request): Future[Either[ErrorResponse, (Login.Response, String)]] =
+    ResponseHeader(200)
     handleRequest {
       logger.info(s"Login API: ${body.email}")
       for {
@@ -37,20 +39,19 @@ class AuthController @Inject() (
       } yield Right(response)
     }
 
-  private def logout(userIdF: Future[UUID]): Future[Either[ErrorResponse, (Logout.Response, String)]] =
+  private def logout(userIdF: Future[UUID]): Future[Either[ErrorResponse, Logout.Response]] =
     handleRequest {
       for {
         _ <- userIdF
         _ = logger.info("Logout")
-        header <- playTapirBridge.clearSession()
-      } yield Right(Logout.Response(), header)
+      } yield Right(Logout.Response())
     }
 
   def routes: List[ServerEndpoint[AkkaStreams with WebSockets, Future]] = {
     List(
       AuthEndpoints.login.serverLogic(login),
       AuthEndpoints.getCurrentUser.serverLogic(me),
-      AuthEndpoints.logout.serverLogic(logout)
+      AuthEndpoints.logout(playTapirBridge.handleSession).serverLogic(logout)
     )
   }
 }

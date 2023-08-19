@@ -20,14 +20,15 @@ class ApiRouter @Inject() (
     healthController: HealthController,
     usersController: UsersController,
     environmentConfigController: EnvironmentConfigController,
-    swaggerConfig: SwaggerConfig
+    swaggerConfig: SwaggerConfig,
+    tapirBridge: PlayTapirBridge
 )(implicit materializer: Materializer, ec: ExecutionContext)
     extends SimpleRouter {
   private val swagger = SwaggerInterpreter(
     swaggerUIOptions = SwaggerUIOptions.default.copy(contextPath = List(swaggerConfig.basePath))
   )
     .fromEndpoints[Future](
-      ApiRouter.routes,
+      ApiRouter.routes(tapirBridge.handleSession),
       Info(
         title = swaggerConfig.info.title,
         version = swaggerConfig.info.version,
@@ -49,10 +50,10 @@ class ApiRouter @Inject() (
 }
 
 object ApiRouter {
-  private def routes(implicit ec: ExecutionContext): List[AnyEndpoint] = List(
+  private def routes(removeAuth: AuthTest => String)(implicit ec: ExecutionContext): List[AnyEndpoint] = List(
     HealthEndpoints.routes,
     AdminEndpoints.routes,
-    AuthEndpoints.routes,
+    AuthEndpoints.routes(removeAuth),
     UsersEndpoints.routes,
     EnvironmentConfigEndpoints.routes
   ).flatten

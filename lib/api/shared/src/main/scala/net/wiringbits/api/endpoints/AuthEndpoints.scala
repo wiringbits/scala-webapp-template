@@ -45,14 +45,15 @@ object AuthEndpoints {
       .summary("Log into the app")
       .description("Sets a session cookie to authenticate the following requests")
 
-  def logout(implicit
+  def logout(authFun: AuthTest => String)(implicit
       authHandler: ServerRequest => Future[UUID]
-  ): Endpoint[Unit, Future[UUID], ErrorResponse, (Logout.Response, String), Any] =
+  ): Endpoint[Unit, Future[UUID], ErrorResponse, Logout.Response, Any] =
     baseEndpoint.post
       .in("logout")
       .in(userAuth)
       .out(jsonBody[Logout.Response].description("Successful logout").example(Logout.Response()))
-      .out(setSessionHeader)
+//      .out(setSessionHeader)
+      .out(tests(AuthTest.RemoveSession, authFun))
       .errorOut(oneOf(HttpErrors.badRequest))
       .summary("Logout from the app")
       .description("Clears the session cookie that's stored securely")
@@ -77,9 +78,15 @@ object AuthEndpoints {
       )
       .summary("Get the details for the authenticated user")
 
-  def routes(implicit authHandler: ServerRequest => Future[UUID]): List[AnyEndpoint] = List(
-    login,
-    logout,
-    getCurrentUser
-  )
+  def routes(removeAuth: AuthTest => String)(implicit authHandler: ServerRequest => Future[UUID]): List[AnyEndpoint] =
+    List(
+      login,
+      logout(removeAuth),
+      getCurrentUser
+    )
+}
+
+enum AuthTest {
+  case RemoveSession
+  case SetSession(userId: UUID)
 }

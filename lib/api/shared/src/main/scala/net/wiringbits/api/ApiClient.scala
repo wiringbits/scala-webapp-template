@@ -129,15 +129,15 @@ class ApiClient(config: ApiClient.Config)(implicit
       }
       .map(asJson[Login.Response])
 
-  def logout: Future[Logout.Response] =
-    client
-      .toRequestThrowDecodeFailures(AuthEndpoints.logout, Some(ServerAPI))
-      .apply(dummyUserId)
-      .response(asStringAlways)
-      .send(sttpBackend)
-      .map { response =>
-        unsafeRemoveLoginResponse()
-        response.body
-      }
-      .map(asJson[Logout.Response])
+//  def logout: Future[Logout.Response] =
+//    client
+//      .toRequestThrowDecodeFailures(AuthEndpoints.logout, Some(ServerAPI))
+//      .apply(dummyUserId)
+//      .response(asStringAlways)
+//      .send(sttpBackend)
+//      .map { response =>
+//        unsafeRemoveLoginResponse()
+//        response.body
+//      }
+//      .map(asJson[Logout.Response])
 }
