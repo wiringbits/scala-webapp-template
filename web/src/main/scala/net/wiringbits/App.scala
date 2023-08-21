@@ -1,7 +1,7 @@
 package net.wiringbits
 
 import com.olvind.mui.muiMaterial.components.ThemeProvider
-import com.olvind.mui.muiMaterial.{components=>mui}
+import com.olvind.mui.muiMaterial.{components => mui}
 import net.wiringbits.components.AppSplash
 import slinky.core.{FunctionalComponent, KeyAddingStage}
 import slinky.core.facade.ReactElement

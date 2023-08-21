@@ -1,7 +1,7 @@
 package net.wiringbits.components.pages
 
 import com.olvind.mui.muiMaterial.stylesCreateThemeMod.Theme
-import com.olvind.mui.muiMaterial.{components=>mui}
+import com.olvind.mui.muiMaterial.{components => mui}
 import com.olvind.mui.react.mod.CSSProperties
 import com.olvind.mui.csstype.mod.Property.TextAlign
 import slinky.core.{FunctionalComponent, KeyAddingStage}
@@ -25,8 +25,8 @@ object SignInPage {
   case class Props(ctx: AppContext)
 
   val styling = new CSSProperties {
-    maxWidth=350
-    width="100%"
+    maxWidth = 350
+    width = "100%"
   }
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
@@ -37,7 +37,7 @@ object SignInPage {
       flex = Some(1),
       justifyContent = Alignment.center,
       alignItems = Alignment.center,
-      child = div(className := "signInPageFormContainer",style:=styling)(
+      child = div(className := "signInPageFormContainer", style := styling)(
         AppCard(
           Fragment(
             Container(
@@ -59,8 +59,8 @@ object SignInPage {
               justifyContent = Container.Alignment.center,
               child = Fragment(
                 mui.Typography(texts.dontHaveAccountYet),
-                mui
-                  .Button.normal()(texts.signUp)
+                mui.Button
+                  .normal()(texts.signUp)
                   .variant("text")
                   .color("primary")
                   .onClick(_ => history.push("/signUp"))
@@ -72,8 +72,8 @@ object SignInPage {
               justifyContent = Container.Alignment.center,
               child = Fragment(
                 mui.Typography(texts.forgotYourPassword),
-                mui
-                  .Button.normal(texts.recoverIt)
+                mui.Button
+                  .normal(texts.recoverIt)
                   .variant("text")
                   .color("primary")
                   .onClick(_ => history.push("/forgot-password"))

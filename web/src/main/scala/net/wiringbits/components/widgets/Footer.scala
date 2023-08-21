@@ -1,11 +1,11 @@
 package net.wiringbits.components.widgets
 
 import com.olvind.mui.muiMaterial.stylesCreateThemeMod.Theme
-import com.olvind.mui.muiMaterial.{components=>mui}
+import com.olvind.mui.muiMaterial.{components => mui}
 import com.olvind.mui.react.mod.CSSProperties
 import com.olvind.mui.csstype.mod.Property.FlexDirection
 import com.olvind.mui.muiMaterial.mod.PropTypes.Color
-import com.olvind.mui.muiIconsMaterial.{components=>muiIcons}
+import com.olvind.mui.muiIconsMaterial.{components => muiIcons}
 
 import net.wiringbits.AppContext
 import net.wiringbits.core.I18nHooks
@@ -21,12 +21,11 @@ object Footer {
     component(Props(ctx = ctx))
 
   case class Props(ctx: AppContext)
-  val styling=new CSSProperties {
-    color="#FFF"
-    backgroundColor="#222"
-    borderRadius=0
+  val styling = new CSSProperties {
+    color = "#FFF"
+    backgroundColor = "#222"
+    borderRadius = 0
   }
-
 
   private val margin = 16
 
@@ -141,5 +140,6 @@ object Footer {
       )
       .component("footer")
       .className("footer")
-      .style(styling)  }
+      .style(styling)
+  }
 }

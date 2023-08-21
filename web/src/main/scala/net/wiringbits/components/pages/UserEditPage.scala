@@ -1,6 +1,6 @@
 package net.wiringbits.components.pages
 
-import com.olvind.mui.muiMaterial.{components=>mui}
+import com.olvind.mui.muiMaterial.{components => mui}
 import net.wiringbits.AppContext
 import net.wiringbits.components.widgets.{EditPasswordForm, UserInfo}
 import net.wiringbits.core.I18nHooks
@@ -32,7 +32,9 @@ object UserEditPage {
       mui
         .Tabs()(
           UserMenuOption.values.map(x => mui.Tab.normal().label(texts.userMenuOption(x)).withKey(x.toString).build)
-        ).value(UserMenuOption.values.indexOf(menuOption)).onChange((_, index) => setMenuOption(UserMenuOption.values(index.toString.toInt)))
+        )
+        .value(UserMenuOption.values.indexOf(menuOption))
+        .onChange((_, index) => setMenuOption(UserMenuOption.values(index.toString.toInt)))
     )
 
     val body = mui.CardContent()(

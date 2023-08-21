@@ -20,29 +20,29 @@ import slinky.web.html.*
 object AppBar {
   def apply(ctx: AppContext): KeyAddingStage =
     component(Props(ctx))
-    
+
   case class Props(ctx: AppContext)
 
-  val appbarStyling=new CSSProperties {
-     color="#FFF"
-  } 
-  val toolBarStyling=new CSSProperties {
-     display="flex"
-     alignItems="center"
-     justifyContent="space-between"
-  }  
-  val toolbarMobileStyling=new CSSProperties {
-     display="flex"
-     alignItems="center"
-  }  
-  val menuStyling=new CSSProperties {
-     display="flex"
+  val appbarStyling = new CSSProperties {
+    color = "#FFF"
   }
-  val menuMobile =  new CSSProperties{
-     display="flex"
-     flexDirection=FlexDirection.column
-     color="#222"
-     textAlign=TextAlign.right
+  val toolBarStyling = new CSSProperties {
+    display = "flex"
+    alignItems = "center"
+    justifyContent = "space-between"
+  }
+  val toolbarMobileStyling = new CSSProperties {
+    display = "flex"
+    alignItems = "center"
+  }
+  val menuStyling = new CSSProperties {
+    display = "flex"
+  }
+  val menuMobile = new CSSProperties {
+    display = "flex"
+    flexDirection = FlexDirection.column
+    color = "#222"
+    textAlign = TextAlign.right
   }
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
@@ -85,9 +85,9 @@ object AppBar {
         justifyContent = Alignment.spaceBetween,
         child = Fragment(
           mui
-            .AppBar(className := "appbar",style:=appbarStyling)
+            .AppBar(className := "appbar", style := appbarStyling)
             .position("relative")(
-              mui.Toolbar(className := "toolbar-mobile",style:=toolbarMobileStyling)(
+              mui.Toolbar(className := "toolbar-mobile", style := toolbarMobileStyling)(
                 Subtitle(texts.appName)
               )
             ),
@@ -99,29 +99,31 @@ object AppBar {
         )
       )
 
-      val drawer = mui.SwipeableDrawer(
-        onOpen = _ => setVisibleDrawer(true),
-        onClose = _ => setVisibleDrawer(false)
-      )(drawerContent).open(visibleDrawer)
+      val drawer = mui
+        .SwipeableDrawer(
+          onOpen = _ => setVisibleDrawer(true),
+          onClose = _ => setVisibleDrawer(false)
+        )(drawerContent)
+        .open(visibleDrawer)
 
-      val toolbar = mui.Toolbar(className := "toolbar-mobile",style:=toolbarMobileStyling)(
-        mui
-          .IconButton.normal()(mui.Icon(muiIcons.Menu()))
+      val toolbar = mui.Toolbar(className := "toolbar-mobile", style := toolbarMobileStyling)(
+        mui.IconButton
+          .normal()(mui.Icon(muiIcons.Menu()))
           .color(Color.inherit)
           .onClick(_ => setVisibleDrawer(true)),
         Subtitle(texts.appName)
       )
 
       mui
-        .AppBar(className := "appbar",style:=appbarStyling)
+        .AppBar(className := "appbar", style := appbarStyling)
         .position("relative")(toolbar, drawer)
     } else {
       mui
-        .AppBar(className := "appbar",style:=appbarStyling)
+        .AppBar(className := "appbar", style := appbarStyling)
         .position("relative")(
-          mui.Toolbar(className := "toolbar",style:=toolBarStyling)(
+          mui.Toolbar(className := "toolbar", style := toolBarStyling)(
             Title(texts.appName),
-            div(className := "menu",style:=menuStyling)(menu)
+            div(className := "menu", style := menuStyling)(menu)
           )
         )
     }

@@ -26,7 +26,8 @@ abstract class ValidatedTextInput[T: TextValidator] {
     val helperText = props.field.value.flatMap(_.errorMessage).getOrElse("")
     val value = props.field.value.map(_.input).getOrElse("")
     val hasError = props.field.value.exists(_.hasError)
-    mui.TextField.outlined()
+    mui.TextField
+      .outlined()
       .id(s"ExperimentalTextInput-${props.field.name}")
       .name(s"ExperimentalTextInput-${props.field.name}")
       .label(props.field.label)

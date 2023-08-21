@@ -16,26 +16,26 @@ object AdminEndpoints {
     .in(adminAuth)
     .errorOut(errorResponseErrorOut)
 
-  val getUserLogsEndpoint
-      : Endpoint[Unit, (String, UUID, String), ErrorResponse, AdminGetUserLogs.Response, Any] = baseEndpoint.get
-    .in("users" / path[UUID]("userId") / "logs")
-    .in(adminHeader)
-    .out(
-      jsonBody[AdminGetUserLogs.Response].example(
-        AdminGetUserLogs.Response(
-          List(
-            AdminGetUserLogs.Response
-              .UserLog(
-                id = UUID.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6"),
-                message = "Message",
-                createdAt = Instant.parse("2021-01-01T00:00:00Z")
-              )
+  val getUserLogsEndpoint: Endpoint[Unit, (String, UUID, String), ErrorResponse, AdminGetUserLogs.Response, Any] =
+    baseEndpoint.get
+      .in("users" / path[UUID]("userId") / "logs")
+      .in(adminHeader)
+      .out(
+        jsonBody[AdminGetUserLogs.Response].example(
+          AdminGetUserLogs.Response(
+            List(
+              AdminGetUserLogs.Response
+                .UserLog(
+                  id = UUID.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6"),
+                  message = "Message",
+                  createdAt = Instant.parse("2021-01-01T00:00:00Z")
+                )
+            )
           )
         )
       )
-    )
-    .errorOut(oneOf(HttpErrors.badRequest, HttpErrors.unauthorized))
-    .summary("Get the logs for a specific user")
+      .errorOut(oneOf(HttpErrors.badRequest, HttpErrors.unauthorized))
+      .summary("Get the logs for a specific user")
 
   val getUsersEndpoint: Endpoint[Unit, (String, String), ErrorResponse, AdminGetUsers.Response, Any] =
     baseEndpoint.get

@@ -1,6 +1,6 @@
 package net.wiringbits.components.widgets
 
-import com.olvind.mui.muiMaterial.{components=>mui}
+import com.olvind.mui.muiMaterial.{components => mui}
 import net.wiringbits.AppContext
 import net.wiringbits.api.models.GetCurrentUser
 import net.wiringbits.api.utils.Formatter
@@ -102,8 +102,8 @@ object EditUserForm {
         Fragment(texts.save)
       }
 
-      mui
-        .Button.normal()(text)
+      mui.Button
+        .normal()(text)
         .fullWidth(true)
         .disabled(formData.isSubmitButtonDisabled || !hasChanges)
         .variant("contained")

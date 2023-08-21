@@ -2,9 +2,9 @@ package net.wiringbits.components.pages
 
 import com.olvind.mui.propTypes
 import com.olvind.mui.muiMaterial.stylesCreateThemeMod.Theme
-import com.olvind.mui.muiMaterial.{components=>mui}
+import com.olvind.mui.muiMaterial.{components => mui}
 import com.olvind.mui.react.mod.CSSProperties
-import com.olvind.mui.csstype.mod.Property.{TextAlign,FlexDirection}
+import com.olvind.mui.csstype.mod.Property.{TextAlign, FlexDirection}
 import net.wiringbits.AppContext
 import net.wiringbits.api.models.VerifyEmail
 import net.wiringbits.common.models.UserToken
@@ -14,7 +14,7 @@ import org.scalablytyped.runtime.StringDictionary
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 import slinky.core.{FunctionalComponent, KeyAddingStage}
 import slinky.core.facade.{Fragment, Hooks}
-import slinky.web.html.{className, div,style}
+import slinky.web.html.{className, div, style}
 import typings.reactRouterDom.mod.{useHistory, useParams}
 
 import scala.scalajs.js
@@ -22,9 +22,9 @@ import scala.scalajs.js.timers.setTimeout
 import scala.util.{Failure, Success}
 
 object VerifyEmailWithTokenPage {
-  def apply(ctx: AppContext): KeyAddingStage = 
+  def apply(ctx: AppContext): KeyAddingStage =
     component(Props(ctx = ctx))
-  
+
   case class Props(ctx: AppContext)
 
   private case class State(
@@ -35,19 +35,19 @@ object VerifyEmailWithTokenPage {
   )
 
   val emailPageStyling = new CSSProperties {
-    flex=1
-    display="flex"
-    flexDirection=FlexDirection.column
-    alignItems="center"
-    textAlign=TextAlign.center
-    justifyContent="center"
+    flex = 1
+    display = "flex"
+    flexDirection = FlexDirection.column
+    alignItems = "center"
+    textAlign = TextAlign.center
+    justifyContent = "center"
   }
   val emailTitleStyling = new CSSProperties {
-    fontWeight=600
+    fontWeight = 600
   }
   val emailPhotoStyling = new CSSProperties {
-    width="10rem"
-    padding="15px 0"
+    width = "10rem"
+    padding = "15px 0"
   }
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
@@ -102,7 +102,7 @@ object VerifyEmailWithTokenPage {
         )
       }
 
-    div(className := "emailCodePage",style := emailPageStyling)(
+    div(className := "emailCodePage", style := emailPageStyling)(
       Fragment(
         mui.Typography(state.title).variant("h5").className("emailTitle").style(emailTitleStyling),
         mui.Typography(state.message).variant("h6"),

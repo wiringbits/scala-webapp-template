@@ -1,7 +1,7 @@
 package net.wiringbits.components.widgets
 
 import com.olvind.mui.muiMaterial.stylesCreateThemeMod.Theme
-import com.olvind.mui.muiMaterial.{components=>mui}
+import com.olvind.mui.muiMaterial.{components => mui}
 import com.olvind.mui.react.mod.CSSProperties
 import com.olvind.mui.muiMaterial.mod.PropTypes.Color
 
@@ -19,23 +19,23 @@ object LogList {
     component(Props(ctx = ctx, response = response, forceRefresh = forceRefresh))
 
   case class Props(ctx: AppContext, response: GetUserLogs.Response, forceRefresh: () => Unit)
-  val styling=new CSSProperties {
-    width="100%"
+  val styling = new CSSProperties {
+    width = "100%"
   }
-
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val texts = I18nHooks.useMessages(props.ctx.$lang)
     val items = props.response.data.map { item =>
-      mui
-        .ListItem.normal()(
+      mui.ListItem
+        .normal()(
           mui
             .ListItemText()
             .primary(item.message)
             .secondary(Formatter.instant(item.createdAt))
         )
         .divider(true)
-        .withKey(item.id.toString).build
+        .withKey(item.id.toString)
+        .build
     }
 
     Container(
@@ -48,8 +48,8 @@ object LogList {
           justifyContent = Container.Alignment.spaceBetween,
           child = Fragment(
             Subtitle(texts.logs),
-            mui
-              .Button.normal()(texts.reload)
+            mui.Button
+              .normal()(texts.reload)
               .color(Color.primary)
               .onClick(_ => props.forceRefresh())
           )

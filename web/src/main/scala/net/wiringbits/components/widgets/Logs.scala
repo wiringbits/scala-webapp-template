@@ -10,7 +10,7 @@ import slinky.core.{FunctionalComponent, KeyAddingStage}
 object Logs {
   def apply(ctx: AppContext, user: User): KeyAddingStage =
     component(Props(ctx = ctx, user = user))
-  
+
   case class Props(ctx: AppContext, user: User)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>

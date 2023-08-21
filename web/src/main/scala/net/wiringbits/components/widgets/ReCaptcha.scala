@@ -8,9 +8,9 @@ import slinky.core.facade.Hooks
 import typings.reactGoogleRecaptcha.components.ReactGoogleRecaptcha
 
 object ReCaptcha {
-  def apply(ctx: AppContext, onChange: Option[Captcha] => Unit): KeyAddingStage = 
+  def apply(ctx: AppContext, onChange: Option[Captcha] => Unit): KeyAddingStage =
     component(Props(ctx = ctx, onChange = onChange))
-  
+
   case class Props(ctx: AppContext, onChange: Option[Captcha] => Unit)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>

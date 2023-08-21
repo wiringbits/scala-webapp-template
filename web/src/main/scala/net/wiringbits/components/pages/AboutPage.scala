@@ -19,16 +19,16 @@ object AboutPage {
 
   case class Props(ctx: AppContext)
 
-  val styling=new CSSProperties {
-    maxWidth=300
-    maxHeight=164
+  val styling = new CSSProperties {
+    maxWidth = 300
+    maxHeight = 164
   }
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val texts = I18nHooks.useMessages(props.ctx.$lang)
 
     val wiringbitsImage =
-      img(src := "/img/wiringbits-logo.png", alt := "wiringbits logo", className := "image",style:=styling)
+      img(src := "/img/wiringbits-logo.png", alt := "wiringbits logo", className := "image", style := styling)
     val repositoryLink = mui
       .Link(texts.checkoutTheRepo)
       .variant("h5")
