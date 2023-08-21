@@ -1,8 +1,10 @@
 package net.wiringbits.components.widgets
 
-import com.alexitc.materialui.facade.materialUiCore.mod.PropTypes.Color
-import com.alexitc.materialui.facade.materialUiCore.{components as mui, materialUiCoreStrings as muiStrings}
-import com.alexitc.materialui.facade.react.components.Fragment
+import com.olvind.mui.muiMaterial.components as mui
+import com.olvind.mui.react.mod.CSSProperties
+import com.olvind.mui.csstype.mod.Property.FlexDirection
+import com.olvind.mui.muiMaterial.mod.PropTypes.Color
+import com.olvind.mui.react.components.Fragment
 import net.wiringbits.AppContext
 import net.wiringbits.common.models.Email
 import net.wiringbits.core.I18nHooks
@@ -111,12 +113,12 @@ object ResendVerifyEmailForm {
         } else Fragment(texts.resendEmail)
 
       mui
-        .Button(text)
+        .Button.normal()(text)
         .fullWidth(true)
         .disabled(formData.isSubmitButtonDisabled)
-        .variant(muiStrings.contained)
-        .color(Color.primary)
-        .`type`(muiStrings.submit)
+        .variant("contained")
+        .color("primary")
+        .`type`("submit")
     }
 
     form(onSubmit := (handleSubmit(_)))(

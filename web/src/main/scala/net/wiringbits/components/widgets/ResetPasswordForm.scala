@@ -1,6 +1,6 @@
 package net.wiringbits.components.widgets
 
-import com.alexitc.materialui.facade.materialUiCore.{components as mui, materialUiCoreStrings as muiStrings}
+import com.olvind.mui.muiMaterial.{components=>mui}
 import net.wiringbits.AppContext
 import net.wiringbits.common.models.UserToken
 import net.wiringbits.core.I18nHooks
@@ -101,13 +101,13 @@ object ResetPasswordForm {
       }
 
       mui
-        .Button(text)
+        .Button.normal()(text)
         .fullWidth(true)
         .disabled(formData.isSubmitButtonDisabled)
-        .variant(muiStrings.contained)
-        .color(muiStrings.primary)
-        .size(muiStrings.large)
-        .`type`(muiStrings.submit)
+        .variant("contained")
+        .color("primary")
+        .size("large")
+        .`type`("submit")
     }
 
     form(onSubmit := (handleSubmit(_)))(

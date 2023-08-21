@@ -1,13 +1,11 @@
 package net.wiringbits.components.widgets
 
-import com.alexitc.materialui.facade.csstype.mod.{FlexDirectionProperty, TextAlignProperty}
-import com.alexitc.materialui.facade.materialUiCore.createMuiThemeMod.Theme
-import com.alexitc.materialui.facade.materialUiCore.mod.PropTypes.Color
-import com.alexitc.materialui.facade.materialUiCore.{components as mui, materialUiCoreStrings as muiStrings}
-import com.alexitc.materialui.facade.materialUiIcons.components as muiIcons
-import com.alexitc.materialui.facade.materialUiStyles.makeStylesMod.StylesHook
-import com.alexitc.materialui.facade.materialUiStyles.mod.makeStyles
-import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{CSSProperties, StyleRulesCallback, Styles, WithStylesOptions}
+import com.olvind.mui.muiMaterial.stylesCreateThemeMod.Theme
+import com.olvind.mui.muiMaterial.components as mui
+import com.olvind.mui.react.mod.CSSProperties
+import com.olvind.mui.csstype.mod.Property.{FlexDirection, TextAlign}
+import com.olvind.mui.muiMaterial.mod.PropTypes.Color
+import com.olvind.mui.muiIconsMaterial.components as muiIcons
 import net.wiringbits.AppContext
 import net.wiringbits.core.{I18nHooks, ReactiveHooks}
 import net.wiringbits.models.AuthState
@@ -25,33 +23,31 @@ object AppBar {
     
   case class Props(ctx: AppContext)
 
-  private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {
-    val stylesCallback: StyleRulesCallback[Theme, Unit, String] = theme =>
-      StringDictionary(
-        "appbar" -> CSSProperties()
-          .setColor("#FFF"),
-        "toolbar" -> CSSProperties()
-          .setDisplay("flex")
-          .setAlignItems("center")
-          .setJustifyContent("space-between"),
-        "toolbar-mobile" -> CSSProperties()
-          .setDisplay("flex")
-          .setAlignItems("center"),
-        "menu" -> CSSProperties()
-          .setDisplay("flex"),
-        "menu-mobile" -> CSSProperties()
-          .setDisplay("flex")
-          .setFlexDirection(FlexDirectionProperty.column)
-          .setColor("#222")
-          .setTextAlign(TextAlignProperty.right)
-      )
-    makeStyles(stylesCallback, WithStylesOptions())
+  val appbarStyling=new CSSProperties {
+     color="#FFF"
+  } 
+  val toolBarStyling=new CSSProperties {
+     display="flex"
+     alignItems="center"
+     justifyContent="space-between"
+  }  
+  val toolbarMobileStyling=new CSSProperties {
+     display="flex"
+     alignItems="center"
+  }  
+  val menuStyling=new CSSProperties {
+     display="flex"
+  }
+  val menuMobile =  new CSSProperties{
+     display="flex"
+     flexDirection=FlexDirection.column
+     color="#222"
+     textAlign=TextAlign.right
   }
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val texts = I18nHooks.useMessages(props.ctx.$lang)
     val auth = ReactiveHooks.useDistinctValue(props.ctx.$auth)
-    val classes = useStyles(())
     val isMobileOrTablet = MediaQueryHooks.useIsMobileOrTablet()
     val (visibleDrawer, setVisibleDrawer) = Hooks.useState(false)
 
@@ -89,9 +85,9 @@ object AppBar {
         justifyContent = Alignment.spaceBetween,
         child = Fragment(
           mui
-            .AppBar(className := classes("appbar"))
-            .position(muiStrings.relative)(
-              mui.Toolbar(className := classes("toolbar-mobile"))(
+            .AppBar(className := "appbar",style:=appbarStyling)
+            .position("relative")(
+              mui.Toolbar(className := "toolbar-mobile",style:=toolbarMobileStyling)(
                 Subtitle(texts.appName)
               )
             ),
@@ -104,29 +100,28 @@ object AppBar {
       )
 
       val drawer = mui.SwipeableDrawer(
-        open = visibleDrawer,
         onOpen = _ => setVisibleDrawer(true),
         onClose = _ => setVisibleDrawer(false)
-      )(drawerContent)
+      )(drawerContent).open(visibleDrawer)
 
-      val toolbar = mui.Toolbar(className := classes("toolbar-mobile"))(
+      val toolbar = mui.Toolbar(className := "toolbar-mobile",style:=toolbarMobileStyling)(
         mui
-          .IconButton(mui.Icon(muiIcons.Menu()))
+          .IconButton.normal()(mui.Icon(muiIcons.Menu()))
           .color(Color.inherit)
           .onClick(_ => setVisibleDrawer(true)),
         Subtitle(texts.appName)
       )
 
       mui
-        .AppBar(className := classes("appbar"))
-        .position(muiStrings.relative)(toolbar, drawer)
+        .AppBar(className := "appbar",style:=appbarStyling)
+        .position("relative")(toolbar, drawer)
     } else {
       mui
-        .AppBar(className := classes("appbar"))
-        .position(muiStrings.relative)(
-          mui.Toolbar(className := classes("toolbar"))(
+        .AppBar(className := "appbar",style:=appbarStyling)
+        .position("relative")(
+          mui.Toolbar(className := "toolbar",style:=toolBarStyling)(
             Title(texts.appName),
-            div(className := classes("menu"))(menu)
+            div(className := "menu",style:=menuStyling)(menu)
           )
         )
     }

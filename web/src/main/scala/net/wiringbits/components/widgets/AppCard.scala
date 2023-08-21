@@ -1,16 +1,12 @@
 package net.wiringbits.components.widgets
 
-import com.alexitc.materialui.facade.csstype.mod.FlexDirectionProperty
-import com.alexitc.materialui.facade.materialUiCore.createMuiThemeMod.Theme
-import com.alexitc.materialui.facade.materialUiCore.{components as mui, materialUiCoreStrings as muiStrings}
-import com.alexitc.materialui.facade.materialUiStyles.makeStylesMod.StylesHook
-import com.alexitc.materialui.facade.materialUiStyles.mod.makeStyles
-import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
-  CSSProperties,
-  StyleRulesCallback,
-  Styles,
-  WithStylesOptions
-}
+
+import com.olvind.mui.muiMaterial.stylesCreateThemeMod.Theme
+import com.olvind.mui.muiMaterial.{components=>mui}
+import com.olvind.mui.react.mod.CSSProperties
+import com.olvind.mui.csstype.mod.Property.FlexDirection
+import com.olvind.mui.muiIconsMaterial.{components=>muiIcons}
+
 import org.scalablytyped.runtime.StringDictionary
 import slinky.core.{FunctionalComponent, KeyAddingStage}
 import slinky.core.facade.{Fragment, ReactElement}
@@ -24,26 +20,20 @@ object AppCard {
 
   case class Props(child: ReactElement, title: Option[String] = None, centerTitle: Boolean = false)
 
-  private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {
-    val stylesCallback: StyleRulesCallback[Theme, Unit, String] = theme =>
-      StringDictionary(
-        "appCard" -> CSSProperties()
-          .setWidth("100%")
-          .setDisplay("flex")
-          .setFlexDirection(FlexDirectionProperty.column)
-          .setBorder("1px solid rgba(0, 0, 0, 0.12)")
-          .setOverflow("hidden"),
-        "appCardHead" -> CSSProperties()
-          .setPadding("16px 16px 0 16px"),
-        "appCardBody" -> CSSProperties()
-          .setPadding("25px 16px")
-      )
-
-    makeStyles(stylesCallback, WithStylesOptions())
+  val appCardStyling=new CSSProperties {
+    width="100%"
+    display="flex"
+    flexDirection=FlexDirection.column
+    border="1px solid rgba(0, 0, 0, 0.12)"
+    overflow="hidden"
   }
-
+  val appCardHeadStyling=new CSSProperties {
+    padding="16px 16px 0 16px"
+  }
+  val appCardBodyStyling=new CSSProperties {
+    padding="25px 16px"
+  }
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
-    val classes = useStyles(())
 
     val head = props.title match {
       case Some(title) =>
@@ -52,16 +42,17 @@ object AppCard {
           fontWeight = 700
         )
         Fragment(
-          div(className := classes("appCardHead"))(
-            mui.Typography(style := textStyle, title).variant(muiStrings.h5).color(muiStrings.inherit)
+          div(className := "appCardHead",style:=appCardHeadStyling)(
+            mui.Typography(style := textStyle, title).variant("h5")
+              .color("inherit")
           )
         )
       case None => Fragment()
     }
-    val body = div(className := classes("appCardBody"))(props.child)
+    val body = div(className := "appCardBody",style:=appCardBodyStyling)(props.child)
 
     mui
-      .Paper(className := classes("appCard"))(head, body)
+      .Paper(className := "appCard",style:=appCardStyling)(head, body)
       .elevation(0)
   }
 }

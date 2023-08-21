@@ -1,26 +1,20 @@
 package net.wiringbits.components.pages
 
-import com.alexitc.materialui.facade.materialUiCore.createMuiThemeMod.Theme
-import com.alexitc.materialui.facade.materialUiCore.{components as mui, materialUiCoreStrings as muiStrings}
-import com.alexitc.materialui.facade.materialUiStyles.makeStylesMod.StylesHook
-import com.alexitc.materialui.facade.materialUiStyles.mod.makeStyles
-import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
-  CSSProperties,
-  StyleRulesCallback,
-  Styles,
-  WithStylesOptions
-}
-import net.wiringbits.AppContext
+import com.olvind.mui.muiMaterial.stylesCreateThemeMod.Theme
+import com.olvind.mui.muiMaterial.{components=>mui}
+import com.olvind.mui.react.mod.CSSProperties
+import com.olvind.mui.csstype.mod.Property.TextAlign
+import slinky.core.{FunctionalComponent, KeyAddingStage}
 import net.wiringbits.components.widgets.*
-import net.wiringbits.core.I18nHooks
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.{Alignment, EdgeInsets}
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{Container, Title}
+import net.wiringbits.AppContext
+import net.wiringbits.core.I18nHooks
 import org.scalablytyped.runtime.StringDictionary
-import slinky.core.{FunctionalComponent, KeyAddingStage}
 import slinky.core.facade.Fragment
-import slinky.web.html.{className, div}
-import typings.reactRouterDom.mod as reactRouterDom
+import slinky.web.html.{className, div, style}
 import typings.reactRouterDom.mod.useHistory
+import typings.reactRouterDom.mod as reactRouterDom
 
 import scala.scalajs.js
 
@@ -30,26 +24,20 @@ object SignInPage {
 
   case class Props(ctx: AppContext)
 
-  private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {
-    val stylesCallback: StyleRulesCallback[Theme, Unit, String] = theme =>
-      StringDictionary(
-        "signInPageFormContainer" -> CSSProperties()
-          .setMaxWidth(350)
-          .setWidth("100%")
-      )
-    makeStyles(stylesCallback, WithStylesOptions())
+  val styling = new CSSProperties {
+    maxWidth=350
+    width="100%"
   }
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val texts = I18nHooks.useMessages(props.ctx.$lang)
-    val classes = useStyles(())
     val history = useHistory().asInstanceOf[js.Dynamic]
 
     Container(
       flex = Some(1),
       justifyContent = Alignment.center,
       alignItems = Alignment.center,
-      child = div(className := classes("signInPageFormContainer"))(
+      child = div(className := "signInPageFormContainer",style:=styling)(
         AppCard(
           Fragment(
             Container(
@@ -72,9 +60,9 @@ object SignInPage {
               child = Fragment(
                 mui.Typography(texts.dontHaveAccountYet),
                 mui
-                  .Button(texts.signUp)
-                  .variant(muiStrings.text)
-                  .color(muiStrings.primary)
+                  .Button.normal()(texts.signUp)
+                  .variant("text")
+                  .color("primary")
                   .onClick(_ => history.push("/signUp"))
               )
             ),
@@ -85,9 +73,9 @@ object SignInPage {
               child = Fragment(
                 mui.Typography(texts.forgotYourPassword),
                 mui
-                  .Button(texts.recoverIt)
-                  .variant(muiStrings.text)
-                  .color(muiStrings.primary)
+                  .Button.normal(texts.recoverIt)
+                  .variant("text")
+                  .color("primary")
                   .onClick(_ => history.push("/forgot-password"))
               )
             )

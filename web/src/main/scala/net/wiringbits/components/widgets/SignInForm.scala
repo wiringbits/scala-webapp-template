@@ -1,7 +1,7 @@
 package net.wiringbits.components.widgets
 
-import com.alexitc.materialui.facade.materialUiCore.mod.PropTypes.Color
-import com.alexitc.materialui.facade.materialUiCore.{components as mui, materialUiCoreStrings as muiStrings}
+import com.olvind.mui.muiMaterial.mod.PropTypes.Color
+import com.olvind.mui.muiMaterial.{components=>mui}
 import net.wiringbits.AppContext
 import net.wiringbits.common.ErrorMessages
 import net.wiringbits.core.I18nHooks
@@ -106,9 +106,9 @@ object SignInForm {
           val email = formData.data.email.inputValue
 
           mui
-            .Button(texts.resendEmail)
-            .variant(muiStrings.text)
-            .color(muiStrings.primary)
+            .Button.normal()(texts.resendEmail)
+            .variant("text")
+            .color("primary")
             .onClick(_ => history.push(s"/resend-verify-email?email=${email}"))
         case _ => Fragment()
       }
@@ -138,12 +138,12 @@ object SignInForm {
           Fragment(texts.login)
 
       mui
-        .Button(text)
+        .Button.normal()(text)
         .fullWidth(true)
         .disabled(formData.isSubmitButtonDisabled)
-        .variant(muiStrings.contained)
-        .color(Color.primary)
-        .`type`(muiStrings.submit)
+        .variant("contained")
+        .color("primary")
+        .`type`("submit")
     }
 
     form(

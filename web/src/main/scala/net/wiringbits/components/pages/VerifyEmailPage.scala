@@ -1,17 +1,12 @@
 package net.wiringbits.components.pages
 
-import com.alexitc.materialui.facade.csstype.mod.{FlexDirectionProperty, TextAlignProperty}
-import com.alexitc.materialui.facade.materialUiCore.createMuiThemeMod.Theme
-import com.alexitc.materialui.facade.materialUiCore.mod.PropTypes.Color
-import com.alexitc.materialui.facade.materialUiCore.{components as mui, materialUiCoreStrings as muiStrings}
-import com.alexitc.materialui.facade.materialUiStyles.makeStylesMod.StylesHook
-import com.alexitc.materialui.facade.materialUiStyles.mod.makeStyles
-import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
-  CSSProperties,
-  StyleRulesCallback,
-  Styles,
-  WithStylesOptions
-}
+import com.olvind.mui.propTypes
+import com.olvind.mui.muiMaterial.stylesCreateThemeMod.Theme
+import com.olvind.mui.muiMaterial.{components=>mui}
+import com.olvind.mui.react.mod.CSSProperties
+import com.olvind.mui.csstype.mod.Property.{TextAlign,FlexDirection}
+import com.olvind.mui.muiMaterial.mod.PropTypes.Color
+
 import net.wiringbits.AppContext
 import net.wiringbits.core.I18nHooks
 import org.scalablytyped.runtime.StringDictionary
@@ -19,7 +14,7 @@ import org.scalajs.dom
 import org.scalajs.dom.URLSearchParams
 import slinky.core.{FunctionalComponent, KeyAddingStage}
 import slinky.core.facade.Fragment
-import slinky.web.html.{br, className, div}
+import slinky.web.html.{br, className, div, style}
 import typings.reactRouterDom.mod as reactRouterDom
 import typings.reactRouterDom.mod.useLocation
 
@@ -31,23 +26,20 @@ object VerifyEmailPage {
   
   case class Props(ctx: AppContext)
 
-  private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {
-    val stylesCallback: StyleRulesCallback[Theme, Unit, String] = _ =>
-      StringDictionary(
-        "emailPage" -> CSSProperties()
-          .setFlex(1)
-          .setDisplay("flex")
-          .setFlexDirection(FlexDirectionProperty.column)
-          .setAlignItems("center")
-          .setTextAlign(TextAlignProperty.center)
-          .setJustifyContent("center"),
-        "emailTitle" -> CSSProperties()
-          .setFontWeight(600),
-        "emailPhoto" -> CSSProperties()
-          .setWidth("10rem")
-          .setPadding("15px 0")
-      )
-    makeStyles(stylesCallback, WithStylesOptions())
+  val emailPageStyling = new CSSProperties {
+    flex=1
+    display="flex"
+    flexDirection=FlexDirection.column
+    alignItems="center"
+    textAlign=TextAlign.center
+    justifyContent="center"
+  }
+  val emailTitleStyling = new CSSProperties {
+    fontWeight=600
+  }
+  val emailPhotoStyling = new CSSProperties {
+    width="10rem"
+    padding="15px 0"
   }
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
@@ -55,31 +47,31 @@ object VerifyEmailPage {
     val history = reactRouterDom.useHistory().asInstanceOf[js.Dynamic]
     val params = new URLSearchParams(useLocation().asInstanceOf[js.Dynamic].search.asInstanceOf[String])
     val emailParam = Option(params.get("email")).getOrElse("")
-    val classes = useStyles(())
 
     Fragment(
-      div(className := classes("emailPage"))(
+      div(className := "emailPage",style:=emailPageStyling)(
         Fragment(
           mui
             .Typography(texts.verifyYourEmailAddress)
-            .variant(muiStrings.h5)
-            .className(classes("emailTitle")),
+            .variant("h5")
+            .className("emailTitle")
+            .style(emailTitleStyling),
           br(),
           mui
             .Typography(
               texts.emailHasBeenSent
             )
-            .variant(muiStrings.h6),
+            .variant("h6"),
           mui
             .Typography(
               texts.emailNotReceived
             )
-            .variant(muiStrings.h6),
+            .variant("h6"),
           br(),
           mui
-            .Button(texts.resendEmail)
-            .variant(muiStrings.contained)
-            .color(Color.primary)
+            .Button.normal()(texts.resendEmail)
+            .variant("contained")
+            .color("primary")
             .onClick(_ => history.push(s"/resend-verify-email?email=${emailParam}"))
         )
       )
