@@ -1,11 +1,9 @@
 package net.wiringbits.components.pages
 
-import com.alexitc.materialui.facade.csstype.mod.TextAlignProperty
-import com.alexitc.materialui.facade.materialUiCore.createMuiThemeMod.Theme
-import com.alexitc.materialui.facade.materialUiCore.{components as mui, materialUiCoreStrings as muiStrings}
-import com.alexitc.materialui.facade.materialUiStyles.makeStylesMod.StylesHook
-import com.alexitc.materialui.facade.materialUiStyles.mod.makeStyles
-import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{CSSProperties, StyleRulesCallback, Styles, WithStylesOptions}
+import com.olvind.mui.muiMaterial.stylesCreateThemeMod.Theme
+import com.olvind.mui.muiMaterial.{components=>mui}
+import com.olvind.mui.react.mod.CSSProperties
+import com.olvind.mui.csstype.mod.Property.TextAlign
 import net.wiringbits.AppContext
 import net.wiringbits.core.I18nHooks
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.*
@@ -21,42 +19,40 @@ object HomePage {
   
   case class Props(ctx: AppContext)
 
-  private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {
-    val stylesCallback: StyleRulesCallback[Theme, Unit, String] = theme =>
-      StringDictionary(
-        "homeContainer" -> CSSProperties()
-          .setMaxWidth(1300)
-          .setWidth("100%"),
-        "homeTitle" -> CSSProperties()
-          .setTextAlign(TextAlignProperty.center)
-          .setMargin("8px 0"),
-        "snippet" -> CSSProperties()
-          .setMaxWidth(800)
-          .setWidth("100%")
-          .setDisplay("block")
-          .setMargin("1em auto"),
-        "screenshot" -> CSSProperties()
-          .setMaxWidth(1200)
-          .setWidth("100%")
-          .setDisplay("block")
-          .setMargin("1em auto")
-      )
-    makeStyles(stylesCallback, WithStylesOptions())
+  val homeContainerStyling = new CSSProperties {
+    maxWidth=1300
+    width="100%"
+  }
+  val homeTitleStyling = new CSSProperties {
+    textAlign=TextAlign.center
+    margin="8px 0"
+
+  }
+  val snippetStyling = new CSSProperties {
+      maxWidth=800
+      width="100%"
+      display="block"
+      margin="1em auto"
+  }
+    val screenshotStyling = new CSSProperties {
+      maxWidth=1200
+      width="100%"
+      display="block"
+      margin="1em auto"
   }
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val texts = I18nHooks.useMessages(props.ctx.$lang)
-    val classes = useStyles(())
 
     def title(msg: String) = mui
       .Typography(msg)
-      .variant(muiStrings.h4)
-      .color(muiStrings.inherit)
+      .variant("h4")
+      .color("inherit")
 
     def paragraph(args: ReactElement) = mui
       .Typography(args)
-      .variant(muiStrings.body1)
-      .color(muiStrings.inherit)
+      .variant("body1")
+      .color("inherit")
 
     def link(msg: String, url: String) = mui
       .Link(msg)
@@ -64,13 +60,13 @@ object HomePage {
       .target("_blank")
 
     def image(srcImg: String, altImg: String, classImg: String) =
-      img(src := srcImg, alt := altImg, className := classes(classImg))
+      img(src := srcImg, alt := altImg, className := classImg,style:=screenshotStyling)
 
     val homeFragment = Fragment(
       mui
-        .Typography(texts.homePage, className := classes("homeTitle"))
-        .variant(muiStrings.h4)
-        .color(muiStrings.inherit),
+        .Typography(texts.homePage, className := "homeTitle",style:=homeTitleStyling)
+        .variant("h4")
+        .color("inherit"),
       paragraph(texts.homePageDescription),
       br(),
       br()
@@ -87,7 +83,7 @@ object HomePage {
       br(),
       br()
     )
-    
+
     val swaggerFragment = Fragment(
       title(texts.swaggerIntegration),
       paragraph(
@@ -124,7 +120,7 @@ object HomePage {
     Container(
       flex = Some(1),
       alignItems = Alignment.center,
-      child = div(className := classes("homeContainer"))(
+      child = div(className := "homeContainer",style:=homeContainerStyling)(
         Fragment(
           homeFragment,
           userProfileFragment,

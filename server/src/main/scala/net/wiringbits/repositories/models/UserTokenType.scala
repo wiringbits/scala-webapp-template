@@ -11,9 +11,3 @@ object UserTokenType extends Enum[UserTokenType] {
 
   val values = findValues
 }
-
-//enum UserTokenType {
-//   case  EmailVerification
-//   case  ResetPassword
-
-//}
