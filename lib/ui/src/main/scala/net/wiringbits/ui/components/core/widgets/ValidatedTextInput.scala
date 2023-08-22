@@ -1,7 +1,6 @@
 package net.wiringbits.ui.components.core.widgets
 
 import com.olvind.mui.muiMaterial.components as mui
-
 import net.wiringbits.webapp.common.validators.{TextValidator, ValidationResult}
 import net.wiringbits.webapp.utils.slinkyUtils.forms.FormField
 import org.scalajs.dom
@@ -9,12 +8,13 @@ import slinky.core.FunctionalComponent
 
 abstract class ValidatedTextInput[T: TextValidator] {
   private val validator = implicitly[TextValidator[T]]
+  private type MuiMargin = "dense" | "normal" | "none"
 
   case class Props(
       field: FormField[T],
       disabled: Boolean = false,
       onChange: ValidationResult[T] => Unit,
-      margin: "dense" = "dense"
+      margin: MuiMargin = "dense"
   )
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
