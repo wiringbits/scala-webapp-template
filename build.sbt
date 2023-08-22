@@ -287,7 +287,7 @@ lazy val ui = (project in file("lib/ui"))
     stIgnore ++= List("@mui/material", "@mui/styles", "@mui/icons-material"),
     Compile / npmDependencies ++= Seq(
       "@mui/material"->"5.11.15",
-      "@mui/styles" -> "5.11.13",
+      "@mui/styles" -> "5.11.13", // note: version 4 is not supported yet
       "@mui/icons-material"->"5.14.3",
       "@types/classnames" -> "2.2.10",
       "react-router" -> "5.1.2",
@@ -413,7 +413,7 @@ lazy val web = (project in file("web"))
 
     Compile / npmDependencies ++= Seq(
       "@mui/material"->"5.11.15",
-      "@mui/styles" -> "5.11.13",
+      "@mui/styles" -> "5.11.13", // note: version 4 is not supported yet
       "@mui/icons-material"->"5.14.3",
       "@emotion/styled"->"11.11.0",
       "@emotion/react"->"11.11.1",
