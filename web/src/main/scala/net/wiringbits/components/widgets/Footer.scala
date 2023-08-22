@@ -1,11 +1,12 @@
 package net.wiringbits.components.widgets
 
-import com.alexitc.materialui.facade.materialUiCore.createMuiThemeMod.Theme
-import com.alexitc.materialui.facade.materialUiCore.mod.PropTypes.Color
-import com.alexitc.materialui.facade.materialUiCore.{typographyTypographyMod, components as mui}
-import com.alexitc.materialui.facade.materialUiStyles.makeStylesMod.StylesHook
-import com.alexitc.materialui.facade.materialUiStyles.mod.makeStyles
-import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{CSSProperties, StyleRulesCallback, Styles, WithStylesOptions}
+import com.olvind.mui.muiMaterial.stylesCreateThemeMod.Theme
+import com.olvind.mui.muiMaterial.{components => mui}
+import com.olvind.mui.react.mod.CSSProperties
+import com.olvind.mui.csstype.mod.Property.FlexDirection
+import com.olvind.mui.muiMaterial.mod.PropTypes.Color
+import com.olvind.mui.muiIconsMaterial.{components => muiIcons}
+
 import net.wiringbits.AppContext
 import net.wiringbits.core.I18nHooks
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container
@@ -20,45 +21,38 @@ object Footer {
     component(Props(ctx = ctx))
 
   case class Props(ctx: AppContext)
-
-  private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {
-    val stylesCallback: StyleRulesCallback[Theme, Unit, String] = theme =>
-      StringDictionary(
-        "footer" -> CSSProperties()
-          .setColor("#FFF")
-          .setBackgroundColor("#222")
-          .setBorderRadius(0)
-      )
-    makeStyles(stylesCallback, WithStylesOptions())
+  val styling = new CSSProperties {
+    color = "#FFF"
+    backgroundColor = "#222"
+    borderRadius = 0
   }
 
   private val margin = 16
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val texts = I18nHooks.useMessages(props.ctx.$lang)
-    val classes = useStyles(())
     val isMobileOrTablet = MediaQueryHooks.useIsMobileOrTablet()
 
     val appName = Container(
       margin = EdgeInsets.bottom(margin),
-      child = mui.Typography(texts.appName).variant(typographyTypographyMod.Style.h4).color(Color.inherit)
+      child = mui.Typography(texts.appName).variant("h4").color(Color.inherit)
     )
     val appDescription =
-      mui.Typography(texts.description).variant(typographyTypographyMod.Style.body2).color(Color.inherit)
+      mui.Typography(texts.description).variant("body2").color(Color.inherit)
 
     def title(text: String) =
       Container(
         margin = EdgeInsets.bottom(margin),
-        child = mui.Typography(text).variant(typographyTypographyMod.Style.h5).color(Color.inherit)
+        child = mui.Typography(text).variant("h5").color(Color.inherit)
       )
 
     def subtitle(text: String) =
-      mui.Typography(text).variant(typographyTypographyMod.Style.subtitle2).color(Color.inherit)
+      mui.Typography(text).variant("subtitle2").color(Color.inherit)
 
     def link(text: String, url: String) =
       mui
         .Link(
-          mui.Typography(text).variant(typographyTypographyMod.Style.body2).color(Color.inherit)
+          mui.Typography(text).variant("body2").color(Color.inherit)
         )
         .href(url)
         .color(Color.inherit)
@@ -97,7 +91,7 @@ object Footer {
           margin = Container.EdgeInsets.top(margin / 2),
           child = Fragment(
             subtitle(texts.phone),
-            mui.Typography(props.ctx.contactPhone).variant(typographyTypographyMod.Style.body2).color(Color.inherit)
+            mui.Typography(props.ctx.contactPhone).variant("body2").color(Color.inherit)
           )
         )
       )
@@ -145,6 +139,7 @@ object Footer {
         )
       )
       .component("footer")
-      .className(classes("footer"))
+      .className("footer")
+      .style(styling)
   }
 }

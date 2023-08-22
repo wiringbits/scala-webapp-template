@@ -10,7 +10,7 @@ import slinky.core.{FunctionalComponent, KeyAddingStage}
 object Logs {
   def apply(ctx: AppContext, user: User): KeyAddingStage =
     component(Props(ctx = ctx, user = user))
-  
+
   case class Props(ctx: AppContext, user: User)
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
@@ -19,8 +19,8 @@ object Logs {
     AsyncComponent.component[GetUserLogs.Response](
       AsyncComponent.Props(
         fetch = () => props.ctx.api.client.getUserLogs,
-        render = response => LogList(props.ctx, response, () => forceRefresh()),
-        progressIndicator = () => Loader(props.ctx),
+        render = response => LogList.component(LogList.Props(props.ctx, response, () => forceRefresh())),
+        progressIndicator = () => Loader.component(Loader.Props(props.ctx)),
         watchedObjects = List(timesRefreshingData)
       )
     )

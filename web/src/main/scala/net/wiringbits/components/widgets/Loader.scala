@@ -1,6 +1,6 @@
 package net.wiringbits.components.widgets
 
-import com.alexitc.materialui.facade.materialUiCore.{components as mui, materialUiCoreStrings as muiStrings}
+import com.olvind.mui.muiMaterial.{components => mui}
 import net.wiringbits.AppContext
 import net.wiringbits.core.I18nHooks
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container}
@@ -22,7 +22,7 @@ object Loader {
       justifyContent = Container.Alignment.center,
       child = Fragment(
         CircularLoader(),
-        mui.Typography(texts.loading).variant(muiStrings.h6)
+        mui.Typography(texts.loading).variant("h6")
       )
     )
   }

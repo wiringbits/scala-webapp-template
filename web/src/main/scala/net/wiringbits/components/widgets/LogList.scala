@@ -1,16 +1,10 @@
 package net.wiringbits.components.widgets
 
-import com.alexitc.materialui.facade.materialUiCore.components as mui
-import com.alexitc.materialui.facade.materialUiCore.createMuiThemeMod.Theme
-import com.alexitc.materialui.facade.materialUiCore.mod.PropTypes.Color
-import com.alexitc.materialui.facade.materialUiStyles.makeStylesMod.StylesHook
-import com.alexitc.materialui.facade.materialUiStyles.mod.makeStyles
-import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
-  CSSProperties,
-  StyleRulesCallback,
-  Styles,
-  WithStylesOptions
-}
+import com.olvind.mui.muiMaterial.stylesCreateThemeMod.Theme
+import com.olvind.mui.muiMaterial.{components => mui}
+import com.olvind.mui.react.mod.CSSProperties
+import com.olvind.mui.muiMaterial.mod.PropTypes.Color
+
 import net.wiringbits.AppContext
 import net.wiringbits.api.models.GetUserLogs
 import net.wiringbits.api.utils.Formatter
@@ -25,22 +19,15 @@ object LogList {
     component(Props(ctx = ctx, response = response, forceRefresh = forceRefresh))
 
   case class Props(ctx: AppContext, response: GetUserLogs.Response, forceRefresh: () => Unit)
-
-  private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {
-    val stylesCallback: StyleRulesCallback[Theme, Unit, String] = theme =>
-      StringDictionary(
-        "list" -> CSSProperties()
-          .setWidth("100%")
-      )
-    makeStyles(stylesCallback, WithStylesOptions())
+  val styling = new CSSProperties {
+    width = "100%"
   }
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val texts = I18nHooks.useMessages(props.ctx.$lang)
-    val classes = useStyles(())
     val items = props.response.data.map { item =>
-      mui
-        .ListItem(
+      mui.ListItem
+        .normal()(
           mui
             .ListItemText()
             .primary(item.message)
@@ -61,15 +48,16 @@ object LogList {
           justifyContent = Container.Alignment.spaceBetween,
           child = Fragment(
             Subtitle(texts.logs),
-            mui
-              .Button(texts.reload)
+            mui.Button
+              .normal()(texts.reload)
               .color(Color.primary)
               .onClick(_ => props.forceRefresh())
           )
         ),
         mui
           .List(items)
-          .className(classes("list"))
+          .className("list")
+          .style(styling)
           .dense(true)
       )
     )

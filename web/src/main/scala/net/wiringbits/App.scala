@@ -1,7 +1,7 @@
 package net.wiringbits
 
-import com.alexitc.materialui.facade.materialUiCore.components as mui
-import com.alexitc.materialui.facade.materialUiStyles.components.ThemeProvider
+import com.olvind.mui.muiMaterial.components.ThemeProvider
+import com.olvind.mui.muiMaterial.{components => mui}
 import net.wiringbits.components.AppSplash
 import slinky.core.{FunctionalComponent, KeyAddingStage}
 import slinky.core.facade.ReactElement
@@ -15,7 +15,7 @@ object App {
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     ThemeProvider(AppTheme.value)(
-      mui.MuiThemeProvider(AppTheme.value)(
+      mui.ThemeProvider(AppTheme.value)(
         mui.CssBaseline(),
         router.BrowserRouter.basename("")(
           AppSplash(props.ctx)(AppRouter(props.ctx): ReactElement)

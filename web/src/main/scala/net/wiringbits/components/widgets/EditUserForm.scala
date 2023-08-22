@@ -1,6 +1,6 @@
 package net.wiringbits.components.widgets
 
-import com.alexitc.materialui.facade.materialUiCore.{components as mui, materialUiCoreStrings as muiStrings}
+import com.olvind.mui.muiMaterial.{components => mui}
 import net.wiringbits.AppContext
 import net.wiringbits.api.models.GetCurrentUser
 import net.wiringbits.api.utils.Formatter
@@ -102,19 +102,19 @@ object EditUserForm {
         Fragment(texts.save)
       }
 
-      mui
-        .Button(text)
+      mui.Button
+        .normal()(text)
         .fullWidth(true)
         .disabled(formData.isSubmitButtonDisabled || !hasChanges)
-        .variant(muiStrings.contained)
-        .color(muiStrings.primary)
-        .size(muiStrings.large)
-        .`type`(muiStrings.submit)
+        .variant("contained")
+        .color("primary")
+        .size("large")
+        .`type`("submit")
     }
 
     val createdAt =
       Fragment(
-        mui.Typography(texts.createdAt).variant(muiStrings.subtitle2),
+        mui.Typography(texts.createdAt).variant("subtitle2"),
         mui.Typography(Formatter.instant(props.response.createdAt))
       )
 

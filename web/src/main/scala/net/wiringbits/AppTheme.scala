@@ -1,52 +1,32 @@
 package net.wiringbits
 
-import com.alexitc.materialui.facade.csstype.mod.{BoxSizingProperty, FlexDirectionProperty, PositionProperty}
-import com.alexitc.materialui.facade.materialUiCore.anon.{PartialPaperProps, PartialStyleRulesPaperCla}
-import com.alexitc.materialui.facade.materialUiCore.colorsMod as Colors
-import com.alexitc.materialui.facade.materialUiCore.createMuiThemeMod.{Theme, ThemeOptions}
-import com.alexitc.materialui.facade.materialUiCore.createPaletteMod.{PaletteColorOptions, PaletteOptions}
-import com.alexitc.materialui.facade.materialUiCore.createTypographyMod.TypographyOptions
-import com.alexitc.materialui.facade.materialUiCore.overridesMod.Overrides
-import com.alexitc.materialui.facade.materialUiCore.propsMod.ComponentsProps
-import com.alexitc.materialui.facade.materialUiCore.shapeMod.ShapeOptions
-import com.alexitc.materialui.facade.materialUiCore.stylesMod.createMuiTheme
-import com.alexitc.materialui.facade.materialUiCore.withStylesMod.CSSProperties
+import com.olvind.mui.muiMaterial.stylesCreateThemeMod.ThemeOptions
+import com.olvind.mui.muiMaterial.stylesCreateThemeMod.Theme
+import com.olvind.mui.muiMaterial.stylesCreatePaletteMod.SimplePaletteColorOptions
+import com.olvind.mui.muiMaterial.stylesCreatePaletteMod.PaletteOptions
+import com.olvind.mui.muiMaterial.stylesCreateTypographyMod.TypographyOptions
+import com.olvind.mui.muiMaterial.stylesMod.{createMuiTheme, createTheme}
+import com.olvind.mui.muiMaterial.colorsMod as Colors
+import com.olvind.mui.muiMaterial.components as mui
+import com.olvind.mui.react.mod.CSSProperties
+import com.olvind.mui.muiMaterial.mod.PropTypes.Color
+import com.olvind.mui.muiIconsMaterial.components as muiIcons
+import com.olvind.mui.csstype.mod.Property.{BoxSizing, FlexDirection, Position}
+import com.olvind.mui.muiSystem.createThemeShapeMod.ShapeOptions
 
 object AppTheme {
   val primaryColor = Colors.teal.`500`
   val secondaryColor = Colors.amber
-  val typography = TypographyOptions().setUseNextVariants(true)
+  val typography = TypographyOptions()
   val borderRadius = 8
 
-  val value: Theme = createMuiTheme(
+  val value: Theme = createTheme(
     ThemeOptions()
       .setPalette(
         PaletteOptions()
-          .setPrimary(PaletteColorOptions.SimplePaletteColorOptions(primaryColor))
+          .setPrimary(SimplePaletteColorOptions(primaryColor))
       )
       .setTypography(typography)
       .setShape(ShapeOptions().setBorderRadius(borderRadius))
-      .setProps(
-        ComponentsProps()
-          .setMuiPaper(
-            PartialPaperProps()
-              .setElevation(1)
-          )
-      )
-      .setOverrides(
-        Overrides()
-          .setMuiPaper(
-            PartialStyleRulesPaperCla()
-              .setRoot(
-                CSSProperties()
-                  .setPosition(PositionProperty.relative)
-                  .setDisplay("flex")
-                  .setFlexDirection(FlexDirectionProperty.column)
-                  .setBoxSizing(BoxSizingProperty.`border-box`)
-                  .setOverflow("hidden")
-              )
-              .setRounded(CSSProperties().setBorderRadius(borderRadius))
-          )
-      )
   )
 }

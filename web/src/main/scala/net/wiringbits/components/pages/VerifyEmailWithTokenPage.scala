@@ -1,16 +1,10 @@
 package net.wiringbits.components.pages
 
-import com.alexitc.materialui.facade.csstype.mod.{FlexDirectionProperty, TextAlignProperty}
-import com.alexitc.materialui.facade.materialUiCore.createMuiThemeMod.Theme
-import com.alexitc.materialui.facade.materialUiCore.{components as mui, materialUiCoreStrings as muiStrings}
-import com.alexitc.materialui.facade.materialUiStyles.makeStylesMod.StylesHook
-import com.alexitc.materialui.facade.materialUiStyles.mod.makeStyles
-import com.alexitc.materialui.facade.materialUiStyles.withStylesMod.{
-  CSSProperties,
-  StyleRulesCallback,
-  Styles,
-  WithStylesOptions
-}
+import com.olvind.mui.propTypes
+import com.olvind.mui.muiMaterial.stylesCreateThemeMod.Theme
+import com.olvind.mui.muiMaterial.{components => mui}
+import com.olvind.mui.react.mod.CSSProperties
+import com.olvind.mui.csstype.mod.Property.{TextAlign, FlexDirection}
 import net.wiringbits.AppContext
 import net.wiringbits.api.models.VerifyEmail
 import net.wiringbits.common.models.UserToken
@@ -20,7 +14,7 @@ import org.scalablytyped.runtime.StringDictionary
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 import slinky.core.{FunctionalComponent, KeyAddingStage}
 import slinky.core.facade.{Fragment, Hooks}
-import slinky.web.html.{className, div}
+import slinky.web.html.{className, div, style}
 import typings.reactRouterDom.mod.{useHistory, useParams}
 
 import scala.scalajs.js
@@ -28,9 +22,9 @@ import scala.scalajs.js.timers.setTimeout
 import scala.util.{Failure, Success}
 
 object VerifyEmailWithTokenPage {
-  def apply(ctx: AppContext): KeyAddingStage = 
+  def apply(ctx: AppContext): KeyAddingStage =
     component(Props(ctx = ctx))
-  
+
   case class Props(ctx: AppContext)
 
   private case class State(
@@ -40,23 +34,20 @@ object VerifyEmailWithTokenPage {
       message: String
   )
 
-  private lazy val useStyles: StylesHook[Styles[Theme, Unit, String]] = {
-    val stylesCallback: StyleRulesCallback[Theme, Unit, String] = theme =>
-      StringDictionary(
-        "emailCodePage" -> CSSProperties()
-          .setFlex(1)
-          .setDisplay("flex")
-          .setFlexDirection(FlexDirectionProperty.column)
-          .setAlignItems("center")
-          .setTextAlign(TextAlignProperty.center)
-          .setJustifyContent("center"),
-        "emailTitle" -> CSSProperties()
-          .setFontWeight(600),
-        "emailPhoto" -> CSSProperties()
-          .setWidth("15rem")
-          .setPadding("15px 0")
-      )
-    makeStyles(stylesCallback, WithStylesOptions())
+  val emailPageStyling = new CSSProperties {
+    flex = 1
+    display = "flex"
+    flexDirection = FlexDirection.column
+    alignItems = "center"
+    textAlign = TextAlign.center
+    justifyContent = "center"
+  }
+  val emailTitleStyling = new CSSProperties {
+    fontWeight = 600
+  }
+  val emailPhotoStyling = new CSSProperties {
+    width = "10rem"
+    padding = "15px 0"
   }
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
@@ -69,7 +60,6 @@ object VerifyEmailWithTokenPage {
       message = texts.waitAMomentPlease
     )
 
-    val classes = useStyles(())
     val history = useHistory().asInstanceOf[js.Dynamic]
     val params = useParams()
     val (state, setState) = Hooks.useState(initialState)
@@ -112,10 +102,10 @@ object VerifyEmailWithTokenPage {
         )
       }
 
-    div(className := classes("emailCodePage"))(
+    div(className := "emailCodePage", style := emailPageStyling)(
       Fragment(
-        mui.Typography(state.title).variant(muiStrings.h5).className(classes("emailTitle")),
-        mui.Typography(state.message).variant(muiStrings.h6),
+        mui.Typography(state.title).variant("h5").className("emailTitle").style(emailTitleStyling),
+        mui.Typography(state.message).variant("h6"),
         loading
       )
     )
