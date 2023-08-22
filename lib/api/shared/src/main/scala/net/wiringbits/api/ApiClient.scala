@@ -2,6 +2,7 @@ package net.wiringbits.api
 
 import net.wiringbits.api.endpoints.*
 import net.wiringbits.api.models.*
+import net.wiringbits.common.AuthAction
 import play.api.libs.json.{Json, Reads}
 import sttp.client3.*
 import sttp.tapir.PublicEndpoint
@@ -27,6 +28,9 @@ class ApiClient(config: ApiClient.Config)(implicit
   // Similarly to the dummy userId, we need a way to derive the userId from a request, which is used only on the
   // server-side code, this function is helpful to fulfill the method signatures
   private implicit val handleDummyUserId: ServerRequest => Future[UUID] = _ => dummyUserId
+
+  // Same as the previous dummies
+  private implicit val handleDummyAuthFun: AuthAction => String = _ => "dummy"
 
   private def asJson[R: Reads](strBody: String) = {
     Try {
@@ -115,29 +119,23 @@ class ApiClient(config: ApiClient.Config)(implicit
   ): Future[SendEmailVerificationToken.Response] =
     handleRequest(UsersEndpoints.sendEmailVerificationToken, request)
 
-  // login and logout are special cases, since they return a cookie, sttp-client can not decode them correctly, so we have
-  // to do it manually
-//  def login(request: Login.Request): Future[Login.Response] =
-//    client
-//      .toRequestThrowDecodeFailures(AuthEndpoints.login, Some(ServerAPI))
-//      .apply(request)
-//      .response(asStringAlways)
-//      .send(sttpBackend)
-//      .map { response =>
-//        unsafeSetLoginResponse(response)
-//        response.body
-//      }
-//      .map(asJson[Login.Response])
+  def logout: Future[Logout.Response] =
+    handleRequest(AuthEndpoints.logout, dummyUserId).map { response =>
+      unsafeRemoveLoginResponse()
+      response
+    }
 
-//  def logout: Future[Logout.Response] =
-//    client
-//      .toRequestThrowDecodeFailures(AuthEndpoints.logout, Some(ServerAPI))
-//      .apply(dummyUserId)
-//      .response(asStringAlways)
-//      .send(sttpBackend)
-//      .map { response =>
-//        unsafeRemoveLoginResponse()
-//        response.body
-//      }
-//      .map(asJson[Logout.Response])
+  // login is a special case, since they return a cookie, sttp-client can not decode them correctly, so we have
+  // to do it manually
+  def login(request: Login.Request): Future[Login.Response] =
+    client
+      .toRequestThrowDecodeFailures(AuthEndpoints.login, Some(ServerAPI))
+      .apply(request)
+      .response(asStringAlways)
+      .send(sttpBackend)
+      .map { response =>
+        unsafeSetLoginResponse(response)
+        response.body
+      }
+      .map(asJson[Login.Response])
 }
