@@ -1,6 +1,5 @@
-import net.wiringbits.api.endpoints.AuthTest
-import net.wiringbits.api.endpoints.AuthTest.RemoveSession
-import net.wiringbits.api.models.{ErrorResponse, errorResponseFormat}
+import net.wiringbits.api.models.ErrorResponse
+import net.wiringbits.common.AuthAction
 import org.slf4j.LoggerFactory
 import play.api.mvc.request.DefaultRequestFactory
 import play.api.mvc.{CookieHeaderEncoding, RequestHeader, Session}
@@ -19,26 +18,21 @@ package object controllers {
   class PlayTapirBridge @Inject() (
       requestFactory: DefaultRequestFactory,
       cookieHeaderEncoding: CookieHeaderEncoding
-  )(implicit ec: ExecutionContext) {
-    def handleSession(authTest: AuthTest): String = authTest match
-      case AuthTest.SetSession(userId) =>
-        userId match
-          case Some(userId) =>
-            val session = Session(Map("id" -> userId.toString))
-            val playCookie = requestFactory.sessionBaker.encodeAsCookie(session)
-            cookieHeaderEncoding.encodeSetCookieHeader(List(playCookie))
-          case None =>
-            val encoded = requestFactory.sessionBaker.discard.toCookie
-            cookieHeaderEncoding.encodeSetCookieHeader(List(encoded))
-      case AuthTest.RemoveSession =>
-        val encoded = requestFactory.sessionBaker.discard.toCookie
-        cookieHeaderEncoding.encodeSetCookieHeader(List(encoded))
-
-    def setSession(userId: UUID): Future[String] = Future {
+  ) {
+    private def setSession(userId: UUID): String =
       val session = Session(Map("id" -> userId.toString))
       val playCookie = requestFactory.sessionBaker.encodeAsCookie(session)
       cookieHeaderEncoding.encodeSetCookieHeader(List(playCookie))
-    }
+
+    private def discardSession: String =
+      val encoded = requestFactory.sessionBaker.discard.toCookie
+      cookieHeaderEncoding.encodeSetCookieHeader(Seq(encoded))
+
+    def handleSession(authTest: AuthAction): String = authTest match
+      case AuthAction.SetSession(userId) =>
+        setSession(userId)
+      case AuthAction.RemoveSession =>
+        discardSession
   }
 
   def handleRequest[R](

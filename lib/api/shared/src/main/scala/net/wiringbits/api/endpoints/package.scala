@@ -1,6 +1,7 @@
 package net.wiringbits.api
 
 import net.wiringbits.api.models.{ErrorResponse, errorResponseFormat}
+import net.wiringbits.common.AuthAction
 import sttp.model.StatusCode
 import sttp.tapir.*
 import sttp.tapir.EndpointInput.AuthType
@@ -44,6 +45,6 @@ package object endpoints {
   def userAuth(implicit handleAuth: ServerRequest => Future[UUID]): EndpointInput.ExtractFromRequest[Future[UUID]] =
     extractFromRequest(handleAuth)
 
-  def tests(auth: AuthTest, handler: AuthTest => String): EndpointIO.FixedHeader[Unit] =
+  def authCookie(auth: AuthAction)(implicit handler: AuthAction => String): EndpointIO.FixedHeader[Unit] =
     header("Set-Cookie", handler(auth))
 }

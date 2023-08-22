@@ -2,6 +2,7 @@ package net.wiringbits.api.endpoints
 
 import net.wiringbits.api.models
 import net.wiringbits.api.models.{ErrorResponse, GetCurrentUser, Login, Logout}
+import net.wiringbits.common.AuthAction
 import net.wiringbits.common.models.{Captcha, Email, Name, Password}
 import sttp.tapir.*
 import sttp.tapir.json.play.*
@@ -17,32 +18,10 @@ object AuthEndpoints {
     .tag("Auth")
     .errorOut(errorResponseErrorOut)
 
-  def login(
-      userId: Option[UUID],
-      authFun: AuthTest => String
-  ): Endpoint[Unit, Login.Request, ErrorResponse, Login.Response, Any] =
+  val login: Endpoint[Unit, Login.Request, ErrorResponse, (Login.Response, String), Any] =
     baseEndpoint.post
       .in("login")
-      .in(jsonBody[Login.Request])
-      .out(tests(AuthTest.SetSession(userId), authFun))
-      .out(jsonBody[Login.Response])
-
-  val testEndpoint = baseEndpoint.post
-    .in("test")
-    .in(
-      jsonBody[Login.Request].example(
-        Login.Request(
-          email = Email.trusted("alexis@wiringbits.net"),
-          password = Password.trusted("notSoWeakPassword"),
-          captcha = Captcha.trusted("captcha")
-        )
-      )
-    )
-
-  val login: Endpoint[Login.Request, Unit, ErrorResponse, (Login.Response, String), Any] =
-    baseEndpoint.post
-      .in("login")
-      .securityIn(
+      .in(
         jsonBody[Login.Request].example(
           Login.Request(
             email = Email.trusted("alexis@wiringbits.net"),
@@ -67,15 +46,15 @@ object AuthEndpoints {
       .summary("Log into the app")
       .description("Sets a session cookie to authenticate the following requests")
 
-  def logout(authFun: AuthTest => String)(implicit
-      authHandler: ServerRequest => Future[UUID]
+  def logout(implicit
+      authHandler: ServerRequest => Future[UUID],
+      authFun: AuthAction => String
   ): Endpoint[Unit, Future[UUID], ErrorResponse, Logout.Response, Any] =
     baseEndpoint.post
       .in("logout")
       .in(userAuth)
       .out(jsonBody[Logout.Response].description("Successful logout").example(Logout.Response()))
-//      .out(setSessionHeader)
-      .out(tests(AuthTest.RemoveSession, authFun))
+      .out(authCookie(AuthAction.RemoveSession))
       .errorOut(oneOf(HttpErrors.badRequest))
       .summary("Logout from the app")
       .description("Clears the session cookie that's stored securely")
@@ -100,15 +79,10 @@ object AuthEndpoints {
       )
       .summary("Get the details for the authenticated user")
 
-  def routes(removeAuth: AuthTest => String)(implicit authHandler: ServerRequest => Future[UUID]): List[AnyEndpoint] =
+  def routes(implicit authHandler: ServerRequest => Future[UUID], removeAuth: AuthAction => String): List[AnyEndpoint] =
     List(
       login,
-      logout(removeAuth),
+      logout,
       getCurrentUser
     )
-}
-
-enum AuthTest {
-  case RemoveSession
-  case SetSession(userId: Option[UUID])
 }

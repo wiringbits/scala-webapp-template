@@ -2,6 +2,7 @@ package controllers
 
 import akka.stream.Materializer
 import net.wiringbits.api.endpoints.*
+import net.wiringbits.common.AuthAction
 import net.wiringbits.config.SwaggerConfig
 import play.api.routing.Router.Routes
 import play.api.routing.SimpleRouter
@@ -21,14 +22,16 @@ class ApiRouter @Inject() (
     usersController: UsersController,
     environmentConfigController: EnvironmentConfigController,
     swaggerConfig: SwaggerConfig,
-    tapirBridge: PlayTapirBridge
+    playTapirBridge: PlayTapirBridge
 )(implicit materializer: Materializer, ec: ExecutionContext)
     extends SimpleRouter {
+  implicit val handleSessionImplicit: AuthAction => String = playTapirBridge.handleSession
+
   private val swagger = SwaggerInterpreter(
     swaggerUIOptions = SwaggerUIOptions.default.copy(contextPath = List(swaggerConfig.basePath))
   )
     .fromEndpoints[Future](
-      ApiRouter.routes(tapirBridge.handleSession),
+      ApiRouter.routes,
       Info(
         title = swaggerConfig.info.title,
         version = swaggerConfig.info.version,
@@ -50,10 +53,10 @@ class ApiRouter @Inject() (
 }
 
 object ApiRouter {
-  private def routes(removeAuth: AuthTest => String)(implicit ec: ExecutionContext): List[AnyEndpoint] = List(
+  private def routes(implicit ec: ExecutionContext, removeAuth: AuthAction => String): List[AnyEndpoint] = List(
     HealthEndpoints.routes,
     AdminEndpoints.routes,
-    AuthEndpoints.routes(removeAuth),
+    AuthEndpoints.routes,
     UsersEndpoints.routes,
     EnvironmentConfigEndpoints.routes
   ).flatten
