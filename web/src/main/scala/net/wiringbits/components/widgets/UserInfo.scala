@@ -1,6 +1,6 @@
 package net.wiringbits.components.widgets
 
-import com.olvind.mui.muiMaterial.{components=>mui}
+import com.olvind.mui.muiMaterial.{components => mui}
 import net.wiringbits.AppContext
 import net.wiringbits.api.models.GetCurrentUser
 import net.wiringbits.core.I18nHooks

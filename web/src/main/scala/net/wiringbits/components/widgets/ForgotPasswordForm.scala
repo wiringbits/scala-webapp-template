@@ -1,6 +1,6 @@
 package net.wiringbits.components.widgets
 
-import com.olvind.mui.muiMaterial.{components=>mui}
+import com.olvind.mui.muiMaterial.{components => mui}
 import net.wiringbits.AppContext
 import net.wiringbits.core.I18nHooks
 import net.wiringbits.forms.ForgotPasswordFormData
@@ -78,8 +78,8 @@ object ForgotPasswordForm {
         Fragment(texts.recover)
       }
 
-      mui
-        .Button.normal()(text)
+      mui.Button
+        .normal()(text)
         .fullWidth(true)
         .disabled(formData.isSubmitButtonDisabled)
         .variant("contained")

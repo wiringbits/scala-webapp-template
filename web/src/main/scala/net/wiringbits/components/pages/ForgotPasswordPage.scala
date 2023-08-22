@@ -2,7 +2,7 @@ package net.wiringbits.components.pages
 
 import slinky.core.{FunctionalComponent, KeyAddingStage}
 import com.olvind.mui.muiMaterial.stylesCreateThemeMod.Theme
-import com.olvind.mui.muiMaterial.{components=>mui}
+import com.olvind.mui.muiMaterial.{components => mui}
 import com.olvind.mui.react.mod.CSSProperties
 
 import net.wiringbits.components.widgets.{AppCard, ForgotPasswordForm}
@@ -12,7 +12,7 @@ import net.wiringbits.AppContext
 import net.wiringbits.core.I18nHooks
 import org.scalablytyped.runtime.StringDictionary
 import slinky.core.facade.Fragment
-import slinky.web.html.{className, div,style}
+import slinky.web.html.{className, div, style}
 import typings.reactRouterDom.mod.useHistory
 import slinky.core.facade.ReactElement.jsUndefOrToElement
 
@@ -23,9 +23,9 @@ object ForgotPasswordPage {
 
   case class Props(ctx: AppContext)
 
-  val styling=new CSSProperties {
-    maxWidth=350
-    width="100%"
+  val styling = new CSSProperties {
+    maxWidth = 350
+    width = "100%"
   }
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
@@ -36,7 +36,7 @@ object ForgotPasswordPage {
       flex = Some(1),
       justifyContent = Alignment.center,
       alignItems = Alignment.center,
-      child = div(className := "forgotPasswordFormContainer",style:=styling)(
+      child = div(className := "forgotPasswordFormContainer", style := styling)(
         AppCard(
           Fragment(
             Container(
@@ -51,8 +51,8 @@ object ForgotPasswordPage {
               justifyContent = Container.Alignment.center,
               child = Fragment(
                 mui.Typography(texts.dontHaveAccountYet),
-                mui
-                  .Button.normal()(texts.signUp)
+                mui.Button
+                  .normal()(texts.signUp)
                   .variant("text")
                   .color("primary")
                   .onClick(_ => history.push("/signUp"))

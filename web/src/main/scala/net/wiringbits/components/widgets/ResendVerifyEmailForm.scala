@@ -112,8 +112,8 @@ object ResendVerifyEmailForm {
           )
         } else Fragment(texts.resendEmail)
 
-      mui
-        .Button.normal()(text)
+      mui.Button
+        .normal()(text)
         .fullWidth(true)
         .disabled(formData.isSubmitButtonDisabled)
         .variant("contained")

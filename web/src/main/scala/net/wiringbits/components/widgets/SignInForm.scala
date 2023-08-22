@@ -1,7 +1,7 @@
 package net.wiringbits.components.widgets
 
 import com.olvind.mui.muiMaterial.mod.PropTypes.Color
-import com.olvind.mui.muiMaterial.{components=>mui}
+import com.olvind.mui.muiMaterial.{components => mui}
 import net.wiringbits.AppContext
 import net.wiringbits.common.ErrorMessages
 import net.wiringbits.core.I18nHooks
@@ -105,8 +105,8 @@ object SignInForm {
         case ErrorMessages.`emailNotVerified` =>
           val email = formData.data.email.inputValue
 
-          mui
-            .Button.normal()(texts.resendEmail)
+          mui.Button
+            .normal()(texts.resendEmail)
             .variant("text")
             .color("primary")
             .onClick(_ => history.push(s"/resend-verify-email?email=${email}"))
@@ -137,8 +137,8 @@ object SignInForm {
         else
           Fragment(texts.login)
 
-      mui
-        .Button.normal()(text)
+      mui.Button
+        .normal()(text)
         .fullWidth(true)
         .disabled(formData.isSubmitButtonDisabled)
         .variant("contained")

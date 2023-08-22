@@ -1,6 +1,6 @@
 package net.wiringbits.components.widgets
 
-import com.olvind.mui.muiMaterial.{components=>mui}
+import com.olvind.mui.muiMaterial.{components => mui}
 import net.wiringbits.AppContext
 import net.wiringbits.common.models.UserToken
 import net.wiringbits.core.I18nHooks
@@ -100,8 +100,8 @@ object ResetPasswordForm {
         Fragment(texts.resetPassword)
       }
 
-      mui
-        .Button.normal()(text)
+      mui.Button
+        .normal()(text)
         .fullWidth(true)
         .disabled(formData.isSubmitButtonDisabled)
         .variant("contained")

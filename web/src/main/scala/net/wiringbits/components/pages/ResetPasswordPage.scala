@@ -1,13 +1,12 @@
 package net.wiringbits.components.pages
 
-
 import net.wiringbits.components.widgets.{AppCard, ResetPasswordForm}
 import net.wiringbits.core.I18nHooks
 import slinky.core.{FunctionalComponent, KeyAddingStage}
 import slinky.core.facade.Fragment
 import typings.reactRouter.mod.{useHistory, useParams}
 import com.olvind.mui.muiMaterial.stylesCreateThemeMod.Theme
-import com.olvind.mui.muiMaterial.{components=>mui}
+import com.olvind.mui.muiMaterial.{components => mui}
 import com.olvind.mui.react.mod.CSSProperties
 import com.olvind.mui.csstype.mod.Property.TextAlign
 
@@ -15,7 +14,7 @@ import net.wiringbits.common.models.UserToken
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container
 import net.wiringbits.AppContext
 import slinky.core.FunctionalComponent
-import slinky.web.html.{className, div,style}
+import slinky.web.html.{className, div, style}
 
 import scala.scalajs.js
 
@@ -25,9 +24,9 @@ object ResetPasswordPage {
 
   case class Props(ctx: AppContext)
 
-  val styling=new CSSProperties {
-    maxWidth=350
-    width="100%"
+  val styling = new CSSProperties {
+    maxWidth = 350
+    width = "100%"
   }
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
@@ -41,7 +40,7 @@ object ResetPasswordPage {
       flex = Some(1),
       justifyContent = Container.Alignment.center,
       alignItems = Container.Alignment.center,
-      child = div(className := "resetPasswordFormContainer",style:=styling)(
+      child = div(className := "resetPasswordFormContainer", style := styling)(
         AppCard(
           Fragment(
             Container(
@@ -57,8 +56,8 @@ object ResetPasswordPage {
               justifyContent = Container.Alignment.center,
               child = Fragment(
                 mui.Typography(texts.alreadyHaveAccount),
-                mui
-                  .Button.normal(texts.signIn)
+                mui.Button
+                  .normal(texts.signIn)
                   .variant("text")
                   .color("primary")
                   .onClick(_ => history.push("/signin"))

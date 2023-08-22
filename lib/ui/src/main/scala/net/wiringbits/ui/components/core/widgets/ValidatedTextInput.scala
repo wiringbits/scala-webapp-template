@@ -1,6 +1,7 @@
 package net.wiringbits.ui.components.core.widgets
 
 import com.olvind.mui.muiMaterial.components as mui
+
 import net.wiringbits.webapp.common.validators.{TextValidator, ValidationResult}
 import net.wiringbits.webapp.utils.slinkyUtils.forms.FormField
 import org.scalajs.dom
@@ -14,7 +15,7 @@ abstract class ValidatedTextInput[T: TextValidator] {
       field: FormField[T],
       disabled: Boolean = false,
       onChange: ValidationResult[T] => Unit,
-      margin: MuiMargin = "dense"
+      margin: "dense" = "dense"
   )
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
@@ -26,7 +27,8 @@ abstract class ValidatedTextInput[T: TextValidator] {
     val helperText = props.field.value.flatMap(_.errorMessage).getOrElse("")
     val value = props.field.value.map(_.input).getOrElse("")
     val hasError = props.field.value.exists(_.hasError)
-    mui.TextField.outlined()
+    mui.TextField
+      .outlined()
       .id(s"ExperimentalTextInput-${props.field.name}")
       .name(s"ExperimentalTextInput-${props.field.name}")
       .label(props.field.label)
