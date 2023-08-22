@@ -117,17 +117,17 @@ class ApiClient(config: ApiClient.Config)(implicit
 
   // login and logout are special cases, since they return a cookie, sttp-client can not decode them correctly, so we have
   // to do it manually
-  def login(request: Login.Request): Future[Login.Response] =
-    client
-      .toRequestThrowDecodeFailures(AuthEndpoints.login, Some(ServerAPI))
-      .apply(request)
-      .response(asStringAlways)
-      .send(sttpBackend)
-      .map { response =>
-        unsafeSetLoginResponse(response)
-        response.body
-      }
-      .map(asJson[Login.Response])
+//  def login(request: Login.Request): Future[Login.Response] =
+//    client
+//      .toRequestThrowDecodeFailures(AuthEndpoints.login, Some(ServerAPI))
+//      .apply(request)
+//      .response(asStringAlways)
+//      .send(sttpBackend)
+//      .map { response =>
+//        unsafeSetLoginResponse(response)
+//        response.body
+//      }
+//      .map(asJson[Login.Response])
 
 //  def logout: Future[Logout.Response] =
 //    client

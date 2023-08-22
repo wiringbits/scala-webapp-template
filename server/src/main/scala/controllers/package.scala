@@ -22,9 +22,14 @@ package object controllers {
   )(implicit ec: ExecutionContext) {
     def handleSession(authTest: AuthTest): String = authTest match
       case AuthTest.SetSession(userId) =>
-        val session = Session(Map("id" -> userId.toString))
-        val playCookie = requestFactory.sessionBaker.encodeAsCookie(session)
-        cookieHeaderEncoding.encodeSetCookieHeader(List(playCookie))
+        userId match
+          case Some(userId) =>
+            val session = Session(Map("id" -> userId.toString))
+            val playCookie = requestFactory.sessionBaker.encodeAsCookie(session)
+            cookieHeaderEncoding.encodeSetCookieHeader(List(playCookie))
+          case None =>
+            val encoded = requestFactory.sessionBaker.discard.toCookie
+            cookieHeaderEncoding.encodeSetCookieHeader(List(encoded))
       case AuthTest.RemoveSession =>
         val encoded = requestFactory.sessionBaker.discard.toCookie
         cookieHeaderEncoding.encodeSetCookieHeader(List(encoded))

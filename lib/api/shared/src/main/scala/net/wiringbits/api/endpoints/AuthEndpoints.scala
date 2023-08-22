@@ -17,10 +17,32 @@ object AuthEndpoints {
     .tag("Auth")
     .errorOut(errorResponseErrorOut)
 
-  val login: Endpoint[Unit, Login.Request, ErrorResponse, (Login.Response, String), Any] =
+  def login(
+      userId: Option[UUID],
+      authFun: AuthTest => String
+  ): Endpoint[Unit, Login.Request, ErrorResponse, Login.Response, Any] =
     baseEndpoint.post
       .in("login")
-      .in(
+      .in(jsonBody[Login.Request])
+      .out(tests(AuthTest.SetSession(userId), authFun))
+      .out(jsonBody[Login.Response])
+
+  val testEndpoint = baseEndpoint.post
+    .in("test")
+    .in(
+      jsonBody[Login.Request].example(
+        Login.Request(
+          email = Email.trusted("alexis@wiringbits.net"),
+          password = Password.trusted("notSoWeakPassword"),
+          captcha = Captcha.trusted("captcha")
+        )
+      )
+    )
+
+  val login: Endpoint[Login.Request, Unit, ErrorResponse, (Login.Response, String), Any] =
+    baseEndpoint.post
+      .in("login")
+      .securityIn(
         jsonBody[Login.Request].example(
           Login.Request(
             email = Email.trusted("alexis@wiringbits.net"),
@@ -88,5 +110,5 @@ object AuthEndpoints {
 
 enum AuthTest {
   case RemoveSession
-  case SetSession(userId: UUID)
+  case SetSession(userId: Option[UUID])
 }

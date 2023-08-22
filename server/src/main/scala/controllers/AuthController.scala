@@ -4,7 +4,6 @@ import net.wiringbits.actions.*
 import net.wiringbits.api.endpoints.AuthEndpoints
 import net.wiringbits.api.models.*
 import org.slf4j.LoggerFactory
-import play.api.mvc.ResponseHeader
 import sttp.capabilities.WebSockets
 import sttp.capabilities.akka.AkkaStreams
 import sttp.tapir.server.ServerEndpoint
@@ -20,14 +19,13 @@ class AuthController @Inject() (
 )(implicit ec: ExecutionContext) {
   private val logger = LoggerFactory.getLogger(this.getClass)
 
-  private def login(body: Login.Request): Future[Either[ErrorResponse, (Login.Response, String)]] =
-    ResponseHeader(200)
+  private def login(body: Login.Request): Future[Either[ErrorResponse, Login.Response]] =
     handleRequest {
       logger.info(s"Login API: ${body.email}")
       for {
         response <- loginAction(body)
-        cookieEncoded <- playTapirBridge.setSession(response.id)
-      } yield Right(response, cookieEncoded)
+//        cookieEncoded <- playTapirBridge.setSession(response.id)
+      } yield Right(response)
     }
 
   private def me(userIdF: Future[UUID]): Future[Either[ErrorResponse, GetCurrentUser.Response]] =
@@ -48,8 +46,20 @@ class AuthController @Inject() (
     }
 
   def routes: List[ServerEndpoint[AkkaStreams with WebSockets, Future]] = {
+    val loginServerLogic = {
+      var id: Option[UUID] = None
+      AuthEndpoints
+        .login(id, playTapirBridge.handleSession)
+        .serverLogic(login(_).map {
+          case Right(value) =>
+            id = Some(value.id)
+            Right(value)
+          case Left(value) => Left(value)
+        })
+    }
+
     List(
-      AuthEndpoints.login.serverLogic(login),
+      loginServerLogic,
       AuthEndpoints.getCurrentUser.serverLogic(me),
       AuthEndpoints.logout(playTapirBridge.handleSession).serverLogic(logout)
     )
