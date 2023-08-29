@@ -1,22 +1,20 @@
 package net.wiringbits.components.pages
 
-import com.olvind.mui.propTypes
-import com.olvind.mui.muiMaterial.stylesCreateThemeMod.Theme
-import com.olvind.mui.muiMaterial.{components => mui}
-import com.olvind.mui.react.mod.CSSProperties
-import com.olvind.mui.csstype.mod.Property.{TextAlign, FlexDirection}
+import com.olvind.mui.csstype.mod.Property.{FlexDirection, TextAlign}
+import com.olvind.mui.muiMaterial.components as mui
 import com.olvind.mui.muiMaterial.mod.PropTypes.Color
-
+import com.olvind.mui.muiMaterial.stylesCreateThemeMod.Theme
+import com.olvind.mui.propTypes
+import com.olvind.mui.react.mod.CSSProperties
 import net.wiringbits.AppContext
 import net.wiringbits.core.I18nHooks
+import net.wiringbits.webapp.utils.slinkyUtils.facades.reactrouterdom.{useHistory, useLocation}
 import org.scalablytyped.runtime.StringDictionary
 import org.scalajs.dom
 import org.scalajs.dom.URLSearchParams
-import slinky.core.{FunctionalComponent, KeyAddingStage}
 import slinky.core.facade.Fragment
+import slinky.core.{FunctionalComponent, KeyAddingStage}
 import slinky.web.html.{br, className, div, style}
-import typings.reactRouterDom.mod as reactRouterDom
-import typings.reactRouterDom.mod.useLocation
 
 import scala.scalajs.js
 
@@ -26,7 +24,7 @@ object VerifyEmailPage {
 
   case class Props(ctx: AppContext)
 
-  val emailPageStyling = new CSSProperties {
+  val emailPageStyling: CSSProperties = new CSSProperties {
     flex = 1
     display = "flex"
     flexDirection = FlexDirection.column
@@ -34,17 +32,14 @@ object VerifyEmailPage {
     textAlign = TextAlign.center
     justifyContent = "center"
   }
-  val emailTitleStyling = new CSSProperties {
+
+  val emailTitleStyling: CSSProperties = new CSSProperties {
     fontWeight = 600
-  }
-  val emailPhotoStyling = new CSSProperties {
-    width = "10rem"
-    padding = "15px 0"
   }
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val texts = I18nHooks.useMessages(props.ctx.$lang)
-    val history = reactRouterDom.useHistory().asInstanceOf[js.Dynamic]
+    val history = useHistory()
     val params = new URLSearchParams(useLocation().asInstanceOf[js.Dynamic].search.asInstanceOf[String])
     val emailParam = Option(params.get("email")).getOrElse("")
 
@@ -72,7 +67,7 @@ object VerifyEmailPage {
             .normal()(texts.resendEmail)
             .variant("contained")
             .color("primary")
-            .onClick(_ => history.push(s"/resend-verify-email?email=${emailParam}"))
+            .onClick(_ => history.push(s"/resend-verify-email?email=$emailParam"))
         )
       )
     )

@@ -13,6 +13,7 @@ import net.wiringbits.ui.components.inputs.EmailInput
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.ErrorLabel
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.{Alignment, EdgeInsets}
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container, Title}
+import net.wiringbits.webapp.utils.slinkyUtils.facades.reactrouterdom.useHistory
 import net.wiringbits.webapp.utils.slinkyUtils.forms.StatefulFormData
 import org.scalajs.dom
 import org.scalajs.dom.URLSearchParams
@@ -21,8 +22,6 @@ import slinky.core.{FunctionalComponent, KeyAddingStage, SyntheticEvent}
 import slinky.core.facade.Hooks
 import slinky.core.{FunctionalComponent, SyntheticEvent}
 import slinky.web.html.*
-import typings.reactRouterDom.mod as reactRouterDom
-import typings.reactRouterDom.mod.useLocation
 
 import scala.scalajs.js
 import scala.util.{Failure, Success}
@@ -35,7 +34,7 @@ object ResendVerifyEmailForm {
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val texts = I18nHooks.useMessages(props.ctx.$lang)
-    val history = reactRouterDom.useHistory().asInstanceOf[js.Dynamic]
+    val history = useHistory()
     val params = URLSearchParams(dom.window.location.search)
     val emailParam = Option(params.get("email")).getOrElse("")
     val (formData, setFormData) = Hooks.useState(

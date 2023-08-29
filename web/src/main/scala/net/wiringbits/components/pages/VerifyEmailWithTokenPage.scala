@@ -2,20 +2,20 @@ package net.wiringbits.components.pages
 
 import com.olvind.mui.propTypes
 import com.olvind.mui.muiMaterial.stylesCreateThemeMod.Theme
-import com.olvind.mui.muiMaterial.{components => mui}
+import com.olvind.mui.muiMaterial.components as mui
 import com.olvind.mui.react.mod.CSSProperties
-import com.olvind.mui.csstype.mod.Property.{TextAlign, FlexDirection}
+import com.olvind.mui.csstype.mod.Property.{FlexDirection, TextAlign}
 import net.wiringbits.AppContext
 import net.wiringbits.api.models.VerifyEmail
 import net.wiringbits.common.models.UserToken
 import net.wiringbits.core.I18nHooks
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container}
+import net.wiringbits.webapp.utils.slinkyUtils.facades.reactrouterdom.{useHistory, useParams}
 import org.scalablytyped.runtime.StringDictionary
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 import slinky.core.{FunctionalComponent, KeyAddingStage}
 import slinky.core.facade.{Fragment, Hooks}
 import slinky.web.html.{className, div, style}
-import typings.reactRouterDom.mod.{useHistory, useParams}
 
 import scala.scalajs.js
 import scala.scalajs.js.timers.setTimeout
@@ -34,7 +34,7 @@ object VerifyEmailWithTokenPage {
       message: String
   )
 
-  val emailPageStyling = new CSSProperties {
+  val emailPageStyling: CSSProperties = new CSSProperties {
     flex = 1
     display = "flex"
     flexDirection = FlexDirection.column
@@ -42,12 +42,9 @@ object VerifyEmailWithTokenPage {
     textAlign = TextAlign.center
     justifyContent = "center"
   }
-  val emailTitleStyling = new CSSProperties {
+
+  val emailTitleStyling: CSSProperties = new CSSProperties {
     fontWeight = 600
-  }
-  val emailPhotoStyling = new CSSProperties {
-    width = "10rem"
-    padding = "15px 0"
   }
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
@@ -60,10 +57,10 @@ object VerifyEmailWithTokenPage {
       message = texts.waitAMomentPlease
     )
 
-    val history = useHistory().asInstanceOf[js.Dynamic]
+    val history = useHistory()
     val params = useParams()
     val (state, setState) = Hooks.useState(initialState)
-    val emailCodeOpt = UserToken.validate(params.asInstanceOf[js.Dynamic].emailCode.toString)
+    val emailCodeOpt = UserToken.validate(params.get("emailCode").getOrElse(""))
 
     def sendEmailCode(): Unit = {
       setState(_.copy(loading = true))
