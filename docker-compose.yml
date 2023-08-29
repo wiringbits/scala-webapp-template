@@ -1,0 +1,52 @@
+version: '3.1'
+# Run docker-compose run web to launch web, docker-compose run server to launch server
+# Run docker pull openjdk:11 if necessary
+# Update the database information to match your own
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    working_dir: /root/app
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - host
+    volumes:
+      - ~/.ivy2:/root/.ivy2
+      - ~/.m2:/root/.m2
+      - ~/.yarn:/.yarn
+      - ~/.sbt:/.sbt
+      - ~/.cache:/root/.cache
+      - .:/root/app
+      - ~/.sdkman/candidates/sbt/current/bin/sbt:/bin/sbt
+    command: ["sbt","dev-web"]
+  server:
+    image: openjdk:11
+    working_dir: /root/app
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - host
+    volumes:
+      - ~/.ivy2:/root/.ivy2
+      - ~/.m2:/root/.m2
+      - ~/.yarn:/.yarn
+      - ~/.sbt:/.sbt
+      - ~/.cache:/root/.cache
+      - .:/root/app
+      - ~/.sdkman/candidates/sbt/current/bin/sbt:/bin/sbt
+    depends_on:
+      - db
+    command: [ "sbt","server/run" ]
+  db:
+    image: 'postgres'
+    ports:
+      - '25432:5432'
+    environment:
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: 'postgres'
+      POSTGRES_DB: 'wiringbits_db'
+networks:
+  host:
+    name: host
