@@ -1,7 +1,7 @@
 package net.wiringbits.components.pages
 
 import com.olvind.mui.muiMaterial.stylesCreateThemeMod.Theme
-import com.olvind.mui.muiMaterial.{components => mui}
+import com.olvind.mui.muiMaterial.components as mui
 import com.olvind.mui.react.mod.CSSProperties
 import com.olvind.mui.csstype.mod.Property.TextAlign
 import slinky.core.{FunctionalComponent, KeyAddingStage}
@@ -10,11 +10,10 @@ import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{Container, Title}
 import net.wiringbits.AppContext
 import net.wiringbits.core.I18nHooks
+import net.wiringbits.webapp.utils.slinkyUtils.facades.reactrouterdom.useHistory
 import org.scalablytyped.runtime.StringDictionary
 import slinky.core.facade.Fragment
 import slinky.web.html.{className, div, style}
-import typings.reactRouterDom.mod.useHistory
-import typings.reactRouterDom.mod as reactRouterDom
 
 import scala.scalajs.js
 
@@ -31,7 +30,7 @@ object SignInPage {
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val texts = I18nHooks.useMessages(props.ctx.$lang)
-    val history = useHistory().asInstanceOf[js.Dynamic]
+    val history = useHistory()
 
     Container(
       flex = Some(1),

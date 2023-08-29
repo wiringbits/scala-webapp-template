@@ -1,6 +1,6 @@
 package net.wiringbits.components.widgets
 
-import com.olvind.mui.muiMaterial.{components => mui}
+import com.olvind.mui.muiMaterial.components as mui
 import net.wiringbits.AppContext
 import net.wiringbits.core.I18nHooks
 import net.wiringbits.forms.SignUpFormData
@@ -8,13 +8,13 @@ import net.wiringbits.ui.components.inputs.{EmailInput, NameInput, PasswordInput
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.ErrorLabel
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.{Alignment, EdgeInsets}
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container, Title}
+import net.wiringbits.webapp.utils.slinkyUtils.facades.reactrouterdom.useHistory
 import net.wiringbits.webapp.utils.slinkyUtils.forms.StatefulFormData
 import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 import slinky.core.facade.{Fragment, Hooks}
 import slinky.core.{FunctionalComponent, KeyAddingStage, SyntheticEvent}
 import slinky.web.html.*
-import typings.reactRouterDom
 
 import scala.scalajs.js
 import scala.util.{Failure, Success}
@@ -27,7 +27,7 @@ object SignUpForm {
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val texts = I18nHooks.useMessages(props.ctx.$lang)
-    val history = reactRouterDom.mod.useHistory().asInstanceOf[js.Dynamic]
+    val history = useHistory()
     val (formData, setFormData) = Hooks.useState(
       StatefulFormData(
         SignUpFormData.initial(
@@ -63,7 +63,7 @@ object SignUpForm {
               val email = formData.data.email.inputValue
 
               setFormData(_.submitted)
-              history.push(s"/verify-email?email=${email}") // redirects to email page
+              history.push(s"/verify-email?email=$email") // redirects to email page
 
             case Failure(ex) =>
               setFormData(_.submissionFailed(ex.getMessage))

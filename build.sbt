@@ -6,7 +6,7 @@ ThisBuild / organization := "net.wiringbits"
 
 val playJson = "2.10.0-RC9"
 val sttp = "3.8.15"
-val webappUtils = "0.5.16"
+val webappUtils = "0.6.1-mui5"
 val anorm = "2.7.0"
 val enumeratum = "1.7.2"
 val scalaJavaTime = "2.5.0"
@@ -226,7 +226,7 @@ lazy val common = (crossProject(JSPlatform, JVMPlatform) in file("lib/common"))
   .jvmSettings(
     libraryDependencies ++= Seq(
       "com.typesafe.play" %% "play-json" % playJson,
-      "net.wiringbits" %% "webapp-common" % "0.6.1-mui5",
+      "net.wiringbits" %% "webapp-common" % webappUtils,
       "org.scalatest" %% "scalatest" % "3.2.16" % Test
     )
   )
@@ -238,7 +238,7 @@ lazy val common = (crossProject(JSPlatform, JVMPlatform) in file("lib/common"))
     libraryDependencies ++= Seq(
       "io.github.cquiroz" %%% "scala-java-time" % scalaJavaTime,
       "com.typesafe.play" %%% "play-json" % playJson,
-      "net.wiringbits" %%% "webapp-common" % "0.6.1-mui5",
+      "net.wiringbits" %%% "webapp-common" % webappUtils,
       "org.scalatest" %%% "scalatest" % "3.2.16" % Test,
       "com.beachape" %%% "enumeratum" % enumeratum
     )
@@ -284,16 +284,14 @@ lazy val ui = (project in file("lib/ui"))
     Test / fork := false, // sjs needs this to run tests
     stTypescriptVersion := "3.9.3",
     // material-ui is provided by a pre-packaged library
-    stIgnore ++= List("@mui/material", "@mui/styles", "@mui/icons-material"),
+    stIgnore ++= List("@mui/material", "@mui/styles", "@mui/icons-material", "react-router", "react-router-dom"),
     Compile / npmDependencies ++= Seq(
-      "@mui/material"->"5.11.15",
+      "@mui/material" -> "5.11.15",
       "@mui/styles" -> "5.11.13", // note: version 4 is not supported yet
-      "@mui/icons-material"->"5.14.3",
+      "@mui/icons-material" -> "5.14.3",
       "@types/classnames" -> "2.2.10",
       "react-router" -> "5.1.2",
-      "@types/react-router" -> "5.1.2",
-      "react-router-dom" -> "5.1.2",
-      "@types/react-router-dom" -> "5.1.2"
+      "react-router-dom" -> "5.1.2"
     ),
     stFlavour := Flavour.Slinky,
     stReactEnableTreeShaking := Selection.All,
@@ -303,7 +301,7 @@ lazy val ui = (project in file("lib/ui"))
       "io.github.cquiroz" %%% "scala-java-time" % scalaJavaTime,
       "org.scala-js" %%% "scala-js-macrotask-executor" % "1.1.1",
       "com.olvind.st-material-ui" %%% "st-material-ui-icons-slinky" % "5.11.16",
-      "net.wiringbits" %%% "slinky-utils" % "0.6.1-mui5",
+      "net.wiringbits" %%% "slinky-utils" % webappUtils,
       "org.scalatest" %%% "scalatest" % "3.2.16" % Test,
       "com.beachape" %%% "enumeratum" % enumeratum
     )
@@ -409,19 +407,16 @@ lazy val web = (project in file("web"))
     stUseScalaJsDom := true,
     Compile / stMinimize := Selection.All,
     // material-ui is provided by a pre-packaged library
-    stIgnore ++= List("@mui/material", "@mui/styles", "@mui/icons-material"),
-
+    stIgnore ++= List("@mui/material", "@mui/styles", "@mui/icons-material", "react-router", "react-router-dom"),
     Compile / npmDependencies ++= Seq(
-      "@mui/material"->"5.11.15",
+      "@mui/material" -> "5.11.15",
       "@mui/styles" -> "5.11.13", // note: version 4 is not supported yet
-      "@mui/icons-material"->"5.14.3",
-      "@emotion/styled"->"11.11.0",
-      "@emotion/react"->"11.11.1",
+      "@mui/icons-material" -> "5.14.3",
+      "@emotion/styled" -> "11.11.0",
+      "@emotion/react" -> "11.11.1",
       "@types/classnames" -> "2.2.10",
       "react-router" -> "5.1.2",
-      "@types/react-router" -> "5.1.2",
       "react-router-dom" -> "5.1.2",
-      "@types/react-router-dom" -> "5.1.2",
       "react-google-recaptcha" -> "2.1.0",
       "@types/react-google-recaptcha" -> "2.1.0"
     ),
@@ -429,7 +424,7 @@ lazy val web = (project in file("web"))
       "com.typesafe.play" %%% "play-json" % playJson,
       "com.softwaremill.sttp.client3" %%% "core" % sttp,
       "org.scala-js" %%% "scala-js-macrotask-executor" % "1.1.1",
-      "net.wiringbits" %%% "scalablytyped-facades" % "0.6.1-mui5",
+      "net.wiringbits" %%% "scalablytyped-facades" % webappUtils,
       "com.olvind.st-material-ui" %%% "st-material-ui-icons-slinky" % "5.11.16",
       "io.monix" %%% "monix-reactive" % "3.4.1",
       "com.softwaremill.sttp.tapir" %%% "tapir-sttp-client" % tapir

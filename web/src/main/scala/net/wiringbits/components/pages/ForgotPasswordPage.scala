@@ -1,19 +1,16 @@
 package net.wiringbits.components.pages
 
 import slinky.core.{FunctionalComponent, KeyAddingStage}
-import com.olvind.mui.muiMaterial.stylesCreateThemeMod.Theme
-import com.olvind.mui.muiMaterial.{components => mui}
+import com.olvind.mui.muiMaterial.components as mui
 import com.olvind.mui.react.mod.CSSProperties
-
 import net.wiringbits.components.widgets.{AppCard, ForgotPasswordForm}
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.Alignment
 import net.wiringbits.AppContext
 import net.wiringbits.core.I18nHooks
-import org.scalablytyped.runtime.StringDictionary
+import net.wiringbits.webapp.utils.slinkyUtils.facades.reactrouterdom.useHistory
 import slinky.core.facade.Fragment
 import slinky.web.html.{className, div, style}
-import typings.reactRouterDom.mod.useHistory
 import slinky.core.facade.ReactElement.jsUndefOrToElement
 
 import scala.scalajs.js
@@ -30,7 +27,7 @@ object ForgotPasswordPage {
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val texts = I18nHooks.useMessages(props.ctx.$lang)
-    val history = useHistory().asInstanceOf[js.Dynamic]
+    val history = useHistory()
 
     Container(
       flex = Some(1),

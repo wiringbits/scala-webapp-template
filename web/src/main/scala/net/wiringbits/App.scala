@@ -1,11 +1,11 @@
 package net.wiringbits
 
 import com.olvind.mui.muiMaterial.components.ThemeProvider
-import com.olvind.mui.muiMaterial.{components => mui}
+import com.olvind.mui.muiMaterial.components as mui
 import net.wiringbits.components.AppSplash
+import net.wiringbits.webapp.utils.slinkyUtils.facades.reactrouterdom.BrowserRouter
 import slinky.core.{FunctionalComponent, KeyAddingStage}
 import slinky.core.facade.ReactElement
-import typings.reactRouterDom.components as router
 
 object App {
   def apply(ctx: AppContext): KeyAddingStage =
@@ -17,7 +17,7 @@ object App {
     ThemeProvider(AppTheme.value)(
       mui.ThemeProvider(AppTheme.value)(
         mui.CssBaseline(),
-        router.BrowserRouter.basename("")(
+        BrowserRouter(basename = "")(
           AppSplash(props.ctx)(AppRouter(props.ctx): ReactElement)
         )
       )
