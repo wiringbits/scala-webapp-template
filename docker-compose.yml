@@ -5,8 +5,8 @@ version: '3.1'
 services:
   web:
     build:
-      context: .
-      dockerfile: Dockerfile.web
+      context: ..
+      dockerfile: ./Dockerfile.web
     working_dir: /root/app
     extra_hosts:
       - "host.docker.internal:host-gateway"
