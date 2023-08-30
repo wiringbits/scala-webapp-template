@@ -35,17 +35,11 @@ object UserInfo {
     }
 
     def renderBody() = {
-      val form = {
-        AsyncComponent.component[GetCurrentUser.Response](
-          AsyncComponent.Props(
-            fetch = () => props.ctx.api.client.currentUser,
-            render = response => EditUserForm(props.ctx, props.user, response, onSaveClick),
-            progressIndicator = () => loader
-          )
-        )
-      }
-
-      form
+      AsyncComponent[GetCurrentUser.Response](
+        fetch = () => props.ctx.api.client.currentUser,
+        render = response => EditUserForm(props.ctx, props.user, response, onSaveClick),
+        progressIndicator = () => loader
+      )
     }
 
     renderBody()

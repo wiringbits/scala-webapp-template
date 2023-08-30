@@ -1,10 +1,10 @@
 package net.wiringbits.components.widgets
 
+import com.olvind.mui.csstype.mod.Property.FlexDirection
 import com.olvind.mui.muiMaterial.stylesCreateThemeMod.Theme
-import com.olvind.mui.muiMaterial.{components => mui}
+import com.olvind.mui.muiMaterial.components as mui
 import com.olvind.mui.react.mod.CSSProperties
 import com.olvind.mui.muiMaterial.mod.PropTypes.Color
-
 import net.wiringbits.AppContext
 import net.wiringbits.api.models.GetUserLogs
 import net.wiringbits.api.utils.Formatter
@@ -43,7 +43,7 @@ object LogList {
       child = Fragment(
         Container(
           minWidth = Some("100%"),
-          flexDirection = Container.FlexDirection.row,
+          flexDirection = FlexDirection.row,
           alignItems = Container.Alignment.center,
           justifyContent = Container.Alignment.spaceBetween,
           child = Fragment(

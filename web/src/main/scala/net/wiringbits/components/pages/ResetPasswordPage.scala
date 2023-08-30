@@ -7,7 +7,7 @@ import slinky.core.facade.Fragment
 import com.olvind.mui.muiMaterial.stylesCreateThemeMod.Theme
 import com.olvind.mui.muiMaterial.components as mui
 import com.olvind.mui.react.mod.CSSProperties
-import com.olvind.mui.csstype.mod.Property.TextAlign
+import com.olvind.mui.csstype.mod.Property.{FlexDirection, TextAlign}
 import net.wiringbits.common.models.UserToken
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container
 import net.wiringbits.AppContext
@@ -50,7 +50,7 @@ object ResetPasswordPage {
             ResetPasswordForm(props.ctx, userToken),
             Container(
               margin = Container.EdgeInsets.top(8),
-              flexDirection = Container.FlexDirection.row,
+              flexDirection = FlexDirection.row,
               alignItems = Container.Alignment.center,
               justifyContent = Container.Alignment.center,
               child = Fragment(

@@ -111,7 +111,7 @@ object Footer {
 
       Container(
         padding = Container.EdgeInsets.all(margin),
-        flexDirection = Container.FlexDirection.row,
+        flexDirection = FlexDirection.row,
         child = Fragment(
           Container(
             margin = Container.EdgeInsets.right(margin / 2),
@@ -121,7 +121,7 @@ object Footer {
           Container(
             flex = Some(1),
             margin = Container.EdgeInsets.left(margin / 2),
-            flexDirection = Container.FlexDirection.row,
+            flexDirection = FlexDirection.row,
             child = Fragment(
               projects,
               contact
