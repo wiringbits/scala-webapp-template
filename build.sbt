@@ -6,7 +6,7 @@ ThisBuild / organization := "net.wiringbits"
 
 val playJson = "2.10.0-RC9"
 val sttp = "3.8.15"
-val webappUtils = "0.6.1-mui5"
+val webappUtils = "0.7.0"
 val anorm = "2.7.0"
 val enumeratum = "1.7.2"
 val scalaJavaTime = "2.5.0"
@@ -158,14 +158,14 @@ lazy val reactNpmDeps: Project => Project =
     stTypescriptVersion := "3.9.3",
     stIgnore += "react-proxy",
     Compile / npmDependencies ++= Seq(
-      "react" -> "17.0.0",
-      "react-dom" -> "17.0.0",
-      "@types/react" -> "17.0.0",
-      "@types/react-dom" -> "17.0.0",
+      "react" -> "18.2.0",
+      "@types/react" -> "18.0.33",
+      "react-dom" -> "18.2.0",
+      "@types/react-dom" -> "18.0.11",
       "csstype" -> "2.6.11",
-      "@types/prop-types" -> "15.7.3",
-      "react-proxy" -> "1.1.8"
-    )
+      "react-proxy" -> "1.1.8",
+      "@types/prop-types" -> "15.7.3"
+    ),
   )
 
 lazy val withCssLoading: Project => Project =
@@ -284,12 +284,21 @@ lazy val ui = (project in file("lib/ui"))
     Test / fork := false, // sjs needs this to run tests
     stTypescriptVersion := "3.9.3",
     // material-ui is provided by a pre-packaged library
-    stIgnore ++= List("@mui/material", "@mui/styles", "@mui/icons-material", "react-router", "react-router-dom"),
+    stIgnore ++= List(
+      "@mui/material",
+      "@mui/icons-material",
+      "@mui/joy",
+      "@emotion/react",
+      "@emotion/styled",
+      "react-router",
+      "react-router-dom"
+    ),
     Compile / npmDependencies ++= Seq(
-      "@mui/material" -> "5.11.15",
-      "@mui/styles" -> "5.11.13", // note: version 4 is not supported yet
-      "@mui/icons-material" -> "5.14.3",
-      "@types/classnames" -> "2.2.10",
+      "@mui/material" -> "5.11.16",
+      "@mui/icons-material" -> "5.11.16",
+      "@mui/joy" -> "5.0.0-alpha.74",
+      "@emotion/react" -> "11.10.6",
+      "@emotion/styled" -> "11.10.6",
       "react-router" -> "5.1.2",
       "react-router-dom" -> "5.1.2"
     ),
@@ -407,14 +416,13 @@ lazy val web = (project in file("web"))
     stUseScalaJsDom := true,
     Compile / stMinimize := Selection.All,
     // material-ui is provided by a pre-packaged library
-    stIgnore ++= List("@mui/material", "@mui/styles", "@mui/icons-material", "react-router", "react-router-dom"),
+    stIgnore ++= List("@mui/material", "@mui/icons-material", "@mui/joy", "react-router", "react-router-dom"),
     Compile / npmDependencies ++= Seq(
-      "@mui/material" -> "5.11.15",
-      "@mui/styles" -> "5.11.13", // note: version 4 is not supported yet
-      "@mui/icons-material" -> "5.14.3",
-      "@emotion/styled" -> "11.11.0",
-      "@emotion/react" -> "11.11.1",
-      "@types/classnames" -> "2.2.10",
+      "@mui/material" -> "5.11.16",
+      "@mui/icons-material" -> "5.11.16",
+      "@mui/joy" -> "5.0.0-alpha.74",
+      "@emotion/styled" -> "11.10.6",
+      "@emotion/react" -> "11.10.6",
       "react-router" -> "5.1.2",
       "react-router-dom" -> "5.1.2",
       "react-google-recaptcha" -> "2.1.0",
@@ -424,7 +432,6 @@ lazy val web = (project in file("web"))
       "com.typesafe.play" %%% "play-json" % playJson,
       "com.softwaremill.sttp.client3" %%% "core" % sttp,
       "org.scala-js" %%% "scala-js-macrotask-executor" % "1.1.1",
-      "net.wiringbits" %%% "scalablytyped-facades" % webappUtils,
       "com.olvind.st-material-ui" %%% "st-material-ui-icons-slinky" % "5.11.16",
       "io.monix" %%% "monix-reactive" % "3.4.1",
       "com.softwaremill.sttp.tapir" %%% "tapir-sttp-client" % tapir

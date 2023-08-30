@@ -1,5 +1,6 @@
 package net.wiringbits.components.pages
 
+import com.olvind.mui.csstype.mod.Property.FlexDirection
 import slinky.core.{FunctionalComponent, KeyAddingStage}
 import com.olvind.mui.muiMaterial.components as mui
 import com.olvind.mui.react.mod.CSSProperties
@@ -43,7 +44,7 @@ object ForgotPasswordPage {
             ForgotPasswordForm(props.ctx),
             Container(
               margin = Container.EdgeInsets.top(8),
-              flexDirection = Container.FlexDirection.row,
+              flexDirection = FlexDirection.row,
               alignItems = Container.Alignment.center,
               justifyContent = Container.Alignment.center,
               child = Fragment(
