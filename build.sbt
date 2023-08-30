@@ -159,14 +159,13 @@ lazy val reactNpmDeps: Project => Project =
     stIgnore += "react-proxy",
     Compile / npmDependencies ++= Seq(
       "react" -> "18.2.0",
-      "react-dom" -> "18.2.0",
-      "csstype" -> "2.6.11",
-      "react-proxy" -> "1.1.8"
-    ),
-    Compile / npmDevDependencies ++= Seq(
       "@types/react" -> "18.0.33",
-      "@types/react-dom" -> "18.0.11"
-    )
+      "react-dom" -> "18.2.0",
+      "@types/react-dom" -> "18.0.11",
+      "csstype" -> "2.6.11",
+      "react-proxy" -> "1.1.8",
+      "@types/prop-types" -> "15.7.3"
+    ),
   )
 
 lazy val withCssLoading: Project => Project =
@@ -426,9 +425,7 @@ lazy val web = (project in file("web"))
       "@emotion/react" -> "11.10.6",
       "react-router" -> "5.1.2",
       "react-router-dom" -> "5.1.2",
-      "react-google-recaptcha" -> "2.1.0"
-    ),
-    Compile / npmDevDependencies ++= Seq(
+      "react-google-recaptcha" -> "2.1.0",
       "@types/react-google-recaptcha" -> "2.1.0"
     ),
     libraryDependencies ++= Seq(
