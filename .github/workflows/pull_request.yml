@@ -47,9 +47,6 @@ jobs:
       - name: Run tests
         run: CI=true sbt test
 
-      - name: Prepare admin build
-        run: sbt admin/build
-
       - name: Prepare web build
         run: sbt web/build
 
