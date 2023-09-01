@@ -6,7 +6,7 @@ ThisBuild / organization := "net.wiringbits"
 
 val playJson = "2.10.0-RC9"
 val sttp = "3.8.15"
-val webappUtils = "0.7.0"
+val webappUtils = "0.7.2"
 val anorm = "2.7.0"
 val enumeratum = "1.7.2"
 val scalaJavaTime = "2.5.0"
@@ -165,7 +165,7 @@ lazy val reactNpmDeps: Project => Project =
       "csstype" -> "2.6.11",
       "react-proxy" -> "1.1.8",
       "@types/prop-types" -> "15.7.3"
-    ),
+    )
   )
 
 lazy val withCssLoading: Project => Project =
