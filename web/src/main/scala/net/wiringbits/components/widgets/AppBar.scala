@@ -11,7 +11,6 @@ import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{Containe
 import net.wiringbits.webapp.utils.slinkyUtils.core.MediaQueryHooks
 import slinky.core.facade.{Fragment, Hooks, ReactElement}
 import slinky.core.{FunctionalComponent, KeyAddingStage}
-import slinky.web.html.*
 
 object AppBar {
   def apply(ctx: AppContext): KeyAddingStage =

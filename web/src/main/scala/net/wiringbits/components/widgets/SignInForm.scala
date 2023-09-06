@@ -16,7 +16,7 @@ import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 import slinky.core.facade.{Fragment, Hooks, ReactElement}
 import slinky.core.{FunctionalComponent, KeyAddingStage, SyntheticEvent}
-import slinky.web.html.*
+import slinky.web.html.{form, onSubmit}
 
 import scala.scalajs.js
 import scala.util.{Failure, Success}
@@ -145,9 +145,7 @@ object SignInForm {
         .`type`("submit")
     }
 
-    form(
-      onSubmit := (handleSubmit(_))
-    )(
+    form(onSubmit := (handleSubmit(_)))(
       Container(
         alignItems = Container.Alignment.center,
         justifyContent = Container.Alignment.center,

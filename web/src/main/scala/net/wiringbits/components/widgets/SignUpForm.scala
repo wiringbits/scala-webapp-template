@@ -13,7 +13,7 @@ import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 import slinky.core.facade.{Fragment, Hooks}
 import slinky.core.{FunctionalComponent, KeyAddingStage, SyntheticEvent}
-import slinky.web.html.*
+import slinky.web.html.{form, onSubmit}
 
 import scala.scalajs.js
 import scala.util.{Failure, Success}

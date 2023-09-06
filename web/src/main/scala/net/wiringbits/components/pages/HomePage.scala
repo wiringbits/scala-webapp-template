@@ -56,8 +56,8 @@ object HomePage {
       img(src := srcImg, alt := altImg, className := classImg, style := screenshotStyling)
 
     val homeFragment = Fragment(
-      mui
-        .Typography(texts.homePage, className := "homeTitle", style := homeTitleStyling)
+      mui.Typography
+        .sx(homeTitleStyling)(texts.homePage)
         .variant("h4")
         .color("inherit"),
       paragraph(texts.homePageDescription),

@@ -11,7 +11,6 @@ import net.wiringbits.webapp.utils.slinkyUtils.facades.reactrouterdom.useHistory
 import slinky.core.facade.Fragment
 import slinky.core.facade.ReactElement.jsUndefOrToElement
 import slinky.core.{FunctionalComponent, KeyAddingStage}
-import slinky.web.html.div
 
 import scala.scalajs.js
 object ForgotPasswordPage {
