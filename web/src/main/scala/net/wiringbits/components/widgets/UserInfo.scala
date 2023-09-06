@@ -1,16 +1,14 @@
 package net.wiringbits.components.widgets
 
-import com.olvind.mui.muiMaterial.{components => mui}
+import com.olvind.mui.muiMaterial.components as mui
 import net.wiringbits.AppContext
 import net.wiringbits.api.models.GetCurrentUser
 import net.wiringbits.core.I18nHooks
 import net.wiringbits.models.User
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.AsyncComponent
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container}
-import net.wiringbits.AppContext
-import net.wiringbits.core.I18nHooks
-import slinky.core.{FunctionalComponent, KeyAddingStage}
 import slinky.core.facade.Fragment
+import slinky.core.{FunctionalComponent, KeyAddingStage}
 
 object UserInfo {
   def apply(ctx: AppContext, user: User): KeyAddingStage =

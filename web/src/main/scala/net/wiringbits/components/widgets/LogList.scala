@@ -1,25 +1,23 @@
 package net.wiringbits.components.widgets
 
 import com.olvind.mui.csstype.mod.Property.FlexDirection
-import com.olvind.mui.muiMaterial.stylesCreateThemeMod.Theme
 import com.olvind.mui.muiMaterial.components as mui
-import com.olvind.mui.react.mod.CSSProperties
 import com.olvind.mui.muiMaterial.mod.PropTypes.Color
 import net.wiringbits.AppContext
 import net.wiringbits.api.models.GetUserLogs
 import net.wiringbits.api.utils.Formatter
 import net.wiringbits.core.I18nHooks
+import net.wiringbits.webapp.utils.slinkyUtils.Utils.CSSPropertiesUtils
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{Container, Subtitle}
-import org.scalablytyped.runtime.StringDictionary
-import slinky.core.{FunctionalComponent, KeyAddingStage}
 import slinky.core.facade.Fragment
+import slinky.core.{FunctionalComponent, KeyAddingStage}
 
 object LogList {
   def apply(ctx: AppContext, response: GetUserLogs.Response, forceRefresh: () => Unit): KeyAddingStage =
     component(Props(ctx = ctx, response = response, forceRefresh = forceRefresh))
 
   case class Props(ctx: AppContext, response: GetUserLogs.Response, forceRefresh: () => Unit)
-  val styling = new CSSProperties {
+  private val styling = new CSSPropertiesUtils {
     width = "100%"
   }
 
@@ -56,8 +54,7 @@ object LogList {
         ),
         mui
           .List(items)
-          .className("list")
-          .style(styling)
+          .sx(styling)
           .dense(true)
       )
     )

@@ -1,16 +1,13 @@
 package net.wiringbits.components.pages
 
-import com.olvind.mui.muiMaterial.stylesCreateThemeMod.Theme
-import com.olvind.mui.muiMaterial.{components => mui}
-import com.olvind.mui.react.mod.CSSProperties
 import com.olvind.mui.csstype.mod.Property.TextAlign
+import com.olvind.mui.muiMaterial.components as mui
 import net.wiringbits.AppContext
 import net.wiringbits.core.I18nHooks
+import net.wiringbits.webapp.utils.slinkyUtils.Utils.CSSPropertiesUtils
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.*
-import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.Alignment
-import org.scalablytyped.runtime.StringDictionary
-import slinky.core.{FunctionalComponent, KeyAddingStage}
 import slinky.core.facade.{Fragment, ReactElement}
+import slinky.core.{FunctionalComponent, KeyAddingStage}
 import slinky.web.html.*
 
 object HomePage {
@@ -19,22 +16,18 @@ object HomePage {
 
   case class Props(ctx: AppContext)
 
-  val homeContainerStyling = new CSSProperties {
+  private val homeContainerStyling = new CSSPropertiesUtils {
     maxWidth = 1300
     width = "100%"
   }
-  val homeTitleStyling = new CSSProperties {
+
+  private val homeTitleStyling = new CSSPropertiesUtils {
     textAlign = TextAlign.center
     margin = "8px 0"
 
   }
-  val snippetStyling = new CSSProperties {
-    maxWidth = 800
-    width = "100%"
-    display = "block"
-    margin = "1em auto"
-  }
-  val screenshotStyling = new CSSProperties {
+
+  private val screenshotStyling = new CSSPropertiesUtils {
     maxWidth = 1200
     width = "100%"
     display = "block"
@@ -119,15 +112,13 @@ object HomePage {
 
     Container(
       flex = Some(1),
-      alignItems = Alignment.center,
-      child = div(className := "homeContainer", style := homeContainerStyling)(
-        Fragment(
-          homeFragment,
-          userProfileFragment,
-          swaggerFragment,
-          dataLoadingFragment,
-          simpleArchitectureFragment
-        )
+      alignItems = Container.Alignment.center,
+      child = mui.Box.sx(homeContainerStyling)(
+        homeFragment,
+        userProfileFragment,
+        swaggerFragment,
+        dataLoadingFragment,
+        simpleArchitectureFragment
       )
     )
   }

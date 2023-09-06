@@ -1,26 +1,24 @@
 package net.wiringbits.components.widgets
 
-import com.olvind.mui.muiMaterial.components as mui
-import com.olvind.mui.react.mod.CSSProperties
 import com.olvind.mui.csstype.mod.Property.FlexDirection
+import com.olvind.mui.muiMaterial.components as mui
 import com.olvind.mui.muiMaterial.mod.PropTypes.Color
 import com.olvind.mui.react.components.Fragment
+import com.olvind.mui.react.mod.CSSProperties
 import net.wiringbits.AppContext
 import net.wiringbits.common.models.Email
 import net.wiringbits.core.I18nHooks
 import net.wiringbits.forms.ResendVerifyEmailFormData
 import net.wiringbits.ui.components.inputs.EmailInput
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.ErrorLabel
-import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.{Alignment, EdgeInsets}
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container, Title}
 import net.wiringbits.webapp.utils.slinkyUtils.facades.reactrouterdom.useHistory
 import net.wiringbits.webapp.utils.slinkyUtils.forms.StatefulFormData
 import org.scalajs.dom
 import org.scalajs.dom.URLSearchParams
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
-import slinky.core.{FunctionalComponent, KeyAddingStage, SyntheticEvent}
 import slinky.core.facade.Hooks
-import slinky.core.{FunctionalComponent, SyntheticEvent}
+import slinky.core.{FunctionalComponent, KeyAddingStage, SyntheticEvent}
 import slinky.web.html.*
 
 import scala.scalajs.js
@@ -83,7 +81,7 @@ object ResendVerifyEmailForm {
 
     val emailInput = Container(
       minWidth = Some("100%"),
-      margin = EdgeInsets.bottom(8),
+      margin = Container.EdgeInsets.bottom(8),
       child = EmailInput.component(
         EmailInput.Props(
           formData.data.email,
@@ -107,7 +105,7 @@ object ResendVerifyEmailForm {
         if (formData.isSubmitting) {
           Fragment(
             CircularLoader(),
-            Container(margin = EdgeInsets.left(8), child = texts.loading)
+            Container(margin = Container.EdgeInsets.left(8), child = texts.loading)
           )
         } else Fragment(texts.resendEmail)
 
@@ -126,8 +124,8 @@ object ResendVerifyEmailForm {
         .elevation(1)(
           Container(
             minWidth = Some("300px"),
-            alignItems = Alignment.center,
-            padding = EdgeInsets.all(16),
+            alignItems = Container.Alignment.center,
+            padding = Container.EdgeInsets.all(16),
             child = Fragment(
               Title(texts.resendEmail),
               emailInput,
@@ -135,8 +133,8 @@ object ResendVerifyEmailForm {
               error,
               Container(
                 minWidth = Some("100%"),
-                margin = EdgeInsets.top(16),
-                alignItems = Alignment.center,
+                margin = Container.EdgeInsets.top(16),
+                alignItems = Container.Alignment.center,
                 child = resendVerifyEmailButton
               )
             )

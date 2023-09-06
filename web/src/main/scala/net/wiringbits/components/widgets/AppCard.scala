@@ -1,15 +1,10 @@
 package net.wiringbits.components.widgets
 
-import com.olvind.mui.muiMaterial.stylesCreateThemeMod.Theme
-import com.olvind.mui.muiMaterial.{components => mui}
-import com.olvind.mui.react.mod.CSSProperties
 import com.olvind.mui.csstype.mod.Property.FlexDirection
-import com.olvind.mui.muiIconsMaterial.{components => muiIcons}
-
-import org.scalablytyped.runtime.StringDictionary
-import slinky.core.{FunctionalComponent, KeyAddingStage}
+import com.olvind.mui.muiMaterial.components as mui
+import net.wiringbits.webapp.utils.slinkyUtils.Utils.CSSPropertiesUtils
 import slinky.core.facade.{Fragment, ReactElement}
-import slinky.web.html.*
+import slinky.core.{FunctionalComponent, KeyAddingStage}
 
 import scala.scalajs.js
 
@@ -19,41 +14,42 @@ object AppCard {
 
   case class Props(child: ReactElement, title: Option[String] = None, centerTitle: Boolean = false)
 
-  val appCardStyling = new CSSProperties {
+  private val appCardStyling = new CSSPropertiesUtils {
     width = "100%"
     display = "flex"
     flexDirection = FlexDirection.column
     border = "1px solid rgba(0, 0, 0, 0.12)"
     overflow = "hidden"
   }
-  val appCardHeadStyling = new CSSProperties {
+  private val appCardHeadStyling = new CSSPropertiesUtils {
     padding = "16px 16px 0 16px"
   }
-  val appCardBodyStyling = new CSSProperties {
+
+  private val appCardBodyStyling = new CSSPropertiesUtils {
     padding = "25px 16px"
   }
-  val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
 
-    val head = props.title match {
+  val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
+    val head: ReactElement = props.title match {
       case Some(title) =>
-        val textStyle = js.Dynamic.literal(
-          textAlign = if (props.centerTitle) "center" else "left",
+        val textStyle = new CSSPropertiesUtils {
+          textAlign = if (props.centerTitle) "center" else "left"
           fontWeight = 700
-        )
-        Fragment(
-          div(className := "appCardHead", style := appCardHeadStyling)(
-            mui
-              .Typography(style := textStyle, title)
-              .variant("h5")
-              .color("inherit")
-          )
+        }
+
+        mui.Box.sx(appCardHeadStyling)(
+          mui
+            .Typography(title)
+            .sx(textStyle)
+            .variant("h5")
+            .color("inherit")
         )
       case None => Fragment()
     }
-    val body = div(className := "appCardBody", style := appCardBodyStyling)(props.child)
+    val body = mui.Box.sx(appCardBodyStyling)(props.child)
 
-    mui
-      .Paper(className := "appCard", style := appCardStyling)(head, body)
-      .elevation(0)
+    mui.Paper
+      .sx(appCardStyling)
+      .elevation(0)(head, body)
   }
 }

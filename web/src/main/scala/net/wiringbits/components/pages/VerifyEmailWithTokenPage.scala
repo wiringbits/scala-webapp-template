@@ -1,21 +1,17 @@
 package net.wiringbits.components.pages
 
-import com.olvind.mui.propTypes
-import com.olvind.mui.muiMaterial.stylesCreateThemeMod.Theme
-import com.olvind.mui.muiMaterial.components as mui
-import com.olvind.mui.react.mod.CSSProperties
 import com.olvind.mui.csstype.mod.Property.{FlexDirection, TextAlign}
+import com.olvind.mui.muiMaterial.components as mui
 import net.wiringbits.AppContext
 import net.wiringbits.api.models.VerifyEmail
 import net.wiringbits.common.models.UserToken
 import net.wiringbits.core.I18nHooks
+import net.wiringbits.webapp.utils.slinkyUtils.Utils.CSSPropertiesUtils
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container}
 import net.wiringbits.webapp.utils.slinkyUtils.facades.reactrouterdom.{useHistory, useParams}
-import org.scalablytyped.runtime.StringDictionary
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
-import slinky.core.{FunctionalComponent, KeyAddingStage}
 import slinky.core.facade.{Fragment, Hooks}
-import slinky.web.html.{className, div, style}
+import slinky.core.{FunctionalComponent, KeyAddingStage}
 
 import scala.scalajs.js
 import scala.scalajs.js.timers.setTimeout
@@ -34,7 +30,7 @@ object VerifyEmailWithTokenPage {
       message: String
   )
 
-  val emailPageStyling: CSSProperties = new CSSProperties {
+  private val emailPageStyling = new CSSPropertiesUtils {
     flex = 1
     display = "flex"
     flexDirection = FlexDirection.column
@@ -43,7 +39,7 @@ object VerifyEmailWithTokenPage {
     justifyContent = "center"
   }
 
-  val emailTitleStyling: CSSProperties = new CSSProperties {
+  private val emailTitleStyling = new CSSPropertiesUtils {
     fontWeight = 600
   }
 
@@ -99,12 +95,10 @@ object VerifyEmailWithTokenPage {
         )
       }
 
-    div(className := "emailCodePage", style := emailPageStyling)(
-      Fragment(
-        mui.Typography(state.title).variant("h5").className("emailTitle").style(emailTitleStyling),
-        mui.Typography(state.message).variant("h6"),
-        loading
-      )
+    mui.Box.sx(emailPageStyling)(
+      mui.Typography(state.title).variant("h5").className("emailTitle").sx(emailTitleStyling),
+      mui.Typography(state.message).variant("h6"),
+      loading
     )
   }
 
@@ -112,8 +106,6 @@ object VerifyEmailWithTokenPage {
     alignItems = Container.Alignment.center,
     justifyContent = Container.Alignment.center,
     padding = Container.EdgeInsets.vertical(16),
-    child = Fragment(
-      CircularLoader(50)
-    )
+    child = CircularLoader(50)
   )
 }

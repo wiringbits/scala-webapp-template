@@ -1,7 +1,7 @@
 package net.wiringbits.components.widgets
 
-import com.olvind.mui.muiMaterial.mod.PropTypes.Color
 import com.olvind.mui.muiMaterial.components as mui
+import com.olvind.mui.muiMaterial.mod.PropTypes.Color
 import net.wiringbits.AppContext
 import net.wiringbits.common.ErrorMessages
 import net.wiringbits.core.I18nHooks
@@ -9,7 +9,6 @@ import net.wiringbits.forms.SignInFormData
 import net.wiringbits.models.User
 import net.wiringbits.ui.components.inputs.{EmailInput, PasswordInput}
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.ErrorLabel
-import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.{Alignment, EdgeInsets}
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container}
 import net.wiringbits.webapp.utils.slinkyUtils.facades.reactrouterdom.useHistory
 import net.wiringbits.webapp.utils.slinkyUtils.forms.StatefulFormData
@@ -75,7 +74,7 @@ object SignInForm {
 
     val emailInput = Container(
       minWidth = Some("100%"),
-      margin = EdgeInsets.bottom(8),
+      margin = Container.EdgeInsets.bottom(8),
       child = EmailInput
         .component(
           EmailInput.Props(
@@ -88,7 +87,7 @@ object SignInForm {
 
     val passwordInput = Container(
       minWidth = Some("100%"),
-      margin = EdgeInsets.bottom(16),
+      margin = Container.EdgeInsets.bottom(16),
       child = PasswordInput
         .component(
           PasswordInput.Props(
@@ -116,7 +115,7 @@ object SignInForm {
 
     val error = formData.firstValidationError.map { errorMessage =>
       Container(
-        alignItems = Alignment.center,
+        alignItems = Container.Alignment.center,
         margin = Container.EdgeInsets.top(16),
         child = Fragment(
           ErrorLabel(errorMessage),
@@ -132,7 +131,7 @@ object SignInForm {
         if (formData.isSubmitting)
           Fragment(
             CircularLoader(),
-            Container(margin = EdgeInsets.left(8), child = texts.loading)
+            Container(margin = Container.EdgeInsets.left(8), child = texts.loading)
           )
         else
           Fragment(texts.login)
@@ -150,8 +149,8 @@ object SignInForm {
       onSubmit := (handleSubmit(_))
     )(
       Container(
-        alignItems = Alignment.center,
-        justifyContent = Alignment.center,
+        alignItems = Container.Alignment.center,
+        justifyContent = Container.Alignment.center,
         child = Fragment(
           emailInput,
           passwordInput,
@@ -159,8 +158,8 @@ object SignInForm {
           error,
           Container(
             minWidth = Some("100%"),
-            margin = EdgeInsets.top(16),
-            alignItems = Alignment.center,
+            margin = Container.EdgeInsets.top(16),
+            alignItems = Container.Alignment.center,
             child = loginButton
           )
         )
