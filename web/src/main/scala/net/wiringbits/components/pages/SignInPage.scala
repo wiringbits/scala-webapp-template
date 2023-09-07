@@ -1,19 +1,15 @@
 package net.wiringbits.components.pages
 
-import com.olvind.mui.muiMaterial.stylesCreateThemeMod.Theme
+import com.olvind.mui.csstype.mod.Property.FlexDirection
 import com.olvind.mui.muiMaterial.components as mui
-import com.olvind.mui.react.mod.CSSProperties
-import com.olvind.mui.csstype.mod.Property.{FlexDirection, TextAlign}
-import slinky.core.{FunctionalComponent, KeyAddingStage}
-import net.wiringbits.components.widgets.*
-import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.{Alignment, EdgeInsets}
-import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{Container, Title}
 import net.wiringbits.AppContext
+import net.wiringbits.components.widgets.*
 import net.wiringbits.core.I18nHooks
+import net.wiringbits.webapp.utils.slinkyUtils.Utils.CSSPropertiesUtils
+import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{Container, Title}
 import net.wiringbits.webapp.utils.slinkyUtils.facades.reactrouterdom.useHistory
-import org.scalablytyped.runtime.StringDictionary
 import slinky.core.facade.Fragment
-import slinky.web.html.{className, div, style}
+import slinky.core.{FunctionalComponent, KeyAddingStage}
 
 import scala.scalajs.js
 
@@ -23,7 +19,7 @@ object SignInPage {
 
   case class Props(ctx: AppContext)
 
-  val styling = new CSSProperties {
+  private val styling = new CSSPropertiesUtils {
     maxWidth = 350
     width = "100%"
   }
@@ -34,21 +30,21 @@ object SignInPage {
 
     Container(
       flex = Some(1),
-      justifyContent = Alignment.center,
-      alignItems = Alignment.center,
-      child = div(className := "signInPageFormContainer", style := styling)(
+      justifyContent = Container.Alignment.center,
+      alignItems = Container.Alignment.center,
+      child = mui.Box.sx(styling)(
         AppCard(
           Fragment(
             Container(
-              justifyContent = Alignment.center,
-              alignItems = Alignment.center,
+              justifyContent = Container.Alignment.center,
+              alignItems = Container.Alignment.center,
               child = Title(texts.signIn)
             ),
             Container(
               flex = Some(1),
-              alignItems = Alignment.center,
-              justifyContent = Alignment.center,
-              padding = EdgeInsets.top(16),
+              alignItems = Container.Alignment.center,
+              justifyContent = Container.Alignment.center,
+              padding = Container.EdgeInsets.top(16),
               child = SignInForm(props.ctx)
             ),
             Container(

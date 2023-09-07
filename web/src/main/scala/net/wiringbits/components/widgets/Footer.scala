@@ -1,27 +1,23 @@
 package net.wiringbits.components.widgets
 
-import com.olvind.mui.muiMaterial.stylesCreateThemeMod.Theme
-import com.olvind.mui.muiMaterial.{components => mui}
-import com.olvind.mui.react.mod.CSSProperties
 import com.olvind.mui.csstype.mod.Property.FlexDirection
+import com.olvind.mui.muiMaterial.components as mui
 import com.olvind.mui.muiMaterial.mod.PropTypes.Color
-import com.olvind.mui.muiIconsMaterial.{components => muiIcons}
-
 import net.wiringbits.AppContext
 import net.wiringbits.core.I18nHooks
+import net.wiringbits.webapp.utils.slinkyUtils.Utils.CSSPropertiesUtils
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container
-import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.EdgeInsets
 import net.wiringbits.webapp.utils.slinkyUtils.core.MediaQueryHooks
-import org.scalablytyped.runtime.StringDictionary
-import slinky.core.{FunctionalComponent, KeyAddingStage}
 import slinky.core.facade.Fragment
+import slinky.core.{FunctionalComponent, KeyAddingStage}
 
 object Footer {
   def apply(ctx: AppContext): KeyAddingStage =
     component(Props(ctx = ctx))
 
   case class Props(ctx: AppContext)
-  val styling = new CSSProperties {
+
+  private val styling = new CSSPropertiesUtils {
     color = "#FFF"
     backgroundColor = "#222"
     borderRadius = 0
@@ -34,7 +30,7 @@ object Footer {
     val isMobileOrTablet = MediaQueryHooks.useIsMobileOrTablet()
 
     val appName = Container(
-      margin = EdgeInsets.bottom(margin),
+      margin = Container.EdgeInsets.bottom(margin),
       child = mui.Typography(texts.appName).variant("h4").color(Color.inherit)
     )
     val appDescription =
@@ -42,7 +38,7 @@ object Footer {
 
     def title(text: String) =
       Container(
-        margin = EdgeInsets.bottom(margin),
+        margin = Container.EdgeInsets.bottom(margin),
         child = mui.Typography(text).variant("h5").color(Color.inherit)
       )
 
@@ -138,8 +134,6 @@ object Footer {
           copyright
         )
       )
-      .component("footer")
-      .className("footer")
-      .style(styling)
+      .sx(styling)
   }
 }

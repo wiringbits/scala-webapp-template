@@ -3,7 +3,6 @@ package net.wiringbits.components
 import net.wiringbits.AppContext
 import net.wiringbits.core.I18nHooks
 import net.wiringbits.models.User
-import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.Alignment
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{Container, Subtitle, Title}
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 import slinky.core.FunctionalComponent
@@ -50,8 +49,8 @@ object AppSplash {
     } else {
       Container(
         flex = Some(1),
-        alignItems = Alignment.center,
-        justifyContent = Alignment.center,
+        alignItems = Container.Alignment.center,
+        justifyContent = Container.Alignment.center,
         child = Fragment(
           Title(texts.appName),
           Subtitle(texts.loading)

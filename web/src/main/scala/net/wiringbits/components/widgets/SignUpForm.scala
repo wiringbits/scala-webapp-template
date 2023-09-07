@@ -6,7 +6,6 @@ import net.wiringbits.core.I18nHooks
 import net.wiringbits.forms.SignUpFormData
 import net.wiringbits.ui.components.inputs.{EmailInput, NameInput, PasswordInput}
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.ErrorLabel
-import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.{Alignment, EdgeInsets}
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container, Title}
 import net.wiringbits.webapp.utils.slinkyUtils.facades.reactrouterdom.useHistory
 import net.wiringbits.webapp.utils.slinkyUtils.forms.StatefulFormData
@@ -14,7 +13,7 @@ import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 import slinky.core.facade.{Fragment, Hooks}
 import slinky.core.{FunctionalComponent, KeyAddingStage, SyntheticEvent}
-import slinky.web.html.*
+import slinky.web.html.{form, onSubmit}
 
 import scala.scalajs.js
 import scala.util.{Failure, Success}
@@ -75,7 +74,7 @@ object SignUpForm {
 
     val nameInput = Container(
       minWidth = Some("100%"),
-      margin = EdgeInsets.bottom(8),
+      margin = Container.EdgeInsets.bottom(8),
       child = NameInput.component(
         NameInput.Props(
           formData.data.name,
@@ -87,7 +86,7 @@ object SignUpForm {
 
     val emailInput = Container(
       minWidth = Some("100%"),
-      margin = EdgeInsets.bottom(8),
+      margin = Container.EdgeInsets.bottom(8),
       child = EmailInput.component(
         EmailInput.Props(
           formData.data.email,
@@ -99,7 +98,7 @@ object SignUpForm {
 
     val passwordInput = Container(
       minWidth = Some("100%"),
-      margin = EdgeInsets.bottom(16),
+      margin = Container.EdgeInsets.bottom(16),
       child = PasswordInput
         .component(
           PasswordInput.Props(
@@ -112,7 +111,7 @@ object SignUpForm {
 
     val repeatPasswordInput = Container(
       minWidth = Some("100%"),
-      margin = EdgeInsets.bottom(16),
+      margin = Container.EdgeInsets.bottom(16),
       child = PasswordInput
         .component(
           PasswordInput.Props(
@@ -137,7 +136,7 @@ object SignUpForm {
         if (formData.isSubmitting) {
           Fragment(
             CircularLoader(),
-            Container(margin = EdgeInsets.left(8), child = texts.loading)
+            Container(margin = Container.EdgeInsets.left(8), child = texts.loading)
           )
         } else Fragment(texts.createAccount)
 
@@ -157,8 +156,8 @@ object SignUpForm {
         .elevation(1)(
           Container(
             minWidth = Some("300px"),
-            alignItems = Alignment.center,
-            padding = EdgeInsets.all(16),
+            alignItems = Container.Alignment.center,
+            padding = Container.EdgeInsets.all(16),
             child = Fragment(
               Title(texts.signUp),
               nameInput,
@@ -169,8 +168,8 @@ object SignUpForm {
               error,
               Container(
                 minWidth = Some("100%"),
-                margin = EdgeInsets.top(16),
-                alignItems = Alignment.center,
+                margin = Container.EdgeInsets.top(16),
+                alignItems = Container.Alignment.center,
                 child = signUpButton
               )
             )

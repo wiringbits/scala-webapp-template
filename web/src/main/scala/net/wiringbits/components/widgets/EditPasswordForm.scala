@@ -1,13 +1,12 @@
 package net.wiringbits.components.widgets
 
-import com.olvind.mui.muiMaterial.{components => mui}
+import com.olvind.mui.muiMaterial.components as mui
 import net.wiringbits.AppContext
 import net.wiringbits.core.I18nHooks
 import net.wiringbits.forms.UpdatePasswordFormData
 import net.wiringbits.models.User
 import net.wiringbits.ui.components.inputs.PasswordInput
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.ErrorLabel
-import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.Alignment
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container}
 import net.wiringbits.webapp.utils.slinkyUtils.forms.StatefulFormData
 import org.scalajs.dom
@@ -128,8 +127,8 @@ object EditPasswordForm {
       passwordInput,
       repeatPasswordInput,
       Container(
-        alignItems = Alignment.center,
-        justifyContent = Alignment.center,
+        alignItems = Container.Alignment.center,
+        justifyContent = Container.Alignment.center,
         child = error
       ),
       saveButton

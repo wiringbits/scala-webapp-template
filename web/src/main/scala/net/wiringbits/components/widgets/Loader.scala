@@ -1,11 +1,11 @@
 package net.wiringbits.components.widgets
 
-import com.olvind.mui.muiMaterial.{components => mui}
+import com.olvind.mui.muiMaterial.components as mui
 import net.wiringbits.AppContext
 import net.wiringbits.core.I18nHooks
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container}
-import slinky.core.{FunctionalComponent, KeyAddingStage}
 import slinky.core.facade.Fragment
+import slinky.core.{FunctionalComponent, KeyAddingStage}
 
 object Loader {
   def apply(ctx: AppContext): KeyAddingStage =

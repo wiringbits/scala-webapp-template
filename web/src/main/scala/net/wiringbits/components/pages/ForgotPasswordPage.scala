@@ -1,18 +1,16 @@
 package net.wiringbits.components.pages
 
 import com.olvind.mui.csstype.mod.Property.FlexDirection
-import slinky.core.{FunctionalComponent, KeyAddingStage}
 import com.olvind.mui.muiMaterial.components as mui
-import com.olvind.mui.react.mod.CSSProperties
-import net.wiringbits.components.widgets.{AppCard, ForgotPasswordForm}
-import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container
-import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.Alignment
 import net.wiringbits.AppContext
+import net.wiringbits.components.widgets.{AppCard, ForgotPasswordForm}
 import net.wiringbits.core.I18nHooks
+import net.wiringbits.webapp.utils.slinkyUtils.Utils.CSSPropertiesUtils
+import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container
 import net.wiringbits.webapp.utils.slinkyUtils.facades.reactrouterdom.useHistory
 import slinky.core.facade.Fragment
-import slinky.web.html.{className, div, style}
 import slinky.core.facade.ReactElement.jsUndefOrToElement
+import slinky.core.{FunctionalComponent, KeyAddingStage}
 
 import scala.scalajs.js
 object ForgotPasswordPage {
@@ -21,7 +19,7 @@ object ForgotPasswordPage {
 
   case class Props(ctx: AppContext)
 
-  val styling = new CSSProperties {
+  private val styling = new CSSPropertiesUtils {
     maxWidth = 350
     width = "100%"
   }
@@ -32,13 +30,13 @@ object ForgotPasswordPage {
 
     Container(
       flex = Some(1),
-      justifyContent = Alignment.center,
-      alignItems = Alignment.center,
-      child = div(className := "forgotPasswordFormContainer", style := styling)(
+      justifyContent = Container.Alignment.center,
+      alignItems = Container.Alignment.center,
+      child = mui.Box.sx(styling)(
         AppCard(
           Fragment(
             Container(
-              alignItems = Alignment.center,
+              alignItems = Container.Alignment.center,
               child = mui.Typography(texts.recoverYourPassword).variant("h5")
             ),
             ForgotPasswordForm(props.ctx),

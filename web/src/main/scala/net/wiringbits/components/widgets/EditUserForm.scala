@@ -1,6 +1,6 @@
 package net.wiringbits.components.widgets
 
-import com.olvind.mui.muiMaterial.{components => mui}
+import com.olvind.mui.muiMaterial.components as mui
 import net.wiringbits.AppContext
 import net.wiringbits.api.models.GetCurrentUser
 import net.wiringbits.api.utils.Formatter
@@ -15,7 +15,7 @@ import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 import slinky.core.facade.{Fragment, Hooks}
 import slinky.core.{FunctionalComponent, KeyAddingStage, SyntheticEvent}
-import slinky.web.html.*
+import slinky.web.html.{form, onSubmit}
 
 import scala.util.{Failure, Success}
 

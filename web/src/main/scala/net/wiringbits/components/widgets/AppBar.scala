@@ -1,21 +1,16 @@
 package net.wiringbits.components.widgets
 
-import com.olvind.mui.muiMaterial.stylesCreateThemeMod.Theme
-import com.olvind.mui.muiMaterial.components as mui
-import com.olvind.mui.react.mod.CSSProperties
-import com.olvind.mui.csstype.mod.Property.{FlexDirection, TextAlign}
-import com.olvind.mui.muiMaterial.mod.PropTypes.Color
 import com.olvind.mui.muiIconsMaterial.components as muiIcons
+import com.olvind.mui.muiMaterial.components as mui
+import com.olvind.mui.muiMaterial.mod.PropTypes.Color
 import net.wiringbits.AppContext
 import net.wiringbits.core.{I18nHooks, ReactiveHooks}
 import net.wiringbits.models.AuthState
-import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.Container.{Alignment, EdgeInsets}
+import net.wiringbits.webapp.utils.slinkyUtils.Utils.CSSPropertiesUtils
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{Container, NavLinkButton, Subtitle, Title}
 import net.wiringbits.webapp.utils.slinkyUtils.core.MediaQueryHooks
-import org.scalablytyped.runtime.StringDictionary
-import slinky.core.{FunctionalComponent, KeyAddingStage}
 import slinky.core.facade.{Fragment, Hooks, ReactElement}
-import slinky.web.html.*
+import slinky.core.{FunctionalComponent, KeyAddingStage}
 
 object AppBar {
   def apply(ctx: AppContext): KeyAddingStage =
@@ -23,26 +18,23 @@ object AppBar {
 
   case class Props(ctx: AppContext)
 
-  val appbarStyling = new CSSProperties {
+  private val appbarStyling = new CSSPropertiesUtils {
     color = "#FFF"
   }
-  val toolBarStyling = new CSSProperties {
+
+  private val toolBarStyling = new CSSPropertiesUtils {
     display = "flex"
     alignItems = "center"
     justifyContent = "space-between"
   }
-  val toolbarMobileStyling = new CSSProperties {
+
+  private val toolbarMobileStyling = new CSSPropertiesUtils {
     display = "flex"
     alignItems = "center"
   }
-  val menuStyling = new CSSProperties {
+
+  private val menuStyling = new CSSPropertiesUtils {
     display = "flex"
-  }
-  val menuMobile = new CSSProperties {
-    display = "flex"
-    flexDirection = FlexDirection.column
-    color = "#222"
-    textAlign = TextAlign.right
   }
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
@@ -80,20 +72,21 @@ object AppBar {
       val drawerContent = Container(
         minWidth = Some("256px"),
         flex = Some(1),
-        margin = EdgeInsets.bottom(32),
-        alignItems = Alignment.flexEnd,
-        justifyContent = Alignment.spaceBetween,
+        margin = Container.EdgeInsets.bottom(32),
+        alignItems = Container.Alignment.flexEnd,
+        justifyContent = Container.Alignment.spaceBetween,
         child = Fragment(
-          mui
-            .AppBar(className := "appbar", style := appbarStyling)
+          mui.AppBar
+            .sx(appbarStyling)
             .position("relative")(
-              mui.Toolbar(className := "toolbar-mobile", style := toolbarMobileStyling)(
-                Subtitle(texts.appName)
-              )
+              mui.Toolbar
+                .sx(toolbarMobileStyling)(
+                  Subtitle(texts.appName)
+                )
             ),
           Container(
-            alignItems = Alignment.flexEnd,
-            justifyContent = Alignment.spaceBetween,
+            alignItems = Container.Alignment.flexEnd,
+            justifyContent = Container.Alignment.spaceBetween,
             child = menu
           )
         )
@@ -106,7 +99,7 @@ object AppBar {
         )(drawerContent)
         .open(visibleDrawer)
 
-      val toolbar = mui.Toolbar(className := "toolbar-mobile", style := toolbarMobileStyling)(
+      val toolbar = mui.Toolbar.sx(toolbarMobileStyling)(
         mui.IconButton
           .normal()(mui.Icon(muiIcons.Menu()))
           .color(Color.inherit)
@@ -114,16 +107,16 @@ object AppBar {
         Subtitle(texts.appName)
       )
 
-      mui
-        .AppBar(className := "appbar", style := appbarStyling)
+      mui.AppBar
+        .sx(appbarStyling)
         .position("relative")(toolbar, drawer)
     } else {
-      mui
-        .AppBar(className := "appbar", style := appbarStyling)
+      mui.AppBar
+        .sx(appbarStyling)
         .position("relative")(
-          mui.Toolbar(className := "toolbar", style := toolBarStyling)(
+          mui.Toolbar.sx(toolBarStyling)(
             Title(texts.appName),
-            div(className := "menu", style := menuStyling)(menu)
+            mui.Box.sx(menuStyling)(menu)
           )
         )
     }
