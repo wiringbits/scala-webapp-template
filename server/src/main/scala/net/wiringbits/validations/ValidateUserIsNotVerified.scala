@@ -1,9 +1,9 @@
 package net.wiringbits.validations
 
-import net.wiringbits.repositories.models.User
+import org.foo.generated.public.users.UsersRow
 
 object ValidateUserIsNotVerified {
-  def apply(user: User): Unit = {
+  def apply(user: UsersRow): Unit = {
     if (user.verifiedOn.isDefined)
       throw new RuntimeException(s"User email is already verified")
     else ()

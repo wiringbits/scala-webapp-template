@@ -1,12 +1,12 @@
 package net.wiringbits.validations
 
-import net.wiringbits.repositories.models.UserToken
+import org.foo.generated.public.user_tokens.UserTokensRow
 
-import java.time.Clock
+import java.time.{Clock, ZoneOffset}
 
 object ValidateUserToken {
-  def apply(token: UserToken)(implicit clock: Clock): Unit = {
-    if (token.expiresAt.isBefore(clock.instant()))
+  def apply(token: UserTokensRow)(implicit clock: Clock): Unit = {
+    if (token.expiresAt.value.isBefore(clock.instant().atOffset(ZoneOffset.UTC)))
       throw new RuntimeException("Token is expired")
     else ()
   }
