@@ -1,32 +1,39 @@
 package net.wiringbits.repositories
 
 import net.wiringbits.executors.DatabaseExecutionContext
-import net.wiringbits.repositories.daos.UserLogsDAO
-import net.wiringbits.repositories.models.UserLog
+import net.wiringbits.typo_generated.customtypes.{TypoOffsetDateTime, TypoUUID}
+import net.wiringbits.typo_generated.public.user_logs.{UserLogsId, UserLogsRepoImpl, UserLogsRow}
+import net.wiringbits.typo_generated.public.users.UsersId
 import play.api.db.Database
 
-import java.util.UUID
+import java.time.{Clock, ZoneOffset}
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class UserLogsRepository @Inject() (database: Database)(implicit ec: DatabaseExecutionContext) {
+class UserLogsRepository @Inject() (database: Database)(implicit ec: DatabaseExecutionContext, clock: Clock) {
 
-  def create(request: UserLog.CreateUserLog): Future[Unit] = Future {
+  def create(userLogsRow: UserLogsRow): Future[Unit] = Future {
     database.withConnection { implicit conn =>
-      UserLogsDAO.create(request)
+      UserLogsRepoImpl.insert(userLogsRow)
     }
   }
 
-  def create(userId: UUID, message: String): Future[Unit] = Future {
+  def create(usersId: UsersId, message: String): Future[Unit] = Future {
+    val createUserLogsRow = UserLogsRow(
+      userLogId = UserLogsId(TypoUUID.randomUUID),
+      userId = usersId,
+      message = message,
+      createdAt = TypoOffsetDateTime(clock.instant().atOffset(ZoneOffset.UTC))
+    )
+
     database.withConnection { implicit conn =>
-      val request = UserLog.CreateUserLog(UUID.randomUUID(), userId, message)
-      UserLogsDAO.create(request)
+      UserLogsRepoImpl.insert(createUserLogsRow)
     }
   }
 
-  def logs(userId: UUID): Future[List[UserLog]] = Future {
+  def logs(usersId: UsersId): Future[List[UserLogsRow]] = Future {
     database.withConnection { implicit conn =>
-      UserLogsDAO.logs(userId)
+      UserLogsRepoImpl.select.where(_.userId === usersId).toList
     }
   }
 }
