@@ -6,8 +6,8 @@ import net.wiringbits.repositories.UsersRepository
 import net.wiringbits.repositories.models.User
 import net.wiringbits.util.EmailsHelper
 import net.wiringbits.validations.{ValidateCaptcha, ValidateVerifiedUser}
-import org.foo.generated.customtypes.{TypoUUID, TypoUnknownCitext}
-import org.foo.generated.public.users.{UsersId, UsersRepoImpl, UsersRow}
+import net.wiringbits.typo_generated.customtypes.{TypoUUID, TypoUnknownCitext}
+import net.wiringbits.typo_generated.public.users.{UsersId, UsersRepoImpl, UsersRow}
 import play.api.db.Database
 
 import java.sql.Connection

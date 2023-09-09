@@ -6,18 +6,21 @@ import net.wiringbits.common.models.{Email, Name}
 import net.wiringbits.config.{UserTokensConfig, WebAppConfig}
 import net.wiringbits.models.jobs.{BackgroundJobPayload, BackgroundJobStatus, BackgroundJobType}
 import net.wiringbits.repositories.UserTokensRepository
-import net.wiringbits.repositories.daos.{BackgroundJobDAO, UsersDAO}
-import net.wiringbits.repositories.models.{BackgroundJobData, User, UserToken, UserTokenType}
-import org.foo.generated.customtypes.{TypoJsonb, TypoOffsetDateTime, TypoUUID}
-import org.foo.generated.public.background_jobs.{BackgroundJobsId, BackgroundJobsRepoImpl, BackgroundJobsRow}
-import org.foo.generated.public.user_tokens.{UserTokensId, UserTokensRepoImpl, UserTokensRow}
-import org.foo.generated.public.users.{UsersId, UsersRepoImpl, UsersRow}
+import net.wiringbits.repositories.models.{UserToken, UserTokenType}
+import net.wiringbits.typo_generated.customtypes.{TypoJsonb, TypoOffsetDateTime, TypoUUID}
+import net.wiringbits.typo_generated.public.background_jobs.{
+  BackgroundJobsId,
+  BackgroundJobsRepoImpl,
+  BackgroundJobsRow
+}
+import net.wiringbits.typo_generated.public.user_tokens.{UserTokensId, UserTokensRepoImpl, UserTokensRow}
+import net.wiringbits.typo_generated.public.users.{UsersId, UsersRepoImpl, UsersRow}
 import play.api.db.Database
 import play.api.libs.json.Json
 
 import java.sql.Connection
 import java.time.temporal.ChronoUnit
-import java.time.{Clock, Instant, OffsetDateTime, ZoneOffset}
+import java.time.{Clock, Instant, ZoneOffset}
 import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}

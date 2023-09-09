@@ -2,8 +2,8 @@ package net.wiringbits.actions
 
 import net.wiringbits.api.models.GetCurrentUser
 import net.wiringbits.common.models.{Email, Name}
-import org.foo.generated.customtypes.TypoUUID
-import org.foo.generated.public.users.{UsersId, UsersRepoImpl, UsersRow}
+import net.wiringbits.typo_generated.customtypes.TypoUUID
+import net.wiringbits.typo_generated.public.users.{UsersId, UsersRepoImpl, UsersRow}
 import play.api.db.Database
 
 import java.sql.Connection

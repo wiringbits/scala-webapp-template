@@ -1,6 +1,6 @@
 package net.wiringbits.validations
 
-import org.foo.generated.public.users.UsersRow
+import net.wiringbits.typo_generated.public.users.UsersRow
 
 object ValidateUserIsNotVerified {
   def apply(user: UsersRow): Unit = {

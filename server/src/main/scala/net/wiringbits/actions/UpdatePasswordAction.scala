@@ -4,9 +4,9 @@ import net.wiringbits.api.models.UpdatePassword
 import net.wiringbits.common.models.Name
 import net.wiringbits.util.{EmailMessage, EmailsHelper}
 import net.wiringbits.validations.ValidatePasswordMatches
-import org.foo.generated.customtypes.{TypoOffsetDateTime, TypoUUID}
-import org.foo.generated.public.user_logs.{UserLogsId, UserLogsRepoImpl, UserLogsRow}
-import org.foo.generated.public.users.{UsersId, UsersRepoImpl, UsersRow}
+import net.wiringbits.typo_generated.customtypes.{TypoOffsetDateTime, TypoUUID}
+import net.wiringbits.typo_generated.public.user_logs.{UserLogsId, UserLogsRepoImpl, UserLogsRow}
+import net.wiringbits.typo_generated.public.users.{UsersId, UsersRepoImpl, UsersRow}
 import org.mindrot.jbcrypt.BCrypt
 import play.api.db.Database
 

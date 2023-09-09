@@ -1,6 +1,6 @@
 package net.wiringbits.validations
 
-import org.foo.generated.public.user_tokens.UserTokensRow
+import net.wiringbits.typo_generated.public.user_tokens.UserTokensRow
 
 import java.time.{Clock, ZoneOffset}
 

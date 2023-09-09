@@ -7,10 +7,10 @@ import net.wiringbits.repositories
 import net.wiringbits.repositories.models.UserTokenType
 import net.wiringbits.util.{EmailsHelper, TokenGenerator, TokensHelper}
 import net.wiringbits.validations.{ValidateCaptcha, ValidateEmailIsAvailable}
-import org.foo.generated.customtypes.{TypoOffsetDateTime, TypoUUID, TypoUnknownCitext}
-import org.foo.generated.public.user_logs.{UserLogsId, UserLogsRepoImpl, UserLogsRow}
-import org.foo.generated.public.user_tokens.{UserTokensId, UserTokensRepoImpl, UserTokensRow}
-import org.foo.generated.public.users.{UsersId, UsersRepoImpl, UsersRow}
+import net.wiringbits.typo_generated.customtypes.{TypoOffsetDateTime, TypoUUID, TypoUnknownCitext}
+import net.wiringbits.typo_generated.public.user_logs.{UserLogsId, UserLogsRepoImpl, UserLogsRow}
+import net.wiringbits.typo_generated.public.user_tokens.{UserTokensId, UserTokensRepoImpl, UserTokensRow}
+import net.wiringbits.typo_generated.public.users.{UsersId, UsersRepoImpl, UsersRow}
 import org.mindrot.jbcrypt.BCrypt
 import play.api.db.Database
 

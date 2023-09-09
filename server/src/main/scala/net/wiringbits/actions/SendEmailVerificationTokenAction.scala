@@ -5,8 +5,8 @@ import net.wiringbits.apis.ReCaptchaApi
 import net.wiringbits.repositories.UsersRepository
 import net.wiringbits.util.EmailsHelper
 import net.wiringbits.validations.{ValidateCaptcha, ValidateEmailIsRegistered, ValidateUserIsNotVerified}
-import org.foo.generated.customtypes.TypoUnknownCitext
-import org.foo.generated.public.users.UsersRepoImpl
+import net.wiringbits.typo_generated.customtypes.TypoUnknownCitext
+import net.wiringbits.typo_generated.public.users.UsersRepoImpl
 import play.api.db.Database
 
 import java.sql.Connection

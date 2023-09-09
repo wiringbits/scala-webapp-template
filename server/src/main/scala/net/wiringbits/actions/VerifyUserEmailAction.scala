@@ -6,10 +6,10 @@ import net.wiringbits.config.UserTokensConfig
 import net.wiringbits.repositories.{UserTokensRepository, UsersRepository}
 import net.wiringbits.util.{EmailMessage, EmailsHelper, TokensHelper}
 import net.wiringbits.validations.{ValidateUserIsNotVerified, ValidateUserToken}
-import org.foo.generated.customtypes.{TypoOffsetDateTime, TypoUUID}
-import org.foo.generated.public.user_logs.{UserLogsId, UserLogsRepoImpl, UserLogsRow}
-import org.foo.generated.public.user_tokens.{UserTokensId, UserTokensRepoImpl}
-import org.foo.generated.public.users.{UsersId, UsersRepoImpl, UsersRow}
+import net.wiringbits.typo_generated.customtypes.{TypoOffsetDateTime, TypoUUID}
+import net.wiringbits.typo_generated.public.user_logs.{UserLogsId, UserLogsRepoImpl, UserLogsRow}
+import net.wiringbits.typo_generated.public.user_tokens.{UserTokensId, UserTokensRepoImpl}
+import net.wiringbits.typo_generated.public.users.{UsersId, UsersRepoImpl, UsersRow}
 import play.api.db.Database
 
 import java.sql.Connection

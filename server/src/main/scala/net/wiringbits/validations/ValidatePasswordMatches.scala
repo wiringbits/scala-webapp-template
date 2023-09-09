@@ -1,7 +1,7 @@
 package net.wiringbits.validations
 
 import net.wiringbits.common.models.Password
-import org.foo.generated.public.users.UsersRow
+import net.wiringbits.typo_generated.public.users.UsersRow
 import org.mindrot.jbcrypt.BCrypt
 
 object ValidatePasswordMatches {

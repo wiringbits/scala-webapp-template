@@ -2,8 +2,8 @@ package net.wiringbits.validations
 
 import net.wiringbits.common.models.Email
 import net.wiringbits.repositories.UsersRepository
-import org.foo.generated.customtypes.TypoUnknownCitext
-import org.foo.generated.public.users.UsersRepoImpl
+import net.wiringbits.typo_generated.customtypes.TypoUnknownCitext
+import net.wiringbits.typo_generated.public.users.UsersRepoImpl
 
 import java.sql.Connection
 import scala.concurrent.{ExecutionContext, Future}

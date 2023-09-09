@@ -5,9 +5,9 @@ import net.wiringbits.apis.ReCaptchaApi
 import net.wiringbits.common.models.{Email, Name}
 import net.wiringbits.repositories.{UserLogsRepository, UsersRepository}
 import net.wiringbits.validations.{ValidateCaptcha, ValidatePasswordMatches, ValidateVerifiedUser}
-import org.foo.generated.customtypes.{TypoOffsetDateTime, TypoUUID, TypoUnknownCitext}
-import org.foo.generated.public.user_logs.{UserLogsId, UserLogsRepoImpl, UserLogsRow}
-import org.foo.generated.public.users.{UsersId, UsersRepoImpl}
+import net.wiringbits.typo_generated.customtypes.{TypoOffsetDateTime, TypoUUID, TypoUnknownCitext}
+import net.wiringbits.typo_generated.public.user_logs.{UserLogsId, UserLogsRepoImpl, UserLogsRow}
+import net.wiringbits.typo_generated.public.users.{UsersId, UsersRepoImpl}
 import play.api.db.Database
 
 import java.sql.Connection
