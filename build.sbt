@@ -11,7 +11,7 @@ val anorm = "2.7.0"
 val enumeratum = "1.7.2"
 val scalaJavaTime = "2.5.0"
 val tapir = "1.5.0"
-val typo = "0.3.0"
+val typoVersion = "0.3.0"
 
 val consoleDisabledOptions = Seq("-Werror", "-Ywarn-unused", "-Ywarn-unused-import")
 
@@ -347,7 +347,7 @@ lazy val tapirPlayJson = (crossProject(JSPlatform, JVMPlatform) in file("tapir/p
   )
 
 lazy val server = (project in file("server"))
-  .dependsOn(common.jvm, api.jvm, tapirServerPlay, tapirPlayJson.jvm)
+  .dependsOn(common.jvm, api.jvm, tapirServerPlay, tapirPlayJson.jvm, typo)
   .configure(baseServerSettings, commonSettings, playSettings)
   .settings(
     name := "wiringbits-server",
@@ -376,8 +376,8 @@ lazy val server = (project in file("server"))
       "org.glassfish" % "javax.el" % "3.0.0",
       "com.beachape" %% "enumeratum" % enumeratum,
       "com.softwaremill.sttp.tapir" %% "tapir-swagger-ui-bundle" % tapir,
-      "com.olvind.typo" %% "typo" % typo,
-      "com.olvind.typo" %% "typo-dsl-anorm" % typo
+      "com.olvind.typo" %% "typo" % typoVersion,
+      "com.olvind.typo" %% "typo-dsl-anorm" % typoVersion
     )
   )
 
@@ -444,6 +444,16 @@ lazy val web = (project in file("web"))
     )
   )
 
+lazy val typo = (project in file("typo"))
+  .settings(
+    name := "wiringbits-typo",
+    libraryDependencies ++= Seq(
+      "com.olvind.typo" %% "typo" % typoVersion,
+      "com.olvind.typo" %% "typo-dsl-anorm" % typoVersion,
+      "com.typesafe.play" %% "play-json" % playJson
+    )
+  )
+
 lazy val root = (project in file("."))
   .aggregate(
     common.jvm,
@@ -452,7 +462,8 @@ lazy val root = (project in file("."))
     api.js,
     ui,
     server,
-    web
+    web,
+    typo
   )
   .settings(
     publish := {},
