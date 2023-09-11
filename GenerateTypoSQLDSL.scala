@@ -8,6 +8,7 @@ import typo.*
 
 object GenerateTypoSQLDSL extends App {
   given conn: java.sql.Connection =
+    // TODO: get connection from config
     java.sql.DriverManager.getConnection(
       "jdbc:postgresql://localhost:5432/wiringbits_db?user=postgres&password=postgres"
     )
@@ -25,7 +26,7 @@ object GenerateTypoSQLDSL extends App {
     val location = java.nio.file.Path.of(sys.props("user.dir"))
 
     // destination folder. All files in this dir will be overwritten!
-    val targetDir = location.resolve("typo/src/main/scala")
+    val targetDir = location.resolve("typo/shared/src/main/scala")
 
     // where typo will look for sql files
     val scriptsFolder = location.resolve("server/src/main/resources/sql")

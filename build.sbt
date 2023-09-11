@@ -247,7 +247,7 @@ lazy val common = (crossProject(JSPlatform, JVMPlatform) in file("lib/common"))
 
 // shared apis
 lazy val api = (crossProject(JSPlatform, JVMPlatform) in file("lib/api"))
-  .dependsOn(common, tapirPlayJson)
+  .dependsOn(common, tapirPlayJson, typo)
   .configure(baseLibSettings, commonSettings)
   .jsConfigure(_.enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin, ScalablyTypedConverterPlugin))
   .jvmSettings(
@@ -347,7 +347,7 @@ lazy val tapirPlayJson = (crossProject(JSPlatform, JVMPlatform) in file("tapir/p
   )
 
 lazy val server = (project in file("server"))
-  .dependsOn(common.jvm, api.jvm, tapirServerPlay, tapirPlayJson.jvm, typo)
+  .dependsOn(common.jvm, api.jvm, tapirServerPlay, tapirPlayJson.jvm, typo.jvm)
   .configure(baseServerSettings, commonSettings, playSettings)
   .settings(
     name := "wiringbits-server",
@@ -444,7 +444,7 @@ lazy val web = (project in file("web"))
     )
   )
 
-lazy val typo = (project in file("typo"))
+lazy val typo = (crossProject(JSPlatform, JVMPlatform) in file("typo"))
   .settings(
     name := "wiringbits-typo",
     libraryDependencies ++= Seq(
@@ -463,7 +463,8 @@ lazy val root = (project in file("."))
     ui,
     server,
     web,
-    typo
+    typo.jvm,
+    typo.js
   )
   .settings(
     publish := {},

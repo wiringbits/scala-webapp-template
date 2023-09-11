@@ -1,4 +1,6 @@
 import net.wiringbits.api.models.{ErrorResponse, errorResponseFormat}
+import net.wiringbits.typo_generated.customtypes.TypoUUID
+import net.wiringbits.typo_generated.public.users.UsersId
 import org.slf4j.LoggerFactory
 import play.api.mvc.request.DefaultRequestFactory
 import play.api.mvc.{CookieHeaderEncoding, RequestHeader, Session}
@@ -18,8 +20,8 @@ package object controllers {
       requestFactory: DefaultRequestFactory,
       cookieHeaderEncoding: CookieHeaderEncoding
   )(implicit ec: ExecutionContext) {
-    def setSession(userId: UUID): Future[String] = Future {
-      val session = Session(Map("id" -> userId.toString))
+    def setSession(usersId: UsersId): Future[String] = Future {
+      val session = Session(Map("id" -> usersId.value.value.toString))
       val playCookie = requestFactory.sessionBaker.encodeAsCookie(session)
       cookieHeaderEncoding.encodeSetCookieHeader(List(playCookie))
     }
@@ -46,19 +48,20 @@ package object controllers {
 
   // This is the way to access the play request from tapir, we need it to extract the play session
   // UUID has to be future, because we want to handle the exception in the controllers
-  implicit def authHandler(serverRequest: ServerRequest)(implicit ec: ExecutionContext): Future[UUID] =
+  implicit def authHandler(serverRequest: ServerRequest)(implicit ec: ExecutionContext): Future[UsersId] =
     val session = serverRequest.underlying
       .asInstanceOf[RequestHeader]
       .session
 
-    def userIdFromSession = Future {
+    def usersIdFromSession = Future {
       session
         .get("id")
         .flatMap(str => Try(UUID.fromString(str)).toOption)
+        .map(id => UsersId(TypoUUID(id)))
         .getOrElse(throw new RuntimeException("Invalid or missing authentication"))
     }
 
-    userIdFromSession
+    usersIdFromSession
       .recover { case NonFatal(_) =>
         throw new RuntimeException("Unauthorized: Invalid or missing authentication")
       }

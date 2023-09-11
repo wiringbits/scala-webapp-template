@@ -1,6 +1,7 @@
 package net.wiringbits.api
 
 import net.wiringbits.api.models.{ErrorResponse, errorResponseFormat}
+import net.wiringbits.typo_generated.public.users.UsersId
 import sttp.model.StatusCode
 import sttp.tapir.*
 import sttp.tapir.EndpointInput.AuthType
@@ -41,6 +42,7 @@ package object endpoints {
     .example(ErrorResponse("Unauthorized: Invalid or missing authentication"))
     .schema(_.hidden(true))
 
-  def userAuth(implicit handleAuth: ServerRequest => Future[UUID]): EndpointInput.ExtractFromRequest[Future[UUID]] =
+  def userAuth(implicit handleAuth: ServerRequest => Future[UsersId]): EndpointInput.ExtractFromRequest[Future[UsersId
+  ]] =
     extractFromRequest(handleAuth)
 }
