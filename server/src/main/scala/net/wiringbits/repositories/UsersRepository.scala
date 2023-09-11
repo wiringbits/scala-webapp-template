@@ -4,7 +4,6 @@ import net.wiringbits.common.models.{Email, Name}
 import net.wiringbits.config.UserTokensConfig
 import net.wiringbits.executors.DatabaseExecutionContext
 import net.wiringbits.models.jobs.{BackgroundJobPayload, BackgroundJobStatus, BackgroundJobType}
-import net.wiringbits.repositories.daos.BackgroundJobDAO
 import net.wiringbits.repositories.models.*
 import net.wiringbits.typo_generated.customtypes.{TypoJsonb, TypoOffsetDateTime, TypoUUID, TypoUnknownCitext}
 import net.wiringbits.typo_generated.public.background_jobs.{
