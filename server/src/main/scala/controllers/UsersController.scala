@@ -3,6 +3,8 @@ package controllers
 import net.wiringbits.actions.*
 import net.wiringbits.api.endpoints.UsersEndpoints
 import net.wiringbits.api.models.*
+import net.wiringbits.typo_generated.customtypes.TypoUUID
+import net.wiringbits.typo_generated.public.users.UsersId
 import org.slf4j.LoggerFactory
 import sttp.capabilities.WebSockets
 import sttp.capabilities.akka.AkkaStreams
@@ -35,7 +37,7 @@ class UsersController @Inject() (
     val token = request.token
     logger.info(s"Verify user's email: ${token.userId}")
     for {
-      response <- verifyUserEmailAction(token.userId, token.token)
+      response <- verifyUserEmailAction(UsersId(TypoUUID(token.userId)), token.token)
     } yield Right(response)
   }
 
@@ -51,7 +53,7 @@ class UsersController @Inject() (
     handleRequest {
       logger.info(s"Reset user's password: ${request.token.userId}")
       for {
-        response <- resetPasswordAction(request.token.userId, request.token.token, request.password)
+        response <- resetPasswordAction(UsersId(TypoUUID(request.token.userId)), request.token.token, request.password)
       } yield Right(response)
     }
 
@@ -67,34 +69,34 @@ class UsersController @Inject() (
 
   private def update(
       request: UpdateUser.Request,
-      userIdF: Future[UUID]
+      usersIdF: Future[UsersId]
   ): Future[Either[ErrorResponse, UpdateUser.Response]] = handleRequest {
     logger.info(s"Update user: $request")
     for {
-      userId <- userIdF
-      _ <- updateUserAction(userId, request)
+      usersId <- usersIdF
+      _ <- updateUserAction(usersId, request)
       response = UpdateUser.Response()
     } yield Right(response)
   }
 
   private def updatePassword(
       request: UpdatePassword.Request,
-      userIdF: Future[UUID]
+      usersIdF: Future[UsersId]
   ): Future[Either[ErrorResponse, UpdatePassword.Response]] = handleRequest {
     for {
-      userId <- userIdF
-      _ = logger.info(s"Update password for: $userId")
-      _ <- updatePasswordAction(userId, request)
+      usersId <- usersIdF
+      _ = logger.info(s"Update password for: $usersId")
+      _ <- updatePasswordAction(usersId, request)
       response = UpdatePassword.Response()
     } yield Right(response)
   }
 
-  private def getLogs(userIdF: Future[UUID]): Future[Either[ErrorResponse, GetUserLogs.Response]] =
+  private def getLogs(usersIdF: Future[UsersId]): Future[Either[ErrorResponse, GetUserLogs.Response]] =
     handleRequest {
       for {
-        userId <- userIdF
-        _ = logger.info(s"Get user logs: $userId")
-        response <- getUserLogsAction(userId)
+        usersId <- usersIdF
+        _ = logger.info(s"Get user logs: $usersId")
+        response <- getUserLogsAction(usersId)
       } yield Right(response)
     }
 

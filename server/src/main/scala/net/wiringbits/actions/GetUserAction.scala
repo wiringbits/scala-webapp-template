@@ -2,21 +2,21 @@ package net.wiringbits.actions
 
 import net.wiringbits.api.models.GetCurrentUser
 import net.wiringbits.common.models.{Email, Name}
-import net.wiringbits.typo_generated.customtypes.TypoUUID
-import net.wiringbits.typo_generated.public.users.{UsersId, UsersRepoImpl, UsersRow}
-import play.api.db.Database
+import net.wiringbits.repositories.UsersRepository
+import net.wiringbits.repositories.models.User
+import net.wiringbits.typo_generated.public.users.{UsersId, UsersRow}
 
-import java.sql.Connection
 import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class GetUserAction @Inject() (database: Database)(implicit ec: ExecutionContext) {
-  given c: Connection = database.getConnection()
+class GetUserAction @Inject() (
+    usersRepository: UsersRepository
+)(implicit ec: ExecutionContext) {
 
-  def apply(userId: UUID): Future[GetCurrentUser.Response] = {
+  def apply(usersId: UsersId): Future[GetCurrentUser.Response] = {
     for {
-      user <- unsafeUser(userId)
+      user <- unsafeUser(usersId)
     } yield GetCurrentUser.Response(
       id = user.userId.value.value,
       email = Email.trusted(user.email.value),
@@ -25,13 +25,15 @@ class GetUserAction @Inject() (database: Database)(implicit ec: ExecutionContext
     )
   }
 
-  private def unsafeUser(userId: UUID): Future[UsersRow] = Future {
-    UsersRepoImpl
-      .selectById(UsersId(TypoUUID(userId)))
-      .getOrElse(
-        throw new RuntimeException(
-          s"Unexpected error because the user wasn't found: $userId"
+  private def unsafeUser(usersId: UsersId): Future[UsersRow] = {
+    usersRepository
+      .find(usersId)
+      .map { maybe =>
+        maybe.getOrElse(
+          throw new RuntimeException(
+            s"Unexpected error because the user wasn't found: $usersId"
+          )
         )
-      )
+      }
   }
 }

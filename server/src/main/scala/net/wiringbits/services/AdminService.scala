@@ -1,7 +1,9 @@
 package net.wiringbits.services
 
 import net.wiringbits.api.models.{AdminGetUserLogs, AdminGetUsers}
+import net.wiringbits.common.models.{Email, Name}
 import net.wiringbits.repositories.{UserLogsRepository, UsersRepository}
+import net.wiringbits.typo_generated.public.users.UsersId
 
 import java.util.UUID
 import javax.inject.Inject
@@ -11,13 +13,13 @@ class AdminService @Inject() (userLogsRepository: UserLogsRepository, usersRepos
     ec: ExecutionContext
 ) {
 
-  def userLogs(userId: UUID): Future[AdminGetUserLogs.Response] = {
+  def userLogs(usersId: UsersId): Future[AdminGetUserLogs.Response] = {
     for {
-      logs <- userLogsRepository.logs(userId)
+      logs <- userLogsRepository.logs(usersId)
       items = logs.map { x =>
         AdminGetUserLogs.Response.UserLog(
-          id = x.userLogId,
-          createdAt = x.createdAt,
+          id = x.userLogId.value.value,
+          createdAt = x.createdAt.value.toInstant,
           message = x.message
         )
       }
@@ -29,10 +31,10 @@ class AdminService @Inject() (userLogsRepository: UserLogsRepository, usersRepos
       users <- usersRepository.all()
       items = users.map { x =>
         AdminGetUsers.Response.User(
-          id = x.id,
-          name = x.name,
-          email = x.email,
-          createdAt = x.createdAt
+          id = x.userId.value.value,
+          name = Name.trusted(x.name),
+          email = Email.trusted(x.email.value),
+          createdAt = x.createdAt.value.toInstant
         )
       }
     } yield AdminGetUsers.Response(items)

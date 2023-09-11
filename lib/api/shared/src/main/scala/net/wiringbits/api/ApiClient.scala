@@ -2,6 +2,8 @@ package net.wiringbits.api
 
 import net.wiringbits.api.endpoints.*
 import net.wiringbits.api.models.*
+import net.wiringbits.typo_generated.customtypes.TypoUUID
+import net.wiringbits.typo_generated.public.users.UsersId
 import play.api.libs.json.{Json, Reads}
 import sttp.client3.*
 import sttp.tapir.PublicEndpoint
@@ -22,11 +24,13 @@ class ApiClient(config: ApiClient.Config)(implicit
 ) {
   // While the server requires a userId, it is extracted from the Session cookie, we need a dummy value just to
   // fulfill the method signatures
-  private val dummyUserId = Future.successful(UUID.fromString("887a5d77-cb5d-4d9c-b4dc-539c8aae3977"))
+  private val dummyUsersId = Future.successful {
+    UsersId(TypoUUID(UUID.fromString("887a5d77-cb5d-4d9c-b4dc-539c8aae3977")))
+  }
 
   // Similarly to the dummy userId, we need a way to derive the userId from a request, which is used only on the
   // server-side code, this function is helpful to fulfill the method signatures
-  private implicit val handleDummyUserId: ServerRequest => Future[UUID] = _ => dummyUserId
+  private implicit val handleDummyUsersId: ServerRequest => Future[UsersId] = _ => dummyUsersId
 
   private def asJson[R: Reads](strBody: String) = {
     Try {
@@ -90,16 +94,16 @@ class ApiClient(config: ApiClient.Config)(implicit
     handleRequest(UsersEndpoints.resetPassword, request)
 
   def currentUser: Future[GetCurrentUser.Response] =
-    handleRequest(AuthEndpoints.getCurrentUser, dummyUserId)
+    handleRequest(AuthEndpoints.getCurrentUser, dummyUsersId)
 
   def updateUser(request: UpdateUser.Request): Future[UpdateUser.Response] =
-    handleRequest(UsersEndpoints.update, (request, dummyUserId))
+    handleRequest(UsersEndpoints.update, (request, dummyUsersId))
 
   def updatePassword(request: UpdatePassword.Request): Future[UpdatePassword.Response] =
-    handleRequest(UsersEndpoints.updatePassword, (request, dummyUserId))
+    handleRequest(UsersEndpoints.updatePassword, (request, dummyUsersId))
 
   def getUserLogs: Future[GetUserLogs.Response] =
-    handleRequest(UsersEndpoints.getLogs, dummyUserId)
+    handleRequest(UsersEndpoints.getLogs, dummyUsersId)
 
   def adminGetUserLogs(userId: UUID): Future[AdminGetUserLogs.Response] =
     handleRequest(AdminEndpoints.getUserLogsEndpoint, ("_", userId, ""))
@@ -132,7 +136,7 @@ class ApiClient(config: ApiClient.Config)(implicit
   def logout: Future[Logout.Response] =
     client
       .toRequestThrowDecodeFailures(AuthEndpoints.logout, Some(ServerAPI))
-      .apply(dummyUserId)
+      .apply(dummyUsersId)
       .response(asStringAlways)
       .send(sttpBackend)
       .map { response =>

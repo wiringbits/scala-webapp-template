@@ -4,6 +4,8 @@ import net.wiringbits.api.endpoints.AdminEndpoints
 import net.wiringbits.api.models.{AdminGetUserLogs, AdminGetUsers, ErrorResponse}
 import net.wiringbits.common.models.Email
 import net.wiringbits.services.AdminService
+import net.wiringbits.typo_generated.customtypes.TypoUUID
+import net.wiringbits.typo_generated.public.users.UsersId
 import org.slf4j.LoggerFactory
 import sttp.capabilities.WebSockets
 import sttp.capabilities.akka.AkkaStreams
@@ -24,8 +26,9 @@ class AdminController @Inject() (
       adminCookie: String
   ): Future[Either[ErrorResponse, AdminGetUserLogs.Response]] = handleRequest {
     logger.info(s"Get user logs: $userId")
+    val usersId = UsersId(TypoUUID(userId))
     for {
-      response <- adminService.userLogs(userId)
+      response <- adminService.userLogs(usersId)
     } yield Right(response)
   }
 

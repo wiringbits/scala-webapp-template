@@ -4,7 +4,11 @@ import anorm.{AkkaStream, SqlStringInterpolation}
 import net.wiringbits.executors.DatabaseExecutionContext
 import net.wiringbits.models.jobs.BackgroundJobStatus
 import net.wiringbits.typo_generated.customtypes.TypoOffsetDateTime
-import net.wiringbits.typo_generated.public.background_jobs.{BackgroundJobsRepoImpl, BackgroundJobsRow}
+import net.wiringbits.typo_generated.public.background_jobs.{
+  BackgroundJobsId,
+  BackgroundJobsRepoImpl,
+  BackgroundJobsRow
+}
 import play.api.db.Database
 
 import java.time.{Clock, Instant, ZoneOffset}
@@ -52,31 +56,32 @@ class BackgroundJobsRepository @Inject() (database: Database)(implicit ec: Datab
   }
 
   def setStatusToFailed(
-      backgroundJobsRow: BackgroundJobsRow,
+      backgroundJobsId: BackgroundJobsId,
       executeAt: TypoOffsetDateTime,
       failReason: String
   ): Future[Unit] = Future {
-    val updatedBackgroundJobsRow = backgroundJobsRow.copy(
-      status = BackgroundJobStatus.Failed.toString,
-      statusDetails = Some(failReason),
-      errorCount = backgroundJobsRow.errorCount.map(_ + 1),
-      executeAt = executeAt,
-      updatedAt = TypoOffsetDateTime(clock.instant().atOffset(ZoneOffset.UTC))
-    )
-
     database.withConnection { implicit conn =>
-      BackgroundJobsRepoImpl.update(updatedBackgroundJobsRow)
+      val row = BackgroundJobsRepoImpl
+        .selectById(backgroundJobsId)
+        .getOrElse(throw new RuntimeException(s"Background job not found $backgroundJobsId"))
+
+      BackgroundJobsRepoImpl.update
+        .where(_.backgroundJobId == backgroundJobsId)
+        .setValue(_.status)(BackgroundJobStatus.Failed.toString)
+        .setValue(_.statusDetails)(Some(failReason))
+        .setValue(_.errorCount)(row.errorCount.map(_ + 1))
+        .setValue(_.executeAt)(executeAt)
+        .setValue(_.updatedAt)(TypoOffsetDateTime(clock.instant().atOffset(ZoneOffset.UTC)))
     }
   }
 
-  def setStatusToSuccess(backgroundJobsRow: BackgroundJobsRow): Future[Unit] = Future {
-    val updatedBackgroundJobsRow = backgroundJobsRow.copy(
-      status = BackgroundJobStatus.Success.toString,
-      updatedAt = TypoOffsetDateTime(clock.instant().atOffset(ZoneOffset.UTC))
-    )
-
+  def setStatusToSuccess(backgroundJobsId: BackgroundJobsId): Future[Unit] = Future {
     database.withConnection { implicit conn =>
-      BackgroundJobsRepoImpl.update(updatedBackgroundJobsRow)
+      BackgroundJobsRepoImpl.update
+        .where(_.backgroundJobId == backgroundJobsId)
+        .setValue(_.status)(BackgroundJobStatus.Success.toString)
+        .setValue(_.updatedAt)(TypoOffsetDateTime(clock.instant().atOffset(ZoneOffset.UTC)))
+        .execute()
     }
   }
 }

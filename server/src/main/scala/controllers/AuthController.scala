@@ -3,6 +3,8 @@ package controllers
 import net.wiringbits.actions.*
 import net.wiringbits.api.endpoints.AuthEndpoints
 import net.wiringbits.api.models.*
+import net.wiringbits.typo_generated.customtypes.TypoUUID
+import net.wiringbits.typo_generated.public.users.UsersId
 import org.slf4j.LoggerFactory
 import sttp.capabilities.WebSockets
 import sttp.capabilities.akka.AkkaStreams
@@ -24,23 +26,23 @@ class AuthController @Inject() (
       logger.info(s"Login API: ${body.email}")
       for {
         response <- loginAction(body)
-        cookieEncoded <- playTapirBridge.setSession(response.id)
+        cookieEncoded <- playTapirBridge.setSession(UsersId(TypoUUID(response.id)))
       } yield Right(response, cookieEncoded)
     }
 
-  private def me(userIdF: Future[UUID]): Future[Either[ErrorResponse, GetCurrentUser.Response]] =
+  private def me(usersIdF: Future[UsersId]): Future[Either[ErrorResponse, GetCurrentUser.Response]] =
     handleRequest {
       for {
-        userId <- userIdF
+        userId <- usersIdF
         _ = logger.info(s"Get user info: $userId")
         response <- getUserAction(userId)
       } yield Right(response)
     }
 
-  private def logout(userIdF: Future[UUID]): Future[Either[ErrorResponse, (Logout.Response, String)]] =
+  private def logout(usersIdF: Future[UsersId]): Future[Either[ErrorResponse, (Logout.Response, String)]] =
     handleRequest {
       for {
-        _ <- userIdF
+        _ <- usersIdF
         _ = logger.info("Logout")
         header <- playTapirBridge.clearSession()
       } yield Right(Logout.Response(), header)

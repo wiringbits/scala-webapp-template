@@ -4,6 +4,7 @@ import akka.actor.ActorSystem
 import akka.stream.scaladsl.*
 import net.wiringbits.repositories.BackgroundJobsRepository
 import net.wiringbits.repositories.models.BackgroundJobData
+import net.wiringbits.typo_generated.public.background_jobs.BackgroundJobsRow
 import org.slf4j.LoggerFactory
 
 import javax.inject.Inject
@@ -16,11 +17,11 @@ class StreamPendingBackgroundJobsForeverAction @Inject() (backgroundJobsReposito
 ) {
   private val logger = LoggerFactory.getLogger(this.getClass)
 
-  def apply(reconnectionDelay: FiniteDuration = 10.seconds): Source[BackgroundJobData, akka.NotUsed] = {
+  def apply(reconnectionDelay: FiniteDuration = 10.seconds): Source[BackgroundJobsRow, akka.NotUsed] = {
     // Let's use unfoldAsync to continuously fetch items from database
     // First execution doesn't involve a delay
     Source
-      .unfoldAsync[Boolean, Source[BackgroundJobData, Future[Int]]](false) { delay =>
+      .unfoldAsync[Boolean, Source[BackgroundJobsRow, Future[Int]]](false) { delay =>
         logger.trace(s"Looking for pending background jobs")
         akka.pattern
           .after(if (delay) reconnectionDelay else 0.seconds) {

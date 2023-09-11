@@ -9,10 +9,13 @@ import net.wiringbits.config.BackgroundJobsExecutorConfig
 import net.wiringbits.models.jobs.{BackgroundJobPayload, BackgroundJobType}
 import net.wiringbits.repositories.BackgroundJobsRepository
 import net.wiringbits.repositories.models.BackgroundJobData
+import net.wiringbits.typo_generated.customtypes.TypoOffsetDateTime
+import net.wiringbits.typo_generated.public.background_jobs.BackgroundJobsRow
 import net.wiringbits.util.{DelayGenerator, EmailMessage}
 import org.slf4j.LoggerFactory
+import play.api.libs.json.Json
 
-import java.time.Clock
+import java.time.{Clock, ZoneOffset}
 import java.time.temporal.ChronoUnit
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
@@ -36,15 +39,15 @@ class BackgroundJobsExecutorTask @Inject() (
     run()
   }
 
-  private def execute(job: BackgroundJobData): Future[Unit] = {
-    val executionResult = job.`type` match {
+  private def execute(job: BackgroundJobsRow): Future[Unit] = {
+    val executionResult = BackgroundJobType.withNameInsensitive(job.`type`) match {
       case BackgroundJobType.SendEmail =>
-        job.payload.asOpt[BackgroundJobPayload.SendEmail] match {
+        Json.toJson(job.payload.value).asOpt[BackgroundJobPayload.SendEmail] match {
           case Some(typedPayload) => sendEmail(typedPayload)
           case None =>
             Future.failed(
               new RuntimeException(
-                s"The given payload is not supported by the SendEmail task, please double check, job id = ${job.id}"
+                s"The given payload is not supported by the SendEmail task, please double check, job id = ${job.backgroundJobId}"
               )
             )
         }
@@ -52,13 +55,14 @@ class BackgroundJobsExecutorTask @Inject() (
 
     executionResult
       .flatMap { _ =>
-        backgroundJobsRepository.setStatusToSuccess(job.id)
+        backgroundJobsRepository.setStatusToSuccess(job.backgroundJobId)
       }
       .recoverWith { case NonFatal(ex) =>
-        val minutesUntilExecute = DelayGenerator.createDelay(job.errorCount)
-        val executeAt = clock.instant().plus(minutesUntilExecute, ChronoUnit.MINUTES)
-        logger.warn(s"Job with id ${job.id} failed: ${ex.getMessage}", ex)
-        backgroundJobsRepository.setStatusToFailed(job.id, executeAt, ex.getMessage)
+        val minutesUntilExecute = DelayGenerator.createDelay(job.errorCount.getOrElse(0))
+        val executeAt =
+          TypoOffsetDateTime(clock.instant().plus(minutesUntilExecute, ChronoUnit.MINUTES).atOffset(ZoneOffset.UTC))
+        logger.warn(s"Job with id ${job.backgroundJobId} failed: ${ex.getMessage}", ex)
+        backgroundJobsRepository.setStatusToFailed(job.backgroundJobId, executeAt, ex.getMessage)
       }
   }
 

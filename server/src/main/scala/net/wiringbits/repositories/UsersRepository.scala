@@ -77,96 +77,94 @@ class UsersRepository @Inject() (
     }
   }
 
-  def update(usersRow: UsersRow, name: Name): Future[Unit] = Future {
-    val updatedUsersRow = usersRow.copy(name = name.string)
-
+  def update(usersId: UsersId, name: Name): Future[Unit] = Future {
     val createUserLogsRow = UserLogsRow(
       userLogId = UserLogsId(TypoUUID.randomUUID),
-      userId = usersRow.userId,
+      userId = usersId,
       message = s"Profile updated",
       createdAt = TypoOffsetDateTime(clock.instant().atOffset(ZoneOffset.UTC))
     )
 
     database.withTransaction { implicit conn =>
-      UsersRepoImpl.update(updatedUsersRow)
+      UsersRepoImpl.update.where(_.userId === usersId).setValue(_.name)(name.string).execute()
       UserLogsRepoImpl.insert(createUserLogsRow)
     }
   }
 
-  def updatePassword(usersRow: UsersRow, password: String, emailMessage: EmailMessage): Future[Unit] = Future {
-    val updatedUsersRow = usersRow.copy(password = password)
-
+  def updatePassword(usersId: UsersId, password: String, emailMessage: EmailMessage): Future[Unit] = Future {
     val createUserLogsRow = UserLogsRow(
       userLogId = UserLogsId(TypoUUID.randomUUID),
-      userId = usersRow.userId,
+      userId = usersId,
       message = s"Password updated",
       createdAt = TypoOffsetDateTime(clock.instant().atOffset(ZoneOffset.UTC))
     )
 
     database.withTransaction { implicit conn =>
-      UsersRepoImpl.insert(updatedUsersRow)
+      UsersRepoImpl.update.where(_.userId === usersId).setValue(_.password)(password).execute()
       UserLogsRepoImpl.insert(createUserLogsRow)
-      sendEmailLater(usersRow, emailMessage)
+      sendEmailLater(usersId, emailMessage)
     }
   }
 
-  def verify(usersRow: UsersRow, userTokensId: UserTokensId, emailMessage: EmailMessage): Future[Unit] = Future {
-    val updateUsersRow = usersRow.copy(verifiedOn = Some(TypoOffsetDateTime(clock.instant().atOffset(ZoneOffset.UTC))))
-
+  def verify(usersId: UsersId, userTokensId: UserTokensId, emailMessage: EmailMessage): Future[Unit] = Future {
     val createUserLogsRow = UserLogsRow(
       userLogId = UserLogsId(TypoUUID.randomUUID),
-      userId = usersRow.userId,
+      userId = usersId,
       message = s"Email verified",
       createdAt = TypoOffsetDateTime(clock.instant().atOffset(ZoneOffset.UTC))
     )
 
     database.withTransaction { implicit conn =>
-      UsersRepoImpl.update(updateUsersRow)
+      UsersRepoImpl.update
+        .where(_.userId === usersId)
+        .setValue(_.verifiedOn)(Some(TypoOffsetDateTime(clock.instant().atOffset(ZoneOffset.UTC))))
+        .execute()
       UserLogsRepoImpl.insert(createUserLogsRow)
       UserTokensRepoImpl.delete
         .where(_.userTokenId === userTokensId)
-        .where(_.userId === usersRow.userId)
+        .where(_.userId === usersId)
         .execute()
-      sendEmailLater(usersRow, emailMessage)
+      sendEmailLater(usersId, emailMessage)
     }
   }
 
-  def resetPassword(usersRow: UsersRow, password: String, emailMessage: EmailMessage): Future[Unit] = Future {
-    val updatedUsersRow = usersRow.copy(password = password)
-
+  def resetPassword(usersId: UsersId, password: String, emailMessage: EmailMessage): Future[Unit] = Future {
     val createUserLogsRow = UserLogsRow(
       userLogId = UserLogsId(TypoUUID.randomUUID),
-      userId = usersRow.userId,
+      userId = usersId,
       message = s"Password reset",
       createdAt = TypoOffsetDateTime(clock.instant().atOffset(ZoneOffset.UTC))
     )
 
     database.withTransaction { implicit conn =>
-      UsersRepoImpl.update(updatedUsersRow)
+      UsersRepoImpl.update.where(_.userId === usersId).setValue(_.password)(password).execute()
       UserLogsRepoImpl.insert(createUserLogsRow)
-      sendEmailLater(usersRow, emailMessage)
+      sendEmailLater(usersId, emailMessage)
     }
   }
 
-  private def sendEmailLater(usersRow: UsersRow, emailMessage: EmailMessage)(implicit conn: Connection): Unit = {
-    val payload = BackgroundJobPayload.SendEmail(
-      email = Email.trusted(usersRow.email.value),
-      subject = emailMessage.subject,
-      body = emailMessage.body
-    )
+  private def sendEmailLater(usersId: UsersId, emailMessage: EmailMessage)(implicit conn: Connection): Unit = {
+    val usersRow = UsersRepoImpl.selectById(usersId)
+    usersRow.foreach { usersRow =>
+      val payload = BackgroundJobPayload.SendEmail(
+        email = Email.trusted(usersRow.email.value),
+        subject = emailMessage.subject,
+        body = emailMessage.body
+      )
 
-    val backgroundJobDatasRow = BackgroundJobsRow(
-      backgroundJobId = BackgroundJobsId(TypoUUID.randomUUID),
-      `type` = BackgroundJobType.SendEmail.toString,
-      payload = TypoJsonb(Json.toJson(payload).toString),
-      status = BackgroundJobStatus.Pending.toString,
-      statusDetails = None,
-      errorCount = None,
-      executeAt = TypoOffsetDateTime(clock.instant().atOffset(ZoneOffset.UTC)),
-      createdAt = TypoOffsetDateTime(clock.instant().atOffset(ZoneOffset.UTC)),
-      updatedAt = TypoOffsetDateTime(clock.instant().atOffset(ZoneOffset.UTC))
-    )
+      val backgroundJobDatasRow = BackgroundJobsRow(
+        backgroundJobId = BackgroundJobsId(TypoUUID.randomUUID),
+        `type` = BackgroundJobType.SendEmail.toString,
+        payload = TypoJsonb(Json.toJson(payload).toString),
+        status = BackgroundJobStatus.Pending.toString,
+        statusDetails = None,
+        errorCount = None,
+        executeAt = TypoOffsetDateTime(clock.instant().atOffset(ZoneOffset.UTC)),
+        createdAt = TypoOffsetDateTime(clock.instant().atOffset(ZoneOffset.UTC)),
+        updatedAt = TypoOffsetDateTime(clock.instant().atOffset(ZoneOffset.UTC))
+      )
 
-    BackgroundJobsRepoImpl.insert(backgroundJobDatasRow)
+      BackgroundJobsRepoImpl.insert(backgroundJobDatasRow)
+    }
   }
 }
