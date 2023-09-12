@@ -5,8 +5,13 @@ import akka.stream.scaladsl.*
 import net.wiringbits.common.models.Email
 import net.wiringbits.core.RepositorySpec
 import net.wiringbits.models.jobs.{BackgroundJobPayload, BackgroundJobStatus, BackgroundJobType}
-import net.wiringbits.repositories.daos.BackgroundJobDAO
 import net.wiringbits.repositories.models.BackgroundJobData
+import net.wiringbits.typo_generated.customtypes.{TypoJsonb, TypoOffsetDateTime, TypoUUID}
+import net.wiringbits.typo_generated.public.background_jobs.{
+  BackgroundJobsId,
+  BackgroundJobsRepoImpl,
+  BackgroundJobsRow
+}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.OptionValues.*
 import org.scalatest.concurrent.ScalaFutures.*
@@ -31,18 +36,20 @@ class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll
   "streamPendingJobs" should {
 
     "work (simple case)" in withRepositories() { repositories =>
-      val createRequest = BackgroundJobData.Create(
-        id = UUID.randomUUID(),
-        `type` = BackgroundJobType.SendEmail,
-        payload = backgroundJobPayload,
-        status = BackgroundJobStatus.Pending,
-        executeAt = Instant.now(),
-        createdAt = Instant.now(),
-        updatedAt = Instant.now()
+      val createRequest = BackgroundJobsRow(
+        backgroundJobId = BackgroundJobsId(TypoUUID.randomUUID),
+        `type` = BackgroundJobType.SendEmail.toString,
+        payload = TypoJsonb(Json.toJson(backgroundJobPayload).toString),
+        status = BackgroundJobStatus.Pending.toString,
+        statusDetails = None,
+        errorCount = None,
+        executeAt = TypoOffsetDateTime.now,
+        createdAt = TypoOffsetDateTime.now,
+        updatedAt = TypoOffsetDateTime.now
       )
 
       repositories.database.withConnection { implicit conn =>
-        BackgroundJobDAO.create(createRequest)
+        BackgroundJobsRepoImpl.insert(createRequest)
       }
 
       val result = repositories.backgroundJobs.streamPendingJobs.futureValue
@@ -57,23 +64,25 @@ class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll
     }
 
     "only return pending jobs" in withRepositories() { repositories =>
-      val createRequestBase = BackgroundJobData.Create(
-        id = UUID.randomUUID(),
-        `type` = BackgroundJobType.SendEmail,
-        payload = backgroundJobPayload,
-        status = BackgroundJobStatus.Pending,
-        executeAt = Instant.now(),
-        createdAt = Instant.now(),
-        updatedAt = Instant.now()
+      val createRequestBase = BackgroundJobsRow(
+        backgroundJobId = BackgroundJobsId(TypoUUID.randomUUID),
+        `type` = BackgroundJobType.SendEmail.toString,
+        payload = TypoJsonb(Json.toJson(backgroundJobPayload).toString),
+        status = BackgroundJobStatus.Pending.toString,
+        statusDetails = None,
+        errorCount = None,
+        executeAt = TypoOffsetDateTime.now,
+        createdAt = TypoOffsetDateTime.now,
+        updatedAt = TypoOffsetDateTime.now
       )
 
       val limit = 6
       for (i <- 1 to limit) {
         repositories.database.withConnection { implicit conn =>
-          BackgroundJobDAO.create(
+          BackgroundJobsRepoImpl.insert(
             createRequestBase.copy(
-              id = UUID.randomUUID(),
-              status = if ((i % 2) == 0) BackgroundJobStatus.Success else BackgroundJobStatus.Pending
+              backgroundJobId = BackgroundJobsId(TypoUUID.randomUUID),
+              status = if ((i % 2) == 0) BackgroundJobStatus.Success.toString else BackgroundJobStatus.Pending.toString
             )
           )
         }
@@ -99,22 +108,24 @@ class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll
 
   "setStatusToFailed" should {
     "work" in withRepositories() { repositories =>
-      val createRequest = BackgroundJobData.Create(
-        id = UUID.randomUUID(),
-        `type` = BackgroundJobType.SendEmail,
-        payload = backgroundJobPayload,
-        status = BackgroundJobStatus.Pending,
-        executeAt = Instant.now(),
-        createdAt = Instant.now(),
-        updatedAt = Instant.now()
+      val createRequest = BackgroundJobsRow(
+        backgroundJobId = BackgroundJobsId(TypoUUID.randomUUID),
+        `type` = BackgroundJobType.SendEmail.toString,
+        payload = TypoJsonb(Json.toJson(backgroundJobPayload).toString),
+        status = BackgroundJobStatus.Pending.toString,
+        statusDetails = None,
+        errorCount = None,
+        executeAt = TypoOffsetDateTime.now,
+        createdAt = TypoOffsetDateTime.now,
+        updatedAt = TypoOffsetDateTime.now
       )
 
       repositories.database.withConnection { implicit conn =>
-        BackgroundJobDAO.create(createRequest)
+        BackgroundJobsRepoImpl.insert(createRequest)
       }
       val failReason = "test"
       repositories.backgroundJobs
-        .setStatusToFailed(createRequest.id, executeAt = Instant.now(), failReason = failReason)
+        .setStatusToFailed(createRequest.backgroundJobId, executeAt = TypoOffsetDateTime.now, failReason = failReason)
         .futureValue
       val result = repositories.backgroundJobs.streamPendingJobs.futureValue
         .runWith(Sink.seq)
@@ -122,7 +133,7 @@ class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll
 
       result.size must be(1)
       val item = result.headOption.value
-      item.id must be(createRequest.id)
+      item.backgroundJobId must be(createRequest.backgroundJobId)
       item.status must be(BackgroundJobStatus.Failed)
       item.statusDetails must be(Some(failReason))
     }
@@ -131,27 +142,33 @@ class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll
       pending // TODO: setStatusToFailed must actually return an error because right now it succeeds
 
       repositories.backgroundJobs
-        .setStatusToFailed(UUID.randomUUID(), executeAt = Instant.now(), failReason = "test")
+        .setStatusToFailed(
+          BackgroundJobsId(TypoUUID.randomUUID),
+          executeAt = TypoOffsetDateTime.now,
+          failReason = "test"
+        )
         .futureValue
     }
   }
 
   "setStatusToSuccess" should {
     "work" in withRepositories() { repositories =>
-      val createRequest = BackgroundJobData.Create(
-        id = UUID.randomUUID(),
-        `type` = BackgroundJobType.SendEmail,
-        payload = backgroundJobPayload,
-        status = BackgroundJobStatus.Pending,
-        executeAt = Instant.now(),
-        createdAt = Instant.now(),
-        updatedAt = Instant.now()
+      val createRequest = BackgroundJobsRow(
+        backgroundJobId = BackgroundJobsId(TypoUUID.randomUUID),
+        `type` = BackgroundJobType.SendEmail.toString,
+        payload = TypoJsonb(Json.toJson(backgroundJobPayload).toString),
+        status = BackgroundJobStatus.Pending.toString,
+        statusDetails = None,
+        errorCount = None,
+        executeAt = TypoOffsetDateTime.now,
+        createdAt = TypoOffsetDateTime.now,
+        updatedAt = TypoOffsetDateTime.now
       )
 
       repositories.database.withConnection { implicit conn =>
-        BackgroundJobDAO.create(createRequest)
+        BackgroundJobsRepoImpl.insert(createRequest)
       }
-      repositories.backgroundJobs.setStatusToSuccess(createRequest.id).futureValue
+      repositories.backgroundJobs.setStatusToSuccess(createRequest.backgroundJobId).futureValue
 
       val result = repositories.backgroundJobs.streamPendingJobs.futureValue
         .runWith(Sink.seq)
@@ -161,7 +178,7 @@ class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll
 
     "fail if the notification doesn't exists" in withRepositories() { repositories =>
       pending // TODO: setStatusToFailed must actually return an error because right now it succeeds
-      repositories.backgroundJobs.setStatusToSuccess(UUID.randomUUID()).futureValue
+      repositories.backgroundJobs.setStatusToSuccess(BackgroundJobsId(TypoUUID.randomUUID)).futureValue
     }
   }
 }

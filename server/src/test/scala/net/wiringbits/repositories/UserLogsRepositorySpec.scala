@@ -3,30 +3,36 @@ package net.wiringbits.repositories
 import net.wiringbits.common.models.{Email, Name}
 import net.wiringbits.core.RepositorySpec
 import net.wiringbits.repositories.models.{User, UserLog}
+import net.wiringbits.typo_generated.customtypes.{TypoOffsetDateTime, TypoUUID}
+import net.wiringbits.typo_generated.public.user_logs.{UserLogsId, UserLogsRow}
+import net.wiringbits.typo_generated.public.users.{UsersId, UsersRow}
 import org.scalatest.concurrent.ScalaFutures.*
 import org.scalatest.matchers.must.Matchers.*
+import utils.{LoginUtils, RepositoryUtils}
 
 import java.util.UUID
 
-class UserLogsRepositorySpec extends RepositorySpec {
+class UserLogsRepositorySpec extends RepositorySpec with RepositoryUtils {
   "create" should {
-    "work" in withRepositories() { repositories =>
-      val request = User.CreateUser(
-        id = UUID.randomUUID(),
-        email = Email.trusted("hello@wiringbits.net"),
-        name = Name.trusted("Sample"),
-        hashedPassword = "password",
-        verifyEmailToken = "token"
-      )
-      repositories.users.create(request).futureValue
+    "work" in withRepositories() { implicit repositories =>
+      val usersRow = createNonVerifyUser().futureValue
 
-      val logsRequest = UserLog.CreateUserLog(userLogId = UUID.randomUUID(), userId = request.id, message = "test")
+      val logsRequest = UserLogsRow(
+        userLogId = UserLogsId(TypoUUID.randomUUID),
+        userId = usersRow.userId,
+        message = "Test",
+        createdAt = TypoOffsetDateTime.now
+      )
       repositories.userLogs.create(logsRequest).futureValue
     }
 
-    "fail if the user doesn't exists" in withRepositories() { repositories =>
-      val logsRequest =
-        UserLog.CreateUserLog(userLogId = UUID.randomUUID(), userId = UUID.randomUUID(), message = "test")
+    "fail if the user doesn't exists" in withRepositories() { implicit repositories =>
+      val logsRequest = UserLogsRow(
+        userLogId = UserLogsId(TypoUUID.randomUUID),
+        userId = UsersId(TypoUUID.randomUUID),
+        message = "Test",
+        createdAt = TypoOffsetDateTime.now
+      )
       val ex = intercept[RuntimeException] {
         repositories.userLogs.create(logsRequest).futureValue
       }
@@ -37,22 +43,15 @@ class UserLogsRepositorySpec extends RepositorySpec {
   }
 
   "create(userId, message)" should {
-    "work" in withRepositories() { repositories =>
-      val request = User.CreateUser(
-        id = UUID.randomUUID(),
-        email = Email.trusted("hello@wiringbits.net"),
-        name = Name.trusted("Sample"),
-        hashedPassword = "password",
-        verifyEmailToken = "token"
-      )
-      repositories.users.create(request).futureValue
+    "work" in withRepositories() { implicit repositories =>
+      val request = createNonVerifyUser().futureValue
 
-      repositories.userLogs.create(request.id, "test").futureValue
+      repositories.userLogs.create(request.userId, "test").futureValue
     }
 
     "fail if the user doesn't exists" in withRepositories() { repositories =>
       val ex = intercept[RuntimeException] {
-        repositories.userLogs.create(UUID.randomUUID(), "test").futureValue
+        repositories.userLogs.create(UsersId(TypoUUID.randomUUID), "test").futureValue
       }
       ex.getCause.getMessage must startWith(
         s"""ERROR: insert or update on table "user_logs" violates foreign key constraint "user_logs_users_fk""""
@@ -61,28 +60,21 @@ class UserLogsRepositorySpec extends RepositorySpec {
   }
 
   "logs" should {
-    "return every log" in withRepositories() { repositories =>
-      val request = User.CreateUser(
-        id = UUID.randomUUID(),
-        email = Email.trusted("hello@wiringbits.net"),
-        name = Name.trusted("Sample"),
-        hashedPassword = "password",
-        verifyEmailToken = "token"
-      )
-      repositories.users.create(request).futureValue
+    "return every log" in withRepositories() { implicit repositories =>
+      val request = createNonVerifyUser().futureValue
 
       val message = "test"
       for (_ <- 1 to 3) {
-        repositories.userLogs.create(request.id, message).futureValue
+        repositories.userLogs.create(request.userId, message).futureValue
       }
 
-      val response = repositories.userLogs.logs(request.id).futureValue
+      val response = repositories.userLogs.logs(request.userId).futureValue
       // Creating a user generates a user log. 3 + 1
       response.length must be(4)
     }
 
-    "return no results" in withRepositories() { repositories =>
-      val response = repositories.userLogs.logs(UUID.randomUUID()).futureValue
+    "return no results" in withRepositories() { implicit repositories =>
+      val response = repositories.userLogs.logs(UsersId(TypoUUID.randomUUID)).futureValue
       response.isEmpty must be(true)
     }
   }

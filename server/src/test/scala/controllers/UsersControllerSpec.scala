@@ -16,6 +16,9 @@ import net.wiringbits.common.models.*
 import net.wiringbits.config.UserTokensConfig
 import net.wiringbits.repositories.UserTokensRepository
 import net.wiringbits.repositories.models.UserTokenType
+import net.wiringbits.typo_generated.customtypes.TypoUUID
+import net.wiringbits.typo_generated.public.user_tokens.UserTokensId
+import net.wiringbits.typo_generated.public.users.UsersId
 import net.wiringbits.util.{TokenGenerator, TokensHelper}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
@@ -75,9 +78,9 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoS
 
       val response = client.createUser(request).futureValue
       val token = userTokensRepository
-        .find(response.id)
+        .find(UsersId(TypoUUID(response.id)))
         .futureValue
-        .find(_.tokenType == UserTokenType.EmailVerification)
+        .find(_.tokenType == UserTokenType.EmailVerification.toString)
         .value
 
       response.name must be(name)
@@ -153,7 +156,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoS
 
       client.verifyEmail(VerifyEmail.Request(UserToken(userId = user.id, token = verificationToken))).futureValue
 
-      userTokensRepository.find(user.id).futureValue must be(empty)
+      userTokensRepository.find(UsersId(TypoUUID(user.id))).futureValue must be(empty)
     }
 
     "fail when trying to verify an already verified user's email" in withApiClient { client =>
@@ -372,9 +375,9 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoS
       val response = client.sendEmailVerificationToken(request).futureValue
 
       val token = userTokensRepository
-        .find(userCreated.id)
+        .find(UsersId(TypoUUID(userCreated.id)))
         .futureValue
-        .find(_.tokenType == UserTokenType.EmailVerification)
+        .find(_.tokenType == UserTokenType.EmailVerification.toString)
         .value
 
       response.expiresAt must be(token.expiresAt)
