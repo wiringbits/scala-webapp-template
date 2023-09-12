@@ -33,7 +33,7 @@ class UserLogsRepository @Inject() (database: Database)(implicit ec: DatabaseExe
 
   def logs(usersId: UsersId): Future[List[UserLogsRow]] = Future {
     database.withConnection { implicit conn =>
-      UserLogsRepoImpl.select.where(_.userId === usersId).toList
+      UserLogsRepoImpl.select.where(_.userId === usersId).orderBy(_.createdAt.desc).toList
     }
   }
 }

@@ -22,13 +22,19 @@ class UserTokensRepository @Inject() (
 
   def find(usersId: UsersId, token: String): Future[Option[UserTokensRow]] = Future {
     database.withConnection { implicit conn =>
-      UserTokensRepoImpl.select.where(_.userId === usersId).where(_.token === token).limit(1).toList.headOption
+      UserTokensRepoImpl.select
+        .where(_.userId === usersId)
+        .where(_.token === token)
+        .orderBy(_.createdAt.desc)
+        .limit(1)
+        .toList
+        .headOption
     }
   }
 
   def find(usersId: UsersId): Future[List[UserTokensRow]] = Future {
     database.withConnection { implicit conn =>
-      UserTokensRepoImpl.select.where(_.userId === usersId).toList
+      UserTokensRepoImpl.select.where(_.userId === usersId).orderBy(_.createdAt.asc).toList
     }
   }
 

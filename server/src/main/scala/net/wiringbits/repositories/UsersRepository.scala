@@ -67,7 +67,12 @@ class UsersRepository @Inject() (
 
   def find(email: Email): Future[Option[UsersRow]] = Future {
     database.withConnection { implicit conn =>
-      UsersRepoImpl.select.where(_.email === TypoUnknownCitext(email.string)).limit(1).toList.headOption
+      UsersRepoImpl.select
+        .where(_.email === TypoUnknownCitext(email.string))
+        .orderBy(_.createdAt.desc)
+        .limit(1)
+        .toList
+        .headOption
     }
   }
 
