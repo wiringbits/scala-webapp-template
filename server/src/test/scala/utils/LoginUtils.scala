@@ -33,5 +33,5 @@ trait LoginUtils {
       response <- client.login(loginRequest)
     } yield response
   }
-  
+
 }

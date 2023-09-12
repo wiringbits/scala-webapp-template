@@ -42,7 +42,8 @@ package object endpoints {
     .example(ErrorResponse("Unauthorized: Invalid or missing authentication"))
     .schema(_.hidden(true))
 
-  def userAuth(implicit handleAuth: ServerRequest => Future[UsersId]): EndpointInput.ExtractFromRequest[Future[UsersId
-  ]] =
+  def userAuth(implicit
+      handleAuth: ServerRequest => Future[UsersId]
+  ): EndpointInput.ExtractFromRequest[Future[UsersId]] =
     extractFromRequest(handleAuth)
 }
