@@ -2,16 +2,13 @@ package net.wiringbits.validations
 
 import net.wiringbits.common.models.Email
 import net.wiringbits.repositories.UsersRepository
-import net.wiringbits.typo_generated.customtypes.TypoUnknownCitext
-import net.wiringbits.typo_generated.public.users.UsersRepoImpl
 
-import java.sql.Connection
 import scala.concurrent.{ExecutionContext, Future}
 
 object ValidateEmailIsRegistered {
-  def apply(email: Email)(using ec: ExecutionContext, conn: Connection): Future[Unit] = {
+  def apply(repository: UsersRepository, email: Email)(implicit ec: ExecutionContext): Future[Unit] = {
     for {
-      maybe <- Future(UsersRepoImpl.select.where(_.email === TypoUnknownCitext(email.string)).toList.headOption)
+      maybe <- repository.find(email)
     } yield {
       if (maybe.isEmpty) throw new RuntimeException(s"The email is not registered")
       else ()

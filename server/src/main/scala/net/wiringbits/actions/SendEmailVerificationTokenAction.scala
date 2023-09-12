@@ -29,8 +29,7 @@ class SendEmailVerificationTokenAction @Inject() (
   private def validations(request: SendEmailVerificationToken.Request) = {
     for {
       _ <- ValidateCaptcha(reCaptchaApi, request.captcha)
-      // TODO
-//      _ <- ValidateEmailIsRegistered(usersRepository, request.email)
+      _ <- ValidateEmailIsRegistered(usersRepository, request.email)
     } yield ()
   }
 }

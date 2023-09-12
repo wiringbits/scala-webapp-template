@@ -62,8 +62,7 @@ class CreateUserAction @Inject() (
   private def validations(request: CreateUser.Request) = {
     for {
       _ <- ValidateCaptcha(reCaptchaApi, request.captcha)
-      // TODO
-//      _ <- ValidateEmailIsAvailable(usersRepository, request.email)
+      _ <- ValidateEmailIsAvailable(usersRepository, request.email)
     } yield ()
   }
 }
