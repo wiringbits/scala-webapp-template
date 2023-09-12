@@ -48,6 +48,7 @@ Deployment 2m demo:
 7. Reasonable Continuous-Integration workflows, don't waste time reviewing code format or asking whether tests are passing, Github Actions do this for you.
 8. A simple to follow architecture, including short-guides for doing common tasks. 
 9. Deployment scripts to cloud instances, we believe in simplicity and most projects are fine with simple managed servers instead of containers/K8s/etc.
+10. A SQL DSL library for postgres databases created by [Typo](https://oyvindberg.github.io/typo/docs/). Just run the `GenerateTypoSQLDSL.scala` file located in the root directory using [scala-cli](https://scala-cli.virtuslab.org/) (running `scala-cli GenerateTypoSQLDSL` in the terminal).
 
 ## Get started
 
