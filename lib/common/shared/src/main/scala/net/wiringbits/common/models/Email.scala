@@ -1,5 +1,6 @@
 package net.wiringbits.common.models
 
+import anorm.*
 import net.wiringbits.webapp.common.models.WrappedString
 import net.wiringbits.webapp.common.validators.ValidationResult
 
@@ -20,4 +21,21 @@ object Email extends WrappedString.Companion[Email] {
   }
 
   override def trusted(string: String): Email = new Email(string)
+
+  implicit val column: Column[Email] = Column.nonNull[Email] { (value, _) =>
+    value match {
+      case string: String => Right(trusted(string))
+      case _ => Left(TypeDoesNotMatch("Error parsing the email"))
+    }
+  }
+
+  implicit val ordering: Ordering[Email] = Ordering.by(_.string)
+
+  implicit val toStatement: ToStatement[Email] = ToStatement[Email]((s, index, v) => s.setObject(index, v.string))
+
+  implicit val emailParameterMetaData: ParameterMetaData[Email] = new ParameterMetaData[Email] {
+    override def sqlType: String = "CITEXT"
+
+    override def jdbcType: Int = java.sql.Types.OTHER
+  }
 }

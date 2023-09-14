@@ -11,8 +11,10 @@ package users
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
-import net.wiringbits.typo_generated.customtypes.TypoOffsetDateTime
-import net.wiringbits.typo_generated.customtypes.TypoUnknownCitext
+import java.time.Instant
+import java.util.UUID
+import net.wiringbits.common.models.Email
+import net.wiringbits.common.models.Name
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -23,13 +25,13 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class UsersRow(
-    userId: UsersId,
-    name: String,
+    userId: /* user-picked */ UUID,
+    name: /* user-picked */ Name,
     lastName: Option[String],
-    email: TypoUnknownCitext,
+    email: /* user-picked */ Email,
     password: String,
-    createdAt: TypoOffsetDateTime,
-    verifiedOn: Option[TypoOffsetDateTime]
+    createdAt: /* user-picked */ Instant,
+    verifiedOn: Option[ /* user-picked */ Instant]
 )
 
 object UsersRow {
@@ -37,13 +39,13 @@ object UsersRow {
     JsResult.fromTry(
       Try(
         UsersRow(
-          userId = json.\("user_id").as(UsersId.reads),
-          name = json.\("name").as(Reads.StringReads),
+          userId = json.\("user_id").as(Reads.uuidReads),
+          name = json.\("name").as(implicitly[Reads[Name]]),
           lastName = json.\("last_name").toOption.map(_.as(Reads.StringReads)),
-          email = json.\("email").as(TypoUnknownCitext.reads),
+          email = json.\("email").as(implicitly[Reads[Email]]),
           password = json.\("password").as(Reads.StringReads),
-          createdAt = json.\("created_at").as(TypoOffsetDateTime.reads),
-          verifiedOn = json.\("verified_on").toOption.map(_.as(TypoOffsetDateTime.reads))
+          createdAt = json.\("created_at").as(implicitly[Reads[Instant]]),
+          verifiedOn = json.\("verified_on").toOption.map(_.as(implicitly[Reads[Instant]]))
         )
       )
     )
@@ -51,26 +53,26 @@ object UsersRow {
   def rowParser(idx: Int): RowParser[UsersRow] = RowParser[UsersRow] { row =>
     Success(
       UsersRow(
-        userId = row(idx + 0)(UsersId.column),
-        name = row(idx + 1)(Column.columnToString),
+        userId = row(idx + 0)(Column.columnToUUID),
+        name = row(idx + 1)(implicitly[Column[Name]]),
         lastName = row(idx + 2)(Column.columnToOption(Column.columnToString)),
-        email = row(idx + 3)(TypoUnknownCitext.column),
+        email = row(idx + 3)(implicitly[Column[Email]]),
         password = row(idx + 4)(Column.columnToString),
-        createdAt = row(idx + 5)(TypoOffsetDateTime.column),
-        verifiedOn = row(idx + 6)(Column.columnToOption(TypoOffsetDateTime.column))
+        createdAt = row(idx + 5)(Implicits.instantColumn),
+        verifiedOn = row(idx + 6)(Column.columnToOption(Implicits.instantColumn))
       )
     )
   }
   implicit lazy val writes: OWrites[UsersRow] = OWrites[UsersRow](o =>
     new JsObject(
       ListMap[String, JsValue](
-        "user_id" -> UsersId.writes.writes(o.userId),
-        "name" -> Writes.StringWrites.writes(o.name),
+        "user_id" -> Writes.UuidWrites.writes(o.userId),
+        "name" -> implicitly[Writes[Name]].writes(o.name),
         "last_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.lastName),
-        "email" -> TypoUnknownCitext.writes.writes(o.email),
+        "email" -> implicitly[Writes[Email]].writes(o.email),
         "password" -> Writes.StringWrites.writes(o.password),
-        "created_at" -> TypoOffsetDateTime.writes.writes(o.createdAt),
-        "verified_on" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.verifiedOn)
+        "created_at" -> implicitly[Writes[Instant]].writes(o.createdAt),
+        "verified_on" -> Writes.OptionWrites(implicitly[Writes[Instant]]).writes(o.verifiedOn)
       )
     )
   )

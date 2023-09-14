@@ -8,9 +8,10 @@ package typo_generated
 package public
 package background_jobs
 
+import java.time.Instant
+import java.util.UUID
 import net.wiringbits.typo_generated.customtypes.Defaulted
 import net.wiringbits.typo_generated.customtypes.TypoJsonb
-import net.wiringbits.typo_generated.customtypes.TypoOffsetDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -22,7 +23,7 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `public.background_jobs` which has not been persisted yet */
 case class BackgroundJobsRowUnsaved(
-    backgroundJobId: BackgroundJobsId,
+    backgroundJobId: /* user-picked */ UUID,
     `type`: String,
     payload: TypoJsonb,
     status: String,
@@ -30,17 +31,17 @@ case class BackgroundJobsRowUnsaved(
     /** Default: 0 */
     errorCount: Defaulted[Option[Int]] = Defaulted.UseDefault,
     /** Default: now() */
-    executeAt: Defaulted[TypoOffsetDateTime] = Defaulted.UseDefault,
+    executeAt: Defaulted[ /* user-picked */ Instant] = Defaulted.UseDefault,
     /** Default: now() */
-    createdAt: Defaulted[TypoOffsetDateTime] = Defaulted.UseDefault,
+    createdAt: Defaulted[ /* user-picked */ Instant] = Defaulted.UseDefault,
     /** Default: now() */
-    updatedAt: Defaulted[TypoOffsetDateTime] = Defaulted.UseDefault
+    updatedAt: Defaulted[ /* user-picked */ Instant] = Defaulted.UseDefault
 ) {
   def toRow(
       errorCountDefault: => Option[Int],
-      executeAtDefault: => TypoOffsetDateTime,
-      createdAtDefault: => TypoOffsetDateTime,
-      updatedAtDefault: => TypoOffsetDateTime
+      executeAtDefault: => /* user-picked */ Instant,
+      createdAtDefault: => /* user-picked */ Instant,
+      updatedAtDefault: => /* user-picked */ Instant
   ): BackgroundJobsRow =
     BackgroundJobsRow(
       backgroundJobId = backgroundJobId,
@@ -71,15 +72,15 @@ object BackgroundJobsRowUnsaved {
     JsResult.fromTry(
       Try(
         BackgroundJobsRowUnsaved(
-          backgroundJobId = json.\("background_job_id").as(BackgroundJobsId.reads),
+          backgroundJobId = json.\("background_job_id").as(Reads.uuidReads),
           `type` = json.\("type").as(Reads.StringReads),
           payload = json.\("payload").as(TypoJsonb.reads),
           status = json.\("status").as(Reads.StringReads),
           statusDetails = json.\("status_details").toOption.map(_.as(Reads.StringReads)),
           errorCount = json.\("error_count").as(Defaulted.readsOpt(Reads.IntReads)),
-          executeAt = json.\("execute_at").as(Defaulted.reads(TypoOffsetDateTime.reads)),
-          createdAt = json.\("created_at").as(Defaulted.reads(TypoOffsetDateTime.reads)),
-          updatedAt = json.\("updated_at").as(Defaulted.reads(TypoOffsetDateTime.reads))
+          executeAt = json.\("execute_at").as(Defaulted.reads(implicitly[Reads[Instant]])),
+          createdAt = json.\("created_at").as(Defaulted.reads(implicitly[Reads[Instant]])),
+          updatedAt = json.\("updated_at").as(Defaulted.reads(implicitly[Reads[Instant]]))
         )
       )
     )
@@ -87,15 +88,15 @@ object BackgroundJobsRowUnsaved {
   implicit lazy val writes: OWrites[BackgroundJobsRowUnsaved] = OWrites[BackgroundJobsRowUnsaved](o =>
     new JsObject(
       ListMap[String, JsValue](
-        "background_job_id" -> BackgroundJobsId.writes.writes(o.backgroundJobId),
+        "background_job_id" -> Writes.UuidWrites.writes(o.backgroundJobId),
         "type" -> Writes.StringWrites.writes(o.`type`),
         "payload" -> TypoJsonb.writes.writes(o.payload),
         "status" -> Writes.StringWrites.writes(o.status),
         "status_details" -> Writes.OptionWrites(Writes.StringWrites).writes(o.statusDetails),
         "error_count" -> Defaulted.writes(Writes.OptionWrites(Writes.IntWrites)).writes(o.errorCount),
-        "execute_at" -> Defaulted.writes(TypoOffsetDateTime.writes).writes(o.executeAt),
-        "created_at" -> Defaulted.writes(TypoOffsetDateTime.writes).writes(o.createdAt),
-        "updated_at" -> Defaulted.writes(TypoOffsetDateTime.writes).writes(o.updatedAt)
+        "execute_at" -> Defaulted.writes(implicitly[Writes[Instant]]).writes(o.executeAt),
+        "created_at" -> Defaulted.writes(implicitly[Writes[Instant]]).writes(o.createdAt),
+        "updated_at" -> Defaulted.writes(implicitly[Writes[Instant]]).writes(o.updatedAt)
       )
     )
   )

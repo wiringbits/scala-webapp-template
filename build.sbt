@@ -228,6 +228,7 @@ lazy val common = (crossProject(JSPlatform, JVMPlatform) in file("lib/common"))
     libraryDependencies ++= Seq(
       "com.typesafe.play" %% "play-json" % playJson,
       "net.wiringbits" %% "webapp-common" % webappUtils,
+      "org.playframework.anorm" %% "anorm" % anorm,
       "org.scalatest" %% "scalatest" % "3.2.16" % Test
     )
   )
@@ -445,6 +446,7 @@ lazy val web = (project in file("web"))
   )
 
 lazy val typo = (crossProject(JSPlatform, JVMPlatform) in file("typo"))
+  .dependsOn(common)
   .settings(
     name := "wiringbits-typo",
     libraryDependencies ++= Seq(

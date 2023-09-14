@@ -1,12 +1,11 @@
 package net.wiringbits.repositories
 
 import net.wiringbits.executors.DatabaseExecutionContext
-import net.wiringbits.typo_generated.customtypes.{TypoOffsetDateTime, TypoUUID}
-import net.wiringbits.typo_generated.public.user_logs.{UserLogsId, UserLogsRepoImpl, UserLogsRow}
-import net.wiringbits.typo_generated.public.users.UsersId
+import net.wiringbits.typo_generated.public.user_logs.{UserLogsRepoImpl, UserLogsRow}
 import play.api.db.Database
 
 import java.time.{Clock, ZoneOffset}
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.Future
 
@@ -18,12 +17,12 @@ class UserLogsRepository @Inject() (database: Database)(implicit ec: DatabaseExe
     }
   }
 
-  def create(usersId: UsersId, message: String): Future[Unit] = Future {
+  def create(userId: UUID, message: String): Future[Unit] = Future {
     val createUserLogsRow = UserLogsRow(
-      userLogId = UserLogsId(TypoUUID.randomUUID),
-      userId = usersId,
+      userLogId = UUID.randomUUID(),
+      userId = userId,
       message = message,
-      createdAt = TypoOffsetDateTime(clock.instant().atOffset(ZoneOffset.UTC))
+      createdAt = clock.instant()
     )
 
     database.withConnection { implicit conn =>
@@ -31,9 +30,9 @@ class UserLogsRepository @Inject() (database: Database)(implicit ec: DatabaseExe
     }
   }
 
-  def logs(usersId: UsersId): Future[List[UserLogsRow]] = Future {
+  def logs(userId: UUID): Future[List[UserLogsRow]] = Future {
     database.withConnection { implicit conn =>
-      UserLogsRepoImpl.select.where(_.userId === usersId).orderBy(_.createdAt.desc).toList
+      UserLogsRepoImpl.select.where(_.userId === userId).orderBy(_.createdAt.desc).toList
     }
   }
 }

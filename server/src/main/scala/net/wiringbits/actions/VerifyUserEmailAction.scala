@@ -4,7 +4,7 @@ import net.wiringbits.api.models.VerifyEmail
 import net.wiringbits.common.models.Name
 import net.wiringbits.config.UserTokensConfig
 import net.wiringbits.repositories.{UserTokensRepository, UsersRepository}
-import net.wiringbits.typo_generated.public.users.UsersId
+
 import net.wiringbits.util.{EmailMessage, TokensHelper}
 import net.wiringbits.validations.{ValidateUserIsNotVerified, ValidateUserToken}
 
@@ -21,20 +21,20 @@ class VerifyUserEmailAction @Inject() (
     ec: ExecutionContext,
     clock: Clock
 ) {
-  def apply(usersId: UsersId, token: UUID): Future[VerifyEmail.Response] = for {
+  def apply(userId: UUID, token: UUID): Future[VerifyEmail.Response] = for {
     // when the user is not verified
-    userMaybe <- usersRepository.find(usersId)
+    userMaybe <- usersRepository.find(userId)
     user = userMaybe.getOrElse(throw new RuntimeException(s"User wasn't found"))
     _ = ValidateUserIsNotVerified(user)
 
     // the token is validated
     hmacToken = TokensHelper.doHMACSHA1(token.toString.getBytes, userTokensConfig.hmacSecret)
-    tokenMaybe <- userTokensRepository.find(usersId, hmacToken)
-    userToken = tokenMaybe.getOrElse(throw new RuntimeException(s"Token for user $usersId wasn't found"))
+    tokenMaybe <- userTokensRepository.find(userId, hmacToken)
+    userToken = tokenMaybe.getOrElse(throw new RuntimeException(s"Token for user $userId wasn't found"))
     _ = ValidateUserToken(userToken)
 
     // then, the user is marked as verified
-    emailMessage = EmailMessage.confirm(Name.trusted(user.name))
-    _ <- usersRepository.verify(usersId = usersId, userTokensId = userToken.userTokenId, emailMessage)
+    emailMessage = EmailMessage.confirm(user.name)
+    _ <- usersRepository.verify(userId = userId, userTokenId = userToken.userTokenId, emailMessage)
   } yield VerifyEmail.Response()
 }

@@ -11,8 +11,8 @@ package user_tokens
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
-import net.wiringbits.typo_generated.customtypes.TypoOffsetDateTime
-import net.wiringbits.typo_generated.public.users.UsersId
+import java.time.Instant
+import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -23,13 +23,13 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class UserTokensRow(
-    userTokenId: UserTokensId,
+    userTokenId: /* user-picked */ UUID,
     token: String,
     tokenType: String,
-    createdAt: TypoOffsetDateTime,
-    expiresAt: TypoOffsetDateTime,
+    createdAt: /* user-picked */ Instant,
+    expiresAt: /* user-picked */ Instant,
     /** Points to [[users.UsersRow.userId]] */
-    userId: UsersId
+    userId: /* user-picked */ UUID
 )
 
 object UserTokensRow {
@@ -37,12 +37,12 @@ object UserTokensRow {
     JsResult.fromTry(
       Try(
         UserTokensRow(
-          userTokenId = json.\("user_token_id").as(UserTokensId.reads),
+          userTokenId = json.\("user_token_id").as(Reads.uuidReads),
           token = json.\("token").as(Reads.StringReads),
           tokenType = json.\("token_type").as(Reads.StringReads),
-          createdAt = json.\("created_at").as(TypoOffsetDateTime.reads),
-          expiresAt = json.\("expires_at").as(TypoOffsetDateTime.reads),
-          userId = json.\("user_id").as(UsersId.reads)
+          createdAt = json.\("created_at").as(implicitly[Reads[Instant]]),
+          expiresAt = json.\("expires_at").as(implicitly[Reads[Instant]]),
+          userId = json.\("user_id").as(Reads.uuidReads)
         )
       )
     )
@@ -50,24 +50,24 @@ object UserTokensRow {
   def rowParser(idx: Int): RowParser[UserTokensRow] = RowParser[UserTokensRow] { row =>
     Success(
       UserTokensRow(
-        userTokenId = row(idx + 0)(UserTokensId.column),
+        userTokenId = row(idx + 0)(Column.columnToUUID),
         token = row(idx + 1)(Column.columnToString),
         tokenType = row(idx + 2)(Column.columnToString),
-        createdAt = row(idx + 3)(TypoOffsetDateTime.column),
-        expiresAt = row(idx + 4)(TypoOffsetDateTime.column),
-        userId = row(idx + 5)(UsersId.column)
+        createdAt = row(idx + 3)(Implicits.instantColumn),
+        expiresAt = row(idx + 4)(Implicits.instantColumn),
+        userId = row(idx + 5)(Column.columnToUUID)
       )
     )
   }
   implicit lazy val writes: OWrites[UserTokensRow] = OWrites[UserTokensRow](o =>
     new JsObject(
       ListMap[String, JsValue](
-        "user_token_id" -> UserTokensId.writes.writes(o.userTokenId),
+        "user_token_id" -> Writes.UuidWrites.writes(o.userTokenId),
         "token" -> Writes.StringWrites.writes(o.token),
         "token_type" -> Writes.StringWrites.writes(o.tokenType),
-        "created_at" -> TypoOffsetDateTime.writes.writes(o.createdAt),
-        "expires_at" -> TypoOffsetDateTime.writes.writes(o.expiresAt),
-        "user_id" -> UsersId.writes.writes(o.userId)
+        "created_at" -> implicitly[Writes[Instant]].writes(o.createdAt),
+        "expires_at" -> implicitly[Writes[Instant]].writes(o.expiresAt),
+        "user_id" -> Writes.UuidWrites.writes(o.userId)
       )
     )
   )

@@ -4,7 +4,7 @@ import net.wiringbits.api.models.ResetPassword
 import net.wiringbits.common.models.{Email, Name, Password}
 import net.wiringbits.config.UserTokensConfig
 import net.wiringbits.repositories.{UserTokensRepository, UsersRepository}
-import net.wiringbits.typo_generated.public.users.UsersId
+
 import net.wiringbits.util.{EmailMessage, TokensHelper}
 import net.wiringbits.validations.ValidateUserToken
 import org.mindrot.jbcrypt.BCrypt
@@ -23,20 +23,20 @@ class ResetPasswordAction @Inject() (
     clock: Clock
 ) {
 
-  def apply(usersId: UsersId, token: UUID, password: Password): Future[ResetPassword.Response] = {
+  def apply(userId: UUID, token: UUID, password: Password): Future[ResetPassword.Response] = {
     val hashedPassword = BCrypt.hashpw(password.string, BCrypt.gensalt())
     val hmacToken = TokensHelper.doHMACSHA1(token.toString.getBytes, userTokensConfig.hmacSecret)
     for {
       // When the token valid
-      tokenMaybe <- userTokensRepository.find(usersId, hmacToken)
-      token = tokenMaybe.getOrElse(throw new RuntimeException(s"Token for user $usersId wasn't found"))
+      tokenMaybe <- userTokensRepository.find(userId, hmacToken)
+      token = tokenMaybe.getOrElse(throw new RuntimeException(s"Token for user $userId wasn't found"))
       _ = ValidateUserToken(token)
 
       // We trigger the reset password flow
-      userMaybe <- usersRepository.find(usersId)
-      user = userMaybe.getOrElse(throw new RuntimeException(s"User with id $usersId wasn't found"))
-      emailMessage = EmailMessage.resetPassword(Name.trusted(user.name))
-      _ <- usersRepository.resetPassword(usersId, hashedPassword, emailMessage)
-    } yield ResetPassword.Response(name = Name.trusted(user.name), email = Email.trusted(user.email.value))
+      userMaybe <- usersRepository.find(userId)
+      user = userMaybe.getOrElse(throw new RuntimeException(s"User with id $userId wasn't found"))
+      emailMessage = EmailMessage.resetPassword(user.name)
+      _ <- usersRepository.resetPassword(userId, hashedPassword, emailMessage)
+    } yield ResetPassword.Response(name = user.name, email = user.email)
   }
 }

@@ -12,19 +12,19 @@ import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
-import net.wiringbits.typo_generated.customtypes.TypoOffsetDateTime
-import net.wiringbits.typo_generated.public.users.UsersId
+import java.time.Instant
+import java.util.UUID
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 object UserTokensRepoImpl extends UserTokensRepo {
-  override def delete(userTokenId: UserTokensId)(implicit c: Connection): Boolean = {
+  override def delete(userTokenId: /* user-picked */ UUID)(implicit c: Connection): Boolean = {
     SQL"""delete from public.user_tokens where "user_token_id" = ${ParameterValue(
         userTokenId,
         null,
-        UserTokensId.toStatement
+        ToStatement.uuidToStatement
       )}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[UserTokensFields, UserTokensRow] = {
@@ -32,19 +32,19 @@ object UserTokensRepoImpl extends UserTokensRepo {
   }
   override def insert(unsaved: UserTokensRow)(implicit c: Connection): UserTokensRow = {
     SQL"""insert into public.user_tokens("user_token_id", "token", "token_type", "created_at", "expires_at", "user_id")
-          values (${ParameterValue(unsaved.userTokenId, null, UserTokensId.toStatement)}::uuid, ${ParameterValue(
+          values (${ParameterValue(unsaved.userTokenId, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(
         unsaved.token,
         null,
         ToStatement.stringToStatement
       )}, ${ParameterValue(unsaved.tokenType, null, ToStatement.stringToStatement)}, ${ParameterValue(
         unsaved.createdAt,
         null,
-        TypoOffsetDateTime.toStatement
+        implicitly[ToStatement[Instant]]
       )}::timestamptz, ${ParameterValue(
         unsaved.expiresAt,
         null,
-        TypoOffsetDateTime.toStatement
-      )}::timestamptz, ${ParameterValue(unsaved.userId, null, UsersId.toStatement)}::uuid)
+        implicitly[ToStatement[Instant]]
+      )}::timestamptz, ${ParameterValue(unsaved.userId, null, ToStatement.uuidToStatement)}::uuid)
           returning "user_token_id", "token", "token_type", "created_at"::text, "expires_at"::text, "user_id"
        """
       .executeInsert(UserTokensRow.rowParser(1).single)
@@ -58,13 +58,15 @@ object UserTokensRepoImpl extends UserTokensRepo {
           from public.user_tokens
        """.as(UserTokensRow.rowParser(1).*)
   }
-  override def selectById(userTokenId: UserTokensId)(implicit c: Connection): Option[UserTokensRow] = {
+  override def selectById(userTokenId: /* user-picked */ UUID)(implicit c: Connection): Option[UserTokensRow] = {
     SQL"""select "user_token_id", "token", "token_type", "created_at"::text, "expires_at"::text, "user_id"
           from public.user_tokens
-          where "user_token_id" = ${ParameterValue(userTokenId, null, UserTokensId.toStatement)}
+          where "user_token_id" = ${ParameterValue(userTokenId, null, ToStatement.uuidToStatement)}
        """.as(UserTokensRow.rowParser(1).singleOpt)
   }
-  override def selectByIds(userTokenIds: Array[UserTokensId])(implicit c: Connection): List[UserTokensRow] = {
+  override def selectByIds(
+      userTokenIds: Array[ /* user-picked */ UUID]
+  )(implicit c: Connection, toStatement: ToStatement[Array[ /* user-picked */ UUID]]): List[UserTokensRow] = {
     SQL"""select "user_token_id", "token", "token_type", "created_at"::text, "expires_at"::text, "user_id"
           from public.user_tokens
           where "user_token_id" = ANY(${userTokenIds})
@@ -76,10 +78,10 @@ object UserTokensRepoImpl extends UserTokensRepo {
     SQL"""update public.user_tokens
           set "token" = ${ParameterValue(row.token, null, ToStatement.stringToStatement)},
               "token_type" = ${ParameterValue(row.tokenType, null, ToStatement.stringToStatement)},
-              "created_at" = ${ParameterValue(row.createdAt, null, TypoOffsetDateTime.toStatement)}::timestamptz,
-              "expires_at" = ${ParameterValue(row.expiresAt, null, TypoOffsetDateTime.toStatement)}::timestamptz,
-              "user_id" = ${ParameterValue(row.userId, null, UsersId.toStatement)}::uuid
-          where "user_token_id" = ${ParameterValue(userTokenId, null, UserTokensId.toStatement)}
+              "created_at" = ${ParameterValue(row.createdAt, null, implicitly[ToStatement[Instant]])}::timestamptz,
+              "expires_at" = ${ParameterValue(row.expiresAt, null, implicitly[ToStatement[Instant]])}::timestamptz,
+              "user_id" = ${ParameterValue(row.userId, null, ToStatement.uuidToStatement)}::uuid
+          where "user_token_id" = ${ParameterValue(userTokenId, null, ToStatement.uuidToStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[UserTokensFields, UserTokensRow] = {
@@ -88,12 +90,12 @@ object UserTokensRepoImpl extends UserTokensRepo {
   override def upsert(unsaved: UserTokensRow)(implicit c: Connection): UserTokensRow = {
     SQL"""insert into public.user_tokens("user_token_id", "token", "token_type", "created_at", "expires_at", "user_id")
           values (
-            ${ParameterValue(unsaved.userTokenId, null, UserTokensId.toStatement)}::uuid,
+            ${ParameterValue(unsaved.userTokenId, null, ToStatement.uuidToStatement)}::uuid,
             ${ParameterValue(unsaved.token, null, ToStatement.stringToStatement)},
             ${ParameterValue(unsaved.tokenType, null, ToStatement.stringToStatement)},
-            ${ParameterValue(unsaved.createdAt, null, TypoOffsetDateTime.toStatement)}::timestamptz,
-            ${ParameterValue(unsaved.expiresAt, null, TypoOffsetDateTime.toStatement)}::timestamptz,
-            ${ParameterValue(unsaved.userId, null, UsersId.toStatement)}::uuid
+            ${ParameterValue(unsaved.createdAt, null, implicitly[ToStatement[Instant]])}::timestamptz,
+            ${ParameterValue(unsaved.expiresAt, null, implicitly[ToStatement[Instant]])}::timestamptz,
+            ${ParameterValue(unsaved.userId, null, ToStatement.uuidToStatement)}::uuid
           )
           on conflict ("user_token_id")
           do update set

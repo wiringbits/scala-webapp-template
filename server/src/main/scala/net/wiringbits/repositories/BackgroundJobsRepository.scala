@@ -3,15 +3,11 @@ package net.wiringbits.repositories
 import anorm.{AkkaStream, SqlStringInterpolation}
 import net.wiringbits.executors.DatabaseExecutionContext
 import net.wiringbits.models.jobs.BackgroundJobStatus
-import net.wiringbits.typo_generated.customtypes.TypoOffsetDateTime
-import net.wiringbits.typo_generated.public.background_jobs.{
-  BackgroundJobsId,
-  BackgroundJobsRepoImpl,
-  BackgroundJobsRow
-}
+import net.wiringbits.typo_generated.public.background_jobs.{BackgroundJobsRepoImpl, BackgroundJobsRow}
 import play.api.db.Database
 
 import java.time.{Clock, Instant, ZoneOffset}
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.Future
 import scala.util.control.NonFatal
@@ -56,8 +52,8 @@ class BackgroundJobsRepository @Inject() (database: Database)(implicit ec: Datab
   }
 
   def setStatusToFailed(
-      backgroundJobsId: BackgroundJobsId,
-      executeAt: TypoOffsetDateTime,
+      backgroundJobsId: UUID,
+      executeAt: Instant,
       failReason: String
   ): Future[Unit] = Future {
     database.withConnection { implicit conn =>
@@ -71,16 +67,16 @@ class BackgroundJobsRepository @Inject() (database: Database)(implicit ec: Datab
         .setValue(_.statusDetails)(Some(failReason))
         .setValue(_.errorCount)(row.errorCount.map(_ + 1))
         .setValue(_.executeAt)(executeAt)
-        .setValue(_.updatedAt)(TypoOffsetDateTime(clock.instant().atOffset(ZoneOffset.UTC)))
+        .setValue(_.updatedAt)(clock.instant())
     }
   }
 
-  def setStatusToSuccess(backgroundJobsId: BackgroundJobsId): Future[Unit] = Future {
+  def setStatusToSuccess(backgroundJobsId: UUID): Future[Unit] = Future {
     database.withConnection { implicit conn =>
       BackgroundJobsRepoImpl.update
         .where(_.backgroundJobId == backgroundJobsId)
         .setValue(_.status)(BackgroundJobStatus.Success.toString)
-        .setValue(_.updatedAt)(TypoOffsetDateTime(clock.instant().atOffset(ZoneOffset.UTC)))
+        .setValue(_.updatedAt)(clock.instant())
         .execute()
     }
   }

@@ -8,8 +8,9 @@ package typo_generated
 package public
 package background_jobs
 
+import java.time.Instant
+import java.util.UUID
 import net.wiringbits.typo_generated.customtypes.TypoJsonb
-import net.wiringbits.typo_generated.customtypes.TypoOffsetDateTime
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
@@ -23,10 +24,11 @@ class BackgroundJobsStructure[Row](
 ) extends Relation[BackgroundJobsFields, BackgroundJobsRow, Row]
     with BackgroundJobsFields[Row] { outer =>
 
-  override val backgroundJobId = new IdField[BackgroundJobsId, Row](prefix, "background_job_id", None, Some("uuid"))(
-    x => extract(x).backgroundJobId,
-    (row, value) => merge(row, extract(row).copy(backgroundJobId = value))
-  )
+  override val backgroundJobId =
+    new IdField[ /* user-picked */ UUID, Row](prefix, "background_job_id", None, Some("uuid"))(
+      x => extract(x).backgroundJobId,
+      (row, value) => merge(row, extract(row).copy(backgroundJobId = value))
+    )
   override val `type` = new Field[String, Row](prefix, "type", None, None)(
     x => extract(x).`type`,
     (row, value) => merge(row, extract(row).copy(`type` = value))
@@ -47,18 +49,21 @@ class BackgroundJobsStructure[Row](
     x => extract(x).errorCount,
     (row, value) => merge(row, extract(row).copy(errorCount = value))
   )
-  override val executeAt = new Field[TypoOffsetDateTime, Row](prefix, "execute_at", Some("text"), Some("timestamptz"))(
-    x => extract(x).executeAt,
-    (row, value) => merge(row, extract(row).copy(executeAt = value))
-  )
-  override val createdAt = new Field[TypoOffsetDateTime, Row](prefix, "created_at", Some("text"), Some("timestamptz"))(
-    x => extract(x).createdAt,
-    (row, value) => merge(row, extract(row).copy(createdAt = value))
-  )
-  override val updatedAt = new Field[TypoOffsetDateTime, Row](prefix, "updated_at", Some("text"), Some("timestamptz"))(
-    x => extract(x).updatedAt,
-    (row, value) => merge(row, extract(row).copy(updatedAt = value))
-  )
+  override val executeAt =
+    new Field[ /* user-picked */ Instant, Row](prefix, "execute_at", Some("text"), Some("timestamptz"))(
+      x => extract(x).executeAt,
+      (row, value) => merge(row, extract(row).copy(executeAt = value))
+    )
+  override val createdAt =
+    new Field[ /* user-picked */ Instant, Row](prefix, "created_at", Some("text"), Some("timestamptz"))(
+      x => extract(x).createdAt,
+      (row, value) => merge(row, extract(row).copy(createdAt = value))
+    )
+  override val updatedAt =
+    new Field[ /* user-picked */ Instant, Row](prefix, "updated_at", Some("text"), Some("timestamptz"))(
+      x => extract(x).updatedAt,
+      (row, value) => merge(row, extract(row).copy(updatedAt = value))
+    )
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](

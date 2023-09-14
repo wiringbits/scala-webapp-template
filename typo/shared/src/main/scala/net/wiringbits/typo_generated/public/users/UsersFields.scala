@@ -8,19 +8,21 @@ package typo_generated
 package public
 package users
 
-import net.wiringbits.typo_generated.customtypes.TypoOffsetDateTime
-import net.wiringbits.typo_generated.customtypes.TypoUnknownCitext
+import java.time.Instant
+import java.util.UUID
+import net.wiringbits.common.models.Email
+import net.wiringbits.common.models.Name
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.SqlExpr.OptField
 
 trait UsersFields[Row] {
-  val userId: IdField[UsersId, Row]
-  val name: Field[String, Row]
+  val userId: IdField[ /* user-picked */ UUID, Row]
+  val name: Field[ /* user-picked */ Name, Row]
   val lastName: OptField[String, Row]
-  val email: Field[TypoUnknownCitext, Row]
+  val email: Field[ /* user-picked */ Email, Row]
   val password: Field[String, Row]
-  val createdAt: Field[TypoOffsetDateTime, Row]
-  val verifiedOn: OptField[TypoOffsetDateTime, Row]
+  val createdAt: Field[ /* user-picked */ Instant, Row]
+  val verifiedOn: OptField[ /* user-picked */ Instant, Row]
 }
 object UsersFields extends UsersStructure[UsersRow](None, identity, (_, x) => x)

@@ -4,10 +4,6 @@ import akka.actor.ActorSystem
 import akka.stream.scaladsl.Sink
 import net.wiringbits.common.models.{Email, Name}
 import net.wiringbits.core.RepositorySpec
-import net.wiringbits.repositories.models.User
-import net.wiringbits.typo_generated.customtypes.TypoUUID
-import net.wiringbits.typo_generated.public.user_tokens.UserTokensId
-import net.wiringbits.typo_generated.public.users.UsersId
 import net.wiringbits.util.EmailMessage
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.OptionValues.*
@@ -43,7 +39,7 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll with Rep
       val request = createNonVerifyUser().futureValue
       val ex = intercept[RuntimeException] {
         createNonVerifyUser(
-          usersIdMaybe = Some(request.userId),
+          userIdMaybe = Some(request.userId),
           emailMaybe = Some(Email.trusted("email2@wiringbits.net"))
         ).futureValue
       }
@@ -57,7 +53,7 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll with Rep
       val request = createNonVerifyUser().futureValue
 
       val ex = intercept[RuntimeException] {
-        createNonVerifyUser(emailMaybe = Some(Email.trusted(request.email.value))).futureValue
+        createNonVerifyUser(emailMaybe = Some(request.email)).futureValue
       }
       // TODO: This should be a better message
       ex.getCause.getMessage must startWith(
@@ -86,7 +82,7 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll with Rep
     "return a user when the email exists" in withRepositories() { implicit repositories =>
       val request = createNonVerifyUser().futureValue
 
-      val response = repositories.users.find(Email.trusted(request.email.value)).futureValue.value
+      val response = repositories.users.find(request.email).futureValue.value
       response.email must be(request.email)
       response.userId must be(request.userId)
       response.password must be(request.password)
@@ -95,7 +91,7 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll with Rep
     "return a user when the email exists (case insensitive match)" in withRepositories() { implicit repositories =>
       val request = createNonVerifyUser().futureValue
 
-      val email = Email.trusted(request.email.value.toUpperCase)
+      val email = Email.trusted(request.email.string.toUpperCase)
       val response = repositories.users.find(email).futureValue
       response.isDefined must be(true)
     }
@@ -118,7 +114,7 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll with Rep
     }
 
     "return no result when the id doesn't exists" in withRepositories() { implicit repositories =>
-      val response = repositories.users.find(UsersId(TypoUUID.randomUUID)).futureValue
+      val response = repositories.users.find(UUID.randomUUID()).futureValue
       response.isEmpty must be(true)
     }
   }
@@ -138,7 +134,7 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll with Rep
     "fail when the user doesn't exist" in withRepositories() { implicit repositories =>
       val newName = Name.trusted("Test")
       val ex = intercept[RuntimeException] {
-        repositories.users.update(UsersId(TypoUUID.randomUUID), newName).futureValue
+        repositories.users.update(UUID.randomUUID(), newName).futureValue
       }
       ex.getCause.getMessage must startWith(
         """ERROR: insert or update on table "user_logs" violates foreign key constraint "user_logs_users_fk""""
@@ -152,7 +148,7 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll with Rep
 
       val newPassword = "test"
       repositories.users
-        .updatePassword(request.userId, newPassword, EmailMessage.updatePassword(Name.trusted(request.name)))
+        .updatePassword(request.userId, newPassword, EmailMessage.updatePassword(request.name))
         .futureValue
 
       val response = repositories.users.find(request.userId).futureValue
@@ -164,7 +160,7 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll with Rep
 
       val newPassword = "test"
       repositories.users
-        .updatePassword(request.userId, newPassword, EmailMessage.updatePassword(Name.trusted(request.name)))
+        .updatePassword(request.userId, newPassword, EmailMessage.updatePassword(request.name))
         .futureValue
 
       val response = repositories.backgroundJobs.streamPendingJobs.futureValue
@@ -177,7 +173,7 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll with Rep
       val name = Name.trusted("test")
       val ex = intercept[RuntimeException] {
         repositories.users
-          .updatePassword(UsersId(TypoUUID.randomUUID), "test", EmailMessage.updatePassword(name))
+          .updatePassword(UUID.randomUUID(), "test", EmailMessage.updatePassword(name))
           .futureValue
       }
       ex.getCause.getMessage must startWith(
@@ -190,7 +186,7 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll with Rep
     "verify a user given a token" in withRepositories() { implicit repositories =>
       val request = createNonVerifyUser().futureValue
       repositories.users
-        .verify(request.userId, UserTokensId(TypoUUID.randomUUID), EmailMessage.confirm(Name.trusted(request.name)))
+        .verify(request.userId, UUID.randomUUID(), EmailMessage.confirm(request.name))
         .futureValue
 
       val response = repositories.users.find(request.userId).futureValue
@@ -200,7 +196,7 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll with Rep
     "produce a notification for the user" in withRepositories() { implicit repositories =>
       val request = createNonVerifyUser().futureValue
       repositories.users
-        .verify(request.userId, UserTokensId(TypoUUID.randomUUID), EmailMessage.confirm(Name.trusted(request.name)))
+        .verify(request.userId, UUID.randomUUID(), EmailMessage.confirm(request.name))
         .futureValue
 
       val response = repositories.backgroundJobs.streamPendingJobs.futureValue
@@ -213,7 +209,7 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll with Rep
       val name = Name.trusted("test")
       val ex = intercept[RuntimeException] {
         repositories.users
-          .verify(UsersId(TypoUUID.randomUUID), UserTokensId(TypoUUID.randomUUID), EmailMessage.confirm(name))
+          .verify(UUID.randomUUID(), UUID.randomUUID(), EmailMessage.confirm(name))
           .futureValue
       }
       ex.getCause.getMessage must startWith(
@@ -228,7 +224,7 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll with Rep
 
       val newPassword = "test"
       repositories.users
-        .resetPassword(request.userId, newPassword, EmailMessage.resetPassword(Name.trusted(request.name)))
+        .resetPassword(request.userId, newPassword, EmailMessage.resetPassword(request.name))
         .futureValue
 
       val response = repositories.users.find(request.userId).futureValue
@@ -240,7 +236,7 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll with Rep
 
       val newPassword = "test"
       repositories.users
-        .resetPassword(request.userId, newPassword, EmailMessage.resetPassword(Name.trusted(request.name)))
+        .resetPassword(request.userId, newPassword, EmailMessage.resetPassword(request.name))
         .futureValue
 
       val response = repositories.backgroundJobs.streamPendingJobs.futureValue
@@ -253,7 +249,7 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll with Rep
       val name = Name.trusted("test")
       val ex = intercept[RuntimeException] {
         repositories.users
-          .resetPassword(UsersId(TypoUUID.randomUUID), "test", EmailMessage.resetPassword(name))
+          .resetPassword(UUID.randomUUID(), "test", EmailMessage.resetPassword(name))
           .futureValue
       }
       ex.getCause.getMessage must startWith(

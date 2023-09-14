@@ -8,22 +8,26 @@ package typo_generated
 package public
 package users
 
+import anorm.ToStatement
 import java.sql.Connection
-import net.wiringbits.typo_generated.customtypes.TypoUnknownCitext
+import java.util.UUID
+import net.wiringbits.common.models.Email
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait UsersRepo {
-  def delete(userId: UsersId)(implicit c: Connection): Boolean
+  def delete(userId: /* user-picked */ UUID)(implicit c: Connection): Boolean
   def delete: DeleteBuilder[UsersFields, UsersRow]
   def insert(unsaved: UsersRow)(implicit c: Connection): UsersRow
   def insert(unsaved: UsersRowUnsaved)(implicit c: Connection): UsersRow
   def select: SelectBuilder[UsersFields, UsersRow]
   def selectAll(implicit c: Connection): List[UsersRow]
-  def selectById(userId: UsersId)(implicit c: Connection): Option[UsersRow]
-  def selectByIds(userIds: Array[UsersId])(implicit c: Connection): List[UsersRow]
-  def selectByUnique(email: TypoUnknownCitext)(implicit c: Connection): Option[UsersRow]
+  def selectById(userId: /* user-picked */ UUID)(implicit c: Connection): Option[UsersRow]
+  def selectByIds(
+      userIds: Array[ /* user-picked */ UUID]
+  )(implicit c: Connection, toStatement: ToStatement[Array[ /* user-picked */ UUID]]): List[UsersRow]
+  def selectByUnique(email: /* user-picked */ Email)(implicit c: Connection): Option[UsersRow]
   def update(row: UsersRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[UsersFields, UsersRow]
   def upsert(unsaved: UsersRow)(implicit c: Connection): UsersRow

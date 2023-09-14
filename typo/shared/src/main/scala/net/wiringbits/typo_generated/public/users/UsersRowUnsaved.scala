@@ -8,9 +8,11 @@ package typo_generated
 package public
 package users
 
+import java.time.Instant
+import java.util.UUID
+import net.wiringbits.common.models.Email
+import net.wiringbits.common.models.Name
 import net.wiringbits.typo_generated.customtypes.Defaulted
-import net.wiringbits.typo_generated.customtypes.TypoOffsetDateTime
-import net.wiringbits.typo_generated.customtypes.TypoUnknownCitext
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -22,16 +24,16 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `public.users` which has not been persisted yet */
 case class UsersRowUnsaved(
-    userId: UsersId,
-    name: String,
+    userId: /* user-picked */ UUID,
+    name: /* user-picked */ Name,
     lastName: Option[String],
-    email: TypoUnknownCitext,
+    email: /* user-picked */ Email,
     password: String,
-    verifiedOn: Option[TypoOffsetDateTime],
+    verifiedOn: Option[ /* user-picked */ Instant],
     /** Default: now() */
-    createdAt: Defaulted[TypoOffsetDateTime] = Defaulted.UseDefault
+    createdAt: Defaulted[ /* user-picked */ Instant] = Defaulted.UseDefault
 ) {
-  def toRow(createdAtDefault: => TypoOffsetDateTime): UsersRow =
+  def toRow(createdAtDefault: => /* user-picked */ Instant): UsersRow =
     UsersRow(
       userId = userId,
       name = name,
@@ -50,13 +52,13 @@ object UsersRowUnsaved {
     JsResult.fromTry(
       Try(
         UsersRowUnsaved(
-          userId = json.\("user_id").as(UsersId.reads),
-          name = json.\("name").as(Reads.StringReads),
+          userId = json.\("user_id").as(Reads.uuidReads),
+          name = json.\("name").as(implicitly[Reads[Name]]),
           lastName = json.\("last_name").toOption.map(_.as(Reads.StringReads)),
-          email = json.\("email").as(TypoUnknownCitext.reads),
+          email = json.\("email").as(implicitly[Reads[Email]]),
           password = json.\("password").as(Reads.StringReads),
-          verifiedOn = json.\("verified_on").toOption.map(_.as(TypoOffsetDateTime.reads)),
-          createdAt = json.\("created_at").as(Defaulted.reads(TypoOffsetDateTime.reads))
+          verifiedOn = json.\("verified_on").toOption.map(_.as(implicitly[Reads[Instant]])),
+          createdAt = json.\("created_at").as(Defaulted.reads(implicitly[Reads[Instant]]))
         )
       )
     )
@@ -64,13 +66,13 @@ object UsersRowUnsaved {
   implicit lazy val writes: OWrites[UsersRowUnsaved] = OWrites[UsersRowUnsaved](o =>
     new JsObject(
       ListMap[String, JsValue](
-        "user_id" -> UsersId.writes.writes(o.userId),
-        "name" -> Writes.StringWrites.writes(o.name),
+        "user_id" -> Writes.UuidWrites.writes(o.userId),
+        "name" -> implicitly[Writes[Name]].writes(o.name),
         "last_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.lastName),
-        "email" -> TypoUnknownCitext.writes.writes(o.email),
+        "email" -> implicitly[Writes[Email]].writes(o.email),
         "password" -> Writes.StringWrites.writes(o.password),
-        "verified_on" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.verifiedOn),
-        "created_at" -> Defaulted.writes(TypoOffsetDateTime.writes).writes(o.createdAt)
+        "verified_on" -> Writes.OptionWrites(implicitly[Writes[Instant]]).writes(o.verifiedOn),
+        "created_at" -> Defaulted.writes(implicitly[Writes[Instant]]).writes(o.createdAt)
       )
     )
   )

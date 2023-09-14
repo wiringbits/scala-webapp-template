@@ -16,20 +16,20 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import java.time.Instant
+import java.util.UUID
 import net.wiringbits.typo_generated.customtypes.Defaulted
-import net.wiringbits.typo_generated.customtypes.TypoOffsetDateTime
-import net.wiringbits.typo_generated.public.users.UsersId
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 object UserLogsRepoImpl extends UserLogsRepo {
-  override def delete(userLogId: UserLogsId)(implicit c: Connection): Boolean = {
+  override def delete(userLogId: /* user-picked */ UUID)(implicit c: Connection): Boolean = {
     SQL"""delete from public.user_logs where "user_log_id" = ${ParameterValue(
         userLogId,
         null,
-        UserLogsId.toStatement
+        ToStatement.uuidToStatement
       )}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[UserLogsFields, UserLogsRow] = {
@@ -37,14 +37,14 @@ object UserLogsRepoImpl extends UserLogsRepo {
   }
   override def insert(unsaved: UserLogsRow)(implicit c: Connection): UserLogsRow = {
     SQL"""insert into public.user_logs("user_log_id", "user_id", "message", "created_at")
-          values (${ParameterValue(unsaved.userLogId, null, UserLogsId.toStatement)}::uuid, ${ParameterValue(
+          values (${ParameterValue(unsaved.userLogId, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(
         unsaved.userId,
         null,
-        UsersId.toStatement
+        ToStatement.uuidToStatement
       )}::uuid, ${ParameterValue(unsaved.message, null, ToStatement.stringToStatement)}, ${ParameterValue(
         unsaved.createdAt,
         null,
-        TypoOffsetDateTime.toStatement
+        implicitly[ToStatement[Instant]]
       )}::timestamptz)
           returning "user_log_id", "user_id", "message", "created_at"::text
        """
@@ -53,14 +53,19 @@ object UserLogsRepoImpl extends UserLogsRepo {
   }
   override def insert(unsaved: UserLogsRowUnsaved)(implicit c: Connection): UserLogsRow = {
     val namedParameters = List(
-      Some((NamedParameter("user_log_id", ParameterValue(unsaved.userLogId, null, UserLogsId.toStatement)), "::uuid")),
-      Some((NamedParameter("user_id", ParameterValue(unsaved.userId, null, UsersId.toStatement)), "::uuid")),
+      Some(
+        (NamedParameter("user_log_id", ParameterValue(unsaved.userLogId, null, ToStatement.uuidToStatement)), "::uuid")
+      ),
+      Some((NamedParameter("user_id", ParameterValue(unsaved.userId, null, ToStatement.uuidToStatement)), "::uuid")),
       Some((NamedParameter("message", ParameterValue(unsaved.message, null, ToStatement.stringToStatement)), "")),
       unsaved.createdAt match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) =>
           Some(
-            (NamedParameter("created_at", ParameterValue(value, null, TypoOffsetDateTime.toStatement)), "::timestamptz")
+            (
+              NamedParameter("created_at", ParameterValue(value, null, implicitly[ToStatement[Instant]])),
+              "::timestamptz"
+            )
           )
       }
     ).flatten
@@ -90,13 +95,15 @@ object UserLogsRepoImpl extends UserLogsRepo {
           from public.user_logs
        """.as(UserLogsRow.rowParser(1).*)
   }
-  override def selectById(userLogId: UserLogsId)(implicit c: Connection): Option[UserLogsRow] = {
+  override def selectById(userLogId: /* user-picked */ UUID)(implicit c: Connection): Option[UserLogsRow] = {
     SQL"""select "user_log_id", "user_id", "message", "created_at"::text
           from public.user_logs
-          where "user_log_id" = ${ParameterValue(userLogId, null, UserLogsId.toStatement)}
+          where "user_log_id" = ${ParameterValue(userLogId, null, ToStatement.uuidToStatement)}
        """.as(UserLogsRow.rowParser(1).singleOpt)
   }
-  override def selectByIds(userLogIds: Array[UserLogsId])(implicit c: Connection): List[UserLogsRow] = {
+  override def selectByIds(
+      userLogIds: Array[ /* user-picked */ UUID]
+  )(implicit c: Connection, toStatement: ToStatement[Array[ /* user-picked */ UUID]]): List[UserLogsRow] = {
     SQL"""select "user_log_id", "user_id", "message", "created_at"::text
           from public.user_logs
           where "user_log_id" = ANY(${userLogIds})
@@ -106,10 +113,10 @@ object UserLogsRepoImpl extends UserLogsRepo {
   override def update(row: UserLogsRow)(implicit c: Connection): Boolean = {
     val userLogId = row.userLogId
     SQL"""update public.user_logs
-          set "user_id" = ${ParameterValue(row.userId, null, UsersId.toStatement)}::uuid,
+          set "user_id" = ${ParameterValue(row.userId, null, ToStatement.uuidToStatement)}::uuid,
               "message" = ${ParameterValue(row.message, null, ToStatement.stringToStatement)},
-              "created_at" = ${ParameterValue(row.createdAt, null, TypoOffsetDateTime.toStatement)}::timestamptz
-          where "user_log_id" = ${ParameterValue(userLogId, null, UserLogsId.toStatement)}
+              "created_at" = ${ParameterValue(row.createdAt, null, implicitly[ToStatement[Instant]])}::timestamptz
+          where "user_log_id" = ${ParameterValue(userLogId, null, ToStatement.uuidToStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[UserLogsFields, UserLogsRow] = {
@@ -118,10 +125,10 @@ object UserLogsRepoImpl extends UserLogsRepo {
   override def upsert(unsaved: UserLogsRow)(implicit c: Connection): UserLogsRow = {
     SQL"""insert into public.user_logs("user_log_id", "user_id", "message", "created_at")
           values (
-            ${ParameterValue(unsaved.userLogId, null, UserLogsId.toStatement)}::uuid,
-            ${ParameterValue(unsaved.userId, null, UsersId.toStatement)}::uuid,
+            ${ParameterValue(unsaved.userLogId, null, ToStatement.uuidToStatement)}::uuid,
+            ${ParameterValue(unsaved.userId, null, ToStatement.uuidToStatement)}::uuid,
             ${ParameterValue(unsaved.message, null, ToStatement.stringToStatement)},
-            ${ParameterValue(unsaved.createdAt, null, TypoOffsetDateTime.toStatement)}::timestamptz
+            ${ParameterValue(unsaved.createdAt, null, implicitly[ToStatement[Instant]])}::timestamptz
           )
           on conflict ("user_log_id")
           do update set

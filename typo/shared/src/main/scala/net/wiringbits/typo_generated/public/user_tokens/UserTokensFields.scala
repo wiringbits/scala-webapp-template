@@ -8,17 +8,17 @@ package typo_generated
 package public
 package user_tokens
 
-import net.wiringbits.typo_generated.customtypes.TypoOffsetDateTime
-import net.wiringbits.typo_generated.public.users.UsersId
+import java.time.Instant
+import java.util.UUID
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField
 
 trait UserTokensFields[Row] {
-  val userTokenId: IdField[UserTokensId, Row]
+  val userTokenId: IdField[ /* user-picked */ UUID, Row]
   val token: Field[String, Row]
   val tokenType: Field[String, Row]
-  val createdAt: Field[TypoOffsetDateTime, Row]
-  val expiresAt: Field[TypoOffsetDateTime, Row]
-  val userId: Field[UsersId, Row]
+  val createdAt: Field[ /* user-picked */ Instant, Row]
+  val expiresAt: Field[ /* user-picked */ Instant, Row]
+  val userId: Field[ /* user-picked */ UUID, Row]
 }
 object UserTokensFields extends UserTokensStructure[UserTokensRow](None, identity, (_, x) => x)

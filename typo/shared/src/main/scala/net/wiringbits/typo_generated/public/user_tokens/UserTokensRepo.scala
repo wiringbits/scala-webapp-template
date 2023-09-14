@@ -8,19 +8,23 @@ package typo_generated
 package public
 package user_tokens
 
+import anorm.ToStatement
 import java.sql.Connection
+import java.util.UUID
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait UserTokensRepo {
-  def delete(userTokenId: UserTokensId)(implicit c: Connection): Boolean
+  def delete(userTokenId: /* user-picked */ UUID)(implicit c: Connection): Boolean
   def delete: DeleteBuilder[UserTokensFields, UserTokensRow]
   def insert(unsaved: UserTokensRow)(implicit c: Connection): UserTokensRow
   def select: SelectBuilder[UserTokensFields, UserTokensRow]
   def selectAll(implicit c: Connection): List[UserTokensRow]
-  def selectById(userTokenId: UserTokensId)(implicit c: Connection): Option[UserTokensRow]
-  def selectByIds(userTokenIds: Array[UserTokensId])(implicit c: Connection): List[UserTokensRow]
+  def selectById(userTokenId: /* user-picked */ UUID)(implicit c: Connection): Option[UserTokensRow]
+  def selectByIds(
+      userTokenIds: Array[ /* user-picked */ UUID]
+  )(implicit c: Connection, toStatement: ToStatement[Array[ /* user-picked */ UUID]]): List[UserTokensRow]
   def update(row: UserTokensRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[UserTokensFields, UserTokensRow]
   def upsert(unsaved: UserTokensRow)(implicit c: Connection): UserTokensRow

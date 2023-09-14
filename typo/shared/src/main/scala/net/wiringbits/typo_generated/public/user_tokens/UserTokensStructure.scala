@@ -8,8 +8,8 @@ package typo_generated
 package public
 package user_tokens
 
-import net.wiringbits.typo_generated.customtypes.TypoOffsetDateTime
-import net.wiringbits.typo_generated.public.users.UsersId
+import java.time.Instant
+import java.util.UUID
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
@@ -22,7 +22,7 @@ class UserTokensStructure[Row](
 ) extends Relation[UserTokensFields, UserTokensRow, Row]
     with UserTokensFields[Row] { outer =>
 
-  override val userTokenId = new IdField[UserTokensId, Row](prefix, "user_token_id", None, Some("uuid"))(
+  override val userTokenId = new IdField[ /* user-picked */ UUID, Row](prefix, "user_token_id", None, Some("uuid"))(
     x => extract(x).userTokenId,
     (row, value) => merge(row, extract(row).copy(userTokenId = value))
   )
@@ -34,15 +34,17 @@ class UserTokensStructure[Row](
     x => extract(x).tokenType,
     (row, value) => merge(row, extract(row).copy(tokenType = value))
   )
-  override val createdAt = new Field[TypoOffsetDateTime, Row](prefix, "created_at", Some("text"), Some("timestamptz"))(
-    x => extract(x).createdAt,
-    (row, value) => merge(row, extract(row).copy(createdAt = value))
-  )
-  override val expiresAt = new Field[TypoOffsetDateTime, Row](prefix, "expires_at", Some("text"), Some("timestamptz"))(
-    x => extract(x).expiresAt,
-    (row, value) => merge(row, extract(row).copy(expiresAt = value))
-  )
-  override val userId = new Field[UsersId, Row](prefix, "user_id", None, Some("uuid"))(
+  override val createdAt =
+    new Field[ /* user-picked */ Instant, Row](prefix, "created_at", Some("text"), Some("timestamptz"))(
+      x => extract(x).createdAt,
+      (row, value) => merge(row, extract(row).copy(createdAt = value))
+    )
+  override val expiresAt =
+    new Field[ /* user-picked */ Instant, Row](prefix, "expires_at", Some("text"), Some("timestamptz"))(
+      x => extract(x).expiresAt,
+      (row, value) => merge(row, extract(row).copy(expiresAt = value))
+    )
+  override val userId = new Field[ /* user-picked */ UUID, Row](prefix, "user_id", None, Some("uuid"))(
     x => extract(x).userId,
     (row, value) => merge(row, extract(row).copy(userId = value))
   )

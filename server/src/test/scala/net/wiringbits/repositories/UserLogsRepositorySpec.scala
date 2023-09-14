@@ -3,13 +3,13 @@ package net.wiringbits.repositories
 import net.wiringbits.common.models.{Email, Name}
 import net.wiringbits.core.RepositorySpec
 import net.wiringbits.repositories.models.{User, UserLog}
-import net.wiringbits.typo_generated.customtypes.{TypoOffsetDateTime, TypoUUID}
-import net.wiringbits.typo_generated.public.user_logs.{UserLogsId, UserLogsRow}
-import net.wiringbits.typo_generated.public.users.{UsersId, UsersRow}
+import net.wiringbits.typo_generated.public.user_logs.UserLogsRow
+import net.wiringbits.typo_generated.public.users.UsersRow
 import org.scalatest.concurrent.ScalaFutures.*
 import org.scalatest.matchers.must.Matchers.*
 import utils.{LoginUtils, RepositoryUtils}
 
+import java.time.Instant
 import java.util.UUID
 
 class UserLogsRepositorySpec extends RepositorySpec with RepositoryUtils {
@@ -18,20 +18,20 @@ class UserLogsRepositorySpec extends RepositorySpec with RepositoryUtils {
       val usersRow = createNonVerifyUser().futureValue
 
       val logsRequest = UserLogsRow(
-        userLogId = UserLogsId(TypoUUID.randomUUID),
+        userLogId = UUID.randomUUID(),
         userId = usersRow.userId,
         message = "Test",
-        createdAt = TypoOffsetDateTime.now
+        createdAt = Instant.now
       )
       repositories.userLogs.create(logsRequest).futureValue
     }
 
     "fail if the user doesn't exists" in withRepositories() { implicit repositories =>
       val logsRequest = UserLogsRow(
-        userLogId = UserLogsId(TypoUUID.randomUUID),
-        userId = UsersId(TypoUUID.randomUUID),
+        userLogId = UUID.randomUUID(),
+        userId = UUID.randomUUID(),
         message = "Test",
-        createdAt = TypoOffsetDateTime.now
+        createdAt = Instant.now
       )
       val ex = intercept[RuntimeException] {
         repositories.userLogs.create(logsRequest).futureValue
@@ -51,7 +51,7 @@ class UserLogsRepositorySpec extends RepositorySpec with RepositoryUtils {
 
     "fail if the user doesn't exists" in withRepositories() { repositories =>
       val ex = intercept[RuntimeException] {
-        repositories.userLogs.create(UsersId(TypoUUID.randomUUID), "test").futureValue
+        repositories.userLogs.create(UUID.randomUUID(), "test").futureValue
       }
       ex.getCause.getMessage must startWith(
         s"""ERROR: insert or update on table "user_logs" violates foreign key constraint "user_logs_users_fk""""
@@ -74,7 +74,7 @@ class UserLogsRepositorySpec extends RepositorySpec with RepositoryUtils {
     }
 
     "return no results" in withRepositories() { implicit repositories =>
-      val response = repositories.userLogs.logs(UsersId(TypoUUID.randomUUID)).futureValue
+      val response = repositories.userLogs.logs(UUID.randomUUID()).futureValue
       response.isEmpty must be(true)
     }
   }

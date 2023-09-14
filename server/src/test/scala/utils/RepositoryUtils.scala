@@ -1,27 +1,28 @@
 package utils
 
-import net.wiringbits.common.models.Email
+import net.wiringbits.common.models.{Email, Name}
 import net.wiringbits.core.RepositoryComponents
-import net.wiringbits.typo_generated.customtypes.{TypoOffsetDateTime, TypoUUID, TypoUnknownCitext}
-import net.wiringbits.typo_generated.public.users.{UsersId, UsersRow}
+import net.wiringbits.typo_generated.public.users.UsersRow
 
+import java.time.Instant
+import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
 trait RepositoryUtils {
-  def createNonVerifyUser(usersIdMaybe: Option[UsersId] = None, emailMaybe: Option[Email] = None)(using
+  def createNonVerifyUser(userIdMaybe: Option[UUID] = None, emailMaybe: Option[Email] = None)(using
       ec: ExecutionContext,
       repositories: RepositoryComponents
   ): Future[UsersRow] = {
-    val usersId = usersIdMaybe.getOrElse(UsersId(TypoUUID.randomUUID))
+    val userId = userIdMaybe.getOrElse(UUID.randomUUID())
     val email = emailMaybe.getOrElse(Email.trusted("hello@wiringbits.net"))
 
     val createUserRow = UsersRow(
-      userId = usersId,
-      name = "Sample",
+      userId = userId,
+      name = Name.trusted("Sample"),
       lastName = None,
-      email = TypoUnknownCitext(email.string),
+      email = email,
       password = "password",
-      createdAt = TypoOffsetDateTime.now,
+      createdAt = Instant.now,
       verifiedOn = None
     )
 

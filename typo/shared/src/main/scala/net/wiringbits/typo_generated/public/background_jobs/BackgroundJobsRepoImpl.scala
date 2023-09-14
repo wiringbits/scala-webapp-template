@@ -17,20 +17,21 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import java.time.Instant
+import java.util.UUID
 import net.wiringbits.typo_generated.customtypes.Defaulted
 import net.wiringbits.typo_generated.customtypes.TypoJsonb
-import net.wiringbits.typo_generated.customtypes.TypoOffsetDateTime
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 object BackgroundJobsRepoImpl extends BackgroundJobsRepo {
-  override def delete(backgroundJobId: BackgroundJobsId)(implicit c: Connection): Boolean = {
+  override def delete(backgroundJobId: /* user-picked */ UUID)(implicit c: Connection): Boolean = {
     SQL"""delete from public.background_jobs where "background_job_id" = ${ParameterValue(
         backgroundJobId,
         null,
-        BackgroundJobsId.toStatement
+        ToStatement.uuidToStatement
       )}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[BackgroundJobsFields, BackgroundJobsRow] = {
@@ -38,15 +39,15 @@ object BackgroundJobsRepoImpl extends BackgroundJobsRepo {
   }
   override def insert(unsaved: BackgroundJobsRow)(implicit c: Connection): BackgroundJobsRow = {
     SQL"""insert into public.background_jobs("background_job_id", "type", "payload", "status", "status_details", "error_count", "execute_at", "created_at", "updated_at")
-          values (${ParameterValue(
-        unsaved.backgroundJobId,
+          values (${ParameterValue(unsaved.backgroundJobId, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(
+        unsaved.`type`,
         null,
-        BackgroundJobsId.toStatement
-      )}::uuid, ${ParameterValue(unsaved.`type`, null, ToStatement.stringToStatement)}, ${ParameterValue(
-        unsaved.payload,
+        ToStatement.stringToStatement
+      )}, ${ParameterValue(unsaved.payload, null, TypoJsonb.toStatement)}::jsonb, ${ParameterValue(
+        unsaved.status,
         null,
-        TypoJsonb.toStatement
-      )}::jsonb, ${ParameterValue(unsaved.status, null, ToStatement.stringToStatement)}, ${ParameterValue(
+        ToStatement.stringToStatement
+      )}, ${ParameterValue(
         unsaved.statusDetails,
         null,
         ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData)
@@ -57,12 +58,12 @@ object BackgroundJobsRepoImpl extends BackgroundJobsRepo {
       )}::int4, ${ParameterValue(
         unsaved.executeAt,
         null,
-        TypoOffsetDateTime.toStatement
+        implicitly[ToStatement[Instant]]
       )}::timestamptz, ${ParameterValue(
         unsaved.createdAt,
         null,
-        TypoOffsetDateTime.toStatement
-      )}::timestamptz, ${ParameterValue(unsaved.updatedAt, null, TypoOffsetDateTime.toStatement)}::timestamptz)
+        implicitly[ToStatement[Instant]]
+      )}::timestamptz, ${ParameterValue(unsaved.updatedAt, null, implicitly[ToStatement[Instant]])}::timestamptz)
           returning "background_job_id", "type", "payload", "status", "status_details", "error_count", "execute_at"::text, "created_at"::text, "updated_at"::text
        """
       .executeInsert(BackgroundJobsRow.rowParser(1).single)
@@ -74,7 +75,7 @@ object BackgroundJobsRepoImpl extends BackgroundJobsRepo {
         (
           NamedParameter(
             "background_job_id",
-            ParameterValue(unsaved.backgroundJobId, null, BackgroundJobsId.toStatement)
+            ParameterValue(unsaved.backgroundJobId, null, ToStatement.uuidToStatement)
           ),
           "::uuid"
         )
@@ -116,21 +117,30 @@ object BackgroundJobsRepoImpl extends BackgroundJobsRepo {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) =>
           Some(
-            (NamedParameter("execute_at", ParameterValue(value, null, TypoOffsetDateTime.toStatement)), "::timestamptz")
+            (
+              NamedParameter("execute_at", ParameterValue(value, null, implicitly[ToStatement[Instant]])),
+              "::timestamptz"
+            )
           )
       },
       unsaved.createdAt match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) =>
           Some(
-            (NamedParameter("created_at", ParameterValue(value, null, TypoOffsetDateTime.toStatement)), "::timestamptz")
+            (
+              NamedParameter("created_at", ParameterValue(value, null, implicitly[ToStatement[Instant]])),
+              "::timestamptz"
+            )
           )
       },
       unsaved.updatedAt match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) =>
           Some(
-            (NamedParameter("updated_at", ParameterValue(value, null, TypoOffsetDateTime.toStatement)), "::timestamptz")
+            (
+              NamedParameter("updated_at", ParameterValue(value, null, implicitly[ToStatement[Instant]])),
+              "::timestamptz"
+            )
           )
       }
     ).flatten
@@ -160,15 +170,17 @@ object BackgroundJobsRepoImpl extends BackgroundJobsRepo {
           from public.background_jobs
        """.as(BackgroundJobsRow.rowParser(1).*)
   }
-  override def selectById(backgroundJobId: BackgroundJobsId)(implicit c: Connection): Option[BackgroundJobsRow] = {
+  override def selectById(
+      backgroundJobId: /* user-picked */ UUID
+  )(implicit c: Connection): Option[BackgroundJobsRow] = {
     SQL"""select "background_job_id", "type", "payload", "status", "status_details", "error_count", "execute_at"::text, "created_at"::text, "updated_at"::text
           from public.background_jobs
-          where "background_job_id" = ${ParameterValue(backgroundJobId, null, BackgroundJobsId.toStatement)}
+          where "background_job_id" = ${ParameterValue(backgroundJobId, null, ToStatement.uuidToStatement)}
        """.as(BackgroundJobsRow.rowParser(1).singleOpt)
   }
   override def selectByIds(
-      backgroundJobIds: Array[BackgroundJobsId]
-  )(implicit c: Connection): List[BackgroundJobsRow] = {
+      backgroundJobIds: Array[ /* user-picked */ UUID]
+  )(implicit c: Connection, toStatement: ToStatement[Array[ /* user-picked */ UUID]]): List[BackgroundJobsRow] = {
     SQL"""select "background_job_id", "type", "payload", "status", "status_details", "error_count", "execute_at"::text, "created_at"::text, "updated_at"::text
           from public.background_jobs
           where "background_job_id" = ANY(${backgroundJobIds})
@@ -191,10 +203,10 @@ object BackgroundJobsRepoImpl extends BackgroundJobsRepo {
         null,
         ToStatement.optionToStatement(ToStatement.intToStatement, ParameterMetaData.IntParameterMetaData)
       )}::int4,
-              "execute_at" = ${ParameterValue(row.executeAt, null, TypoOffsetDateTime.toStatement)}::timestamptz,
-              "created_at" = ${ParameterValue(row.createdAt, null, TypoOffsetDateTime.toStatement)}::timestamptz,
-              "updated_at" = ${ParameterValue(row.updatedAt, null, TypoOffsetDateTime.toStatement)}::timestamptz
-          where "background_job_id" = ${ParameterValue(backgroundJobId, null, BackgroundJobsId.toStatement)}
+              "execute_at" = ${ParameterValue(row.executeAt, null, implicitly[ToStatement[Instant]])}::timestamptz,
+              "created_at" = ${ParameterValue(row.createdAt, null, implicitly[ToStatement[Instant]])}::timestamptz,
+              "updated_at" = ${ParameterValue(row.updatedAt, null, implicitly[ToStatement[Instant]])}::timestamptz
+          where "background_job_id" = ${ParameterValue(backgroundJobId, null, ToStatement.uuidToStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[BackgroundJobsFields, BackgroundJobsRow] = {
@@ -203,7 +215,7 @@ object BackgroundJobsRepoImpl extends BackgroundJobsRepo {
   override def upsert(unsaved: BackgroundJobsRow)(implicit c: Connection): BackgroundJobsRow = {
     SQL"""insert into public.background_jobs("background_job_id", "type", "payload", "status", "status_details", "error_count", "execute_at", "created_at", "updated_at")
           values (
-            ${ParameterValue(unsaved.backgroundJobId, null, BackgroundJobsId.toStatement)}::uuid,
+            ${ParameterValue(unsaved.backgroundJobId, null, ToStatement.uuidToStatement)}::uuid,
             ${ParameterValue(unsaved.`type`, null, ToStatement.stringToStatement)},
             ${ParameterValue(unsaved.payload, null, TypoJsonb.toStatement)}::jsonb,
             ${ParameterValue(unsaved.status, null, ToStatement.stringToStatement)},
@@ -217,9 +229,9 @@ object BackgroundJobsRepoImpl extends BackgroundJobsRepo {
         null,
         ToStatement.optionToStatement(ToStatement.intToStatement, ParameterMetaData.IntParameterMetaData)
       )}::int4,
-            ${ParameterValue(unsaved.executeAt, null, TypoOffsetDateTime.toStatement)}::timestamptz,
-            ${ParameterValue(unsaved.createdAt, null, TypoOffsetDateTime.toStatement)}::timestamptz,
-            ${ParameterValue(unsaved.updatedAt, null, TypoOffsetDateTime.toStatement)}::timestamptz
+            ${ParameterValue(unsaved.executeAt, null, implicitly[ToStatement[Instant]])}::timestamptz,
+            ${ParameterValue(unsaved.createdAt, null, implicitly[ToStatement[Instant]])}::timestamptz,
+            ${ParameterValue(unsaved.updatedAt, null, implicitly[ToStatement[Instant]])}::timestamptz
           )
           on conflict ("background_job_id")
           do update set

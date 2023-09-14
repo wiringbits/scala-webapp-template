@@ -17,17 +17,19 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import java.time.Instant
+import java.util.UUID
+import net.wiringbits.common.models.Email
+import net.wiringbits.common.models.Name
 import net.wiringbits.typo_generated.customtypes.Defaulted
-import net.wiringbits.typo_generated.customtypes.TypoOffsetDateTime
-import net.wiringbits.typo_generated.customtypes.TypoUnknownCitext
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 object UsersRepoImpl extends UsersRepo {
-  override def delete(userId: UsersId)(implicit c: Connection): Boolean = {
-    SQL"""delete from public.users where "user_id" = ${ParameterValue(userId, null, UsersId.toStatement)}"""
+  override def delete(userId: /* user-picked */ UUID)(implicit c: Connection): Boolean = {
+    SQL"""delete from public.users where "user_id" = ${ParameterValue(userId, null, ToStatement.uuidToStatement)}"""
       .executeUpdate() > 0
   }
   override def delete: DeleteBuilder[UsersFields, UsersRow] = {
@@ -35,22 +37,22 @@ object UsersRepoImpl extends UsersRepo {
   }
   override def insert(unsaved: UsersRow)(implicit c: Connection): UsersRow = {
     SQL"""insert into public.users("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")
-          values (${ParameterValue(unsaved.userId, null, UsersId.toStatement)}::uuid, ${ParameterValue(
+          values (${ParameterValue(unsaved.userId, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(
         unsaved.name,
         null,
-        ToStatement.stringToStatement
+        implicitly[ToStatement[Name]]
       )}, ${ParameterValue(
         unsaved.lastName,
         null,
         ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData)
-      )}, ${ParameterValue(unsaved.email, null, TypoUnknownCitext.toStatement)}::citext, ${ParameterValue(
+      )}, ${ParameterValue(unsaved.email, null, implicitly[ToStatement[Email]])}::citext, ${ParameterValue(
         unsaved.password,
         null,
         ToStatement.stringToStatement
-      )}, ${ParameterValue(unsaved.createdAt, null, TypoOffsetDateTime.toStatement)}::timestamptz, ${ParameterValue(
+      )}, ${ParameterValue(unsaved.createdAt, null, implicitly[ToStatement[Instant]])}::timestamptz, ${ParameterValue(
         unsaved.verifiedOn,
         null,
-        ToStatement.optionToStatement(TypoOffsetDateTime.toStatement, TypoOffsetDateTime.parameterMetadata)
+        ToStatement.optionToStatement(implicitly[ToStatement[Instant]], implicitly[ParameterMetaData[Instant]])
       )}::timestamptz)
           returning "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text
        """
@@ -59,8 +61,8 @@ object UsersRepoImpl extends UsersRepo {
   }
   override def insert(unsaved: UsersRowUnsaved)(implicit c: Connection): UsersRow = {
     val namedParameters = List(
-      Some((NamedParameter("user_id", ParameterValue(unsaved.userId, null, UsersId.toStatement)), "::uuid")),
-      Some((NamedParameter("name", ParameterValue(unsaved.name, null, ToStatement.stringToStatement)), "")),
+      Some((NamedParameter("user_id", ParameterValue(unsaved.userId, null, ToStatement.uuidToStatement)), "::uuid")),
+      Some((NamedParameter("name", ParameterValue(unsaved.name, null, implicitly[ToStatement[Name]])), "")),
       Some(
         (
           NamedParameter(
@@ -74,7 +76,7 @@ object UsersRepoImpl extends UsersRepo {
           ""
         )
       ),
-      Some((NamedParameter("email", ParameterValue(unsaved.email, null, TypoUnknownCitext.toStatement)), "::citext")),
+      Some((NamedParameter("email", ParameterValue(unsaved.email, null, implicitly[ToStatement[Email]])), "::citext")),
       Some((NamedParameter("password", ParameterValue(unsaved.password, null, ToStatement.stringToStatement)), "")),
       Some(
         (
@@ -83,7 +85,7 @@ object UsersRepoImpl extends UsersRepo {
             ParameterValue(
               unsaved.verifiedOn,
               null,
-              ToStatement.optionToStatement(TypoOffsetDateTime.toStatement, TypoOffsetDateTime.parameterMetadata)
+              ToStatement.optionToStatement(implicitly[ToStatement[Instant]], implicitly[ParameterMetaData[Instant]])
             )
           ),
           "::timestamptz"
@@ -93,7 +95,10 @@ object UsersRepoImpl extends UsersRepo {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) =>
           Some(
-            (NamedParameter("created_at", ParameterValue(value, null, TypoOffsetDateTime.toStatement)), "::timestamptz")
+            (
+              NamedParameter("created_at", ParameterValue(value, null, implicitly[ToStatement[Instant]])),
+              "::timestamptz"
+            )
           )
       }
     ).flatten
@@ -122,44 +127,48 @@ object UsersRepoImpl extends UsersRepo {
           from public.users
        """.as(UsersRow.rowParser(1).*)
   }
-  override def selectById(userId: UsersId)(implicit c: Connection): Option[UsersRow] = {
+  override def selectById(userId: /* user-picked */ UUID)(implicit c: Connection): Option[UsersRow] = {
+    println(ParameterValue(userId, null, ToStatement.uuidToStatement))
+
     SQL"""select "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text
           from public.users
-          where "user_id" = ${ParameterValue(userId, null, UsersId.toStatement)}
+          where "user_id" = ${ParameterValue(userId, null, ToStatement.uuidToStatement)}
        """.as(UsersRow.rowParser(1).singleOpt)
   }
-  override def selectByIds(userIds: Array[UsersId])(implicit c: Connection): List[UsersRow] = {
+  override def selectByIds(
+      userIds: Array[ /* user-picked */ UUID]
+  )(implicit c: Connection, toStatement: ToStatement[Array[ /* user-picked */ UUID]]): List[UsersRow] = {
     SQL"""select "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text
           from public.users
           where "user_id" = ANY(${userIds})
        """.as(UsersRow.rowParser(1).*)
 
   }
-  override def selectByUnique(email: TypoUnknownCitext)(implicit c: Connection): Option[UsersRow] = {
+  override def selectByUnique(email: /* user-picked */ Email)(implicit c: Connection): Option[UsersRow] = {
     SQL"""select "email"::text
           from public.users
-          where "email" = ${ParameterValue(email, null, TypoUnknownCitext.toStatement)}
+          where "email" = ${ParameterValue(email, null, implicitly[ToStatement[Email]])}
        """.as(UsersRow.rowParser(1).singleOpt)
 
   }
   override def update(row: UsersRow)(implicit c: Connection): Boolean = {
     val userId = row.userId
     SQL"""update public.users
-          set "name" = ${ParameterValue(row.name, null, ToStatement.stringToStatement)},
+          set "name" = ${ParameterValue(row.name, null, implicitly[ToStatement[Name]])},
               "last_name" = ${ParameterValue(
         row.lastName,
         null,
         ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData)
       )},
-              "email" = ${ParameterValue(row.email, null, TypoUnknownCitext.toStatement)}::citext,
+              "email" = ${ParameterValue(row.email, null, implicitly[ToStatement[Email]])}::citext,
               "password" = ${ParameterValue(row.password, null, ToStatement.stringToStatement)},
-              "created_at" = ${ParameterValue(row.createdAt, null, TypoOffsetDateTime.toStatement)}::timestamptz,
+              "created_at" = ${ParameterValue(row.createdAt, null, implicitly[ToStatement[Instant]])}::timestamptz,
               "verified_on" = ${ParameterValue(
         row.verifiedOn,
         null,
-        ToStatement.optionToStatement(TypoOffsetDateTime.toStatement, TypoOffsetDateTime.parameterMetadata)
+        ToStatement.optionToStatement(implicitly[ToStatement[Instant]], implicitly[ParameterMetaData[Instant]])
       )}::timestamptz
-          where "user_id" = ${ParameterValue(userId, null, UsersId.toStatement)}
+          where "user_id" = ${ParameterValue(userId, null, ToStatement.uuidToStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[UsersFields, UsersRow] = {
@@ -168,20 +177,20 @@ object UsersRepoImpl extends UsersRepo {
   override def upsert(unsaved: UsersRow)(implicit c: Connection): UsersRow = {
     SQL"""insert into public.users("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")
           values (
-            ${ParameterValue(unsaved.userId, null, UsersId.toStatement)}::uuid,
-            ${ParameterValue(unsaved.name, null, ToStatement.stringToStatement)},
+            ${ParameterValue(unsaved.userId, null, ToStatement.uuidToStatement)}::uuid,
+            ${ParameterValue(unsaved.name, null, implicitly[ToStatement[Name]])},
             ${ParameterValue(
         unsaved.lastName,
         null,
         ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData)
       )},
-            ${ParameterValue(unsaved.email, null, TypoUnknownCitext.toStatement)}::citext,
+            ${ParameterValue(unsaved.email, null, implicitly[ToStatement[Email]])}::citext,
             ${ParameterValue(unsaved.password, null, ToStatement.stringToStatement)},
-            ${ParameterValue(unsaved.createdAt, null, TypoOffsetDateTime.toStatement)}::timestamptz,
+            ${ParameterValue(unsaved.createdAt, null, implicitly[ToStatement[Instant]])}::timestamptz,
             ${ParameterValue(
         unsaved.verifiedOn,
         null,
-        ToStatement.optionToStatement(TypoOffsetDateTime.toStatement, TypoOffsetDateTime.parameterMetadata)
+        ToStatement.optionToStatement(implicitly[ToStatement[Instant]], implicitly[ParameterMetaData[Instant]])
       )}::timestamptz
           )
           on conflict ("user_id")

@@ -8,8 +8,10 @@ package typo_generated
 package public
 package users
 
-import net.wiringbits.typo_generated.customtypes.TypoOffsetDateTime
-import net.wiringbits.typo_generated.customtypes.TypoUnknownCitext
+import java.time.Instant
+import java.util.UUID
+import net.wiringbits.common.models.Email
+import net.wiringbits.common.models.Name
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
@@ -20,11 +22,11 @@ class UsersStructure[Row](val prefix: Option[String], val extract: Row => UsersR
     extends Relation[UsersFields, UsersRow, Row]
     with UsersFields[Row] { outer =>
 
-  override val userId = new IdField[UsersId, Row](prefix, "user_id", None, Some("uuid"))(
+  override val userId = new IdField[ /* user-picked */ UUID, Row](prefix, "user_id", None, Some("uuid"))(
     x => extract(x).userId,
     (row, value) => merge(row, extract(row).copy(userId = value))
   )
-  override val name = new Field[String, Row](prefix, "name", None, None)(
+  override val name = new Field[ /* user-picked */ Name, Row](prefix, "name", None, None)(
     x => extract(x).name,
     (row, value) => merge(row, extract(row).copy(name = value))
   )
@@ -32,7 +34,7 @@ class UsersStructure[Row](val prefix: Option[String], val extract: Row => UsersR
     x => extract(x).lastName,
     (row, value) => merge(row, extract(row).copy(lastName = value))
   )
-  override val email = new Field[TypoUnknownCitext, Row](prefix, "email", Some("text"), Some("citext"))(
+  override val email = new Field[ /* user-picked */ Email, Row](prefix, "email", Some("text"), Some("citext"))(
     x => extract(x).email,
     (row, value) => merge(row, extract(row).copy(email = value))
   )
@@ -40,12 +42,13 @@ class UsersStructure[Row](val prefix: Option[String], val extract: Row => UsersR
     x => extract(x).password,
     (row, value) => merge(row, extract(row).copy(password = value))
   )
-  override val createdAt = new Field[TypoOffsetDateTime, Row](prefix, "created_at", Some("text"), Some("timestamptz"))(
-    x => extract(x).createdAt,
-    (row, value) => merge(row, extract(row).copy(createdAt = value))
-  )
+  override val createdAt =
+    new Field[ /* user-picked */ Instant, Row](prefix, "created_at", Some("text"), Some("timestamptz"))(
+      x => extract(x).createdAt,
+      (row, value) => merge(row, extract(row).copy(createdAt = value))
+    )
   override val verifiedOn =
-    new OptField[TypoOffsetDateTime, Row](prefix, "verified_on", Some("text"), Some("timestamptz"))(
+    new OptField[ /* user-picked */ Instant, Row](prefix, "verified_on", Some("text"), Some("timestamptz"))(
       x => extract(x).verifiedOn,
       (row, value) => merge(row, extract(row).copy(verifiedOn = value))
     )

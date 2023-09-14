@@ -8,21 +8,22 @@ package typo_generated
 package public
 package background_jobs
 
+import java.time.Instant
+import java.util.UUID
 import net.wiringbits.typo_generated.customtypes.TypoJsonb
-import net.wiringbits.typo_generated.customtypes.TypoOffsetDateTime
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.SqlExpr.OptField
 
 trait BackgroundJobsFields[Row] {
-  val backgroundJobId: IdField[BackgroundJobsId, Row]
+  val backgroundJobId: IdField[ /* user-picked */ UUID, Row]
   val `type`: Field[String, Row]
   val payload: Field[TypoJsonb, Row]
   val status: Field[String, Row]
   val statusDetails: OptField[String, Row]
   val errorCount: OptField[Int, Row]
-  val executeAt: Field[TypoOffsetDateTime, Row]
-  val createdAt: Field[TypoOffsetDateTime, Row]
-  val updatedAt: Field[TypoOffsetDateTime, Row]
+  val executeAt: Field[ /* user-picked */ Instant, Row]
+  val createdAt: Field[ /* user-picked */ Instant, Row]
+  val updatedAt: Field[ /* user-picked */ Instant, Row]
 }
 object BackgroundJobsFields extends BackgroundJobsStructure[BackgroundJobsRow](None, identity, (_, x) => x)

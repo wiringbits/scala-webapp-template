@@ -3,9 +3,8 @@ package net.wiringbits.repositories
 import net.wiringbits.common.models.{Email, Name}
 import net.wiringbits.core.{RepositoryComponents, RepositorySpec}
 import net.wiringbits.repositories.models.{User, UserToken, UserTokenType}
-import net.wiringbits.typo_generated.customtypes.{TypoOffsetDateTime, TypoUUID}
-import net.wiringbits.typo_generated.public.user_tokens.{UserTokensId, UserTokensRow}
-import net.wiringbits.typo_generated.public.users.UsersId
+import net.wiringbits.typo_generated.public.user_tokens.UserTokensRow
+
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.concurrent.ScalaFutures.*
 import org.scalatest.matchers.must.Matchers.*
@@ -18,19 +17,19 @@ import scala.concurrent.Future
 
 class UserTokensRepositorySpec extends RepositorySpec with RepositoryUtils {
   private def createTokenRequest(
-      usersId: UsersId,
+      userId: UUID,
       token: String = "test",
       userTokenType: UserTokenType = UserTokenType.ResetPassword
   )(using
       repositories: RepositoryComponents
   ): Future[UserTokensRow] = {
     val userTokensRow = UserTokensRow(
-      userTokenId = UserTokensId(TypoUUID.randomUUID),
+      userTokenId = UUID.randomUUID(),
       token = token,
       tokenType = userTokenType.toString,
-      createdAt = TypoOffsetDateTime.now,
-      expiresAt = TypoOffsetDateTime(OffsetDateTime.now().plus(2L, ChronoUnit.DAYS)),
-      userId = usersId
+      createdAt = Instant.now,
+      expiresAt = Instant.now().plus(2L, ChronoUnit.DAYS),
+      userId = userId
     )
 
     for {
@@ -47,7 +46,7 @@ class UserTokensRepositorySpec extends RepositorySpec with RepositoryUtils {
 
     "fail when the user doesn't exists" in withRepositories() { implicit repositories =>
       val ex = intercept[RuntimeException] {
-        createTokenRequest(UsersId(TypoUUID.randomUUID)).futureValue
+        createTokenRequest(UUID.randomUUID()).futureValue
       }
       ex.getCause.getMessage must startWith(
         s"""ERROR: insert or update on table "user_tokens" violates foreign key constraint "user_tokens_user_id_fk""""
@@ -71,7 +70,7 @@ class UserTokensRepositorySpec extends RepositorySpec with RepositoryUtils {
     }
 
     "return no results when the user doesn't exists" in withRepositories() { repositories =>
-      val response = repositories.userTokens.find(UsersId(TypoUUID.randomUUID)).futureValue
+      val response = repositories.userTokens.find(UUID.randomUUID()).futureValue
       response.isEmpty must be(true)
     }
   }
@@ -86,7 +85,7 @@ class UserTokensRepositorySpec extends RepositorySpec with RepositoryUtils {
     }
 
     "return no results when the user doesn't exists" in withRepositories() { repositories =>
-      val response = repositories.userTokens.find(UsersId(TypoUUID.randomUUID), "test").futureValue
+      val response = repositories.userTokens.find(UUID.randomUUID(), "test").futureValue
       response.isEmpty must be(true)
     }
   }
@@ -98,7 +97,7 @@ class UserTokensRepositorySpec extends RepositorySpec with RepositoryUtils {
       val maybe = repositories.userTokens.find(request.userId).futureValue
       val tokenId = maybe.headOption.value.userTokenId
 
-      repositories.userTokens.delete(userTokenId = tokenId, usersId = request.userId).futureValue
+      repositories.userTokens.delete(userTokenId = tokenId, userId = request.userId).futureValue
 
       val response = repositories.userTokens.find(request.userId).futureValue
       response.isEmpty must be(true)

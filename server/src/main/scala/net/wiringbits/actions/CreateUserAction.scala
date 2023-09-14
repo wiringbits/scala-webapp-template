@@ -6,8 +6,7 @@ import net.wiringbits.config.UserTokensConfig
 import net.wiringbits.repositories
 import net.wiringbits.repositories.UsersRepository
 import net.wiringbits.repositories.models.User
-import net.wiringbits.typo_generated.customtypes.{TypoOffsetDateTime, TypoUUID, TypoUnknownCitext}
-import net.wiringbits.typo_generated.public.users.{UsersId, UsersRow}
+import net.wiringbits.typo_generated.public.users.UsersRow
 import net.wiringbits.util.{EmailsHelper, TokenGenerator, TokensHelper}
 import net.wiringbits.validations.{ValidateCaptcha, ValidateEmailIsAvailable}
 import org.mindrot.jbcrypt.BCrypt
@@ -37,12 +36,12 @@ class CreateUserAction @Inject() (
 
       // create the user
       createUsersRow = UsersRow(
-        userId = UsersId(TypoUUID.randomUUID),
-        name = request.name.string,
+        userId = UUID.randomUUID(),
+        name = request.name,
         lastName = None,
-        email = TypoUnknownCitext(request.email.string),
+        email = request.email,
         password = hashedPassword,
-        createdAt = TypoOffsetDateTime(clock.instant().atOffset(ZoneOffset.UTC)),
+        createdAt = clock.instant(),
         verifiedOn = None
       )
       _ <- usersRepository.create(createUsersRow, hmacToken)
@@ -53,7 +52,7 @@ class CreateUserAction @Inject() (
         token
       )
     } yield CreateUser.Response(
-      id = createUsersRow.userId.value.value,
+      id = createUsersRow.userId,
       email = request.email,
       name = request.name
     )

@@ -8,9 +8,9 @@ package typo_generated
 package public
 package user_logs
 
+import java.time.Instant
+import java.util.UUID
 import net.wiringbits.typo_generated.customtypes.Defaulted
-import net.wiringbits.typo_generated.customtypes.TypoOffsetDateTime
-import net.wiringbits.typo_generated.public.users.UsersId
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -22,14 +22,14 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `public.user_logs` which has not been persisted yet */
 case class UserLogsRowUnsaved(
-    userLogId: UserLogsId,
+    userLogId: /* user-picked */ UUID,
     /** Points to [[users.UsersRow.userId]] */
-    userId: UsersId,
+    userId: /* user-picked */ UUID,
     message: String,
     /** Default: now() */
-    createdAt: Defaulted[TypoOffsetDateTime] = Defaulted.UseDefault
+    createdAt: Defaulted[ /* user-picked */ Instant] = Defaulted.UseDefault
 ) {
-  def toRow(createdAtDefault: => TypoOffsetDateTime): UserLogsRow =
+  def toRow(createdAtDefault: => /* user-picked */ Instant): UserLogsRow =
     UserLogsRow(
       userLogId = userLogId,
       userId = userId,
@@ -45,10 +45,10 @@ object UserLogsRowUnsaved {
     JsResult.fromTry(
       Try(
         UserLogsRowUnsaved(
-          userLogId = json.\("user_log_id").as(UserLogsId.reads),
-          userId = json.\("user_id").as(UsersId.reads),
+          userLogId = json.\("user_log_id").as(Reads.uuidReads),
+          userId = json.\("user_id").as(Reads.uuidReads),
           message = json.\("message").as(Reads.StringReads),
-          createdAt = json.\("created_at").as(Defaulted.reads(TypoOffsetDateTime.reads))
+          createdAt = json.\("created_at").as(Defaulted.reads(implicitly[Reads[Instant]]))
         )
       )
     )
@@ -56,10 +56,10 @@ object UserLogsRowUnsaved {
   implicit lazy val writes: OWrites[UserLogsRowUnsaved] = OWrites[UserLogsRowUnsaved](o =>
     new JsObject(
       ListMap[String, JsValue](
-        "user_log_id" -> UserLogsId.writes.writes(o.userLogId),
-        "user_id" -> UsersId.writes.writes(o.userId),
+        "user_log_id" -> Writes.UuidWrites.writes(o.userLogId),
+        "user_id" -> Writes.UuidWrites.writes(o.userId),
         "message" -> Writes.StringWrites.writes(o.message),
-        "created_at" -> Defaulted.writes(TypoOffsetDateTime.writes).writes(o.createdAt)
+        "created_at" -> Defaulted.writes(implicitly[Writes[Instant]]).writes(o.createdAt)
       )
     )
   )

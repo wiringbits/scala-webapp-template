@@ -9,7 +9,6 @@ import net.wiringbits.config.BackgroundJobsExecutorConfig
 import net.wiringbits.models.jobs.{BackgroundJobPayload, BackgroundJobType}
 import net.wiringbits.repositories.BackgroundJobsRepository
 import net.wiringbits.repositories.models.BackgroundJobData
-import net.wiringbits.typo_generated.customtypes.TypoOffsetDateTime
 import net.wiringbits.typo_generated.public.background_jobs.BackgroundJobsRow
 import net.wiringbits.util.{DelayGenerator, EmailMessage}
 import org.slf4j.LoggerFactory
@@ -59,8 +58,7 @@ class BackgroundJobsExecutorTask @Inject() (
       }
       .recoverWith { case NonFatal(ex) =>
         val minutesUntilExecute = DelayGenerator.createDelay(job.errorCount.getOrElse(0))
-        val executeAt =
-          TypoOffsetDateTime(clock.instant().plus(minutesUntilExecute, ChronoUnit.MINUTES).atOffset(ZoneOffset.UTC))
+        val executeAt = clock.instant().plus(minutesUntilExecute, ChronoUnit.MINUTES)
         logger.warn(s"Job with id ${job.backgroundJobId} failed: ${ex.getMessage}", ex)
         backgroundJobsRepository.setStatusToFailed(job.backgroundJobId, executeAt, ex.getMessage)
       }

@@ -6,7 +6,7 @@ import java.time.{Clock, ZoneOffset}
 
 object ValidateUserToken {
   def apply(token: UserTokensRow)(implicit clock: Clock): Unit = {
-    if (token.expiresAt.value.isBefore(clock.instant().atOffset(ZoneOffset.UTC)))
+    if (token.expiresAt.isBefore(clock.instant()))
       throw new RuntimeException("Token is expired")
     else ()
   }

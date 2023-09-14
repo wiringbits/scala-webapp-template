@@ -8,20 +8,24 @@ package typo_generated
 package public
 package background_jobs
 
+import anorm.ToStatement
 import java.sql.Connection
+import java.util.UUID
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait BackgroundJobsRepo {
-  def delete(backgroundJobId: BackgroundJobsId)(implicit c: Connection): Boolean
+  def delete(backgroundJobId: /* user-picked */ UUID)(implicit c: Connection): Boolean
   def delete: DeleteBuilder[BackgroundJobsFields, BackgroundJobsRow]
   def insert(unsaved: BackgroundJobsRow)(implicit c: Connection): BackgroundJobsRow
   def insert(unsaved: BackgroundJobsRowUnsaved)(implicit c: Connection): BackgroundJobsRow
   def select: SelectBuilder[BackgroundJobsFields, BackgroundJobsRow]
   def selectAll(implicit c: Connection): List[BackgroundJobsRow]
-  def selectById(backgroundJobId: BackgroundJobsId)(implicit c: Connection): Option[BackgroundJobsRow]
-  def selectByIds(backgroundJobIds: Array[BackgroundJobsId])(implicit c: Connection): List[BackgroundJobsRow]
+  def selectById(backgroundJobId: /* user-picked */ UUID)(implicit c: Connection): Option[BackgroundJobsRow]
+  def selectByIds(
+      backgroundJobIds: Array[ /* user-picked */ UUID]
+  )(implicit c: Connection, toStatement: ToStatement[Array[ /* user-picked */ UUID]]): List[BackgroundJobsRow]
   def update(row: BackgroundJobsRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[BackgroundJobsFields, BackgroundJobsRow]
   def upsert(unsaved: BackgroundJobsRow)(implicit c: Connection): BackgroundJobsRow

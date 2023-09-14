@@ -11,8 +11,8 @@ package user_logs
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
-import net.wiringbits.typo_generated.customtypes.TypoOffsetDateTime
-import net.wiringbits.typo_generated.public.users.UsersId
+import java.time.Instant
+import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -23,11 +23,11 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class UserLogsRow(
-    userLogId: UserLogsId,
+    userLogId: /* user-picked */ UUID,
     /** Points to [[users.UsersRow.userId]] */
-    userId: UsersId,
+    userId: /* user-picked */ UUID,
     message: String,
-    createdAt: TypoOffsetDateTime
+    createdAt: /* user-picked */ Instant
 )
 
 object UserLogsRow {
@@ -35,10 +35,10 @@ object UserLogsRow {
     JsResult.fromTry(
       Try(
         UserLogsRow(
-          userLogId = json.\("user_log_id").as(UserLogsId.reads),
-          userId = json.\("user_id").as(UsersId.reads),
+          userLogId = json.\("user_log_id").as(Reads.uuidReads),
+          userId = json.\("user_id").as(Reads.uuidReads),
           message = json.\("message").as(Reads.StringReads),
-          createdAt = json.\("created_at").as(TypoOffsetDateTime.reads)
+          createdAt = json.\("created_at").as(implicitly[Reads[Instant]])
         )
       )
     )
@@ -46,20 +46,20 @@ object UserLogsRow {
   def rowParser(idx: Int): RowParser[UserLogsRow] = RowParser[UserLogsRow] { row =>
     Success(
       UserLogsRow(
-        userLogId = row(idx + 0)(UserLogsId.column),
-        userId = row(idx + 1)(UsersId.column),
+        userLogId = row(idx + 0)(Column.columnToUUID),
+        userId = row(idx + 1)(Column.columnToUUID),
         message = row(idx + 2)(Column.columnToString),
-        createdAt = row(idx + 3)(TypoOffsetDateTime.column)
+        createdAt = row(idx + 3)(Implicits.instantColumn)
       )
     )
   }
   implicit lazy val writes: OWrites[UserLogsRow] = OWrites[UserLogsRow](o =>
     new JsObject(
       ListMap[String, JsValue](
-        "user_log_id" -> UserLogsId.writes.writes(o.userLogId),
-        "user_id" -> UsersId.writes.writes(o.userId),
+        "user_log_id" -> Writes.UuidWrites.writes(o.userLogId),
+        "user_id" -> Writes.UuidWrites.writes(o.userId),
         "message" -> Writes.StringWrites.writes(o.message),
-        "created_at" -> TypoOffsetDateTime.writes.writes(o.createdAt)
+        "created_at" -> implicitly[Writes[Instant]].writes(o.createdAt)
       )
     )
   )

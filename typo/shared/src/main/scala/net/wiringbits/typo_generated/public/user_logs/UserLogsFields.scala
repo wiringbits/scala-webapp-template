@@ -8,15 +8,15 @@ package typo_generated
 package public
 package user_logs
 
-import net.wiringbits.typo_generated.customtypes.TypoOffsetDateTime
-import net.wiringbits.typo_generated.public.users.UsersId
+import java.time.Instant
+import java.util.UUID
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField
 
 trait UserLogsFields[Row] {
-  val userLogId: IdField[UserLogsId, Row]
-  val userId: Field[UsersId, Row]
+  val userLogId: IdField[ /* user-picked */ UUID, Row]
+  val userId: Field[ /* user-picked */ UUID, Row]
   val message: Field[String, Row]
-  val createdAt: Field[TypoOffsetDateTime, Row]
+  val createdAt: Field[ /* user-picked */ Instant, Row]
 }
 object UserLogsFields extends UserLogsStructure[UserLogsRow](None, identity, (_, x) => x)
