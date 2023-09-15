@@ -20,7 +20,7 @@ class EmailsHelper @Inject() (
     webAppConfig: WebAppConfig,
     userTokensRepository: UserTokensRepository,
     tokenGenerator: TokenGenerator,
-    userTokensConfig: UserTokensConfig,
+    userTokensConfig: UserTokensConfig
 )(implicit ec: ExecutionContext, clock: Clock) {
   def sendEmailVerificationToken(user: UsersRow): Future[Instant] = {
     // we can't retrieve the plain text token, hence, we generate another one

@@ -6,15 +6,12 @@ import net.wiringbits.common.models.{Email, InstantCustom, UUIDCustom}
 import net.wiringbits.core.RepositorySpec
 import net.wiringbits.models.jobs.{BackgroundJobPayload, BackgroundJobStatus, BackgroundJobType}
 import net.wiringbits.typo_generated.customtypes.TypoJsonb
-import net.wiringbits.typo_generated.public.background_jobs.{BackgroundJobsRepoImpl, BackgroundJobsRow}
+import net.wiringbits.typo_generated.public.background_jobs.BackgroundJobsRow
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.OptionValues.*
 import org.scalatest.concurrent.ScalaFutures.*
 import org.scalatest.matchers.must.Matchers.*
-import play.api.libs.json.Json
-
-import java.time.Instant
-import java.util.UUID
+import play.api.libs.json.{JsValue, Json}
 
 class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll {
 
@@ -37,15 +34,13 @@ class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll
         payload = TypoJsonb(Json.toJson(backgroundJobPayload).toString),
         status = BackgroundJobStatus.Pending.toString,
         statusDetails = None,
-        errorCount = None,
+        errorCount = Some(0),
         executeAt = InstantCustom.now(),
         createdAt = InstantCustom.now(),
         updatedAt = InstantCustom.now()
       )
 
-      repositories.database.withConnection { implicit conn =>
-        BackgroundJobsRepoImpl.insert(createRequest)
-      }
+      repositories.backgroundJobs.create(createRequest).futureValue
 
       val result = repositories.backgroundJobs.streamPendingJobs.futureValue
         .runWith(Sink.seq)
@@ -55,7 +50,11 @@ class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll
       val item = result.headOption.value
       item.status must be(createRequest.status)
       item.`type` must be(createRequest.`type`)
-      item.payload must be(Json.toJson(createRequest.payload))
+      val itemJsValue = Json.parse(item.payload.value)
+      val backgroundJobPayloadJsValue = Json.toJson(backgroundJobPayload)
+      (itemJsValue \ "email") must be(backgroundJobPayloadJsValue \ "email")
+      (itemJsValue \ "subject") must be(backgroundJobPayloadJsValue \ "subject")
+      (itemJsValue \ "body") must be(backgroundJobPayloadJsValue \ "body")
     }
 
     "only return pending jobs" in withRepositories() { repositories =>
@@ -65,7 +64,7 @@ class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll
         payload = TypoJsonb(Json.toJson(backgroundJobPayload).toString),
         status = BackgroundJobStatus.Pending.toString,
         statusDetails = None,
-        errorCount = None,
+        errorCount = Some(0),
         executeAt = InstantCustom.now(),
         createdAt = InstantCustom.now(),
         updatedAt = InstantCustom.now()
@@ -73,23 +72,27 @@ class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll
 
       val limit = 6
       for (i <- 1 to limit) {
-        repositories.database.withConnection { implicit conn =>
-          BackgroundJobsRepoImpl.insert(
+        repositories.backgroundJobs
+          .create(
             createRequestBase.copy(
               backgroundJobId = UUIDCustom.randomUUID(),
               status = if ((i % 2) == 0) BackgroundJobStatus.Success.toString else BackgroundJobStatus.Pending.toString
             )
           )
-        }
+          .futureValue
       }
       val response = repositories.backgroundJobs.streamPendingJobs.futureValue
         .runWith(Sink.seq)
         .futureValue
       response.length must be(limit / 2)
+      val backgroundJobPayloadJsValue = Json.toJson(backgroundJobPayload)
       response.foreach { x =>
-        x.status must be(BackgroundJobStatus.Pending)
+        x.status must be(BackgroundJobStatus.Pending.toString)
         x.`type` must be(createRequestBase.`type`)
-        x.payload must be(Json.toJson(createRequestBase.payload))
+        val itemJsValue = Json.parse(x.payload.value)
+        (itemJsValue \ "email") must be(backgroundJobPayloadJsValue \ "email")
+        (itemJsValue \ "subject") must be(backgroundJobPayloadJsValue \ "subject")
+        (itemJsValue \ "body") must be(backgroundJobPayloadJsValue \ "body")
       }
     }
 
@@ -109,15 +112,14 @@ class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll
         payload = TypoJsonb(Json.toJson(backgroundJobPayload).toString),
         status = BackgroundJobStatus.Pending.toString,
         statusDetails = None,
-        errorCount = None,
+        errorCount = Some(0),
         executeAt = InstantCustom.now(),
         createdAt = InstantCustom.now(),
         updatedAt = InstantCustom.now()
       )
 
-      repositories.database.withConnection { implicit conn =>
-        BackgroundJobsRepoImpl.insert(createRequest)
-      }
+      repositories.backgroundJobs.create(createRequest).futureValue
+
       val failReason = "test"
       repositories.backgroundJobs
         .setStatusToFailed(createRequest.backgroundJobId, executeAt = InstantCustom.now(), failReason = failReason)
@@ -129,7 +131,7 @@ class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll
       result.size must be(1)
       val item = result.headOption.value
       item.backgroundJobId must be(createRequest.backgroundJobId)
-      item.status must be(BackgroundJobStatus.Failed)
+      item.status must be(BackgroundJobStatus.Failed.toString)
       item.statusDetails must be(Some(failReason))
     }
 
@@ -154,15 +156,13 @@ class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll
         payload = TypoJsonb(Json.toJson(backgroundJobPayload).toString),
         status = BackgroundJobStatus.Pending.toString,
         statusDetails = None,
-        errorCount = None,
+        errorCount = Some(0),
         executeAt = InstantCustom.now(),
         createdAt = InstantCustom.now(),
         updatedAt = InstantCustom.now()
       )
 
-      repositories.database.withConnection { implicit conn =>
-        BackgroundJobsRepoImpl.insert(createRequest)
-      }
+      repositories.backgroundJobs.create(createRequest).futureValue
       repositories.backgroundJobs.setStatusToSuccess(createRequest.backgroundJobId).futureValue
 
       val result = repositories.backgroundJobs.streamPendingJobs.futureValue

@@ -9,13 +9,12 @@ import net.wiringbits.common.models.InstantCustom
 import net.wiringbits.config.BackgroundJobsExecutorConfig
 import net.wiringbits.models.jobs.{BackgroundJobPayload, BackgroundJobType}
 import net.wiringbits.repositories.BackgroundJobsRepository
-import net.wiringbits.repositories.models.BackgroundJobData
 import net.wiringbits.typo_generated.public.background_jobs.BackgroundJobsRow
 import net.wiringbits.util.{DelayGenerator, EmailMessage}
 import org.slf4j.LoggerFactory
 import play.api.libs.json.Json
 
-import java.time.{Clock, ZoneOffset}
+import java.time.Clock
 import java.time.temporal.ChronoUnit
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
@@ -42,7 +41,7 @@ class BackgroundJobsExecutorTask @Inject() (
   private def execute(job: BackgroundJobsRow): Future[Unit] = {
     val executionResult = BackgroundJobType.withNameInsensitive(job.`type`) match {
       case BackgroundJobType.SendEmail =>
-        Json.toJson(job.payload.value).asOpt[BackgroundJobPayload.SendEmail] match {
+        Json.toJson(job.payload).asOpt[BackgroundJobPayload.SendEmail] match {
           case Some(typedPayload) => sendEmail(typedPayload)
           case None =>
             Future.failed(
@@ -62,6 +61,7 @@ class BackgroundJobsExecutorTask @Inject() (
         val executeAt = InstantCustom.fromClock.plus(minutesUntilExecute, ChronoUnit.MINUTES)
         logger.warn(s"Job with id ${job.backgroundJobId} failed: ${ex.getMessage}", ex)
         backgroundJobsRepository.setStatusToFailed(job.backgroundJobId, executeAt, ex.getMessage)
+        Future.unit
       }
   }
 

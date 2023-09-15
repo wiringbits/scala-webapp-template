@@ -15,9 +15,8 @@ import play.api.db.Database
 import play.api.libs.json.Json
 
 import java.sql.Connection
+import java.time.Clock
 import java.time.temporal.ChronoUnit
-import java.time.{Clock, ZoneOffset}
-import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.Future
 
@@ -156,7 +155,7 @@ class UsersRepository @Inject() (
         payload = TypoJsonb(Json.toJson(payload).toString),
         status = BackgroundJobStatus.Pending.toString,
         statusDetails = None,
-        errorCount = None,
+        errorCount = Some(0),
         executeAt = InstantCustom.fromClock,
         createdAt = InstantCustom.fromClock,
         updatedAt = InstantCustom.fromClock

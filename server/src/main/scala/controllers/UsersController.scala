@@ -52,7 +52,11 @@ class UsersController @Inject() (
     handleRequest {
       logger.info(s"Reset user's password: ${request.token.userId}")
       for {
-        response <- resetPasswordAction(UUIDCustom(request.token.userId), UUIDCustom(request.token.token), request.password)
+        response <- resetPasswordAction(
+          UUIDCustom(request.token.userId),
+          UUIDCustom(request.token.token),
+          request.password
+        )
       } yield Right(response)
     }
 

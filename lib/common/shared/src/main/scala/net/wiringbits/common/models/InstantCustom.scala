@@ -1,11 +1,13 @@
 package net.wiringbits.common.models
 
-import anorm.{Column, ParameterMetaData, ToStatement, TypeDoesNotMatch}
-import play.api.libs.json.{Format, JsString, Json, Reads, Writes}
+import anorm.*
+import play.api.libs.json.*
 
+import java.sql.Timestamp
 import java.time.format.{DateTimeFormatter, DateTimeFormatterBuilder}
 import java.time.temporal.{ChronoField, TemporalUnit}
-import java.time.{Clock, Instant, OffsetDateTime}
+import java.time.*
+import java.util.Date
 import scala.util.{Failure, Success, Try}
 
 // Typo doesn't support correctly java Instant, so we have to do our custom Instant
@@ -33,13 +35,32 @@ object InstantCustom {
     .appendPattern("X")
     .toFormatter
 
-  implicit val instantCustomColumn: Column[InstantCustom] = Column.nonNull[InstantCustom] { (value, _) =>
+  private def timestamp[T](ts: Timestamp)(f: Timestamp => T): Either[SqlRequestError, T] = Right(
+    if (ts == null) null.asInstanceOf[T] else f(ts)
+  )
+
+  implicit val columnToInstant: Column[InstantCustom] = Column.nonNull(instantValueTo(instantToInstantCustom))
+
+  private def instantToInstantCustom(instant: Instant): InstantCustom = InstantCustom(instant)
+
+  private def instantValueTo(
+      epoch: Instant => InstantCustom
+  )(value: Any, meta: MetaDataItem): Either[SqlRequestError, InstantCustom] = {
     value match {
+      case date: LocalDateTime => Right(epoch(date.toInstant(ZoneOffset.UTC)))
+      case ts: java.sql.Timestamp => timestamp(ts)(t => epoch(t.toInstant))
+      case date: java.util.Date =>
+        Right(epoch(Instant.ofEpochMilli(date.getTime)))
+      case time: Long =>
+        Right(epoch(Instant.ofEpochMilli(time)))
+      case TimestampWrapper1(ts) => timestamp(ts)(t => epoch(t.toInstant))
+      case TimestampWrapper2(ts) => timestamp(ts)(t => epoch(t.toInstant))
       case string: String =>
         Try(InstantCustom(OffsetDateTime.parse(string, timestamptzParser).toInstant)) match
           case Failure(_) => Left(TypeDoesNotMatch("Error parsing the instant"))
           case Success(value) => Right(value)
-      case _ => Left(TypeDoesNotMatch("Error parsing the instant"))
+      case _ =>
+        Left(TypeDoesNotMatch("Error parsing the instant"))
     }
   }
 
