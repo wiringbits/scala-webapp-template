@@ -35,6 +35,7 @@ object InstantCustom {
     .appendPattern("X")
     .toFormatter
 
+  @SuppressWarnings(Array("org.wartremover.warts.Null"))
   private def timestamp[T](ts: Timestamp)(f: Timestamp => T): Either[SqlRequestError, T] = Right(
     if (ts == null) null.asInstanceOf[T] else f(ts)
   )
