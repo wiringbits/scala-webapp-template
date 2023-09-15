@@ -1,6 +1,6 @@
 package net.wiringbits.repositories
 
-import net.wiringbits.common.models.{Email, Name}
+import net.wiringbits.common.models.{Email, InstantCustom, Name, UUIDCustom}
 import net.wiringbits.core.RepositorySpec
 import net.wiringbits.repositories.models.{User, UserLog}
 import net.wiringbits.typo_generated.public.user_logs.UserLogsRow
@@ -18,20 +18,20 @@ class UserLogsRepositorySpec extends RepositorySpec with RepositoryUtils {
       val usersRow = createNonVerifyUser().futureValue
 
       val logsRequest = UserLogsRow(
-        userLogId = UUID.randomUUID(),
+        userLogId = UUIDCustom.randomUUID(),
         userId = usersRow.userId,
         message = "Test",
-        createdAt = Instant.now
+        createdAt = InstantCustom.now()
       )
       repositories.userLogs.create(logsRequest).futureValue
     }
 
     "fail if the user doesn't exists" in withRepositories() { implicit repositories =>
       val logsRequest = UserLogsRow(
-        userLogId = UUID.randomUUID(),
-        userId = UUID.randomUUID(),
+        userLogId = UUIDCustom.randomUUID(),
+        userId = UUIDCustom.randomUUID(),
         message = "Test",
-        createdAt = Instant.now
+        createdAt = InstantCustom.now()
       )
       val ex = intercept[RuntimeException] {
         repositories.userLogs.create(logsRequest).futureValue
@@ -51,7 +51,7 @@ class UserLogsRepositorySpec extends RepositorySpec with RepositoryUtils {
 
     "fail if the user doesn't exists" in withRepositories() { repositories =>
       val ex = intercept[RuntimeException] {
-        repositories.userLogs.create(UUID.randomUUID(), "test").futureValue
+        repositories.userLogs.create(UUIDCustom.randomUUID(), "test").futureValue
       }
       ex.getCause.getMessage must startWith(
         s"""ERROR: insert or update on table "user_logs" violates foreign key constraint "user_logs_users_fk""""
@@ -74,7 +74,7 @@ class UserLogsRepositorySpec extends RepositorySpec with RepositoryUtils {
     }
 
     "return no results" in withRepositories() { implicit repositories =>
-      val response = repositories.userLogs.logs(UUID.randomUUID()).futureValue
+      val response = repositories.userLogs.logs(UUIDCustom.randomUUID()).futureValue
       response.isEmpty must be(true)
     }
   }

@@ -1,9 +1,8 @@
 package net.wiringbits.actions
 
 import net.wiringbits.api.models.UpdatePassword
-import net.wiringbits.common.models.Name
+import net.wiringbits.common.models.{Name, UUIDCustom}
 import net.wiringbits.repositories.UsersRepository
-
 import net.wiringbits.util.EmailMessage
 import net.wiringbits.validations.ValidatePasswordMatches
 import org.mindrot.jbcrypt.BCrypt
@@ -16,7 +15,7 @@ class UpdatePasswordAction @Inject() (
     usersRepository: UsersRepository
 )(implicit ec: ExecutionContext) {
 
-  def apply(userId: UUID, request: UpdatePassword.Request): Future[Unit] = {
+  def apply(userId: UUIDCustom, request: UpdatePassword.Request): Future[Unit] = {
     for {
       maybe <- usersRepository.find(userId)
       user = ValidatePasswordMatches(maybe, request.oldPassword)

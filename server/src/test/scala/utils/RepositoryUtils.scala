@@ -1,6 +1,6 @@
 package utils
 
-import net.wiringbits.common.models.{Email, Name}
+import net.wiringbits.common.models.{Email, InstantCustom, Name, UUIDCustom}
 import net.wiringbits.core.RepositoryComponents
 import net.wiringbits.typo_generated.public.users.UsersRow
 
@@ -9,11 +9,11 @@ import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
 trait RepositoryUtils {
-  def createNonVerifyUser(userIdMaybe: Option[UUID] = None, emailMaybe: Option[Email] = None)(using
+  def createNonVerifyUser(userIdMaybe: Option[UUIDCustom] = None, emailMaybe: Option[Email] = None)(using
       ec: ExecutionContext,
       repositories: RepositoryComponents
   ): Future[UsersRow] = {
-    val userId = userIdMaybe.getOrElse(UUID.randomUUID())
+    val userId = userIdMaybe.getOrElse(UUIDCustom.randomUUID())
     val email = emailMaybe.getOrElse(Email.trusted("hello@wiringbits.net"))
 
     val createUserRow = UsersRow(
@@ -22,7 +22,7 @@ trait RepositoryUtils {
       lastName = None,
       email = email,
       password = "password",
-      createdAt = Instant.now,
+      createdAt = InstantCustom.now(),
       verifiedOn = None
     )
 

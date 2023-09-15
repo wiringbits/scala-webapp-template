@@ -2,7 +2,7 @@ package controllers
 
 import net.wiringbits.api.endpoints.AdminEndpoints
 import net.wiringbits.api.models.{AdminGetUserLogs, AdminGetUsers, ErrorResponse}
-import net.wiringbits.common.models.Email
+import net.wiringbits.common.models.{Email, UUIDCustom}
 import net.wiringbits.services.AdminService
 import org.slf4j.LoggerFactory
 import sttp.capabilities.WebSockets
@@ -25,7 +25,7 @@ class AdminController @Inject() (
   ): Future[Either[ErrorResponse, AdminGetUserLogs.Response]] = handleRequest {
     logger.info(s"Get user logs: $userId")
     for {
-      response <- adminService.userLogs(userId)
+      response <- adminService.userLogs(UUIDCustom(userId))
     } yield Right(response)
   }
 

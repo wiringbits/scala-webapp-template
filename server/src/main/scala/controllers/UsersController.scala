@@ -3,7 +3,7 @@ package controllers
 import net.wiringbits.actions.*
 import net.wiringbits.api.endpoints.UsersEndpoints
 import net.wiringbits.api.models.*
-
+import net.wiringbits.common.models.UUIDCustom
 import org.slf4j.LoggerFactory
 import sttp.capabilities.WebSockets
 import sttp.capabilities.akka.AkkaStreams
@@ -36,7 +36,7 @@ class UsersController @Inject() (
     val token = request.token
     logger.info(s"Verify user's email: ${token.userId}")
     for {
-      response <- verifyUserEmailAction(token.userId, token.token)
+      response <- verifyUserEmailAction(UUIDCustom(token.userId), UUIDCustom(token.token))
     } yield Right(response)
   }
 
@@ -52,7 +52,7 @@ class UsersController @Inject() (
     handleRequest {
       logger.info(s"Reset user's password: ${request.token.userId}")
       for {
-        response <- resetPasswordAction(request.token.userId, request.token.token, request.password)
+        response <- resetPasswordAction(UUIDCustom(request.token.userId), UUIDCustom(request.token.token), request.password)
       } yield Right(response)
     }
 
@@ -68,7 +68,7 @@ class UsersController @Inject() (
 
   private def update(
       request: UpdateUser.Request,
-      userIdF: Future[UUID]
+      userIdF: Future[UUIDCustom]
   ): Future[Either[ErrorResponse, UpdateUser.Response]] = handleRequest {
     logger.info(s"Update user: $request")
     for {
@@ -80,7 +80,7 @@ class UsersController @Inject() (
 
   private def updatePassword(
       request: UpdatePassword.Request,
-      userIdF: Future[UUID]
+      userIdF: Future[UUIDCustom]
   ): Future[Either[ErrorResponse, UpdatePassword.Response]] = handleRequest {
     for {
       userId <- userIdF
@@ -90,7 +90,7 @@ class UsersController @Inject() (
     } yield Right(response)
   }
 
-  private def getLogs(userIdF: Future[UUID]): Future[Either[ErrorResponse, GetUserLogs.Response]] =
+  private def getLogs(userIdF: Future[UUIDCustom]): Future[Either[ErrorResponse, GetUserLogs.Response]] =
     handleRequest {
       for {
         userId <- userIdF

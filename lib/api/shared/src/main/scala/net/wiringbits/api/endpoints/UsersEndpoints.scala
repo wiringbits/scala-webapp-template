@@ -136,8 +136,8 @@ object UsersEndpoints {
       )
 
   def update(implicit
-      authHandler: ServerRequest => Future[UUID]
-  ): Endpoint[Unit, (UpdateUser.Request, Future[UUID]), ErrorResponse, UpdateUser.Response, Any] =
+      authHandler: ServerRequest => Future[UUIDCustom]
+  ): Endpoint[Unit, (UpdateUser.Request, Future[UUIDCustom]), ErrorResponse, UpdateUser.Response, Any] =
     baseEndpoint.put
       .in("me")
       .in(
@@ -153,8 +153,8 @@ object UsersEndpoints {
       .summary("Updates the authenticated user details")
 
   def updatePassword(implicit
-      authHandler: ServerRequest => Future[UUID]
-  ): Endpoint[Unit, (UpdatePassword.Request, Future[UUID]), ErrorResponse, UpdatePassword.Response, Any] =
+      authHandler: ServerRequest => Future[UUIDCustom]
+  ): Endpoint[Unit, (UpdatePassword.Request, Future[UUIDCustom]), ErrorResponse, UpdatePassword.Response, Any] =
     baseEndpoint.put
       .in("me" / "password")
       .in(
@@ -173,8 +173,8 @@ object UsersEndpoints {
       .summary("Updates the authenticated user password")
 
   def getLogs(implicit
-      authHandler: ServerRequest => Future[UUID]
-  ): Endpoint[Unit, Future[UUID], ErrorResponse, GetUserLogs.Response, Any] = baseEndpoint.get
+      authHandler: ServerRequest => Future[UUIDCustom]
+  ): Endpoint[Unit, Future[UUIDCustom], ErrorResponse, GetUserLogs.Response, Any] = baseEndpoint.get
     .in("me" / "logs")
     .in(userAuth)
     .out(
@@ -195,7 +195,7 @@ object UsersEndpoints {
     .errorOut(oneOf(HttpErrors.badRequest))
     .summary("Get the logs for the authenticated user")
 
-  def routes(implicit authHandler: ServerRequest => Future[UUID]): List[AnyEndpoint] = List(
+  def routes(implicit authHandler: ServerRequest => Future[UUIDCustom]): List[AnyEndpoint] = List(
     create,
     verifyEmail,
     forgotPassword,

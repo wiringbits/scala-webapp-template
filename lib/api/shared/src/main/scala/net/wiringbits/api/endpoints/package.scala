@@ -1,6 +1,7 @@
 package net.wiringbits.api
 
 import net.wiringbits.api.models.{ErrorResponse, errorResponseFormat}
+import net.wiringbits.common.models.UUIDCustom
 import sttp.model.StatusCode
 import sttp.tapir.*
 import sttp.tapir.EndpointInput.AuthType
@@ -42,7 +43,7 @@ package object endpoints {
     .schema(_.hidden(true))
 
   def userAuth(implicit
-      handleAuth: ServerRequest => Future[UUID]
-  ): EndpointInput.ExtractFromRequest[Future[UUID]] =
+      handleAuth: ServerRequest => Future[UUIDCustom]
+  ): EndpointInput.ExtractFromRequest[Future[UUIDCustom]] =
     extractFromRequest(handleAuth)
 }

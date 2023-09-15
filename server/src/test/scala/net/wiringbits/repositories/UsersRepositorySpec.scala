@@ -2,7 +2,7 @@ package net.wiringbits.repositories
 
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.Sink
-import net.wiringbits.common.models.{Email, Name}
+import net.wiringbits.common.models.{Email, Name, UUIDCustom}
 import net.wiringbits.core.RepositorySpec
 import net.wiringbits.util.EmailMessage
 import org.scalatest.BeforeAndAfterAll
@@ -114,7 +114,7 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll with Rep
     }
 
     "return no result when the id doesn't exists" in withRepositories() { implicit repositories =>
-      val response = repositories.users.find(UUID.randomUUID()).futureValue
+      val response = repositories.users.find(UUIDCustom.randomUUID()).futureValue
       response.isEmpty must be(true)
     }
   }
@@ -127,14 +127,14 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll with Rep
       repositories.users.update(request.userId, newName).futureValue
 
       val response = repositories.users.find(request.userId).futureValue.value
-      response.name must be(newName.string)
+      response.name must be(newName)
       response.email must be(request.email)
     }
 
     "fail when the user doesn't exist" in withRepositories() { implicit repositories =>
       val newName = Name.trusted("Test")
       val ex = intercept[RuntimeException] {
-        repositories.users.update(UUID.randomUUID(), newName).futureValue
+        repositories.users.update(UUIDCustom.randomUUID(), newName).futureValue
       }
       ex.getCause.getMessage must startWith(
         """ERROR: insert or update on table "user_logs" violates foreign key constraint "user_logs_users_fk""""
@@ -173,7 +173,7 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll with Rep
       val name = Name.trusted("test")
       val ex = intercept[RuntimeException] {
         repositories.users
-          .updatePassword(UUID.randomUUID(), "test", EmailMessage.updatePassword(name))
+          .updatePassword(UUIDCustom.randomUUID(), "test", EmailMessage.updatePassword(name))
           .futureValue
       }
       ex.getCause.getMessage must startWith(
@@ -186,7 +186,7 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll with Rep
     "verify a user given a token" in withRepositories() { implicit repositories =>
       val request = createNonVerifyUser().futureValue
       repositories.users
-        .verify(request.userId, UUID.randomUUID(), EmailMessage.confirm(request.name))
+        .verify(request.userId, UUIDCustom.randomUUID(), EmailMessage.confirm(request.name))
         .futureValue
 
       val response = repositories.users.find(request.userId).futureValue
@@ -196,7 +196,7 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll with Rep
     "produce a notification for the user" in withRepositories() { implicit repositories =>
       val request = createNonVerifyUser().futureValue
       repositories.users
-        .verify(request.userId, UUID.randomUUID(), EmailMessage.confirm(request.name))
+        .verify(request.userId, UUIDCustom.randomUUID(), EmailMessage.confirm(request.name))
         .futureValue
 
       val response = repositories.backgroundJobs.streamPendingJobs.futureValue
@@ -209,7 +209,7 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll with Rep
       val name = Name.trusted("test")
       val ex = intercept[RuntimeException] {
         repositories.users
-          .verify(UUID.randomUUID(), UUID.randomUUID(), EmailMessage.confirm(name))
+          .verify(UUIDCustom.randomUUID(), UUIDCustom.randomUUID(), EmailMessage.confirm(name))
           .futureValue
       }
       ex.getCause.getMessage must startWith(
@@ -249,7 +249,7 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll with Rep
       val name = Name.trusted("test")
       val ex = intercept[RuntimeException] {
         repositories.users
-          .resetPassword(UUID.randomUUID(), "test", EmailMessage.resetPassword(name))
+          .resetPassword(UUIDCustom.randomUUID(), "test", EmailMessage.resetPassword(name))
           .futureValue
       }
       ex.getCause.getMessage must startWith(

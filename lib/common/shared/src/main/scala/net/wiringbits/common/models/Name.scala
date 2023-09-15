@@ -25,7 +25,7 @@ object Name extends WrappedString.Companion[Name] {
   implicit val nameColumn: Column[Name] = Column.nonNull[Name] { (value, _) =>
     value match {
       case string: String => Right(trusted(string))
-      case _ => Left(TypeDoesNotMatch("Error parsing the email"))
+      case _ => Left(TypeDoesNotMatch("Error parsing the name"))
     }
   }
 

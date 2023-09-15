@@ -1,5 +1,6 @@
 package net.wiringbits.repositories
 
+import net.wiringbits.common.models.{InstantCustom, UUIDCustom}
 import net.wiringbits.executors.DatabaseExecutionContext
 import net.wiringbits.typo_generated.public.user_logs.{UserLogsRepoImpl, UserLogsRow}
 import play.api.db.Database
@@ -17,12 +18,12 @@ class UserLogsRepository @Inject() (database: Database)(implicit ec: DatabaseExe
     }
   }
 
-  def create(userId: UUID, message: String): Future[Unit] = Future {
+  def create(userId: UUIDCustom, message: String): Future[Unit] = Future {
     val createUserLogsRow = UserLogsRow(
-      userLogId = UUID.randomUUID(),
+      userLogId = UUIDCustom.randomUUID(),
       userId = userId,
       message = message,
-      createdAt = clock.instant()
+      createdAt = InstantCustom.fromClock
     )
 
     database.withConnection { implicit conn =>
@@ -30,7 +31,7 @@ class UserLogsRepository @Inject() (database: Database)(implicit ec: DatabaseExe
     }
   }
 
-  def logs(userId: UUID): Future[List[UserLogsRow]] = Future {
+  def logs(userId: UUIDCustom): Future[List[UserLogsRow]] = Future {
     database.withConnection { implicit conn =>
       UserLogsRepoImpl.select.where(_.userId === userId).orderBy(_.createdAt.desc).toList
     }

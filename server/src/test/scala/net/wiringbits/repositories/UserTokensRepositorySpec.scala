@@ -1,34 +1,31 @@
 package net.wiringbits.repositories
 
-import net.wiringbits.common.models.{Email, Name}
+import net.wiringbits.common.models.{InstantCustom, UUIDCustom}
 import net.wiringbits.core.{RepositoryComponents, RepositorySpec}
-import net.wiringbits.repositories.models.{User, UserToken, UserTokenType}
+import net.wiringbits.repositories.models.UserTokenType
 import net.wiringbits.typo_generated.public.user_tokens.UserTokensRow
-
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.concurrent.ScalaFutures.*
 import org.scalatest.matchers.must.Matchers.*
 import utils.RepositoryUtils
 
-import java.time.{Instant, OffsetDateTime}
 import java.time.temporal.ChronoUnit
-import java.util.UUID
 import scala.concurrent.Future
 
 class UserTokensRepositorySpec extends RepositorySpec with RepositoryUtils {
   private def createTokenRequest(
-      userId: UUID,
+      userId: UUIDCustom,
       token: String = "test",
       userTokenType: UserTokenType = UserTokenType.ResetPassword
   )(using
       repositories: RepositoryComponents
   ): Future[UserTokensRow] = {
     val userTokensRow = UserTokensRow(
-      userTokenId = UUID.randomUUID(),
+      userTokenId = UUIDCustom.randomUUID(),
       token = token,
       tokenType = userTokenType.toString,
-      createdAt = Instant.now,
-      expiresAt = Instant.now().plus(2L, ChronoUnit.DAYS),
+      createdAt = InstantCustom.now(),
+      expiresAt = InstantCustom.now().plus(2L, ChronoUnit.DAYS),
       userId = userId
     )
 
@@ -46,7 +43,7 @@ class UserTokensRepositorySpec extends RepositorySpec with RepositoryUtils {
 
     "fail when the user doesn't exists" in withRepositories() { implicit repositories =>
       val ex = intercept[RuntimeException] {
-        createTokenRequest(UUID.randomUUID()).futureValue
+        createTokenRequest(UUIDCustom.randomUUID()).futureValue
       }
       ex.getCause.getMessage must startWith(
         s"""ERROR: insert or update on table "user_tokens" violates foreign key constraint "user_tokens_user_id_fk""""
@@ -59,10 +56,8 @@ class UserTokensRepositorySpec extends RepositorySpec with RepositoryUtils {
       val request = createNonVerifyUser().futureValue
 
       val tokenRequest = createTokenRequest(request.userId).futureValue
-      println(tokenRequest)
 
       val maybe = repositories.userTokens.find(request.userId).futureValue
-      println(maybe.mkString("\n"))
       val response = maybe.headOption.value
       response.token must be(tokenRequest.token)
       response.tokenType must be(tokenRequest.tokenType)
@@ -70,7 +65,7 @@ class UserTokensRepositorySpec extends RepositorySpec with RepositoryUtils {
     }
 
     "return no results when the user doesn't exists" in withRepositories() { repositories =>
-      val response = repositories.userTokens.find(UUID.randomUUID()).futureValue
+      val response = repositories.userTokens.find(UUIDCustom.randomUUID()).futureValue
       response.isEmpty must be(true)
     }
   }
@@ -85,7 +80,7 @@ class UserTokensRepositorySpec extends RepositorySpec with RepositoryUtils {
     }
 
     "return no results when the user doesn't exists" in withRepositories() { repositories =>
-      val response = repositories.userTokens.find(UUID.randomUUID(), "test").futureValue
+      val response = repositories.userTokens.find(UUIDCustom.randomUUID(), "test").futureValue
       response.isEmpty must be(true)
     }
   }

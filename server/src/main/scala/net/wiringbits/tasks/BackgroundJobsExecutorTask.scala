@@ -5,6 +5,7 @@ import com.google.inject.Inject
 import net.wiringbits.actions.internal.StreamPendingBackgroundJobsForeverAction
 import net.wiringbits.apis.EmailApi
 import net.wiringbits.apis.models.EmailRequest
+import net.wiringbits.common.models.InstantCustom
 import net.wiringbits.config.BackgroundJobsExecutorConfig
 import net.wiringbits.models.jobs.{BackgroundJobPayload, BackgroundJobType}
 import net.wiringbits.repositories.BackgroundJobsRepository
@@ -58,7 +59,7 @@ class BackgroundJobsExecutorTask @Inject() (
       }
       .recoverWith { case NonFatal(ex) =>
         val minutesUntilExecute = DelayGenerator.createDelay(job.errorCount.getOrElse(0))
-        val executeAt = clock.instant().plus(minutesUntilExecute, ChronoUnit.MINUTES)
+        val executeAt = InstantCustom.fromClock.plus(minutesUntilExecute, ChronoUnit.MINUTES)
         logger.warn(s"Job with id ${job.backgroundJobId} failed: ${ex.getMessage}", ex)
         backgroundJobsRepository.setStatusToFailed(job.backgroundJobId, executeAt, ex.getMessage)
       }

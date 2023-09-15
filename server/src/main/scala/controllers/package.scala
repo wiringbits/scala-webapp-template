@@ -1,5 +1,5 @@
 import net.wiringbits.api.models.{ErrorResponse, errorResponseFormat}
-
+import net.wiringbits.common.models.UUIDCustom
 import org.slf4j.LoggerFactory
 import play.api.mvc.request.DefaultRequestFactory
 import play.api.mvc.{CookieHeaderEncoding, RequestHeader, Session}
@@ -47,7 +47,7 @@ package object controllers {
 
   // This is the way to access the play request from tapir, we need it to extract the play session
   // UUID has to be future, because we want to handle the exception in the controllers
-  implicit def authHandler(serverRequest: ServerRequest)(implicit ec: ExecutionContext): Future[UUID] =
+  implicit def authHandler(serverRequest: ServerRequest)(implicit ec: ExecutionContext): Future[UUIDCustom] =
     val session = serverRequest.underlying
       .asInstanceOf[RequestHeader]
       .session
@@ -55,7 +55,7 @@ package object controllers {
     def userIdFromSession = Future {
       session
         .get("id")
-        .flatMap(str => Try(UUID.fromString(str)).toOption)
+        .flatMap(str => Try(UUIDCustom.fromString(str)).toOption)
         .getOrElse(throw new RuntimeException("Invalid or missing authentication"))
     }
 

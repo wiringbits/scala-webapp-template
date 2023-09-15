@@ -1,10 +1,9 @@
 package net.wiringbits.actions
 
 import net.wiringbits.api.models.ResetPassword
-import net.wiringbits.common.models.{Email, Name, Password}
+import net.wiringbits.common.models.{Email, Name, Password, UUIDCustom}
 import net.wiringbits.config.UserTokensConfig
 import net.wiringbits.repositories.{UserTokensRepository, UsersRepository}
-
 import net.wiringbits.util.{EmailMessage, TokensHelper}
 import net.wiringbits.validations.ValidateUserToken
 import org.mindrot.jbcrypt.BCrypt
@@ -23,7 +22,7 @@ class ResetPasswordAction @Inject() (
     clock: Clock
 ) {
 
-  def apply(userId: UUID, token: UUID, password: Password): Future[ResetPassword.Response] = {
+  def apply(userId: UUIDCustom, token: UUIDCustom, password: Password): Future[ResetPassword.Response] = {
     val hashedPassword = BCrypt.hashpw(password.string, BCrypt.gensalt())
     val hmacToken = TokensHelper.doHMACSHA1(token.toString.getBytes, userTokensConfig.hmacSecret)
     for {

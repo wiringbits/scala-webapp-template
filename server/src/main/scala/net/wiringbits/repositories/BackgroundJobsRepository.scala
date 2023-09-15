@@ -1,6 +1,7 @@
 package net.wiringbits.repositories
 
 import anorm.{AkkaStream, SqlStringInterpolation}
+import net.wiringbits.common.models.{InstantCustom, UUIDCustom}
 import net.wiringbits.executors.DatabaseExecutionContext
 import net.wiringbits.models.jobs.BackgroundJobStatus
 import net.wiringbits.typo_generated.public.background_jobs.{BackgroundJobsRepoImpl, BackgroundJobsRow}
@@ -52,8 +53,8 @@ class BackgroundJobsRepository @Inject() (database: Database)(implicit ec: Datab
   }
 
   def setStatusToFailed(
-      backgroundJobsId: UUID,
-      executeAt: Instant,
+      backgroundJobsId: UUIDCustom,
+      executeAt: InstantCustom,
       failReason: String
   ): Future[Unit] = Future {
     database.withConnection { implicit conn =>
@@ -67,16 +68,16 @@ class BackgroundJobsRepository @Inject() (database: Database)(implicit ec: Datab
         .setValue(_.statusDetails)(Some(failReason))
         .setValue(_.errorCount)(row.errorCount.map(_ + 1))
         .setValue(_.executeAt)(executeAt)
-        .setValue(_.updatedAt)(clock.instant())
+        .setValue(_.updatedAt)(InstantCustom.fromClock)
     }
   }
 
-  def setStatusToSuccess(backgroundJobsId: UUID): Future[Unit] = Future {
+  def setStatusToSuccess(backgroundJobsId: UUIDCustom): Future[Unit] = Future {
     database.withConnection { implicit conn =>
       BackgroundJobsRepoImpl.update
         .where(_.backgroundJobId == backgroundJobsId)
         .setValue(_.status)(BackgroundJobStatus.Success.toString)
-        .setValue(_.updatedAt)(clock.instant())
+        .setValue(_.updatedAt)(InstantCustom.fromClock)
         .execute()
     }
   }

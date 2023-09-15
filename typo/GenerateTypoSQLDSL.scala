@@ -8,35 +8,56 @@ import typo.*
 import typo.db.*
 
 object TypeOverrides {
+  private val uuidTypeImport = "net.wiringbits.common.models.UUIDCustom"
+  private val emailTypeImport = "net.wiringbits.common.models.Email"
+  private val nameTypeImport = "net.wiringbits.common.models.Name"
+  private val instantTypeImport = "net.wiringbits.common.models.InstantCustom"
+
   def apply(): TypeOverride = usersOverrides
     .orElse(userTokensOverrides)
     .orElse(backgroundJobsOverrides)
     .orElse(userLogsOverrides)
 
-  private val usersOverrides = TypeOverride.of {
-    case (RelationName(Some("public"), "users"), ColName("user_id")) => "java.util.UUID"
-    case (RelationName(Some("public"), "users"), ColName("email")) => "net.wiringbits.common.models.Email"
-    case (RelationName(Some("public"), "users"), ColName("name")) => "net.wiringbits.common.models.Name"
-    case (RelationName(Some("public"), "users"), ColName("created_at")) => "java.time.Instant"
-    case (RelationName(Some("public"), "users"), ColName("verified_on")) => "java.time.Instant"
+  private val usersOverrides = {
+    val relationName = RelationName(Some("public"), "users")
+
+    TypeOverride.of {
+      case (relationName, ColName("user_id")) => uuidTypeImport
+      case (relationName, ColName("email")) => emailTypeImport
+      case (relationName, ColName("name")) => nameTypeImport
+      case (relationName, ColName("created_at")) => instantTypeImport
+      case (relationName, ColName("verified_on")) => instantTypeImport
+    }
   }
 
-  private val userTokensOverrides = TypeOverride.of {
-    case (RelationName(Some("public"), "user_tokens"), ColName("user_token_id")) => "java.util.UUID"
-    case (RelationName(Some("public"), "user_tokens"), ColName("created_at")) => "java.time.Instant"
-    case (RelationName(Some("public"), "user_tokens"), ColName("expires_at")) => "java.time.Instant"
+  private val userTokensOverrides = {
+    val relationName = RelationName(Some("public"), "user_tokens")
+
+    TypeOverride.of {
+      case (relationName, ColName("user_token_id")) => uuidTypeImport
+      case (relationName, ColName("created_at")) => instantTypeImport
+      case (relationName, ColName("expires_at")) => instantTypeImport
+    }
   }
 
-  private val backgroundJobsOverrides = TypeOverride.of {
-    case (RelationName(Some("public"), "background_jobs"), ColName("background_job_id")) => "java.util.UUID"
-    case (RelationName(Some("public"), "background_jobs"), ColName("execute_at")) => "java.time.Instant"
-    case (RelationName(Some("public"), "background_jobs"), ColName("created_at")) => "java.time.Instant"
-    case (RelationName(Some("public"), "background_jobs"), ColName("updated_at")) => "java.time.Instant"
+  private val backgroundJobsOverrides = {
+    val relationName = RelationName(Some("public"), "background_jobs")
+
+    TypeOverride.of {
+      case (relationName, ColName("background_job_id")) => uuidTypeImport
+      case (relationName, ColName("execute_at")) => instantTypeImport
+      case (relationName, ColName("created_at")) => instantTypeImport
+      case (relationName, ColName("updated_at")) => instantTypeImport
+    }
   }
 
-  private val userLogsOverrides = TypeOverride.of {
-    case (RelationName(Some("public"), "user_logs"), ColName("user_log_id")) => "java.util.UUID"
-    case (RelationName(Some("public"), "user_logs"), ColName("created_at")) => "java.time.Instant"
+  private val userLogsOverrides = {
+    val relationName = RelationName(Some("public"), "user_logs")
+
+    TypeOverride.of {
+      case (relationName, ColName("user_log_id")) => uuidTypeImport
+      case (relationName, ColName("created_at")) => instantTypeImport
+    }
   }
 }
 

@@ -1,6 +1,6 @@
 package net.wiringbits.repositories
 
-import net.wiringbits.common.models.{Email, Name}
+import net.wiringbits.common.models.{Email, InstantCustom, Name, UUIDCustom}
 import net.wiringbits.config.UserTokensConfig
 import net.wiringbits.executors.DatabaseExecutionContext
 import net.wiringbits.models.jobs.{BackgroundJobPayload, BackgroundJobStatus, BackgroundJobType}
@@ -31,19 +31,19 @@ class UsersRepository @Inject() (
 
   def create(usersRow: UsersRow, verifyEmailToken: String): Future[Unit] = Future {
     val createUserTokensRow = UserTokensRow(
-      userTokenId = UUID.randomUUID(),
+      userTokenId = UUIDCustom.randomUUID(),
       token = verifyEmailToken,
       tokenType = UserTokenType.EmailVerification.toString,
-      createdAt = clock.instant(),
-      expiresAt = clock.instant().plus(userTokensConfig.emailVerificationExp.toHours, ChronoUnit.HOURS),
+      createdAt = InstantCustom.fromClock,
+      expiresAt = InstantCustom.fromClock.plus(userTokensConfig.emailVerificationExp.toHours, ChronoUnit.HOURS),
       userId = usersRow.userId
     )
 
     val createUserLogsRow = UserLogsRow(
-      userLogId = UUID.randomUUID(),
+      userLogId = UUIDCustom.randomUUID(),
       userId = usersRow.userId,
       message = s"Account created, name = ${usersRow.name}, email = ${usersRow.email}",
-      createdAt = clock.instant()
+      createdAt = InstantCustom.fromClock
     )
 
     database.withTransaction { implicit conn =>
@@ -64,26 +64,23 @@ class UsersRepository @Inject() (
       UsersRepoImpl.select
         .where(_.email === email)
         .orderBy(_.createdAt.desc)
-        .limit(1)
         .toList
         .headOption
     }
   }
 
-  def find(userId: UUID): Future[Option[UsersRow]] = Future {
+  def find(userId: UUIDCustom): Future[Option[UsersRow]] = Future {
     database.withConnection { implicit conn =>
-//      UsersRepoImpl.selectById(userId)
-      println(UsersRepoImpl.select.where(_.userId === userId).sql)
-      UsersRepoImpl.select.where(_.userId === userId).toList.headOption
+      UsersRepoImpl.selectById(userId)
     }
   }
 
-  def update(userId: UUID, name: Name): Future[Unit] = Future {
+  def update(userId: UUIDCustom, name: Name): Future[Unit] = Future {
     val createUserLogsRow = UserLogsRow(
-      userLogId = UUID.randomUUID(),
+      userLogId = UUIDCustom.randomUUID(),
       userId = userId,
       message = s"Profile updated",
-      createdAt = clock.instant()
+      createdAt = InstantCustom.fromClock
     )
 
     database.withTransaction { implicit conn =>
@@ -92,12 +89,12 @@ class UsersRepository @Inject() (
     }
   }
 
-  def updatePassword(userId: UUID, password: String, emailMessage: EmailMessage): Future[Unit] = Future {
+  def updatePassword(userId: UUIDCustom, password: String, emailMessage: EmailMessage): Future[Unit] = Future {
     val createUserLogsRow = UserLogsRow(
-      userLogId = UUID.randomUUID(),
+      userLogId = UUIDCustom.randomUUID(),
       userId = userId,
       message = s"Password updated",
-      createdAt = clock.instant()
+      createdAt = InstantCustom.fromClock
     )
 
     database.withTransaction { implicit conn =>
@@ -107,18 +104,18 @@ class UsersRepository @Inject() (
     }
   }
 
-  def verify(userId: UUID, userTokenId: UUID, emailMessage: EmailMessage): Future[Unit] = Future {
+  def verify(userId: UUIDCustom, userTokenId: UUIDCustom, emailMessage: EmailMessage): Future[Unit] = Future {
     val createUserLogsRow = UserLogsRow(
-      userLogId = UUID.randomUUID(),
+      userLogId = UUIDCustom.randomUUID(),
       userId = userId,
       message = s"Email verified",
-      createdAt = clock.instant()
+      createdAt = InstantCustom.fromClock
     )
 
     database.withTransaction { implicit conn =>
       UsersRepoImpl.update
         .where(_.userId === userId)
-        .setValue(_.verifiedOn)(Some(clock.instant()))
+        .setValue(_.verifiedOn)(Some(InstantCustom.fromClock))
         .execute()
       UserLogsRepoImpl.insert(createUserLogsRow)
       UserTokensRepoImpl.delete
@@ -129,12 +126,12 @@ class UsersRepository @Inject() (
     }
   }
 
-  def resetPassword(userId: UUID, password: String, emailMessage: EmailMessage): Future[Unit] = Future {
+  def resetPassword(userId: UUIDCustom, password: String, emailMessage: EmailMessage): Future[Unit] = Future {
     val createUserLogsRow = UserLogsRow(
-      userLogId = UUID.randomUUID(),
+      userLogId = UUIDCustom.randomUUID(),
       userId = userId,
       message = s"Password reset",
-      createdAt = clock.instant()
+      createdAt = InstantCustom.fromClock
     )
 
     database.withTransaction { implicit conn =>
@@ -144,7 +141,7 @@ class UsersRepository @Inject() (
     }
   }
 
-  private def sendEmailLater(userId: UUID, emailMessage: EmailMessage)(implicit conn: Connection): Unit = {
+  private def sendEmailLater(userId: UUIDCustom, emailMessage: EmailMessage)(implicit conn: Connection): Unit = {
     val usersRow = UsersRepoImpl.selectById(userId)
     usersRow.foreach { usersRow =>
       val payload = BackgroundJobPayload.SendEmail(
@@ -154,15 +151,15 @@ class UsersRepository @Inject() (
       )
 
       val backgroundJobDatasRow = BackgroundJobsRow(
-        backgroundJobId = UUID.randomUUID(),
+        backgroundJobId = UUIDCustom.randomUUID(),
         `type` = BackgroundJobType.SendEmail.toString,
         payload = TypoJsonb(Json.toJson(payload).toString),
         status = BackgroundJobStatus.Pending.toString,
         statusDetails = None,
         errorCount = None,
-        executeAt = clock.instant(),
-        createdAt = clock.instant(),
-        updatedAt = clock.instant()
+        executeAt = InstantCustom.fromClock,
+        createdAt = InstantCustom.fromClock,
+        updatedAt = InstantCustom.fromClock
       )
 
       BackgroundJobsRepoImpl.insert(backgroundJobDatasRow)

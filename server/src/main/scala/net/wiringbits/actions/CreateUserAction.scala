@@ -2,6 +2,7 @@ package net.wiringbits.actions
 
 import net.wiringbits.api.models.CreateUser
 import net.wiringbits.apis.ReCaptchaApi
+import net.wiringbits.common.models.{InstantCustom, UUIDCustom}
 import net.wiringbits.config.UserTokensConfig
 import net.wiringbits.repositories
 import net.wiringbits.repositories.UsersRepository
@@ -36,12 +37,12 @@ class CreateUserAction @Inject() (
 
       // create the user
       createUsersRow = UsersRow(
-        userId = UUID.randomUUID(),
+        userId = UUIDCustom.randomUUID(),
         name = request.name,
         lastName = None,
         email = request.email,
         password = hashedPassword,
-        createdAt = clock.instant(),
+        createdAt = InstantCustom.fromClock,
         verifiedOn = None
       )
       _ <- usersRepository.create(createUsersRow, hmacToken)
@@ -52,7 +53,7 @@ class CreateUserAction @Inject() (
         token
       )
     } yield CreateUser.Response(
-      id = createUsersRow.userId,
+      id = createUsersRow.userId.value,
       email = request.email,
       name = request.name
     )

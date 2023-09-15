@@ -1,10 +1,9 @@
 package net.wiringbits.actions
 
 import net.wiringbits.api.models.VerifyEmail
-import net.wiringbits.common.models.Name
+import net.wiringbits.common.models.{Name, UUIDCustom}
 import net.wiringbits.config.UserTokensConfig
 import net.wiringbits.repositories.{UserTokensRepository, UsersRepository}
-
 import net.wiringbits.util.{EmailMessage, TokensHelper}
 import net.wiringbits.validations.{ValidateUserIsNotVerified, ValidateUserToken}
 
@@ -21,7 +20,7 @@ class VerifyUserEmailAction @Inject() (
     ec: ExecutionContext,
     clock: Clock
 ) {
-  def apply(userId: UUID, token: UUID): Future[VerifyEmail.Response] = for {
+  def apply(userId: UUIDCustom, token: UUIDCustom): Future[VerifyEmail.Response] = for {
     // when the user is not verified
     userMaybe <- usersRepository.find(userId)
     user = userMaybe.getOrElse(throw new RuntimeException(s"User wasn't found"))

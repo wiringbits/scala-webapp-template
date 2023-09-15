@@ -2,7 +2,7 @@ package net.wiringbits.util
 
 import net.wiringbits.apis.EmailApi
 import net.wiringbits.apis.models.EmailRequest
-import net.wiringbits.common.models.{Email, Name}
+import net.wiringbits.common.models.{Email, InstantCustom, Name, UUIDCustom}
 import net.wiringbits.config.{UserTokensConfig, WebAppConfig}
 import net.wiringbits.repositories.UserTokensRepository
 import net.wiringbits.repositories.models.UserTokenType
@@ -21,26 +21,25 @@ class EmailsHelper @Inject() (
     userTokensRepository: UserTokensRepository,
     tokenGenerator: TokenGenerator,
     userTokensConfig: UserTokensConfig,
-    clock: Clock
-)(implicit ec: ExecutionContext) {
+)(implicit ec: ExecutionContext, clock: Clock) {
   def sendEmailVerificationToken(user: UsersRow): Future[Instant] = {
     // we can't retrieve the plain text token, hence, we generate another one
     val token = tokenGenerator.next()
     val hmacToken = TokensHelper.doHMACSHA1(token.toString.getBytes(), userTokensConfig.hmacSecret)
 
     val createToken = UserTokensRow(
-      userTokenId = UUID.randomUUID(),
+      userTokenId = UUIDCustom.randomUUID(),
       token = hmacToken,
       tokenType = UserTokenType.EmailVerification.toString,
-      createdAt = clock.instant(),
-      expiresAt = clock.instant().plusSeconds(userTokensConfig.emailVerificationExp.toSeconds),
+      createdAt = InstantCustom.fromClock,
+      expiresAt = InstantCustom.fromClock.plusSeconds(userTokensConfig.emailVerificationExp.toSeconds),
       userId = user.userId
     )
 
     for {
       _ <- userTokensRepository.create(createToken)
       _ <- sendRegistrationEmailWithVerificationToken(user, token)
-    } yield createToken.expiresAt
+    } yield createToken.expiresAt.value
   }
 
   // we don't save emails in the queue when user tokens are involved
@@ -62,11 +61,11 @@ class EmailsHelper @Inject() (
     val emailParameter = s"${usersRow.userId}_$token"
     val hmacToken = TokensHelper.doHMACSHA1(token.toString.getBytes, userTokensConfig.hmacSecret)
     val createUserTokensRow = UserTokensRow(
-      userTokenId = UUID.randomUUID(),
+      userTokenId = UUIDCustom.randomUUID(),
       token = hmacToken,
       tokenType = UserTokenType.ResetPassword.toString,
-      createdAt = clock.instant(),
-      expiresAt = clock.instant().plus(userTokensConfig.resetPasswordExp.toHours, ChronoUnit.HOURS),
+      createdAt = InstantCustom.fromClock,
+      expiresAt = InstantCustom.fromClock.plus(userTokensConfig.resetPasswordExp.toHours, ChronoUnit.HOURS),
       userId = usersRow.userId
     )
     val message = EmailMessage.forgotPassword(usersRow.name, webAppConfig.host, emailParameter)
