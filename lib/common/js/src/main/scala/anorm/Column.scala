@@ -5,6 +5,8 @@ import java.util.UUID
 import scala.language.implicitConversions
 import scala.util.Failure
 
+// Dummy to allow using anorm in our sjs compiled models
+// Based on https://github.com/playframework/anorm
 trait Column[T] {
   def apply[A](transformer: (Any, MetaDataItem) => Either[SqlRequestError, A]): Column[A] = new Column[A] {}
   def map[A](f: T => A): Column[A] = new Column[A] {}

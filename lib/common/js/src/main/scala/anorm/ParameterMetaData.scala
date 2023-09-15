@@ -4,6 +4,8 @@ import java.sql.Types
 import java.time.Instant
 import java.util.UUID
 
+// Dummy to allow using anorm in our sjs compiled models
+// Based on https://github.com/playframework/anorm
 trait ParameterMetaData[T] {
   def sqlType: String
 

@@ -4,6 +4,8 @@ import java.sql.PreparedStatement
 import java.time.Instant
 import java.util.UUID
 
+// Dummy to allow using anorm in our sjs compiled models
+// Based on https://github.com/playframework/anorm
 trait ToStatement[T] {
   def contramap[A](f: A => T): ToStatement[A] = new ToStatement[A] {}
 }
