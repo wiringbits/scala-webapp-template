@@ -33,7 +33,7 @@ class CreateUserAction @Inject() (
       _ <- validations(request)
       hashedPassword = BCrypt.hashpw(request.password.string, BCrypt.gensalt())
       token = tokenGenerator.next()
-        hmacToken = TokensHelper.doHMACSHA1(token.toString.getBytes(), userTokensConfig.hmacSecret)
+      hmacToken = TokensHelper.doHMACSHA1(token.toString.getBytes(), userTokensConfig.hmacSecret)
 
       // create the user
       createUsersRow = UsersRow(
