@@ -72,7 +72,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoS
       )
 
       val verificationToken = UUIDCustom.randomUUID()
-      when(tokenGenerator.next()).thenReturn(verificationToken)
+      when(tokenGenerator.next()).thenReturn(verificationToken.value)
 
       val response = client.createUser(request).futureValue
       val token = userTokensRepository
@@ -148,7 +148,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoS
         captcha = Captcha.trusted("test")
       )
       val verificationToken = UUIDCustom.randomUUID()
-      when(tokenGenerator.next()).thenReturn(verificationToken)
+      when(tokenGenerator.next()).thenReturn(verificationToken.value)
 
       val user = client.createUser(request).futureValue
 
@@ -264,7 +264,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoS
       val user = createVerifyLoginUser(request, client, tokenGenerator).futureValue
 
       val verificationToken = UUIDCustom.randomUUID()
-      when(tokenGenerator.next()).thenReturn(verificationToken)
+      when(tokenGenerator.next()).thenReturn(verificationToken.value)
 
       val forgotPasswordRequest = ForgotPassword.Request(email, Captcha.trusted("test"))
       client.forgotPassword(forgotPasswordRequest).futureValue
@@ -297,7 +297,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoS
       val userId = createVerifyLoginUser(request, client, tokenGenerator).futureValue.id
 
       val verificationToken = UUIDCustom.randomUUID()
-      when(tokenGenerator.next()).thenReturn(verificationToken)
+      when(tokenGenerator.next()).thenReturn(verificationToken.value)
 
       val forgotPasswordRequest = ForgotPassword.Request(email, Captcha.trusted("test"))
       client.forgotPassword(forgotPasswordRequest).futureValue
@@ -326,7 +326,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoS
         val user = createVerifyLoginUser(request, client, tokenGenerator).futureValue
 
         val verificationToken = UUIDCustom.randomUUID()
-        when(tokenGenerator.next()).thenReturn(verificationToken)
+        when(tokenGenerator.next()).thenReturn(verificationToken.value)
 
         val forgotPasswordRequest = ForgotPassword.Request(email, Captcha.trusted("test"))
         client.forgotPassword(forgotPasswordRequest).futureValue
@@ -366,7 +366,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoS
       )
 
       val verificationToken = UUIDCustom.randomUUID()
-      when(tokenGenerator.next()).thenReturn(verificationToken)
+      when(tokenGenerator.next()).thenReturn(verificationToken.value)
 
       val userCreated = client.createUser(userRequest).futureValue
 
@@ -378,7 +378,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoS
         .find(_.tokenType == UserTokenType.EmailVerification.toString)
         .value
 
-      response.expiresAt must be(token.expiresAt)
+      response.expiresAt must be(token.expiresAt.value)
     }
 
     "success on verifying email and login" in withApiClient { client =>
@@ -399,12 +399,12 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoS
       )
 
       val verificationToken = UUIDCustom.randomUUID()
-      when(tokenGenerator.next()).thenReturn(verificationToken)
+      when(tokenGenerator.next()).thenReturn(verificationToken.value)
 
       val userCreated = client.createUser(userRequest).futureValue
 
       val emailVerificationToken = UUIDCustom.randomUUID()
-      when(tokenGenerator.next()).thenReturn(emailVerificationToken)
+      when(tokenGenerator.next()).thenReturn(emailVerificationToken.value)
 
       client.sendEmailVerificationToken(request).futureValue
       client.verifyEmail(VerifyEmail.Request(UserToken(userCreated.id, emailVerificationToken.value))).futureValue
@@ -465,7 +465,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoS
       )
 
       val verificationToken = UUIDCustom.randomUUID()
-      when(tokenGenerator.next()).thenReturn(verificationToken)
+      when(tokenGenerator.next()).thenReturn(verificationToken.value)
 
       createVerifyLoginUser(userRequest, client, tokenGenerator).futureValue
 
