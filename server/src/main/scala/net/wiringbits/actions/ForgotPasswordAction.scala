@@ -3,7 +3,6 @@ package net.wiringbits.actions
 import net.wiringbits.api.models.ForgotPassword
 import net.wiringbits.apis.ReCaptchaApi
 import net.wiringbits.repositories.UsersRepository
-import net.wiringbits.repositories.models.User
 import net.wiringbits.typo_generated.public.users.UsersRow
 import net.wiringbits.util.EmailsHelper
 import net.wiringbits.validations.{ValidateCaptcha, ValidateVerifiedUser}

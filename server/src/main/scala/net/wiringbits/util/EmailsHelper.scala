@@ -2,10 +2,10 @@ package net.wiringbits.util
 
 import net.wiringbits.apis.EmailApi
 import net.wiringbits.apis.models.EmailRequest
+import net.wiringbits.common.models.enums.UserTokenType
 import net.wiringbits.common.models.{Email, InstantCustom, Name, UUIDCustom}
 import net.wiringbits.config.{UserTokensConfig, WebAppConfig}
 import net.wiringbits.repositories.UserTokensRepository
-import net.wiringbits.repositories.models.UserTokenType
 import net.wiringbits.typo_generated.public.user_tokens.UserTokensRow
 import net.wiringbits.typo_generated.public.users.UsersRow
 
@@ -30,7 +30,7 @@ class EmailsHelper @Inject() (
     val createToken = UserTokensRow(
       userTokenId = UUIDCustom.randomUUID(),
       token = hmacToken,
-      tokenType = UserTokenType.EmailVerification.toString,
+      tokenType = UserTokenType.EmailVerification,
       createdAt = InstantCustom.fromClock,
       expiresAt = InstantCustom.fromClock.plusSeconds(userTokensConfig.emailVerificationExp.toSeconds),
       userId = user.userId
@@ -63,7 +63,7 @@ class EmailsHelper @Inject() (
     val createUserTokensRow = UserTokensRow(
       userTokenId = UUIDCustom.randomUUID(),
       token = hmacToken,
-      tokenType = UserTokenType.ResetPassword.toString,
+      tokenType = UserTokenType.ResetPassword,
       createdAt = InstantCustom.fromClock,
       expiresAt = InstantCustom.fromClock.plus(userTokensConfig.resetPasswordExp.toHours, ChronoUnit.HOURS),
       userId = usersRow.userId

@@ -6,8 +6,9 @@ import net.wiringbits.actions.internal.StreamPendingBackgroundJobsForeverAction
 import net.wiringbits.apis.EmailApi
 import net.wiringbits.apis.models.EmailRequest
 import net.wiringbits.common.models.InstantCustom
+import net.wiringbits.common.models.enums.BackgroundJobType
 import net.wiringbits.config.BackgroundJobsExecutorConfig
-import net.wiringbits.models.jobs.{BackgroundJobPayload, BackgroundJobType}
+import net.wiringbits.models.jobs.BackgroundJobPayload
 import net.wiringbits.repositories.BackgroundJobsRepository
 import net.wiringbits.typo_generated.public.background_jobs.BackgroundJobsRow
 import net.wiringbits.util.{DelayGenerator, EmailMessage}
@@ -39,7 +40,7 @@ class BackgroundJobsExecutorTask @Inject() (
   }
 
   private def execute(job: BackgroundJobsRow): Future[Unit] = {
-    val executionResult = BackgroundJobType.withNameInsensitive(job.`type`) match {
+    val executionResult = job.`type` match {
       case BackgroundJobType.SendEmail =>
         Json.toJson(job.payload).asOpt[BackgroundJobPayload.SendEmail] match {
           case Some(typedPayload) => sendEmail(typedPayload)

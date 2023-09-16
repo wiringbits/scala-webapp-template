@@ -12,6 +12,9 @@ object TypeOverrides {
   private val emailTypeImport = "net.wiringbits.common.models.Email"
   private val nameTypeImport = "net.wiringbits.common.models.Name"
   private val instantTypeImport = "net.wiringbits.common.models.InstantCustom"
+  private val userTokenTypeImport = "net.wiringbits.common.models.enums.UserTokenType"
+  private val backgroundJobTypeImport = "net.wiringbits.common.models.enums.BackgroundJobType"
+  private val backgroundJobStatusImport = "net.wiringbits.common.models.enums.BackgroundJobStatus"
 
   def apply(): TypeOverride = usersOverrides
     .orElse(userTokensOverrides)
@@ -35,6 +38,7 @@ object TypeOverrides {
 
     TypeOverride.of {
       case (relationName, ColName("user_token_id")) => uuidTypeImport
+      case (relationName, ColName("token_type")) => userTokenTypeImport
       case (relationName, ColName("created_at")) => instantTypeImport
       case (relationName, ColName("expires_at")) => instantTypeImport
     }
@@ -45,6 +49,8 @@ object TypeOverrides {
 
     TypeOverride.of {
       case (relationName, ColName("background_job_id")) => uuidTypeImport
+      case (relationName, ColName("type")) => backgroundJobTypeImport
+      case (relationName, ColName("status")) => backgroundJobStatusImport
       case (relationName, ColName("execute_at")) => instantTypeImport
       case (relationName, ColName("created_at")) => instantTypeImport
       case (relationName, ColName("updated_at")) => instantTypeImport

@@ -14,6 +14,7 @@ import anorm.ToStatement
 import java.sql.Connection
 import net.wiringbits.common.models.InstantCustom
 import net.wiringbits.common.models.UUIDCustom
+import net.wiringbits.common.models.enums.UserTokenType
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -39,7 +40,7 @@ object UserTokensRepoImpl extends UserTokensRepo {
       )}::uuid, ${ParameterValue(unsaved.token, null, ToStatement.stringToStatement)}, ${ParameterValue(
         unsaved.tokenType,
         null,
-        ToStatement.stringToStatement
+        implicitly[ToStatement[UserTokenType]]
       )}, ${ParameterValue(
         unsaved.createdAt,
         null,
@@ -81,7 +82,7 @@ object UserTokensRepoImpl extends UserTokensRepo {
     val userTokenId = row.userTokenId
     SQL"""update public.user_tokens
           set "token" = ${ParameterValue(row.token, null, ToStatement.stringToStatement)},
-              "token_type" = ${ParameterValue(row.tokenType, null, ToStatement.stringToStatement)},
+              "token_type" = ${ParameterValue(row.tokenType, null, implicitly[ToStatement[UserTokenType]])},
               "created_at" = ${ParameterValue(
         row.createdAt,
         null,
@@ -104,7 +105,7 @@ object UserTokensRepoImpl extends UserTokensRepo {
           values (
             ${ParameterValue(unsaved.userTokenId, null, implicitly[ToStatement[UUIDCustom]])}::uuid,
             ${ParameterValue(unsaved.token, null, ToStatement.stringToStatement)},
-            ${ParameterValue(unsaved.tokenType, null, ToStatement.stringToStatement)},
+            ${ParameterValue(unsaved.tokenType, null, implicitly[ToStatement[UserTokenType]])},
             ${ParameterValue(unsaved.createdAt, null, implicitly[ToStatement[InstantCustom]])}::timestamptz,
             ${ParameterValue(unsaved.expiresAt, null, implicitly[ToStatement[InstantCustom]])}::timestamptz,
             ${ParameterValue(unsaved.userId, null, implicitly[ToStatement[UUIDCustom]])}::uuid

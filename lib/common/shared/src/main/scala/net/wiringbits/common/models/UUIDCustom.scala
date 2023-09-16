@@ -28,23 +28,23 @@ object UUIDCustom {
     }
   }
 
-  implicit val instantCustomOrdering: Ordering[UUIDCustom] = Ordering.by(_.value)
+  implicit val uuidCustomOrdering: Ordering[UUIDCustom] = Ordering.by(_.value)
 
-  implicit val instantCustomToStatement: ToStatement[UUIDCustom] =
+  implicit val uuidCustomToStatement: ToStatement[UUIDCustom] =
     ToStatement[UUIDCustom]((s, index, v) => s.setObject(index, v.value))
 
-  implicit val nameParameterMetaData: ParameterMetaData[UUIDCustom] = new ParameterMetaData[UUIDCustom] {
+  implicit val uuidParameterMetaData: ParameterMetaData[UUIDCustom] = new ParameterMetaData[UUIDCustom] {
     override def sqlType: String = "UUID"
 
     override def jdbcType: Int = java.sql.Types.OTHER
   }
 
-  implicit val instantCustomFormat: Format[UUIDCustom] = Format[UUIDCustom](
+  implicit val uuidCustomFormat: Format[UUIDCustom] = Format[UUIDCustom](
     fjs = implicitly[Reads[String]].map(string => fromString(string)),
     tjs = Writes[UUIDCustom](i => JsString(i.value.toString))
   )
 
-  implicit val instantCustomReads: Reads[UUIDCustom] = implicitly[Reads[String]].map(string => fromString(string))
+  implicit val uuidCustomReads: Reads[UUIDCustom] = implicitly[Reads[String]].map(string => fromString(string))
 
-  implicit val instantCustomWrites: Writes[UUIDCustom] = Writes[UUIDCustom](i => JsString(i.value.toString))
+  implicit val uuidCustomWrites: Writes[UUIDCustom] = Writes[UUIDCustom](i => JsString(i.value.toString))
 }

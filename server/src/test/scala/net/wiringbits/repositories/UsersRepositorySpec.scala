@@ -163,7 +163,9 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll with Rep
         .updatePassword(request.userId, newPassword, EmailMessage.updatePassword(request.name))
         .futureValue
 
-      val response = repositories.backgroundJobs.streamPendingJobs.futureValue
+      val response = repositories.backgroundJobs
+        .streamPendingJobs()
+        .futureValue
         .runWith(Sink.seq)
         .futureValue
       response.length must be(1)
@@ -199,7 +201,9 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll with Rep
         .verify(request.userId, UUIDCustom.randomUUID(), EmailMessage.confirm(request.name))
         .futureValue
 
-      val response = repositories.backgroundJobs.streamPendingJobs.futureValue
+      val response = repositories.backgroundJobs
+        .streamPendingJobs()
+        .futureValue
         .runWith(Sink.seq)
         .futureValue
       response.length must be(1)
@@ -239,7 +243,9 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll with Rep
         .resetPassword(request.userId, newPassword, EmailMessage.resetPassword(request.name))
         .futureValue
 
-      val response = repositories.backgroundJobs.streamPendingJobs.futureValue
+      val response = repositories.backgroundJobs
+        .streamPendingJobs()
+        .futureValue
         .runWith(Sink.seq)
         .futureValue
       response.length must be(1)

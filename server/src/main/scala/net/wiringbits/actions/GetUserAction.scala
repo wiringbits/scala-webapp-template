@@ -1,12 +1,10 @@
 package net.wiringbits.actions
 
 import net.wiringbits.api.models.GetCurrentUser
-import net.wiringbits.common.models.{Email, InstantCustom, Name, UUIDCustom}
+import net.wiringbits.common.models.UUIDCustom
 import net.wiringbits.repositories.UsersRepository
-import net.wiringbits.repositories.models.User
 import net.wiringbits.typo_generated.public.users.UsersRow
 
-import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 

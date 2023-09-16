@@ -229,7 +229,8 @@ lazy val common = (crossProject(JSPlatform, JVMPlatform) in file("lib/common"))
       "com.typesafe.play" %% "play-json" % playJson,
       "net.wiringbits" %% "webapp-common" % webappUtils,
       "org.playframework.anorm" %% "anorm" % anorm,
-      "org.scalatest" %% "scalatest" % "3.2.16" % Test
+      "org.scalatest" %% "scalatest" % "3.2.16" % Test,
+      "com.beachape" %% "enumeratum" % enumeratum
     )
   )
   .jsSettings(

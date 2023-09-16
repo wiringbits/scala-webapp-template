@@ -2,9 +2,10 @@ package net.wiringbits.repositories
 
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.*
+import net.wiringbits.common.models.enums.{BackgroundJobStatus, BackgroundJobType}
 import net.wiringbits.common.models.{Email, InstantCustom, UUIDCustom}
 import net.wiringbits.core.RepositorySpec
-import net.wiringbits.models.jobs.{BackgroundJobPayload, BackgroundJobStatus, BackgroundJobType}
+import net.wiringbits.models.jobs.BackgroundJobPayload
 import net.wiringbits.typo_generated.customtypes.TypoJsonb
 import net.wiringbits.typo_generated.public.background_jobs.BackgroundJobsRow
 import org.scalatest.BeforeAndAfterAll
@@ -30,9 +31,9 @@ class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll
     "work (simple case)" in withRepositories() { repositories =>
       val createRequest = BackgroundJobsRow(
         backgroundJobId = UUIDCustom.randomUUID(),
-        `type` = BackgroundJobType.SendEmail.toString,
+        `type` = BackgroundJobType.SendEmail,
         payload = TypoJsonb(Json.toJson(backgroundJobPayload).toString),
-        status = BackgroundJobStatus.Pending.toString,
+        status = BackgroundJobStatus.Pending,
         statusDetails = None,
         errorCount = Some(0),
         executeAt = InstantCustom.now(),
@@ -42,7 +43,9 @@ class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll
 
       repositories.backgroundJobs.create(createRequest).futureValue
 
-      val result = repositories.backgroundJobs.streamPendingJobs.futureValue
+      val result = repositories.backgroundJobs
+        .streamPendingJobs()
+        .futureValue
         .runWith(Sink.seq)
         .futureValue
 
@@ -60,9 +63,9 @@ class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll
     "only return pending jobs" in withRepositories() { repositories =>
       val createRequestBase = BackgroundJobsRow(
         backgroundJobId = UUIDCustom.randomUUID(),
-        `type` = BackgroundJobType.SendEmail.toString,
+        `type` = BackgroundJobType.SendEmail,
         payload = TypoJsonb(Json.toJson(backgroundJobPayload).toString),
-        status = BackgroundJobStatus.Pending.toString,
+        status = BackgroundJobStatus.Pending,
         statusDetails = None,
         errorCount = Some(0),
         executeAt = InstantCustom.now(),
@@ -76,18 +79,20 @@ class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll
           .create(
             createRequestBase.copy(
               backgroundJobId = UUIDCustom.randomUUID(),
-              status = if ((i % 2) == 0) BackgroundJobStatus.Success.toString else BackgroundJobStatus.Pending.toString
+              status = if ((i % 2) == 0) BackgroundJobStatus.Success else BackgroundJobStatus.Pending
             )
           )
           .futureValue
       }
-      val response = repositories.backgroundJobs.streamPendingJobs.futureValue
+      val response = repositories.backgroundJobs
+        .streamPendingJobs()
+        .futureValue
         .runWith(Sink.seq)
         .futureValue
       response.length must be(limit / 2)
       val backgroundJobPayloadJsValue = Json.toJson(backgroundJobPayload)
       response.foreach { x =>
-        x.status must be(BackgroundJobStatus.Pending.toString)
+        x.status must be(BackgroundJobStatus.Pending)
         x.`type` must be(createRequestBase.`type`)
         val itemJsValue = Json.parse(x.payload.value)
         (itemJsValue \ "email") must be(backgroundJobPayloadJsValue \ "email")
@@ -97,7 +102,9 @@ class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll
     }
 
     "return no results" in withRepositories() { repositories =>
-      val response = repositories.backgroundJobs.streamPendingJobs.futureValue
+      val response = repositories.backgroundJobs
+        .streamPendingJobs()
+        .futureValue
         .runWith(Sink.seq)
         .futureValue
       response.isEmpty must be(true)
@@ -108,9 +115,9 @@ class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll
     "work" in withRepositories() { repositories =>
       val createRequest = BackgroundJobsRow(
         backgroundJobId = UUIDCustom.randomUUID(),
-        `type` = BackgroundJobType.SendEmail.toString,
+        `type` = BackgroundJobType.SendEmail,
         payload = TypoJsonb(Json.toJson(backgroundJobPayload).toString),
-        status = BackgroundJobStatus.Pending.toString,
+        status = BackgroundJobStatus.Pending,
         statusDetails = None,
         errorCount = Some(0),
         executeAt = InstantCustom.now(),
@@ -124,14 +131,16 @@ class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll
       repositories.backgroundJobs
         .setStatusToFailed(createRequest.backgroundJobId, executeAt = InstantCustom.now(), failReason = failReason)
         .futureValue
-      val result = repositories.backgroundJobs.streamPendingJobs.futureValue
+      val result = repositories.backgroundJobs
+        .streamPendingJobs()
+        .futureValue
         .runWith(Sink.seq)
         .futureValue
 
       result.size must be(1)
       val item = result.headOption.value
       item.backgroundJobId must be(createRequest.backgroundJobId)
-      item.status must be(BackgroundJobStatus.Failed.toString)
+      item.status must be(BackgroundJobStatus.Failed)
       item.statusDetails must be(Some(failReason))
     }
 
@@ -152,9 +161,9 @@ class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll
     "work" in withRepositories() { repositories =>
       val createRequest = BackgroundJobsRow(
         backgroundJobId = UUIDCustom.randomUUID(),
-        `type` = BackgroundJobType.SendEmail.toString,
+        `type` = BackgroundJobType.SendEmail,
         payload = TypoJsonb(Json.toJson(backgroundJobPayload).toString),
-        status = BackgroundJobStatus.Pending.toString,
+        status = BackgroundJobStatus.Pending,
         statusDetails = None,
         errorCount = Some(0),
         executeAt = InstantCustom.now(),
@@ -165,7 +174,9 @@ class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll
       repositories.backgroundJobs.create(createRequest).futureValue
       repositories.backgroundJobs.setStatusToSuccess(createRequest.backgroundJobId).futureValue
 
-      val result = repositories.backgroundJobs.streamPendingJobs.futureValue
+      val result = repositories.backgroundJobs
+        .streamPendingJobs()
+        .futureValue
         .runWith(Sink.seq)
         .futureValue
       result.isEmpty must be(true)

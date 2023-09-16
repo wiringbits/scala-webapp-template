@@ -70,7 +70,7 @@ object InstantCustom {
   implicit val instantCustomToStatement: ToStatement[InstantCustom] =
     ToStatement[InstantCustom]((s, index, v) => s.setObject(index, v.value.toString))
 
-  implicit val nameParameterMetaData: ParameterMetaData[InstantCustom] = new ParameterMetaData[InstantCustom] {
+  implicit val instantParameterMetaData: ParameterMetaData[InstantCustom] = new ParameterMetaData[InstantCustom] {
     override def sqlType: String = "TIMESTAMPTZ"
 
     override def jdbcType: Int = java.sql.Types.TIMESTAMP_WITH_TIMEZONE

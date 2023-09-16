@@ -10,6 +10,8 @@ package background_jobs
 
 import net.wiringbits.common.models.InstantCustom
 import net.wiringbits.common.models.UUIDCustom
+import net.wiringbits.common.models.enums.BackgroundJobStatus
+import net.wiringbits.common.models.enums.BackgroundJobType
 import net.wiringbits.typo_generated.customtypes.Defaulted
 import net.wiringbits.typo_generated.customtypes.TypoJsonb
 import play.api.libs.json.JsObject
@@ -24,9 +26,9 @@ import scala.util.Try
 /** This class corresponds to a row in table `public.background_jobs` which has not been persisted yet */
 case class BackgroundJobsRowUnsaved(
     backgroundJobId: /* user-picked */ UUIDCustom,
-    `type`: String,
+    `type`: /* user-picked */ BackgroundJobType,
     payload: TypoJsonb,
-    status: String,
+    status: /* user-picked */ BackgroundJobStatus,
     statusDetails: Option[String],
     /** Default: 0 */
     errorCount: Defaulted[Option[Int]] = Defaulted.UseDefault,
@@ -73,9 +75,9 @@ object BackgroundJobsRowUnsaved {
       Try(
         BackgroundJobsRowUnsaved(
           backgroundJobId = json.\("background_job_id").as(implicitly[Reads[UUIDCustom]]),
-          `type` = json.\("type").as(Reads.StringReads),
+          `type` = json.\("type").as(implicitly[Reads[BackgroundJobType]]),
           payload = json.\("payload").as(TypoJsonb.reads),
-          status = json.\("status").as(Reads.StringReads),
+          status = json.\("status").as(implicitly[Reads[BackgroundJobStatus]]),
           statusDetails = json.\("status_details").toOption.map(_.as(Reads.StringReads)),
           errorCount = json.\("error_count").as(Defaulted.readsOpt(Reads.IntReads)),
           executeAt = json.\("execute_at").as(Defaulted.reads(implicitly[Reads[InstantCustom]])),
@@ -89,9 +91,9 @@ object BackgroundJobsRowUnsaved {
     new JsObject(
       ListMap[String, JsValue](
         "background_job_id" -> implicitly[Writes[UUIDCustom]].writes(o.backgroundJobId),
-        "type" -> Writes.StringWrites.writes(o.`type`),
+        "type" -> implicitly[Writes[BackgroundJobType]].writes(o.`type`),
         "payload" -> TypoJsonb.writes.writes(o.payload),
-        "status" -> Writes.StringWrites.writes(o.status),
+        "status" -> implicitly[Writes[BackgroundJobStatus]].writes(o.status),
         "status_details" -> Writes.OptionWrites(Writes.StringWrites).writes(o.statusDetails),
         "error_count" -> Defaulted.writes(Writes.OptionWrites(Writes.IntWrites)).writes(o.errorCount),
         "execute_at" -> Defaulted.writes(implicitly[Writes[InstantCustom]]).writes(o.executeAt),

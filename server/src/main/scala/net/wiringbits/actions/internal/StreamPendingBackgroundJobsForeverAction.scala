@@ -3,7 +3,6 @@ package net.wiringbits.actions.internal
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.*
 import net.wiringbits.repositories.BackgroundJobsRepository
-import net.wiringbits.repositories.models.BackgroundJobData
 import net.wiringbits.typo_generated.public.background_jobs.BackgroundJobsRow
 import org.slf4j.LoggerFactory
 
@@ -25,7 +24,7 @@ class StreamPendingBackgroundJobsForeverAction @Inject() (backgroundJobsReposito
         logger.trace(s"Looking for pending background jobs")
         akka.pattern
           .after(if (delay) reconnectionDelay else 0.seconds) {
-            backgroundJobsRepository.streamPendingJobs
+            backgroundJobsRepository.streamPendingJobs()
           }
           .map(source => Some(true -> source))
       }

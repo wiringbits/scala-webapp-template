@@ -6,14 +6,12 @@ import net.wiringbits.common.models.{InstantCustom, UUIDCustom}
 import net.wiringbits.config.UserTokensConfig
 import net.wiringbits.repositories
 import net.wiringbits.repositories.UsersRepository
-import net.wiringbits.repositories.models.User
 import net.wiringbits.typo_generated.public.users.UsersRow
 import net.wiringbits.util.{EmailsHelper, TokenGenerator, TokensHelper}
 import net.wiringbits.validations.{ValidateCaptcha, ValidateEmailIsAvailable}
 import org.mindrot.jbcrypt.BCrypt
 
-import java.time.{Clock, Instant, ZoneOffset}
-import java.util.UUID
+import java.time.Clock
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 

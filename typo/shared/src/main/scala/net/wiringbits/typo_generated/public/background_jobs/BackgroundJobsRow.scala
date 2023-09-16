@@ -13,6 +13,8 @@ import anorm.RowParser
 import anorm.Success
 import net.wiringbits.common.models.InstantCustom
 import net.wiringbits.common.models.UUIDCustom
+import net.wiringbits.common.models.enums.BackgroundJobStatus
+import net.wiringbits.common.models.enums.BackgroundJobType
 import net.wiringbits.typo_generated.customtypes.TypoJsonb
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -25,9 +27,9 @@ import scala.util.Try
 
 case class BackgroundJobsRow(
     backgroundJobId: /* user-picked */ UUIDCustom,
-    `type`: String,
+    `type`: /* user-picked */ BackgroundJobType,
     payload: TypoJsonb,
-    status: String,
+    status: /* user-picked */ BackgroundJobStatus,
     statusDetails: Option[String],
     errorCount: Option[Int],
     executeAt: /* user-picked */ InstantCustom,
@@ -41,9 +43,9 @@ object BackgroundJobsRow {
       Try(
         BackgroundJobsRow(
           backgroundJobId = json.\("background_job_id").as(implicitly[Reads[UUIDCustom]]),
-          `type` = json.\("type").as(Reads.StringReads),
+          `type` = json.\("type").as(implicitly[Reads[BackgroundJobType]]),
           payload = json.\("payload").as(TypoJsonb.reads),
-          status = json.\("status").as(Reads.StringReads),
+          status = json.\("status").as(implicitly[Reads[BackgroundJobStatus]]),
           statusDetails = json.\("status_details").toOption.map(_.as(Reads.StringReads)),
           errorCount = json.\("error_count").toOption.map(_.as(Reads.IntReads)),
           executeAt = json.\("execute_at").as(implicitly[Reads[InstantCustom]]),
@@ -57,9 +59,9 @@ object BackgroundJobsRow {
     Success(
       BackgroundJobsRow(
         backgroundJobId = row(idx + 0)(implicitly[Column[UUIDCustom]]),
-        `type` = row(idx + 1)(Column.columnToString),
+        `type` = row(idx + 1)(implicitly[Column[BackgroundJobType]]),
         payload = row(idx + 2)(TypoJsonb.column),
-        status = row(idx + 3)(Column.columnToString),
+        status = row(idx + 3)(implicitly[Column[BackgroundJobStatus]]),
         statusDetails = row(idx + 4)(Column.columnToOption(Column.columnToString)),
         errorCount = row(idx + 5)(Column.columnToOption(Column.columnToInt)),
         executeAt = row(idx + 6)(implicitly[Column[InstantCustom]]),
@@ -72,9 +74,9 @@ object BackgroundJobsRow {
     new JsObject(
       ListMap[String, JsValue](
         "background_job_id" -> implicitly[Writes[UUIDCustom]].writes(o.backgroundJobId),
-        "type" -> Writes.StringWrites.writes(o.`type`),
+        "type" -> implicitly[Writes[BackgroundJobType]].writes(o.`type`),
         "payload" -> TypoJsonb.writes.writes(o.payload),
-        "status" -> Writes.StringWrites.writes(o.status),
+        "status" -> implicitly[Writes[BackgroundJobStatus]].writes(o.status),
         "status_details" -> Writes.OptionWrites(Writes.StringWrites).writes(o.statusDetails),
         "error_count" -> Writes.OptionWrites(Writes.IntWrites).writes(o.errorCount),
         "execute_at" -> implicitly[Writes[InstantCustom]].writes(o.executeAt),

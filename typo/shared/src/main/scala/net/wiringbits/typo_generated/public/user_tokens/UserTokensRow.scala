@@ -13,6 +13,7 @@ import anorm.RowParser
 import anorm.Success
 import net.wiringbits.common.models.InstantCustom
 import net.wiringbits.common.models.UUIDCustom
+import net.wiringbits.common.models.enums.UserTokenType
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -25,7 +26,7 @@ import scala.util.Try
 case class UserTokensRow(
     userTokenId: /* user-picked */ UUIDCustom,
     token: String,
-    tokenType: String,
+    tokenType: /* user-picked */ UserTokenType,
     createdAt: /* user-picked */ InstantCustom,
     expiresAt: /* user-picked */ InstantCustom,
     /** Points to [[users.UsersRow.userId]] */
@@ -39,7 +40,7 @@ object UserTokensRow {
         UserTokensRow(
           userTokenId = json.\("user_token_id").as(implicitly[Reads[UUIDCustom]]),
           token = json.\("token").as(Reads.StringReads),
-          tokenType = json.\("token_type").as(Reads.StringReads),
+          tokenType = json.\("token_type").as(implicitly[Reads[UserTokenType]]),
           createdAt = json.\("created_at").as(implicitly[Reads[InstantCustom]]),
           expiresAt = json.\("expires_at").as(implicitly[Reads[InstantCustom]]),
           userId = json.\("user_id").as(implicitly[Reads[UUIDCustom]])
@@ -52,7 +53,7 @@ object UserTokensRow {
       UserTokensRow(
         userTokenId = row(idx + 0)(implicitly[Column[UUIDCustom]]),
         token = row(idx + 1)(Column.columnToString),
-        tokenType = row(idx + 2)(Column.columnToString),
+        tokenType = row(idx + 2)(implicitly[Column[UserTokenType]]),
         createdAt = row(idx + 3)(implicitly[Column[InstantCustom]]),
         expiresAt = row(idx + 4)(implicitly[Column[InstantCustom]]),
         userId = row(idx + 5)(implicitly[Column[UUIDCustom]])
@@ -64,7 +65,7 @@ object UserTokensRow {
       ListMap[String, JsValue](
         "user_token_id" -> implicitly[Writes[UUIDCustom]].writes(o.userTokenId),
         "token" -> Writes.StringWrites.writes(o.token),
-        "token_type" -> Writes.StringWrites.writes(o.tokenType),
+        "token_type" -> implicitly[Writes[UserTokenType]].writes(o.tokenType),
         "created_at" -> implicitly[Writes[InstantCustom]].writes(o.createdAt),
         "expires_at" -> implicitly[Writes[InstantCustom]].writes(o.expiresAt),
         "user_id" -> implicitly[Writes[UUIDCustom]].writes(o.userId)

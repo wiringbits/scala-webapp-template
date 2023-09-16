@@ -13,9 +13,9 @@ import net.wiringbits.api.models.{
 import net.wiringbits.apis.models.EmailRequest
 import net.wiringbits.apis.{EmailApi, ReCaptchaApi}
 import net.wiringbits.common.models.*
+import net.wiringbits.common.models.enums.UserTokenType
 import net.wiringbits.config.UserTokensConfig
 import net.wiringbits.repositories.UserTokensRepository
-import net.wiringbits.repositories.models.UserTokenType
 
 import net.wiringbits.util.{TokenGenerator, TokensHelper}
 import org.mockito.ArgumentMatchers.any
@@ -78,7 +78,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoS
       val token = userTokensRepository
         .find(UUIDCustom(response.id))
         .futureValue
-        .find(_.tokenType == UserTokenType.EmailVerification.toString)
+        .find(_.tokenType == UserTokenType.EmailVerification)
         .value
 
       response.name must be(name)
@@ -375,7 +375,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoS
       val token = userTokensRepository
         .find(UUIDCustom(userCreated.id))
         .futureValue
-        .find(_.tokenType == UserTokenType.EmailVerification.toString)
+        .find(_.tokenType == UserTokenType.EmailVerification)
         .value
 
       response.expiresAt must be(token.expiresAt.value)

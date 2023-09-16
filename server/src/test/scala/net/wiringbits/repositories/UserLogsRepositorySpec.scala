@@ -1,16 +1,11 @@
 package net.wiringbits.repositories
 
-import net.wiringbits.common.models.{Email, InstantCustom, Name, UUIDCustom}
+import net.wiringbits.common.models.{InstantCustom, UUIDCustom}
 import net.wiringbits.core.RepositorySpec
-import net.wiringbits.repositories.models.{User, UserLog}
 import net.wiringbits.typo_generated.public.user_logs.UserLogsRow
-import net.wiringbits.typo_generated.public.users.UsersRow
 import org.scalatest.concurrent.ScalaFutures.*
 import org.scalatest.matchers.must.Matchers.*
-import utils.{LoginUtils, RepositoryUtils}
-
-import java.time.Instant
-import java.util.UUID
+import utils.RepositoryUtils
 
 class UserLogsRepositorySpec extends RepositorySpec with RepositoryUtils {
   "create" should {

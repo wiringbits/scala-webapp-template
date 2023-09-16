@@ -1,10 +1,10 @@
 package net.wiringbits.repositories
 
+import net.wiringbits.common.models.enums.{BackgroundJobStatus, BackgroundJobType, UserTokenType}
 import net.wiringbits.common.models.{Email, InstantCustom, Name, UUIDCustom}
 import net.wiringbits.config.UserTokensConfig
 import net.wiringbits.executors.DatabaseExecutionContext
-import net.wiringbits.models.jobs.{BackgroundJobPayload, BackgroundJobStatus, BackgroundJobType}
-import net.wiringbits.repositories.models.*
+import net.wiringbits.models.jobs.BackgroundJobPayload
 import net.wiringbits.typo_generated.customtypes.TypoJsonb
 import net.wiringbits.typo_generated.public.background_jobs.{BackgroundJobsRepoImpl, BackgroundJobsRow}
 import net.wiringbits.typo_generated.public.user_logs.{UserLogsRepoImpl, UserLogsRow}
@@ -32,7 +32,7 @@ class UsersRepository @Inject() (
     val createUserTokensRow = UserTokensRow(
       userTokenId = UUIDCustom.randomUUID(),
       token = verifyEmailToken,
-      tokenType = UserTokenType.EmailVerification.toString,
+      tokenType = UserTokenType.EmailVerification,
       createdAt = InstantCustom.fromClock,
       expiresAt = InstantCustom.fromClock.plus(userTokensConfig.emailVerificationExp.toHours, ChronoUnit.HOURS),
       userId = usersRow.userId
@@ -151,9 +151,9 @@ class UsersRepository @Inject() (
 
       val backgroundJobDatasRow = BackgroundJobsRow(
         backgroundJobId = UUIDCustom.randomUUID(),
-        `type` = BackgroundJobType.SendEmail.toString,
+        `type` = BackgroundJobType.SendEmail,
         payload = TypoJsonb(Json.toJson(payload).toString),
-        status = BackgroundJobStatus.Pending.toString,
+        status = BackgroundJobStatus.Pending,
         statusDetails = None,
         errorCount = Some(0),
         executeAt = InstantCustom.fromClock,

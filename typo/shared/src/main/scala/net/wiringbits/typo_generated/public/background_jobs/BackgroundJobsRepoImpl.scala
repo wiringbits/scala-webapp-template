@@ -19,6 +19,8 @@ import anorm.ToStatement
 import java.sql.Connection
 import net.wiringbits.common.models.InstantCustom
 import net.wiringbits.common.models.UUIDCustom
+import net.wiringbits.common.models.enums.BackgroundJobStatus
+import net.wiringbits.common.models.enums.BackgroundJobType
 import net.wiringbits.typo_generated.customtypes.Defaulted
 import net.wiringbits.typo_generated.customtypes.TypoJsonb
 import typo.dsl.DeleteBuilder
@@ -43,11 +45,15 @@ object BackgroundJobsRepoImpl extends BackgroundJobsRepo {
         unsaved.backgroundJobId,
         null,
         implicitly[ToStatement[UUIDCustom]]
-      )}::uuid, ${ParameterValue(unsaved.`type`, null, ToStatement.stringToStatement)}, ${ParameterValue(
+      )}::uuid, ${ParameterValue(unsaved.`type`, null, implicitly[ToStatement[BackgroundJobType]])}, ${ParameterValue(
         unsaved.payload,
         null,
         TypoJsonb.toStatement
-      )}::jsonb, ${ParameterValue(unsaved.status, null, ToStatement.stringToStatement)}, ${ParameterValue(
+      )}::jsonb, ${ParameterValue(
+        unsaved.status,
+        null,
+        implicitly[ToStatement[BackgroundJobStatus]]
+      )}, ${ParameterValue(
         unsaved.statusDetails,
         null,
         ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData)
@@ -80,9 +86,16 @@ object BackgroundJobsRepoImpl extends BackgroundJobsRepo {
           "::uuid"
         )
       ),
-      Some((NamedParameter("type", ParameterValue(unsaved.`type`, null, ToStatement.stringToStatement)), "")),
+      Some(
+        (NamedParameter("type", ParameterValue(unsaved.`type`, null, implicitly[ToStatement[BackgroundJobType]])), "")
+      ),
       Some((NamedParameter("payload", ParameterValue(unsaved.payload, null, TypoJsonb.toStatement)), "::jsonb")),
-      Some((NamedParameter("status", ParameterValue(unsaved.status, null, ToStatement.stringToStatement)), "")),
+      Some(
+        (
+          NamedParameter("status", ParameterValue(unsaved.status, null, implicitly[ToStatement[BackgroundJobStatus]])),
+          ""
+        )
+      ),
       Some(
         (
           NamedParameter(
@@ -190,9 +203,9 @@ object BackgroundJobsRepoImpl extends BackgroundJobsRepo {
   override def update(row: BackgroundJobsRow)(implicit c: Connection): Boolean = {
     val backgroundJobId = row.backgroundJobId
     SQL"""update public.background_jobs
-          set "type" = ${ParameterValue(row.`type`, null, ToStatement.stringToStatement)},
+          set "type" = ${ParameterValue(row.`type`, null, implicitly[ToStatement[BackgroundJobType]])},
               "payload" = ${ParameterValue(row.payload, null, TypoJsonb.toStatement)}::jsonb,
-              "status" = ${ParameterValue(row.status, null, ToStatement.stringToStatement)},
+              "status" = ${ParameterValue(row.status, null, implicitly[ToStatement[BackgroundJobStatus]])},
               "status_details" = ${ParameterValue(
         row.statusDetails,
         null,
@@ -224,9 +237,9 @@ object BackgroundJobsRepoImpl extends BackgroundJobsRepo {
     SQL"""insert into public.background_jobs("background_job_id", "type", "payload", "status", "status_details", "error_count", "execute_at", "created_at", "updated_at")
           values (
             ${ParameterValue(unsaved.backgroundJobId, null, implicitly[ToStatement[UUIDCustom]])}::uuid,
-            ${ParameterValue(unsaved.`type`, null, ToStatement.stringToStatement)},
+            ${ParameterValue(unsaved.`type`, null, implicitly[ToStatement[BackgroundJobType]])},
             ${ParameterValue(unsaved.payload, null, TypoJsonb.toStatement)}::jsonb,
-            ${ParameterValue(unsaved.status, null, ToStatement.stringToStatement)},
+            ${ParameterValue(unsaved.status, null, implicitly[ToStatement[BackgroundJobStatus]])},
             ${ParameterValue(
         unsaved.statusDetails,
         null,

@@ -1,8 +1,8 @@
 package net.wiringbits.repositories
 
+import net.wiringbits.common.models.enums.UserTokenType
 import net.wiringbits.common.models.{InstantCustom, UUIDCustom}
 import net.wiringbits.core.{RepositoryComponents, RepositorySpec}
-import net.wiringbits.repositories.models.UserTokenType
 import net.wiringbits.typo_generated.public.user_tokens.UserTokensRow
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.concurrent.ScalaFutures.*
@@ -23,7 +23,7 @@ class UserTokensRepositorySpec extends RepositorySpec with RepositoryUtils {
     val userTokensRow = UserTokensRow(
       userTokenId = UUIDCustom.randomUUID(),
       token = token,
-      tokenType = userTokenType.toString,
+      tokenType = userTokenType,
       createdAt = InstantCustom.now(),
       expiresAt = InstantCustom.now().plus(2L, ChronoUnit.DAYS),
       userId = userId
