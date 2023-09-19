@@ -12,9 +12,9 @@ import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import net.wiringbits.common.models.InstantCustom
-import net.wiringbits.common.models.UUIDCustom
 import net.wiringbits.common.models.enums.BackgroundJobStatus
 import net.wiringbits.common.models.enums.BackgroundJobType
+import net.wiringbits.common.models.id.BackgroundJobId
 import net.wiringbits.typo_generated.customtypes.TypoJsonb
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -26,7 +26,7 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class BackgroundJobsRow(
-    backgroundJobId: /* user-picked */ UUIDCustom,
+    backgroundJobId: /* user-picked */ BackgroundJobId,
     `type`: /* user-picked */ BackgroundJobType,
     payload: TypoJsonb,
     status: /* user-picked */ BackgroundJobStatus,
@@ -42,7 +42,7 @@ object BackgroundJobsRow {
     JsResult.fromTry(
       Try(
         BackgroundJobsRow(
-          backgroundJobId = json.\("background_job_id").as(implicitly[Reads[UUIDCustom]]),
+          backgroundJobId = json.\("background_job_id").as(implicitly[Reads[BackgroundJobId]]),
           `type` = json.\("type").as(implicitly[Reads[BackgroundJobType]]),
           payload = json.\("payload").as(TypoJsonb.reads),
           status = json.\("status").as(implicitly[Reads[BackgroundJobStatus]]),
@@ -58,7 +58,7 @@ object BackgroundJobsRow {
   def rowParser(idx: Int): RowParser[BackgroundJobsRow] = RowParser[BackgroundJobsRow] { row =>
     Success(
       BackgroundJobsRow(
-        backgroundJobId = row(idx + 0)(implicitly[Column[UUIDCustom]]),
+        backgroundJobId = row(idx + 0)(implicitly[Column[BackgroundJobId]]),
         `type` = row(idx + 1)(implicitly[Column[BackgroundJobType]]),
         payload = row(idx + 2)(TypoJsonb.column),
         status = row(idx + 3)(implicitly[Column[BackgroundJobStatus]]),
@@ -73,7 +73,7 @@ object BackgroundJobsRow {
   implicit lazy val writes: OWrites[BackgroundJobsRow] = OWrites[BackgroundJobsRow](o =>
     new JsObject(
       ListMap[String, JsValue](
-        "background_job_id" -> implicitly[Writes[UUIDCustom]].writes(o.backgroundJobId),
+        "background_job_id" -> implicitly[Writes[BackgroundJobId]].writes(o.backgroundJobId),
         "type" -> implicitly[Writes[BackgroundJobType]].writes(o.`type`),
         "payload" -> TypoJsonb.writes.writes(o.payload),
         "status" -> implicitly[Writes[BackgroundJobStatus]].writes(o.status),

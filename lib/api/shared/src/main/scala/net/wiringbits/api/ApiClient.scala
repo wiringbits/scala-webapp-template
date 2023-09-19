@@ -2,7 +2,7 @@ package net.wiringbits.api
 
 import net.wiringbits.api.endpoints.*
 import net.wiringbits.api.models.*
-import net.wiringbits.common.models.UUIDCustom
+import net.wiringbits.common.models.id.UserId
 import play.api.libs.json.{Json, Reads}
 import sttp.client3.*
 import sttp.tapir.PublicEndpoint
@@ -23,11 +23,11 @@ class ApiClient(config: ApiClient.Config)(implicit
 ) {
   // While the server requires a userId, it is extracted from the Session cookie, we need a dummy value just to
   // fulfill the method signatures
-  private val dummyUsersId = Future.successful(UUIDCustom.fromString("887a5d77-cb5d-4d9c-b4dc-539c8aae3977"))
+  private val dummyUsersId = Future.successful(UserId.fromString("887a5d77-cb5d-4d9c-b4dc-539c8aae3977"))
 
   // Similarly to the dummy userId, we need a way to derive the userId from a request, which is used only on the
   // server-side code, this function is helpful to fulfill the method signatures
-  private implicit val handleDummyUsersId: ServerRequest => Future[UUIDCustom] = _ => dummyUsersId
+  private implicit val handleDummyUsersId: ServerRequest => Future[UserId] = _ => dummyUsersId
 
   private def asJson[R: Reads](strBody: String) = {
     Try {

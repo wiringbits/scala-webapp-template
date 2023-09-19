@@ -2,8 +2,8 @@ package controllers
 
 import net.wiringbits.api.endpoints.AdminEndpoints
 import net.wiringbits.api.models.{AdminGetUserLogs, AdminGetUsers, ErrorResponse}
+import net.wiringbits.common.models.Email
 import net.wiringbits.common.models.id.UserId
-import net.wiringbits.common.models.{Email, UUIDCustom}
 import net.wiringbits.services.AdminService
 import org.slf4j.LoggerFactory
 import sttp.capabilities.WebSockets

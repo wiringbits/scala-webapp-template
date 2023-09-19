@@ -3,7 +3,7 @@ package net.wiringbits.actions
 import net.wiringbits.api.models.CreateUser
 import net.wiringbits.apis.ReCaptchaApi
 import net.wiringbits.common.models.id.UserId
-import net.wiringbits.common.models.{InstantCustom, UUIDCustom}
+import net.wiringbits.common.models.InstantCustom
 import net.wiringbits.config.UserTokensConfig
 import net.wiringbits.repositories
 import net.wiringbits.repositories.UsersRepository

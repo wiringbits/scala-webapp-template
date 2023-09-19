@@ -8,13 +8,13 @@ import typo.*
 import typo.db.*
 
 object TypeOverrides {
-  private val uuidTypeImport = "net.wiringbits.common.models.UUIDCustom"
   private val emailTypeImport = "net.wiringbits.common.models.Email"
   private val nameTypeImport = "net.wiringbits.common.models.Name"
   private val instantTypeImport = "net.wiringbits.common.models.InstantCustom"
   private val userTokenTypeImport = "net.wiringbits.common.models.enums.UserTokenType"
   private val backgroundJobTypeImport = "net.wiringbits.common.models.enums.BackgroundJobType"
   private val backgroundJobStatusImport = "net.wiringbits.common.models.enums.BackgroundJobStatus"
+  private def idImport(name: String) = s"net.wiringbits.common.models.id.$name"
 
   def apply(): TypeOverride = usersOverrides
     .orElse(userTokensOverrides)
@@ -25,7 +25,7 @@ object TypeOverrides {
     val relationName = RelationName(Some("public"), "users")
 
     TypeOverride.of {
-      case (relationName, ColName("user_id")) => "net.wiringbits.common.models.id.UserId"
+      case (relationName, ColName("user_id")) => idImport("UserId")
       case (relationName, ColName("email")) => emailTypeImport
       case (relationName, ColName("name")) => nameTypeImport
       case (relationName, ColName("created_at")) => instantTypeImport
@@ -37,7 +37,7 @@ object TypeOverrides {
     val relationName = RelationName(Some("public"), "user_tokens")
 
     TypeOverride.of {
-      case (relationName, ColName("user_token_id")) => uuidTypeImport
+      case (relationName, ColName("user_token_id")) => idImport("UserTokenId")
       case (relationName, ColName("token_type")) => userTokenTypeImport
       case (relationName, ColName("created_at")) => instantTypeImport
       case (relationName, ColName("expires_at")) => instantTypeImport
@@ -48,7 +48,7 @@ object TypeOverrides {
     val relationName = RelationName(Some("public"), "background_jobs")
 
     TypeOverride.of {
-      case (relationName, ColName("background_job_id")) => uuidTypeImport
+      case (relationName, ColName("background_job_id")) => idImport("BackgroundJobId")
       case (relationName, ColName("type")) => backgroundJobTypeImport
       case (relationName, ColName("status")) => backgroundJobStatusImport
       case (relationName, ColName("execute_at")) => instantTypeImport
@@ -61,7 +61,7 @@ object TypeOverrides {
     val relationName = RelationName(Some("public"), "user_logs")
 
     TypeOverride.of {
-      case (relationName, ColName("user_log_id")) => uuidTypeImport
+      case (relationName, ColName("user_log_id")) => idImport("UserLogId")
       case (relationName, ColName("created_at")) => instantTypeImport
     }
   }

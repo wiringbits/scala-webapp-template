@@ -13,20 +13,20 @@ import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
 import net.wiringbits.common.models.InstantCustom
-import net.wiringbits.common.models.UUIDCustom
 import net.wiringbits.common.models.enums.UserTokenType
 import net.wiringbits.common.models.id.UserId
+import net.wiringbits.common.models.id.UserTokenId
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 object UserTokensRepoImpl extends UserTokensRepo {
-  override def delete(userTokenId: /* user-picked */ UUIDCustom)(implicit c: Connection): Boolean = {
+  override def delete(userTokenId: /* user-picked */ UserTokenId)(implicit c: Connection): Boolean = {
     SQL"""delete from public.user_tokens where "user_token_id" = ${ParameterValue(
         userTokenId,
         null,
-        implicitly[ToStatement[UUIDCustom]]
+        implicitly[ToStatement[UserTokenId]]
       )}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[UserTokensFields, UserTokensRow] = {
@@ -37,7 +37,7 @@ object UserTokensRepoImpl extends UserTokensRepo {
           values (${ParameterValue(
         unsaved.userTokenId,
         null,
-        implicitly[ToStatement[UUIDCustom]]
+        implicitly[ToStatement[UserTokenId]]
       )}::uuid, ${ParameterValue(unsaved.token, null, ToStatement.stringToStatement)}, ${ParameterValue(
         unsaved.tokenType,
         null,
@@ -64,15 +64,15 @@ object UserTokensRepoImpl extends UserTokensRepo {
           from public.user_tokens
        """.as(UserTokensRow.rowParser(1).*)
   }
-  override def selectById(userTokenId: /* user-picked */ UUIDCustom)(implicit c: Connection): Option[UserTokensRow] = {
+  override def selectById(userTokenId: /* user-picked */ UserTokenId)(implicit c: Connection): Option[UserTokensRow] = {
     SQL"""select "user_token_id", "token", "token_type", "created_at"::text, "expires_at"::text, "user_id"
           from public.user_tokens
-          where "user_token_id" = ${ParameterValue(userTokenId, null, implicitly[ToStatement[UUIDCustom]])}
+          where "user_token_id" = ${ParameterValue(userTokenId, null, implicitly[ToStatement[UserTokenId]])}
        """.as(UserTokensRow.rowParser(1).singleOpt)
   }
   override def selectByIds(
-      userTokenIds: Array[ /* user-picked */ UUIDCustom]
-  )(implicit c: Connection, toStatement: ToStatement[Array[ /* user-picked */ UUIDCustom]]): List[UserTokensRow] = {
+      userTokenIds: Array[ /* user-picked */ UserTokenId]
+  )(implicit c: Connection, toStatement: ToStatement[Array[ /* user-picked */ UserTokenId]]): List[UserTokensRow] = {
     SQL"""select "user_token_id", "token", "token_type", "created_at"::text, "expires_at"::text, "user_id"
           from public.user_tokens
           where "user_token_id" = ANY(${userTokenIds})
@@ -95,7 +95,7 @@ object UserTokensRepoImpl extends UserTokensRepo {
         implicitly[ToStatement[InstantCustom]]
       )}::timestamptz,
               "user_id" = ${ParameterValue(row.userId, null, implicitly[ToStatement[UserId]])}::uuid
-          where "user_token_id" = ${ParameterValue(userTokenId, null, implicitly[ToStatement[UUIDCustom]])}
+          where "user_token_id" = ${ParameterValue(userTokenId, null, implicitly[ToStatement[UserTokenId]])}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[UserTokensFields, UserTokensRow] = {
@@ -104,7 +104,7 @@ object UserTokensRepoImpl extends UserTokensRepo {
   override def upsert(unsaved: UserTokensRow)(implicit c: Connection): UserTokensRow = {
     SQL"""insert into public.user_tokens("user_token_id", "token", "token_type", "created_at", "expires_at", "user_id")
           values (
-            ${ParameterValue(unsaved.userTokenId, null, implicitly[ToStatement[UUIDCustom]])}::uuid,
+            ${ParameterValue(unsaved.userTokenId, null, implicitly[ToStatement[UserTokenId]])}::uuid,
             ${ParameterValue(unsaved.token, null, ToStatement.stringToStatement)},
             ${ParameterValue(unsaved.tokenType, null, implicitly[ToStatement[UserTokenType]])},
             ${ParameterValue(unsaved.createdAt, null, implicitly[ToStatement[InstantCustom]])}::timestamptz,

@@ -1,7 +1,7 @@
 package net.wiringbits.common.models.id
 
 import anorm.{Column, ParameterMetaData, ToStatement, TypeDoesNotMatch}
-import play.api.libs.json.{JsString, Reads, Writes}
+import play.api.libs.json.{Format, JsString, Reads, Writes}
 
 import java.util.UUID
 import scala.util.{Failure, Success, Try}
@@ -16,7 +16,7 @@ private[id] object Id {
 
     def randomUUID: T = parse(UUID.randomUUID())
 
-    private def fromString(str: String): T = parse(UUID.fromString(str))
+    def fromString(str: String): T = parse(UUID.fromString(str))
 
     implicit val idToStatement: ToStatement[T] = ToStatement[T]((s, index, v) => s.setObject(index, v.value))
 
@@ -42,5 +42,10 @@ private[id] object Id {
     implicit val idCustomReads: Reads[T] = implicitly[Reads[String]].map(string => fromString(string))
 
     implicit val idCustomWrites: Writes[T] = Writes[T](i => JsString(i.value.toString))
+
+    implicit val backgroundJobStatusCustomFormat: Format[T] = Format[T](
+      fjs = implicitly[Reads[String]].map(string => fromString(string)),
+      tjs = Writes[T](i => JsString(i.value.toString))
+    )
   }
 }

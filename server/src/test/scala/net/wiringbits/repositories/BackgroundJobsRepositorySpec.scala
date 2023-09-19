@@ -3,7 +3,8 @@ package net.wiringbits.repositories
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.*
 import net.wiringbits.common.models.enums.{BackgroundJobStatus, BackgroundJobType}
-import net.wiringbits.common.models.{Email, InstantCustom, UUIDCustom}
+import net.wiringbits.common.models.id.BackgroundJobId
+import net.wiringbits.common.models.{Email, InstantCustom}
 import net.wiringbits.core.RepositorySpec
 import net.wiringbits.models.jobs.BackgroundJobPayload
 import net.wiringbits.typo_generated.customtypes.TypoJsonb
@@ -30,7 +31,7 @@ class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll
 
     "work (simple case)" in withRepositories() { repositories =>
       val createRequest = BackgroundJobsRow(
-        backgroundJobId = UUIDCustom.randomUUID(),
+        backgroundJobId = BackgroundJobId.randomUUID,
         `type` = BackgroundJobType.SendEmail,
         payload = TypoJsonb(Json.toJson(backgroundJobPayload).toString),
         status = BackgroundJobStatus.Pending,
@@ -62,7 +63,7 @@ class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll
 
     "only return pending jobs" in withRepositories() { repositories =>
       val createRequestBase = BackgroundJobsRow(
-        backgroundJobId = UUIDCustom.randomUUID(),
+        backgroundJobId = BackgroundJobId.randomUUID,
         `type` = BackgroundJobType.SendEmail,
         payload = TypoJsonb(Json.toJson(backgroundJobPayload).toString),
         status = BackgroundJobStatus.Pending,
@@ -78,7 +79,7 @@ class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll
         repositories.backgroundJobs
           .create(
             createRequestBase.copy(
-              backgroundJobId = UUIDCustom.randomUUID(),
+              backgroundJobId = BackgroundJobId.randomUUID,
               status = if ((i % 2) == 0) BackgroundJobStatus.Success else BackgroundJobStatus.Pending
             )
           )
@@ -114,7 +115,7 @@ class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll
   "setStatusToFailed" should {
     "work" in withRepositories() { repositories =>
       val createRequest = BackgroundJobsRow(
-        backgroundJobId = UUIDCustom.randomUUID(),
+        backgroundJobId = BackgroundJobId.randomUUID,
         `type` = BackgroundJobType.SendEmail,
         payload = TypoJsonb(Json.toJson(backgroundJobPayload).toString),
         status = BackgroundJobStatus.Pending,
@@ -149,7 +150,7 @@ class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll
 
       repositories.backgroundJobs
         .setStatusToFailed(
-          UUIDCustom.randomUUID(),
+          BackgroundJobId.randomUUID,
           executeAt = InstantCustom.now(),
           failReason = "test"
         )
@@ -160,7 +161,7 @@ class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll
   "setStatusToSuccess" should {
     "work" in withRepositories() { repositories =>
       val createRequest = BackgroundJobsRow(
-        backgroundJobId = UUIDCustom.randomUUID(),
+        backgroundJobId = BackgroundJobId.randomUUID,
         `type` = BackgroundJobType.SendEmail,
         payload = TypoJsonb(Json.toJson(backgroundJobPayload).toString),
         status = BackgroundJobStatus.Pending,
@@ -184,7 +185,7 @@ class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll
 
     "fail if the notification doesn't exists" in withRepositories() { repositories =>
       pending // TODO: setStatusToFailed must actually return an error because right now it succeeds
-      repositories.backgroundJobs.setStatusToSuccess(UUIDCustom.randomUUID()).futureValue
+      repositories.backgroundJobs.setStatusToSuccess(BackgroundJobId.randomUUID).futureValue
     }
   }
 }

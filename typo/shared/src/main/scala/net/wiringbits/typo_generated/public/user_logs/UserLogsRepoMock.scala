@@ -10,7 +10,7 @@ package user_logs
 
 import anorm.ToStatement
 import java.sql.Connection
-import net.wiringbits.common.models.UUIDCustom
+import net.wiringbits.common.models.id.UserLogId
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -23,9 +23,9 @@ import typo.dsl.UpdateParams
 
 class UserLogsRepoMock(
     toRow: Function1[UserLogsRowUnsaved, UserLogsRow],
-    map: scala.collection.mutable.Map[ /* user-picked */ UUIDCustom, UserLogsRow] = scala.collection.mutable.Map.empty
+    map: scala.collection.mutable.Map[ /* user-picked */ UserLogId, UserLogsRow] = scala.collection.mutable.Map.empty
 ) extends UserLogsRepo {
-  override def delete(userLogId: /* user-picked */ UUIDCustom)(implicit c: Connection): Boolean = {
+  override def delete(userLogId: /* user-picked */ UserLogId)(implicit c: Connection): Boolean = {
     map.remove(userLogId).isDefined
   }
   override def delete: DeleteBuilder[UserLogsFields, UserLogsRow] = {
@@ -47,12 +47,12 @@ class UserLogsRepoMock(
   override def selectAll(implicit c: Connection): List[UserLogsRow] = {
     map.values.toList
   }
-  override def selectById(userLogId: /* user-picked */ UUIDCustom)(implicit c: Connection): Option[UserLogsRow] = {
+  override def selectById(userLogId: /* user-picked */ UserLogId)(implicit c: Connection): Option[UserLogsRow] = {
     map.get(userLogId)
   }
   override def selectByIds(
-      userLogIds: Array[ /* user-picked */ UUIDCustom]
-  )(implicit c: Connection, toStatement: ToStatement[Array[ /* user-picked */ UUIDCustom]]): List[UserLogsRow] = {
+      userLogIds: Array[ /* user-picked */ UserLogId]
+  )(implicit c: Connection, toStatement: ToStatement[Array[ /* user-picked */ UserLogId]]): List[UserLogsRow] = {
     userLogIds.flatMap(map.get).toList
   }
   override def update(row: UserLogsRow)(implicit c: Connection): Boolean = {

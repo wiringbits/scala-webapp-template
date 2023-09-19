@@ -10,7 +10,7 @@ package background_jobs
 
 import anorm.ToStatement
 import java.sql.Connection
-import net.wiringbits.common.models.UUIDCustom
+import net.wiringbits.common.models.id.BackgroundJobId
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -23,10 +23,10 @@ import typo.dsl.UpdateParams
 
 class BackgroundJobsRepoMock(
     toRow: Function1[BackgroundJobsRowUnsaved, BackgroundJobsRow],
-    map: scala.collection.mutable.Map[ /* user-picked */ UUIDCustom, BackgroundJobsRow] =
+    map: scala.collection.mutable.Map[ /* user-picked */ BackgroundJobId, BackgroundJobsRow] =
       scala.collection.mutable.Map.empty
 ) extends BackgroundJobsRepo {
-  override def delete(backgroundJobId: /* user-picked */ UUIDCustom)(implicit c: Connection): Boolean = {
+  override def delete(backgroundJobId: /* user-picked */ BackgroundJobId)(implicit c: Connection): Boolean = {
     map.remove(backgroundJobId).isDefined
   }
   override def delete: DeleteBuilder[BackgroundJobsFields, BackgroundJobsRow] = {
@@ -49,13 +49,14 @@ class BackgroundJobsRepoMock(
     map.values.toList
   }
   override def selectById(
-      backgroundJobId: /* user-picked */ UUIDCustom
+      backgroundJobId: /* user-picked */ BackgroundJobId
   )(implicit c: Connection): Option[BackgroundJobsRow] = {
     map.get(backgroundJobId)
   }
-  override def selectByIds(
-      backgroundJobIds: Array[ /* user-picked */ UUIDCustom]
-  )(implicit c: Connection, toStatement: ToStatement[Array[ /* user-picked */ UUIDCustom]]): List[BackgroundJobsRow] = {
+  override def selectByIds(backgroundJobIds: Array[ /* user-picked */ BackgroundJobId])(implicit
+      c: Connection,
+      toStatement: ToStatement[Array[ /* user-picked */ BackgroundJobId]]
+  ): List[BackgroundJobsRow] = {
     backgroundJobIds.flatMap(map.get).toList
   }
   override def update(row: BackgroundJobsRow)(implicit c: Connection): Boolean = {

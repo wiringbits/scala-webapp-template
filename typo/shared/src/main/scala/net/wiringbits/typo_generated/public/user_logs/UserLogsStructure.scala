@@ -9,8 +9,8 @@ package public
 package user_logs
 
 import net.wiringbits.common.models.InstantCustom
-import net.wiringbits.common.models.UUIDCustom
 import net.wiringbits.common.models.id.UserId
+import net.wiringbits.common.models.id.UserLogId
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
@@ -23,7 +23,7 @@ class UserLogsStructure[Row](
 ) extends Relation[UserLogsFields, UserLogsRow, Row]
     with UserLogsFields[Row] { outer =>
 
-  override val userLogId = new IdField[ /* user-picked */ UUIDCustom, Row](prefix, "user_log_id", None, Some("uuid"))(
+  override val userLogId = new IdField[ /* user-picked */ UserLogId, Row](prefix, "user_log_id", None, Some("uuid"))(
     x => extract(x).userLogId,
     (row, value) => merge(row, extract(row).copy(userLogId = value))
   )

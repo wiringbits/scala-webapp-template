@@ -9,9 +9,9 @@ package public
 package background_jobs
 
 import net.wiringbits.common.models.InstantCustom
-import net.wiringbits.common.models.UUIDCustom
 import net.wiringbits.common.models.enums.BackgroundJobStatus
 import net.wiringbits.common.models.enums.BackgroundJobType
+import net.wiringbits.common.models.id.BackgroundJobId
 import net.wiringbits.typo_generated.customtypes.Defaulted
 import net.wiringbits.typo_generated.customtypes.TypoJsonb
 import play.api.libs.json.JsObject
@@ -25,7 +25,7 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `public.background_jobs` which has not been persisted yet */
 case class BackgroundJobsRowUnsaved(
-    backgroundJobId: /* user-picked */ UUIDCustom,
+    backgroundJobId: /* user-picked */ BackgroundJobId,
     `type`: /* user-picked */ BackgroundJobType,
     payload: TypoJsonb,
     status: /* user-picked */ BackgroundJobStatus,
@@ -74,7 +74,7 @@ object BackgroundJobsRowUnsaved {
     JsResult.fromTry(
       Try(
         BackgroundJobsRowUnsaved(
-          backgroundJobId = json.\("background_job_id").as(implicitly[Reads[UUIDCustom]]),
+          backgroundJobId = json.\("background_job_id").as(implicitly[Reads[BackgroundJobId]]),
           `type` = json.\("type").as(implicitly[Reads[BackgroundJobType]]),
           payload = json.\("payload").as(TypoJsonb.reads),
           status = json.\("status").as(implicitly[Reads[BackgroundJobStatus]]),
@@ -90,7 +90,7 @@ object BackgroundJobsRowUnsaved {
   implicit lazy val writes: OWrites[BackgroundJobsRowUnsaved] = OWrites[BackgroundJobsRowUnsaved](o =>
     new JsObject(
       ListMap[String, JsValue](
-        "background_job_id" -> implicitly[Writes[UUIDCustom]].writes(o.backgroundJobId),
+        "background_job_id" -> implicitly[Writes[BackgroundJobId]].writes(o.backgroundJobId),
         "type" -> implicitly[Writes[BackgroundJobType]].writes(o.`type`),
         "payload" -> TypoJsonb.writes.writes(o.payload),
         "status" -> implicitly[Writes[BackgroundJobStatus]].writes(o.status),

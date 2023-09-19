@@ -1,7 +1,7 @@
 package net.wiringbits.repositories
 
-import net.wiringbits.common.models.id.UserId
-import net.wiringbits.common.models.{InstantCustom, UUIDCustom}
+import net.wiringbits.common.models.id.{UserId, UserLogId}
+import net.wiringbits.common.models.InstantCustom
 import net.wiringbits.core.RepositorySpec
 import net.wiringbits.typo_generated.public.user_logs.UserLogsRow
 import org.scalatest.concurrent.ScalaFutures.*
@@ -14,7 +14,7 @@ class UserLogsRepositorySpec extends RepositorySpec with RepositoryUtils {
       val usersRow = createNonVerifyUser().futureValue
 
       val logsRequest = UserLogsRow(
-        userLogId = UUIDCustom.randomUUID(),
+        userLogId = UserLogId.randomUUID,
         userId = usersRow.userId,
         message = "Test",
         createdAt = InstantCustom.now()
@@ -24,7 +24,7 @@ class UserLogsRepositorySpec extends RepositorySpec with RepositoryUtils {
 
     "fail if the user doesn't exists" in withRepositories() { implicit repositories =>
       val logsRequest = UserLogsRow(
-        userLogId = UUIDCustom.randomUUID(),
+        userLogId = UserLogId.randomUUID,
         userId = UserId.randomUUID,
         message = "Test",
         createdAt = InstantCustom.now()

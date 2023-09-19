@@ -12,9 +12,9 @@ import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import net.wiringbits.common.models.InstantCustom
-import net.wiringbits.common.models.UUIDCustom
 import net.wiringbits.common.models.enums.UserTokenType
 import net.wiringbits.common.models.id.UserId
+import net.wiringbits.common.models.id.UserTokenId
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -25,7 +25,7 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class UserTokensRow(
-    userTokenId: /* user-picked */ UUIDCustom,
+    userTokenId: /* user-picked */ UserTokenId,
     token: String,
     tokenType: /* user-picked */ UserTokenType,
     createdAt: /* user-picked */ InstantCustom,
@@ -39,7 +39,7 @@ object UserTokensRow {
     JsResult.fromTry(
       Try(
         UserTokensRow(
-          userTokenId = json.\("user_token_id").as(implicitly[Reads[UUIDCustom]]),
+          userTokenId = json.\("user_token_id").as(implicitly[Reads[UserTokenId]]),
           token = json.\("token").as(Reads.StringReads),
           tokenType = json.\("token_type").as(implicitly[Reads[UserTokenType]]),
           createdAt = json.\("created_at").as(implicitly[Reads[InstantCustom]]),
@@ -52,7 +52,7 @@ object UserTokensRow {
   def rowParser(idx: Int): RowParser[UserTokensRow] = RowParser[UserTokensRow] { row =>
     Success(
       UserTokensRow(
-        userTokenId = row(idx + 0)(implicitly[Column[UUIDCustom]]),
+        userTokenId = row(idx + 0)(implicitly[Column[UserTokenId]]),
         token = row(idx + 1)(Column.columnToString),
         tokenType = row(idx + 2)(implicitly[Column[UserTokenType]]),
         createdAt = row(idx + 3)(implicitly[Column[InstantCustom]]),
@@ -64,7 +64,7 @@ object UserTokensRow {
   implicit lazy val writes: OWrites[UserTokensRow] = OWrites[UserTokensRow](o =>
     new JsObject(
       ListMap[String, JsValue](
-        "user_token_id" -> implicitly[Writes[UUIDCustom]].writes(o.userTokenId),
+        "user_token_id" -> implicitly[Writes[UserTokenId]].writes(o.userTokenId),
         "token" -> Writes.StringWrites.writes(o.token),
         "token_type" -> implicitly[Writes[UserTokenType]].writes(o.tokenType),
         "created_at" -> implicitly[Writes[InstantCustom]].writes(o.createdAt),

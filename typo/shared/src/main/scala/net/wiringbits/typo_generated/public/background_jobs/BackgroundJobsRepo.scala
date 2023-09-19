@@ -10,22 +10,23 @@ package background_jobs
 
 import anorm.ToStatement
 import java.sql.Connection
-import net.wiringbits.common.models.UUIDCustom
+import net.wiringbits.common.models.id.BackgroundJobId
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait BackgroundJobsRepo {
-  def delete(backgroundJobId: /* user-picked */ UUIDCustom)(implicit c: Connection): Boolean
+  def delete(backgroundJobId: /* user-picked */ BackgroundJobId)(implicit c: Connection): Boolean
   def delete: DeleteBuilder[BackgroundJobsFields, BackgroundJobsRow]
   def insert(unsaved: BackgroundJobsRow)(implicit c: Connection): BackgroundJobsRow
   def insert(unsaved: BackgroundJobsRowUnsaved)(implicit c: Connection): BackgroundJobsRow
   def select: SelectBuilder[BackgroundJobsFields, BackgroundJobsRow]
   def selectAll(implicit c: Connection): List[BackgroundJobsRow]
-  def selectById(backgroundJobId: /* user-picked */ UUIDCustom)(implicit c: Connection): Option[BackgroundJobsRow]
-  def selectByIds(
-      backgroundJobIds: Array[ /* user-picked */ UUIDCustom]
-  )(implicit c: Connection, toStatement: ToStatement[Array[ /* user-picked */ UUIDCustom]]): List[BackgroundJobsRow]
+  def selectById(backgroundJobId: /* user-picked */ BackgroundJobId)(implicit c: Connection): Option[BackgroundJobsRow]
+  def selectByIds(backgroundJobIds: Array[ /* user-picked */ BackgroundJobId])(implicit
+      c: Connection,
+      toStatement: ToStatement[Array[ /* user-picked */ BackgroundJobId]]
+  ): List[BackgroundJobsRow]
   def update(row: BackgroundJobsRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[BackgroundJobsFields, BackgroundJobsRow]
   def upsert(unsaved: BackgroundJobsRow)(implicit c: Connection): BackgroundJobsRow

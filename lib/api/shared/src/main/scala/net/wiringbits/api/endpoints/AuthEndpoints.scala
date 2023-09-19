@@ -2,7 +2,8 @@ package net.wiringbits.api.endpoints
 
 import net.wiringbits.api.models
 import net.wiringbits.api.models.{ErrorResponse, GetCurrentUser, Login, Logout}
-import net.wiringbits.common.models.{Captcha, Email, Name, Password, UUIDCustom}
+import net.wiringbits.common.models.id.UserId
+import net.wiringbits.common.models.{Captcha, Email, Name, Password}
 import sttp.tapir.*
 import sttp.tapir.json.play.*
 import sttp.tapir.model.ServerRequest
@@ -46,8 +47,8 @@ object AuthEndpoints {
       .description("Sets a session cookie to authenticate the following requests")
 
   def logout(implicit
-      authHandler: ServerRequest => Future[UUIDCustom]
-  ): Endpoint[Unit, Future[UUIDCustom], ErrorResponse, (Logout.Response, String), Any] =
+      authHandler: ServerRequest => Future[UserId]
+  ): Endpoint[Unit, Future[UserId], ErrorResponse, (Logout.Response, String), Any] =
     baseEndpoint.post
       .in("logout")
       .in(userAuth)
@@ -58,8 +59,8 @@ object AuthEndpoints {
       .description("Clears the session cookie that's stored securely")
 
   def getCurrentUser(implicit
-      authHandler: ServerRequest => Future[UUIDCustom]
-  ): Endpoint[Unit, Future[UUIDCustom], ErrorResponse, GetCurrentUser.Response, Any] =
+      authHandler: ServerRequest => Future[UserId]
+  ): Endpoint[Unit, Future[UserId], ErrorResponse, GetCurrentUser.Response, Any] =
     baseEndpoint.get
       .in("me")
       .in(userAuth)
@@ -77,7 +78,7 @@ object AuthEndpoints {
       )
       .summary("Get the details for the authenticated user")
 
-  def routes(implicit authHandler: ServerRequest => Future[UUIDCustom]): List[AnyEndpoint] = List(
+  def routes(implicit authHandler: ServerRequest => Future[UserId]): List[AnyEndpoint] = List(
     login,
     logout,
     getCurrentUser

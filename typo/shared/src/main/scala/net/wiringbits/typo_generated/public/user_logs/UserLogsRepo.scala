@@ -9,23 +9,22 @@ package public
 package user_logs
 
 import anorm.ToStatement
+import net.wiringbits.common.models.id.UserLogId
+import typo.dsl.{DeleteBuilder, SelectBuilder, UpdateBuilder}
+
 import java.sql.Connection
-import net.wiringbits.common.models.UUIDCustom
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
 
 trait UserLogsRepo {
-  def delete(userLogId: /* user-picked */ UUIDCustom)(implicit c: Connection): Boolean
+  def delete(userLogId: /* user-picked */ UserLogId)(implicit c: Connection): Boolean
   def delete: DeleteBuilder[UserLogsFields, UserLogsRow]
   def insert(unsaved: UserLogsRow)(implicit c: Connection): UserLogsRow
   def insert(unsaved: UserLogsRowUnsaved)(implicit c: Connection): UserLogsRow
   def select: SelectBuilder[UserLogsFields, UserLogsRow]
   def selectAll(implicit c: Connection): List[UserLogsRow]
-  def selectById(userLogId: /* user-picked */ UUIDCustom)(implicit c: Connection): Option[UserLogsRow]
+  def selectById(userLogId: /* user-picked */ UserLogId)(implicit c: Connection): Option[UserLogsRow]
   def selectByIds(
-      userLogIds: Array[ /* user-picked */ UUIDCustom]
-  )(implicit c: Connection, toStatement: ToStatement[Array[ /* user-picked */ UUIDCustom]]): List[UserLogsRow]
+      userLogIds: Array[ /* user-picked */ UserLogId]
+  )(implicit c: Connection, toStatement: ToStatement[Array[ /* user-picked */ UserLogId]]): List[UserLogsRow]
   def update(row: UserLogsRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[UserLogsFields, UserLogsRow]
   def upsert(unsaved: UserLogsRow)(implicit c: Connection): UserLogsRow

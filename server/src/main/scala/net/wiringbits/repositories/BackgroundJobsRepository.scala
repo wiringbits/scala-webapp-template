@@ -1,8 +1,9 @@
 package net.wiringbits.repositories
 
 import anorm.*
+import net.wiringbits.common.models.InstantCustom
 import net.wiringbits.common.models.enums.BackgroundJobStatus
-import net.wiringbits.common.models.{InstantCustom, UUIDCustom}
+import net.wiringbits.common.models.id.BackgroundJobId
 import net.wiringbits.executors.DatabaseExecutionContext
 import net.wiringbits.typo_generated.public.background_jobs.{BackgroundJobsRepoImpl, BackgroundJobsRow}
 import play.api.db.Database
@@ -58,7 +59,7 @@ class BackgroundJobsRepository @Inject() (database: Database)(implicit ec: Datab
   }
 
   def setStatusToFailed(
-      backgroundJobId: UUIDCustom,
+      backgroundJobId: BackgroundJobId,
       executeAt: InstantCustom,
       failReason: String
   ): Future[Unit] = Future {
@@ -74,7 +75,7 @@ class BackgroundJobsRepository @Inject() (database: Database)(implicit ec: Datab
     }
   }
 
-  def setStatusToSuccess(backgroundJobId: UUIDCustom): Future[Unit] = Future {
+  def setStatusToSuccess(backgroundJobId: BackgroundJobId): Future[Unit] = Future {
     database.withConnection { implicit conn =>
       BackgroundJobsRepoImpl.update
         .where(_.backgroundJobId === backgroundJobId)

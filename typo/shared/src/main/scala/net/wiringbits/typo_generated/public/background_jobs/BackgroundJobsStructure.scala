@@ -9,9 +9,9 @@ package public
 package background_jobs
 
 import net.wiringbits.common.models.InstantCustom
-import net.wiringbits.common.models.UUIDCustom
 import net.wiringbits.common.models.enums.BackgroundJobStatus
 import net.wiringbits.common.models.enums.BackgroundJobType
+import net.wiringbits.common.models.id.BackgroundJobId
 import net.wiringbits.typo_generated.customtypes.TypoJsonb
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -27,7 +27,7 @@ class BackgroundJobsStructure[Row](
     with BackgroundJobsFields[Row] { outer =>
 
   override val backgroundJobId =
-    new IdField[ /* user-picked */ UUIDCustom, Row](prefix, "background_job_id", None, Some("uuid"))(
+    new IdField[ /* user-picked */ BackgroundJobId, Row](prefix, "background_job_id", None, Some("uuid"))(
       x => extract(x).backgroundJobId,
       (row, value) => merge(row, extract(row).copy(backgroundJobId = value))
     )

@@ -9,8 +9,8 @@ package public
 package user_logs
 
 import net.wiringbits.common.models.InstantCustom
-import net.wiringbits.common.models.UUIDCustom
 import net.wiringbits.common.models.id.UserId
+import net.wiringbits.common.models.id.UserLogId
 import net.wiringbits.typo_generated.customtypes.Defaulted
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -23,7 +23,7 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `public.user_logs` which has not been persisted yet */
 case class UserLogsRowUnsaved(
-    userLogId: /* user-picked */ UUIDCustom,
+    userLogId: /* user-picked */ UserLogId,
     /** Points to [[users.UsersRow.userId]] */
     userId: /* user-picked */ UserId,
     message: String,
@@ -46,7 +46,7 @@ object UserLogsRowUnsaved {
     JsResult.fromTry(
       Try(
         UserLogsRowUnsaved(
-          userLogId = json.\("user_log_id").as(implicitly[Reads[UUIDCustom]]),
+          userLogId = json.\("user_log_id").as(implicitly[Reads[UserLogId]]),
           userId = json.\("user_id").as(implicitly[Reads[UserId]]),
           message = json.\("message").as(Reads.StringReads),
           createdAt = json.\("created_at").as(Defaulted.reads(implicitly[Reads[InstantCustom]]))
@@ -57,7 +57,7 @@ object UserLogsRowUnsaved {
   implicit lazy val writes: OWrites[UserLogsRowUnsaved] = OWrites[UserLogsRowUnsaved](o =>
     new JsObject(
       ListMap[String, JsValue](
-        "user_log_id" -> implicitly[Writes[UUIDCustom]].writes(o.userLogId),
+        "user_log_id" -> implicitly[Writes[UserLogId]].writes(o.userLogId),
         "user_id" -> implicitly[Writes[UserId]].writes(o.userId),
         "message" -> Writes.StringWrites.writes(o.message),
         "created_at" -> Defaulted.writes(implicitly[Writes[InstantCustom]]).writes(o.createdAt)

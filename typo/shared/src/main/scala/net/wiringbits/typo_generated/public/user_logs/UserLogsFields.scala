@@ -9,13 +9,13 @@ package public
 package user_logs
 
 import net.wiringbits.common.models.InstantCustom
-import net.wiringbits.common.models.UUIDCustom
 import net.wiringbits.common.models.id.UserId
+import net.wiringbits.common.models.id.UserLogId
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField
 
 trait UserLogsFields[Row] {
-  val userLogId: IdField[ /* user-picked */ UUIDCustom, Row]
+  val userLogId: IdField[ /* user-picked */ UserLogId, Row]
   val userId: Field[ /* user-picked */ UserId, Row]
   val message: Field[String, Row]
   val createdAt: Field[ /* user-picked */ InstantCustom, Row]

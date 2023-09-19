@@ -1,7 +1,6 @@
 package net.wiringbits.repositories
 
-import net.wiringbits.common.models.UUIDCustom
-import net.wiringbits.common.models.id.UserId
+import net.wiringbits.common.models.id.{UserId, UserTokenId}
 import net.wiringbits.executors.DatabaseExecutionContext
 import net.wiringbits.typo_generated.public.user_tokens.{UserTokensRepoImpl, UserTokensRow}
 import play.api.db.Database
@@ -39,7 +38,7 @@ class UserTokensRepository @Inject() (
     }
   }
 
-  def delete(userTokenId: UUIDCustom, userId: UserId): Future[Unit] = Future {
+  def delete(userTokenId: UserTokenId, userId: UserId): Future[Unit] = Future {
     database.withConnection { implicit conn =>
       UserTokensRepoImpl.delete.where(_.userTokenId === userTokenId).where(_.userId === userId).execute()
     }

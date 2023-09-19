@@ -2,8 +2,8 @@ package net.wiringbits.repositories
 
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.Sink
-import net.wiringbits.common.models.id.UserId
-import net.wiringbits.common.models.{Email, Name, UUIDCustom}
+import net.wiringbits.common.models.id.{UserId, UserTokenId}
+import net.wiringbits.common.models.{Email, Name}
 import net.wiringbits.core.RepositorySpec
 import net.wiringbits.util.EmailMessage
 import org.scalatest.BeforeAndAfterAll
@@ -189,7 +189,7 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll with Rep
     "verify a user given a token" in withRepositories() { implicit repositories =>
       val request = createNonVerifyUser().futureValue
       repositories.users
-        .verify(request.userId, UUIDCustom.randomUUID(), EmailMessage.confirm(request.name))
+        .verify(request.userId, UserTokenId.randomUUID, EmailMessage.confirm(request.name))
         .futureValue
 
       val response = repositories.users.find(request.userId).futureValue
@@ -199,7 +199,7 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll with Rep
     "produce a notification for the user" in withRepositories() { implicit repositories =>
       val request = createNonVerifyUser().futureValue
       repositories.users
-        .verify(request.userId, UUIDCustom.randomUUID(), EmailMessage.confirm(request.name))
+        .verify(request.userId, UserTokenId.randomUUID, EmailMessage.confirm(request.name))
         .futureValue
 
       val response = repositories.backgroundJobs
@@ -214,7 +214,7 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll with Rep
       val name = Name.trusted("test")
       val ex = intercept[RuntimeException] {
         repositories.users
-          .verify(UserId.randomUUID, UUIDCustom.randomUUID(), EmailMessage.confirm(name))
+          .verify(UserId.randomUUID, UserTokenId.randomUUID, EmailMessage.confirm(name))
           .futureValue
       }
       ex.getCause.getMessage must startWith(

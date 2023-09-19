@@ -2,7 +2,7 @@ package net.wiringbits.actions
 
 import net.wiringbits.api.models.UpdatePassword
 import net.wiringbits.common.models.id.UserId
-import net.wiringbits.common.models.{Name, UUIDCustom}
+import net.wiringbits.common.models.Name
 import net.wiringbits.repositories.UsersRepository
 import net.wiringbits.util.EmailMessage
 import net.wiringbits.validations.ValidatePasswordMatches

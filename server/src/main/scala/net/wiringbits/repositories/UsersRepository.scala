@@ -1,8 +1,8 @@
 package net.wiringbits.repositories
 
 import net.wiringbits.common.models.enums.{BackgroundJobStatus, BackgroundJobType, UserTokenType}
-import net.wiringbits.common.models.id.UserId
-import net.wiringbits.common.models.{Email, InstantCustom, Name, UUIDCustom}
+import net.wiringbits.common.models.id.{BackgroundJobId, UserId, UserLogId, UserTokenId}
+import net.wiringbits.common.models.{Email, InstantCustom, Name}
 import net.wiringbits.config.UserTokensConfig
 import net.wiringbits.executors.DatabaseExecutionContext
 import net.wiringbits.models.jobs.BackgroundJobPayload
@@ -31,7 +31,7 @@ class UsersRepository @Inject() (
 
   def create(usersRow: UsersRow, verifyEmailToken: String): Future[Unit] = Future {
     val createUserTokensRow = UserTokensRow(
-      userTokenId = UUIDCustom.randomUUID(),
+      userTokenId = UserTokenId.randomUUID,
       token = verifyEmailToken,
       tokenType = UserTokenType.EmailVerification,
       createdAt = InstantCustom.fromClock,
@@ -40,7 +40,7 @@ class UsersRepository @Inject() (
     )
 
     val createUserLogsRow = UserLogsRow(
-      userLogId = UUIDCustom.randomUUID(),
+      userLogId = UserLogId.randomUUID,
       userId = usersRow.userId,
       message = s"Account created, name = ${usersRow.name}, email = ${usersRow.email}",
       createdAt = InstantCustom.fromClock
@@ -77,7 +77,7 @@ class UsersRepository @Inject() (
 
   def update(userId: UserId, name: Name): Future[Unit] = Future {
     val createUserLogsRow = UserLogsRow(
-      userLogId = UUIDCustom.randomUUID(),
+      userLogId = UserLogId.randomUUID,
       userId = userId,
       message = s"Profile updated",
       createdAt = InstantCustom.fromClock
@@ -91,7 +91,7 @@ class UsersRepository @Inject() (
 
   def updatePassword(userId: UserId, password: String, emailMessage: EmailMessage): Future[Unit] = Future {
     val createUserLogsRow = UserLogsRow(
-      userLogId = UUIDCustom.randomUUID(),
+      userLogId = UserLogId.randomUUID,
       userId = userId,
       message = s"Password updated",
       createdAt = InstantCustom.fromClock
@@ -104,9 +104,9 @@ class UsersRepository @Inject() (
     }
   }
 
-  def verify(userId: UserId, userTokenId: UUIDCustom, emailMessage: EmailMessage): Future[Unit] = Future {
+  def verify(userId: UserId, userTokenId: UserTokenId, emailMessage: EmailMessage): Future[Unit] = Future {
     val createUserLogsRow = UserLogsRow(
-      userLogId = UUIDCustom.randomUUID(),
+      userLogId = UserLogId.randomUUID,
       userId = userId,
       message = s"Email verified",
       createdAt = InstantCustom.fromClock
@@ -128,7 +128,7 @@ class UsersRepository @Inject() (
 
   def resetPassword(userId: UserId, password: String, emailMessage: EmailMessage): Future[Unit] = Future {
     val createUserLogsRow = UserLogsRow(
-      userLogId = UUIDCustom.randomUUID(),
+      userLogId = UserLogId.randomUUID,
       userId = userId,
       message = s"Password reset",
       createdAt = InstantCustom.fromClock
@@ -151,7 +151,7 @@ class UsersRepository @Inject() (
       )
 
       val backgroundJobDatasRow = BackgroundJobsRow(
-        backgroundJobId = UUIDCustom.randomUUID(),
+        backgroundJobId = BackgroundJobId.randomUUID,
         `type` = BackgroundJobType.SendEmail,
         payload = TypoJsonb(Json.toJson(payload).toString),
         status = BackgroundJobStatus.Pending,

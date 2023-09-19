@@ -3,7 +3,8 @@ package net.wiringbits.util
 import net.wiringbits.apis.EmailApi
 import net.wiringbits.apis.models.EmailRequest
 import net.wiringbits.common.models.enums.UserTokenType
-import net.wiringbits.common.models.{Email, InstantCustom, Name, UUIDCustom}
+import net.wiringbits.common.models.id.UserTokenId
+import net.wiringbits.common.models.{Email, InstantCustom, Name}
 import net.wiringbits.config.{UserTokensConfig, WebAppConfig}
 import net.wiringbits.repositories.UserTokensRepository
 import net.wiringbits.typo_generated.public.user_tokens.UserTokensRow
@@ -28,7 +29,7 @@ class EmailsHelper @Inject() (
     val hmacToken = TokensHelper.doHMACSHA1(token.toString.getBytes(), userTokensConfig.hmacSecret)
 
     val createToken = UserTokensRow(
-      userTokenId = UUIDCustom.randomUUID(),
+      userTokenId = UserTokenId.randomUUID,
       token = hmacToken,
       tokenType = UserTokenType.EmailVerification,
       createdAt = InstantCustom.fromClock,
@@ -61,7 +62,7 @@ class EmailsHelper @Inject() (
     val emailParameter = s"${usersRow.userId}_$token"
     val hmacToken = TokensHelper.doHMACSHA1(token.toString.getBytes, userTokensConfig.hmacSecret)
     val createUserTokensRow = UserTokensRow(
-      userTokenId = UUIDCustom.randomUUID(),
+      userTokenId = UserTokenId.randomUUID,
       token = hmacToken,
       tokenType = UserTokenType.ResetPassword,
       createdAt = InstantCustom.fromClock,

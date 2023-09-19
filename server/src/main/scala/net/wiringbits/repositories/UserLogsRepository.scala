@@ -1,13 +1,12 @@
 package net.wiringbits.repositories
 
-import net.wiringbits.common.models.id.UserId
-import net.wiringbits.common.models.{InstantCustom, UUIDCustom}
+import net.wiringbits.common.models.id.{UserId, UserLogId}
+import net.wiringbits.common.models.InstantCustom
 import net.wiringbits.executors.DatabaseExecutionContext
 import net.wiringbits.typo_generated.public.user_logs.{UserLogsRepoImpl, UserLogsRow}
 import play.api.db.Database
 
-import java.time.{Clock, ZoneOffset}
-import java.util.UUID
+import java.time.Clock
 import javax.inject.Inject
 import scala.concurrent.Future
 
@@ -21,7 +20,7 @@ class UserLogsRepository @Inject() (database: Database)(implicit ec: DatabaseExe
 
   def create(userId: UserId, message: String): Future[Unit] = Future {
     val createUserLogsRow = UserLogsRow(
-      userLogId = UUIDCustom.randomUUID(),
+      userLogId = UserLogId.randomUUID,
       userId = userId,
       message = message,
       createdAt = InstantCustom.fromClock

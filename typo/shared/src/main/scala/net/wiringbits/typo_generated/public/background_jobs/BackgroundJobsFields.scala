@@ -9,16 +9,16 @@ package public
 package background_jobs
 
 import net.wiringbits.common.models.InstantCustom
-import net.wiringbits.common.models.UUIDCustom
 import net.wiringbits.common.models.enums.BackgroundJobStatus
 import net.wiringbits.common.models.enums.BackgroundJobType
+import net.wiringbits.common.models.id.BackgroundJobId
 import net.wiringbits.typo_generated.customtypes.TypoJsonb
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.SqlExpr.OptField
 
 trait BackgroundJobsFields[Row] {
-  val backgroundJobId: IdField[ /* user-picked */ UUIDCustom, Row]
+  val backgroundJobId: IdField[ /* user-picked */ BackgroundJobId, Row]
   val `type`: Field[ /* user-picked */ BackgroundJobType, Row]
   val payload: Field[TypoJsonb, Row]
   val status: Field[ /* user-picked */ BackgroundJobStatus, Row]

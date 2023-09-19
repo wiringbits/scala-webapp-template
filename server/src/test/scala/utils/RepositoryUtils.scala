@@ -1,12 +1,10 @@
 package utils
 
 import net.wiringbits.common.models.id.UserId
-import net.wiringbits.common.models.{Email, InstantCustom, Name, UUIDCustom}
+import net.wiringbits.common.models.{Email, InstantCustom, Name}
 import net.wiringbits.core.RepositoryComponents
 import net.wiringbits.typo_generated.public.users.UsersRow
 
-import java.time.Instant
-import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
 trait RepositoryUtils {

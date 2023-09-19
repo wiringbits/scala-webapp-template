@@ -2,7 +2,7 @@ package net.wiringbits.services
 
 import net.wiringbits.api.models.{AdminGetUserLogs, AdminGetUsers}
 import net.wiringbits.common.models.id.UserId
-import net.wiringbits.common.models.{Email, Name, UUIDCustom}
+import net.wiringbits.common.models.{Email, Name}
 import net.wiringbits.repositories.{UserLogsRepository, UsersRepository}
 
 import java.util.UUID

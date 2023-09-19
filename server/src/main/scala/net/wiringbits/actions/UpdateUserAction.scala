@@ -1,7 +1,6 @@
 package net.wiringbits.actions
 
 import net.wiringbits.api.models.UpdateUser
-import net.wiringbits.common.models.UUIDCustom
 import net.wiringbits.common.models.id.UserId
 import net.wiringbits.repositories.UsersRepository
 

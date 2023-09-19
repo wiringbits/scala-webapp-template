@@ -9,14 +9,14 @@ package public
 package user_tokens
 
 import net.wiringbits.common.models.InstantCustom
-import net.wiringbits.common.models.UUIDCustom
 import net.wiringbits.common.models.enums.UserTokenType
 import net.wiringbits.common.models.id.UserId
+import net.wiringbits.common.models.id.UserTokenId
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField
 
 trait UserTokensFields[Row] {
-  val userTokenId: IdField[ /* user-picked */ UUIDCustom, Row]
+  val userTokenId: IdField[ /* user-picked */ UserTokenId, Row]
   val token: Field[String, Row]
   val tokenType: Field[ /* user-picked */ UserTokenType, Row]
   val createdAt: Field[ /* user-picked */ InstantCustom, Row]

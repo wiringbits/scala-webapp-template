@@ -12,8 +12,8 @@ import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import net.wiringbits.common.models.InstantCustom
-import net.wiringbits.common.models.UUIDCustom
 import net.wiringbits.common.models.id.UserId
+import net.wiringbits.common.models.id.UserLogId
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -24,7 +24,7 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class UserLogsRow(
-    userLogId: /* user-picked */ UUIDCustom,
+    userLogId: /* user-picked */ UserLogId,
     /** Points to [[users.UsersRow.userId]] */
     userId: /* user-picked */ UserId,
     message: String,
@@ -36,7 +36,7 @@ object UserLogsRow {
     JsResult.fromTry(
       Try(
         UserLogsRow(
-          userLogId = json.\("user_log_id").as(implicitly[Reads[UUIDCustom]]),
+          userLogId = json.\("user_log_id").as(implicitly[Reads[UserLogId]]),
           userId = json.\("user_id").as(implicitly[Reads[UserId]]),
           message = json.\("message").as(Reads.StringReads),
           createdAt = json.\("created_at").as(implicitly[Reads[InstantCustom]])
@@ -47,7 +47,7 @@ object UserLogsRow {
   def rowParser(idx: Int): RowParser[UserLogsRow] = RowParser[UserLogsRow] { row =>
     Success(
       UserLogsRow(
-        userLogId = row(idx + 0)(implicitly[Column[UUIDCustom]]),
+        userLogId = row(idx + 0)(implicitly[Column[UserLogId]]),
         userId = row(idx + 1)(implicitly[Column[UserId]]),
         message = row(idx + 2)(Column.columnToString),
         createdAt = row(idx + 3)(implicitly[Column[InstantCustom]])
@@ -57,7 +57,7 @@ object UserLogsRow {
   implicit lazy val writes: OWrites[UserLogsRow] = OWrites[UserLogsRow](o =>
     new JsObject(
       ListMap[String, JsValue](
-        "user_log_id" -> implicitly[Writes[UUIDCustom]].writes(o.userLogId),
+        "user_log_id" -> implicitly[Writes[UserLogId]].writes(o.userLogId),
         "user_id" -> implicitly[Writes[UserId]].writes(o.userId),
         "message" -> Writes.StringWrites.writes(o.message),
         "created_at" -> implicitly[Writes[InstantCustom]].writes(o.createdAt)

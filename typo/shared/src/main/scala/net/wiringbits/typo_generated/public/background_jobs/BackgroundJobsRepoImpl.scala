@@ -18,9 +18,9 @@ import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
 import net.wiringbits.common.models.InstantCustom
-import net.wiringbits.common.models.UUIDCustom
 import net.wiringbits.common.models.enums.BackgroundJobStatus
 import net.wiringbits.common.models.enums.BackgroundJobType
+import net.wiringbits.common.models.id.BackgroundJobId
 import net.wiringbits.typo_generated.customtypes.Defaulted
 import net.wiringbits.typo_generated.customtypes.TypoJsonb
 import typo.dsl.DeleteBuilder
@@ -29,11 +29,11 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 object BackgroundJobsRepoImpl extends BackgroundJobsRepo {
-  override def delete(backgroundJobId: /* user-picked */ UUIDCustom)(implicit c: Connection): Boolean = {
+  override def delete(backgroundJobId: /* user-picked */ BackgroundJobId)(implicit c: Connection): Boolean = {
     SQL"""delete from public.background_jobs where "background_job_id" = ${ParameterValue(
         backgroundJobId,
         null,
-        implicitly[ToStatement[UUIDCustom]]
+        implicitly[ToStatement[BackgroundJobId]]
       )}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[BackgroundJobsFields, BackgroundJobsRow] = {
@@ -44,7 +44,7 @@ object BackgroundJobsRepoImpl extends BackgroundJobsRepo {
           values (${ParameterValue(
         unsaved.backgroundJobId,
         null,
-        implicitly[ToStatement[UUIDCustom]]
+        implicitly[ToStatement[BackgroundJobId]]
       )}::uuid, ${ParameterValue(unsaved.`type`, null, implicitly[ToStatement[BackgroundJobType]])}, ${ParameterValue(
         unsaved.payload,
         null,
@@ -81,7 +81,7 @@ object BackgroundJobsRepoImpl extends BackgroundJobsRepo {
         (
           NamedParameter(
             "background_job_id",
-            ParameterValue(unsaved.backgroundJobId, null, implicitly[ToStatement[UUIDCustom]])
+            ParameterValue(unsaved.backgroundJobId, null, implicitly[ToStatement[BackgroundJobId]])
           ),
           "::uuid"
         )
@@ -184,16 +184,17 @@ object BackgroundJobsRepoImpl extends BackgroundJobsRepo {
        """.as(BackgroundJobsRow.rowParser(1).*)
   }
   override def selectById(
-      backgroundJobId: /* user-picked */ UUIDCustom
+      backgroundJobId: /* user-picked */ BackgroundJobId
   )(implicit c: Connection): Option[BackgroundJobsRow] = {
     SQL"""select "background_job_id", "type", "payload", "status", "status_details", "error_count", "execute_at"::text, "created_at"::text, "updated_at"::text
           from public.background_jobs
-          where "background_job_id" = ${ParameterValue(backgroundJobId, null, implicitly[ToStatement[UUIDCustom]])}
+          where "background_job_id" = ${ParameterValue(backgroundJobId, null, implicitly[ToStatement[BackgroundJobId]])}
        """.as(BackgroundJobsRow.rowParser(1).singleOpt)
   }
-  override def selectByIds(
-      backgroundJobIds: Array[ /* user-picked */ UUIDCustom]
-  )(implicit c: Connection, toStatement: ToStatement[Array[ /* user-picked */ UUIDCustom]]): List[BackgroundJobsRow] = {
+  override def selectByIds(backgroundJobIds: Array[ /* user-picked */ BackgroundJobId])(implicit
+      c: Connection,
+      toStatement: ToStatement[Array[ /* user-picked */ BackgroundJobId]]
+  ): List[BackgroundJobsRow] = {
     SQL"""select "background_job_id", "type", "payload", "status", "status_details", "error_count", "execute_at"::text, "created_at"::text, "updated_at"::text
           from public.background_jobs
           where "background_job_id" = ANY(${backgroundJobIds})
@@ -227,7 +228,7 @@ object BackgroundJobsRepoImpl extends BackgroundJobsRepo {
         implicitly[ToStatement[InstantCustom]]
       )}::timestamptz,
               "updated_at" = ${ParameterValue(row.updatedAt, null, implicitly[ToStatement[InstantCustom]])}::timestamptz
-          where "background_job_id" = ${ParameterValue(backgroundJobId, null, implicitly[ToStatement[UUIDCustom]])}
+          where "background_job_id" = ${ParameterValue(backgroundJobId, null, implicitly[ToStatement[BackgroundJobId]])}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[BackgroundJobsFields, BackgroundJobsRow] = {
@@ -236,7 +237,7 @@ object BackgroundJobsRepoImpl extends BackgroundJobsRepo {
   override def upsert(unsaved: BackgroundJobsRow)(implicit c: Connection): BackgroundJobsRow = {
     SQL"""insert into public.background_jobs("background_job_id", "type", "payload", "status", "status_details", "error_count", "execute_at", "created_at", "updated_at")
           values (
-            ${ParameterValue(unsaved.backgroundJobId, null, implicitly[ToStatement[UUIDCustom]])}::uuid,
+            ${ParameterValue(unsaved.backgroundJobId, null, implicitly[ToStatement[BackgroundJobId]])}::uuid,
             ${ParameterValue(unsaved.`type`, null, implicitly[ToStatement[BackgroundJobType]])},
             ${ParameterValue(unsaved.payload, null, TypoJsonb.toStatement)}::jsonb,
             ${ParameterValue(unsaved.status, null, implicitly[ToStatement[BackgroundJobStatus]])},

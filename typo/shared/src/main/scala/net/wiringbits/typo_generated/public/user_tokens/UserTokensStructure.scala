@@ -9,9 +9,9 @@ package public
 package user_tokens
 
 import net.wiringbits.common.models.InstantCustom
-import net.wiringbits.common.models.UUIDCustom
 import net.wiringbits.common.models.enums.UserTokenType
 import net.wiringbits.common.models.id.UserId
+import net.wiringbits.common.models.id.UserTokenId
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
@@ -25,7 +25,7 @@ class UserTokensStructure[Row](
     with UserTokensFields[Row] { outer =>
 
   override val userTokenId =
-    new IdField[ /* user-picked */ UUIDCustom, Row](prefix, "user_token_id", None, Some("uuid"))(
+    new IdField[ /* user-picked */ UserTokenId, Row](prefix, "user_token_id", None, Some("uuid"))(
       x => extract(x).userTokenId,
       (row, value) => merge(row, extract(row).copy(userTokenId = value))
     )
