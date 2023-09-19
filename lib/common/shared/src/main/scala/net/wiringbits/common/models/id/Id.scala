@@ -8,6 +8,8 @@ import scala.util.{Failure, Success, Try}
 
 private[id] trait Id {
   def value: UUID
+
+  override def toString: String = value.toString
 }
 
 private[id] object Id {
