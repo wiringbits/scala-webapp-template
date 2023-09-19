@@ -2,7 +2,7 @@ package net.wiringbits.api.endpoints
 
 import net.wiringbits.api.models.*
 import net.wiringbits.common.models.*
-import net.wiringbits.common.models.id.UserId
+import net.wiringbits.common.models.id.{UserId, UserLogId, UserTokenId}
 import sttp.tapir.*
 import sttp.tapir.json.play.*
 import sttp.tapir.model.ServerRequest
@@ -33,7 +33,7 @@ object UsersEndpoints {
         .description("The account was created")
         .example(
           CreateUser.Response(
-            id = UUID.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6"),
+            userId = UserId.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6"),
             name = Name.trusted("Alexis"),
             email = Email.trusted("alexis@wiringbits.net")
           )
@@ -49,8 +49,8 @@ object UsersEndpoints {
       jsonBody[VerifyEmail.Request].example(
         VerifyEmail.Request(
           UserToken(
-            userId = UUID.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6"),
-            token = UUID.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6")
+            userId = UserId.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6"),
+            userTokenId = UserTokenId.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6")
           )
         )
       )
@@ -89,8 +89,8 @@ object UsersEndpoints {
           .example(
             ResetPassword.Request(
               token = UserToken(
-                userId = UUID.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6"),
-                token = UUID.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6")
+                userId = UserId.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6"),
+                userTokenId = UserTokenId.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6")
               ),
               password = Password.trusted("notSoWeakPassword")
             )
@@ -126,7 +126,7 @@ object UsersEndpoints {
           .description("The account's email was verified")
           .example(
             SendEmailVerificationToken.Response(
-              expiresAt = Instant.parse("2021-01-01T00:00:00Z")
+              expiresAt = InstantCustom.parse("2021-01-01T00:00:00Z")
             )
           )
       )
@@ -185,9 +185,9 @@ object UsersEndpoints {
           GetUserLogs.Response(
             List(
               GetUserLogs.Response.UserLog(
-                id = UUID.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6"),
+                userLogId = UserLogId.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6"),
                 message = "Message",
-                createdAt = Instant.parse("2021-01-01T00:00:00Z")
+                createdAt = InstantCustom.parse("2021-01-01T00:00:00Z")
               )
             )
           )

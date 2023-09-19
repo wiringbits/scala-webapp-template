@@ -29,6 +29,8 @@ object InstantCustom {
 
   def fromClock(implicit clock: Clock): InstantCustom = InstantCustom(clock.instant())
 
+  def parse(str: String): InstantCustom = InstantCustom(Instant.parse(str))
+
   private val timestamptzParser: DateTimeFormatter = new DateTimeFormatterBuilder()
     .appendPattern("yyyy-MM-dd HH:mm:ss")
     .appendFraction(ChronoField.MICRO_OF_SECOND, 0, 6, true)

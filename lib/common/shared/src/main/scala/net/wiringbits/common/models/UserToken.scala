@@ -1,21 +1,20 @@
 package net.wiringbits.common.models
 
+import net.wiringbits.common.models.id.{UserId, UserTokenId}
 import play.api.libs.json.{Format, Json}
 
-import java.util.UUID
 import scala.util.Try
 
-case class UserToken(userId: UUID, token: UUID)
+case class UserToken(userId: UserId, userTokenId: UserTokenId)
 
 object UserToken {
   def validate(tokenStr: String): Option[UserToken] = {
     val splittedToken = tokenStr.split("_")
-    val isValid = splittedToken.length == 2
 
-    // TODO: Improve this impl
-    Try(
-      Option.when(isValid)(UserToken(UUID.fromString(splittedToken(0)), UUID.fromString(splittedToken(1))))
-    ).toOption.flatten
+    splittedToken match
+      case Array(userIdStr, userTokenIdStr) =>
+        Try(UserToken(UserId.fromString(userIdStr), UserTokenId.fromString(userTokenIdStr))).toOption
+      case _ => None
   }
 
   implicit val userTokenFormat: Format[UserToken] = Json.format[UserToken]

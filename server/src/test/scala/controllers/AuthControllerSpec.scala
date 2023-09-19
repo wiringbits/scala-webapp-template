@@ -6,6 +6,7 @@ import net.wiringbits.api.models.{CreateUser, Login, VerifyEmail}
 import net.wiringbits.apis.models.EmailRequest
 import net.wiringbits.apis.{EmailApi, ReCaptchaApi}
 import net.wiringbits.common.models.*
+import net.wiringbits.common.models.id.UserTokenId
 import net.wiringbits.config.UserTokensConfig
 import net.wiringbits.repositories.UserTokensRepository
 import net.wiringbits.util.TokenGenerator
@@ -57,12 +58,12 @@ class AuthControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoSu
         password = Password.trusted("test123..."),
         captcha = Captcha.trusted("test")
       )
-      val verificationToken = UUID.randomUUID()
+      val verificationToken = UserTokenId.randomUUID
       when(tokenGenerator.next()).thenReturn(verificationToken)
 
       val user = client.createUser(request).futureValue
 
-      client.verifyEmail(VerifyEmail.Request(UserToken(user.id, verificationToken))).futureValue
+      client.verifyEmail(VerifyEmail.Request(UserToken(user.userId, verificationToken))).futureValue
 
       val loginRequest = Login.Request(
         email = user.email,
@@ -105,14 +106,14 @@ class AuthControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoSu
       )
       val user = client.createUser(request).futureValue
 
-      val verificationToken = UUID.randomUUID()
+      val verificationToken = UserTokenId.randomUUID
       when(tokenGenerator.next()).thenReturn(verificationToken)
 
       val error = client
-        .verifyEmail(VerifyEmail.Request(UserToken(user.id, verificationToken)))
+        .verifyEmail(VerifyEmail.Request(UserToken(user.userId, verificationToken)))
         .expectError
 
-      error must be(s"Token for user ${user.id} wasn't found")
+      error must be(s"Token for user ${user.userId} wasn't found")
     }
 
     "fail when the user tries to verify with an expired token" in withApiClient { client =>
@@ -123,7 +124,7 @@ class AuthControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoSu
         password = Password.trusted("test123..."),
         captcha = Captcha.trusted("test")
       )
-      val verificationToken = UUID.randomUUID()
+      val verificationToken = UserTokenId.randomUUID
       when(tokenGenerator.next()).thenReturn(verificationToken)
 
       val user = client.createUser(request).futureValue
@@ -135,7 +136,7 @@ class AuthControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoSu
       })
 
       val error = client
-        .verifyEmail(VerifyEmail.Request(UserToken(user.id, verificationToken)))
+        .verifyEmail(VerifyEmail.Request(UserToken(user.userId, verificationToken)))
         .expectError
 
       error must be("Token is expired")
@@ -150,12 +151,12 @@ class AuthControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoSu
         password = password,
         captcha = Captcha.trusted("test")
       )
-      val verificationToken = UUID.randomUUID()
+      val verificationToken = UserTokenId.randomUUID
       when(tokenGenerator.next()).thenReturn(verificationToken)
 
       val user = client.createUser(request).futureValue
 
-      client.verifyEmail(VerifyEmail.Request(UserToken(user.id, verificationToken))).futureValue
+      client.verifyEmail(VerifyEmail.Request(UserToken(user.userId, verificationToken))).futureValue
 
       val response =
         client.login(Login.Request(email = email, password = password, captcha = Captcha.trusted("test"))).futureValue
@@ -169,12 +170,12 @@ class AuthControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoSu
         password = Password.trusted("test123..."),
         captcha = Captcha.trusted("test")
       )
-      val verificationToken = UUID.randomUUID()
+      val verificationToken = UserTokenId.randomUUID
       when(tokenGenerator.next()).thenReturn(verificationToken)
 
       val user = client.createUser(request).futureValue
 
-      client.verifyEmail(VerifyEmail.Request(UserToken(user.id, verificationToken))).futureValue
+      client.verifyEmail(VerifyEmail.Request(UserToken(user.userId, verificationToken))).futureValue
 
       val loginRequest = Login.Request(
         email = user.email,
@@ -247,11 +248,11 @@ class AuthControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoSu
         password = Password.trusted("test123..."),
         captcha = Captcha.trusted("test")
       )
-      val verificationToken = UUID.randomUUID()
+      val verificationToken = UserTokenId.randomUUID
       when(tokenGenerator.next()).thenReturn(verificationToken)
       val user = client.createUser(request).futureValue
 
-      client.verifyEmail(VerifyEmail.Request(UserToken(user.id, verificationToken))).futureValue
+      client.verifyEmail(VerifyEmail.Request(UserToken(user.userId, verificationToken))).futureValue
 
       val loginRequest = Login.Request(
         email = Email.trusted("test1@email.com"),
@@ -261,7 +262,7 @@ class AuthControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoSu
       client.login(loginRequest).futureValue
 
       val currentUser = client.currentUser.futureValue
-      currentUser.id must be(user.id)
+      currentUser.userId must be(user.userId)
       currentUser.name must be(user.name)
       currentUser.email must be(user.email)
     }

@@ -19,7 +19,7 @@ package object controllers {
       requestFactory: DefaultRequestFactory,
       cookieHeaderEncoding: CookieHeaderEncoding
   )(implicit ec: ExecutionContext) {
-    def setSession(userId: UUID): Future[String] = Future {
+    def setSession(userId: UserId): Future[String] = Future {
       val session = Session(Map("id" -> userId.toString))
       val playCookie = requestFactory.sessionBaker.encodeAsCookie(session)
       cookieHeaderEncoding.encodeSetCookieHeader(List(playCookie))

@@ -12,7 +12,6 @@ import net.wiringbits.typo_generated.public.users.UsersRow
 
 import java.time.temporal.ChronoUnit
 import java.time.{Clock, Instant, ZoneOffset}
-import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -23,7 +22,7 @@ class EmailsHelper @Inject() (
     tokenGenerator: TokenGenerator,
     userTokensConfig: UserTokensConfig
 )(implicit ec: ExecutionContext, clock: Clock) {
-  def sendEmailVerificationToken(user: UsersRow): Future[Instant] = {
+  def sendEmailVerificationToken(user: UsersRow): Future[InstantCustom] = {
     // we can't retrieve the plain text token, hence, we generate another one
     val token = tokenGenerator.next()
     val hmacToken = TokensHelper.doHMACSHA1(token.toString.getBytes(), userTokensConfig.hmacSecret)
@@ -40,12 +39,12 @@ class EmailsHelper @Inject() (
     for {
       _ <- userTokensRepository.create(createToken)
       _ <- sendRegistrationEmailWithVerificationToken(user, token)
-    } yield createToken.expiresAt.value
+    } yield createToken.expiresAt
   }
 
   // we don't save emails in the queue when user tokens are involved
-  def sendRegistrationEmailWithVerificationToken(user: UsersRow, token: UUID): Future[Unit] = {
-    val emailParameter = s"${user.userId}_$token"
+  def sendRegistrationEmailWithVerificationToken(user: UsersRow, userTokenId: UserTokenId): Future[Unit] = {
+    val emailParameter = s"${user.userId}_$userTokenId"
     val emailMessage = EmailMessage.registration(
       name = user.name,
       url = webAppConfig.host,

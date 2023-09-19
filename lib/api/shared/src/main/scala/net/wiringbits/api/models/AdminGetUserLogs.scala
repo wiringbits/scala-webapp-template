@@ -1,5 +1,7 @@
 package net.wiringbits.api.models
 
+import net.wiringbits.common.models.InstantCustom
+import net.wiringbits.common.models.id.UserLogId
 import play.api.libs.json.{Format, Json}
 import sttp.tapir.Schema
 import sttp.tapir.generic.auto.*
@@ -16,7 +18,7 @@ object AdminGetUserLogs {
     .description("Includes the logs for a single user")
 
   object Response {
-    case class UserLog(id: UUID, message: String, createdAt: Instant)
+    case class UserLog(userLogId: UserLogId, message: String, createdAt: InstantCustom)
     implicit val adminGetUserLogsResponseUserLogFormat: Format[UserLog] = Json.format[UserLog]
     implicit val adminGetUserLogsResponseUserLogSchema: Schema[UserLog] = Schema
       .derived[UserLog]

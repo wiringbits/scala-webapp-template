@@ -52,7 +52,7 @@ class CreateUserAction @Inject() (
         token
       )
     } yield CreateUser.Response(
-      id = createUsersRow.userId.value,
+      userId = createUsersRow.userId,
       email = request.email,
       name = request.name
     )

@@ -5,7 +5,6 @@ import net.wiringbits.common.models.id.UserId
 import net.wiringbits.common.models.{Email, Name}
 import net.wiringbits.repositories.{UserLogsRepository, UsersRepository}
 
-import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -18,8 +17,8 @@ class AdminService @Inject() (userLogsRepository: UserLogsRepository, usersRepos
       logs <- userLogsRepository.logs(userId)
       items = logs.map { x =>
         AdminGetUserLogs.Response.UserLog(
-          id = x.userLogId.value,
-          createdAt = x.createdAt.value,
+          userLogId = x.userLogId,
+          createdAt = x.createdAt,
           message = x.message
         )
       }
@@ -31,10 +30,10 @@ class AdminService @Inject() (userLogsRepository: UserLogsRepository, usersRepos
       users <- usersRepository.all()
       items = users.map { x =>
         AdminGetUsers.Response.User(
-          id = x.userId.value,
+          userId = x.userId,
           name = x.name,
           email = x.email,
-          createdAt = x.createdAt.value
+          createdAt = x.createdAt
         )
       }
     } yield AdminGetUsers.Response(items)

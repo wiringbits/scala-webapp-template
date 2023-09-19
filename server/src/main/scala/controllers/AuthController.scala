@@ -24,7 +24,7 @@ class AuthController @Inject() (
       logger.info(s"Login API: ${body.email}")
       for {
         response <- loginAction(body)
-        cookieEncoded <- playTapirBridge.setSession(response.id)
+        cookieEncoded <- playTapirBridge.setSession(response.userId)
       } yield Right(response, cookieEncoded)
     }
 

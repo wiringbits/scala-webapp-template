@@ -16,10 +16,10 @@ class GetUserAction @Inject() (
     for {
       user <- unsafeUser(userId)
     } yield GetCurrentUser.Response(
-      id = user.userId.value,
+      userId = user.userId,
       email = user.email,
       name = user.name,
-      createdAt = user.createdAt.value
+      createdAt = user.createdAt
     )
   }
 

@@ -2,6 +2,7 @@ package utils
 
 import net.wiringbits.api.ApiClient
 import net.wiringbits.api.models.{CreateUser, Login, VerifyEmail}
+import net.wiringbits.common.models.id.UserTokenId
 import net.wiringbits.common.models.{Captcha, Password, UserToken}
 import net.wiringbits.util.TokenGenerator
 import org.mockito.Mockito.*
@@ -17,13 +18,13 @@ trait LoginUtils {
       tokenGenerator: TokenGenerator
   )(implicit ec: ExecutionContext): Future[Login.Response] = {
 
-    val verificationToken = UUID.randomUUID()
+    val verificationToken = UserTokenId.randomUUID
 
     when(tokenGenerator.next()).thenReturn(verificationToken)
 
     for {
       user <- client.createUser(request)
-      _ <- client.verifyEmail(VerifyEmail.Request(UserToken(user.id, verificationToken)))
+      _ <- client.verifyEmail(VerifyEmail.Request(UserToken(user.userId, verificationToken)))
 
       loginRequest = Login.Request(
         email = user.email,

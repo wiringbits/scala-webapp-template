@@ -1,8 +1,9 @@
 package net.wiringbits.api.models
 
-import net.wiringbits.common.models.{Captcha, Email}
+import net.wiringbits.common.models.{Captcha, Email, InstantCustom}
 import play.api.libs.json.{Format, Json}
 import sttp.tapir.Schema
+import sttp.tapir.generic.auto.*
 
 import java.time.Instant
 
@@ -10,7 +11,7 @@ object SendEmailVerificationToken {
 
   case class Request(email: Email, captcha: Captcha)
 
-  case class Response(expiresAt: Instant)
+  case class Response(expiresAt: InstantCustom)
 
   implicit val sendEmailVerificationTokenRequestFormat: Format[Request] = Json.format[Request]
   implicit val sendEmailVerificationTokenResponseFormat: Format[Response] = Json.format[Response]

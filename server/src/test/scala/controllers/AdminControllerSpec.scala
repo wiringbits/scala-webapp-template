@@ -77,7 +77,7 @@ class AdminControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoS
         captcha = Captcha.trusted("test")
       )
       val user = createVerifyLoginUser(request, client, tokenGenerator).futureValue
-      val response = client.adminGetUserLogs(user.id).futureValue
+      val response = client.adminGetUserLogs(user.userId.value).futureValue
       response.data.isEmpty must be(false)
     }
 

@@ -1,5 +1,7 @@
 package net.wiringbits.api.models
 
+import net.wiringbits.common.models.InstantCustom
+import net.wiringbits.common.models.id.UserLogId
 import play.api.libs.json.{Format, Json}
 import sttp.tapir.Schema
 import sttp.tapir.generic.auto.*
@@ -11,7 +13,7 @@ object GetUserLogs {
   case class Response(data: List[Response.UserLog])
 
   object Response {
-    case class UserLog(id: UUID, message: String, createdAt: Instant)
+    case class UserLog(userLogId: UserLogId, message: String, createdAt: InstantCustom)
     implicit val getUserLogsResponseFormat: Format[UserLog] = Json.format[UserLog]
     implicit val getUserLogsResponseSchema: Schema[UserLog] =
       Schema.derived[UserLog].name(Schema.SName("GetUserLogsResponseUserLog"))

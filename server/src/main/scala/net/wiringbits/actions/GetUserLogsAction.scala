@@ -4,7 +4,6 @@ import net.wiringbits.api.models.GetUserLogs
 import net.wiringbits.common.models.id.UserId
 import net.wiringbits.repositories.UserLogsRepository
 
-import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -17,9 +16,9 @@ class GetUserLogsAction @Inject() (
       logs <- userLogsRepository.logs(userId)
       items = logs.map { x =>
         GetUserLogs.Response.UserLog(
-          id = x.userLogId.value,
+          userLogId = x.userLogId,
           message = x.message,
-          createdAt = x.createdAt.value
+          createdAt = x.createdAt
         )
       }
     } yield GetUserLogs.Response(items)

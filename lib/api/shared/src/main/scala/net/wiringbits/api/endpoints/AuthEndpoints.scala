@@ -3,7 +3,7 @@ package net.wiringbits.api.endpoints
 import net.wiringbits.api.models
 import net.wiringbits.api.models.{ErrorResponse, GetCurrentUser, Login, Logout}
 import net.wiringbits.common.models.id.UserId
-import net.wiringbits.common.models.{Captcha, Email, Name, Password}
+import net.wiringbits.common.models.{Captcha, Email, InstantCustom, Name, Password}
 import sttp.tapir.*
 import sttp.tapir.json.play.*
 import sttp.tapir.model.ServerRequest
@@ -35,7 +35,7 @@ object AuthEndpoints {
           .description("Successful login")
           .example(
             Login.Response(
-              id = UUID.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6"),
+              userId = UserId.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6"),
               name = Name.trusted("Alexis"),
               email = Email.trusted("alexis@wiringbits.net")
             )
@@ -69,10 +69,10 @@ object AuthEndpoints {
           .description("Got user details")
           .example(
             GetCurrentUser.Response(
-              id = UUID.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6"),
+              userId = UserId.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6"),
               name = Name.trusted("Alexis"),
               email = Email.trusted("alexis@wiringbits.net"),
-              createdAt = Instant.parse("2021-01-01T00:00:00Z")
+              createdAt = InstantCustom.parse("2021-01-01T00:00:00Z")
             )
           )
       )
