@@ -19,7 +19,7 @@ class GetUserAction @Inject() (
       userId = user.userId,
       email = user.email,
       name = user.name,
-      createdAt = user.createdAt
+      createdAt = user.createdAt.value
     )
   }
 

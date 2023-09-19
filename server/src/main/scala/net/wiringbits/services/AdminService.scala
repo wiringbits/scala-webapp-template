@@ -33,7 +33,7 @@ class AdminService @Inject() (userLogsRepository: UserLogsRepository, usersRepos
           userId = x.userId,
           name = x.name,
           email = x.email,
-          createdAt = x.createdAt
+          createdAt = x.createdAt.value
         )
       }
     } yield AdminGetUsers.Response(items)

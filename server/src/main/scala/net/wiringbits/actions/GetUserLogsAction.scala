@@ -18,7 +18,7 @@ class GetUserLogsAction @Inject() (
         GetUserLogs.Response.UserLog(
           userLogId = x.userLogId,
           message = x.message,
-          createdAt = x.createdAt
+          createdAt = x.createdAt.value
         )
       }
     } yield GetUserLogs.Response(items)
