@@ -1,6 +1,7 @@
 package net.wiringbits.actions
 
 import net.wiringbits.api.models.UpdateUser
+import net.wiringbits.common.models.id.UserId
 import net.wiringbits.repositories.UsersRepository
 
 import java.util.UUID
@@ -11,7 +12,7 @@ class UpdateUserAction @Inject() (
     usersRepository: UsersRepository
 )(implicit ec: ExecutionContext) {
 
-  def apply(userId: UUID, request: UpdateUser.Request): Future[Unit] = {
+  def apply(userId: UserId, request: UpdateUser.Request): Future[Unit] = {
     val validate = Future {
       if (request.name.string.isEmpty) new RuntimeException(s"The name is required")
       else ()

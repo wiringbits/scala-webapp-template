@@ -1,8 +1,8 @@
 package net.wiringbits.repositories
 
+import net.wiringbits.common.models.id.{UserId, UserTokenId}
 import net.wiringbits.executors.DatabaseExecutionContext
-import net.wiringbits.repositories.daos.UserTokensDAO
-import net.wiringbits.repositories.models.UserToken
+import net.wiringbits.typo_generated.public.user_tokens.{UserTokensRepoImpl, UserTokensRow}
 import play.api.db.Database
 
 import java.util.UUID
@@ -15,27 +15,32 @@ class UserTokensRepository @Inject() (
     ec: DatabaseExecutionContext
 ) {
 
-  def create(request: UserToken.Create): Future[Unit] = Future {
+  def create(userTokensRow: UserTokensRow): Future[Unit] = Future {
     database.withConnection { implicit conn =>
-      UserTokensDAO.create(request)
+      UserTokensRepoImpl.insert(userTokensRow)
     }
   }
 
-  def find(userId: UUID, token: String): Future[Option[UserToken]] = Future {
+  def find(userId: UserId, token: String): Future[Option[UserTokensRow]] = Future {
     database.withConnection { implicit conn =>
-      UserTokensDAO.find(userId, token)
+      UserTokensRepoImpl.select
+        .where(_.userId === userId)
+        .where(_.token === token)
+        .orderBy(_.createdAt.desc)
+        .toList
+        .headOption
     }
   }
 
-  def find(userId: UUID): Future[List[UserToken]] = Future {
+  def find(userId: UserId): Future[List[UserTokensRow]] = Future {
     database.withConnection { implicit conn =>
-      UserTokensDAO.find(userId)
+      UserTokensRepoImpl.select.where(_.userId === userId).orderBy(_.createdAt.desc).toList
     }
   }
 
-  def delete(tokenId: UUID, userId: UUID): Future[Unit] = Future {
+  def delete(userTokenId: UserTokenId, userId: UserId): Future[Unit] = Future {
     database.withConnection { implicit conn =>
-      UserTokensDAO.delete(tokenId, userId: UUID)
+      UserTokensRepoImpl.delete.where(_.userTokenId === userTokenId).where(_.userId === userId).execute()
     }
   }
 }

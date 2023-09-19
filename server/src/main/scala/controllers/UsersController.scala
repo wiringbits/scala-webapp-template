@@ -3,12 +3,12 @@ package controllers
 import net.wiringbits.actions.*
 import net.wiringbits.api.endpoints.UsersEndpoints
 import net.wiringbits.api.models.*
+import net.wiringbits.common.models.id.{UserId, UserTokenId}
 import org.slf4j.LoggerFactory
 import sttp.capabilities.WebSockets
 import sttp.capabilities.akka.AkkaStreams
 import sttp.tapir.server.ServerEndpoint
 
-import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -35,7 +35,7 @@ class UsersController @Inject() (
     val token = request.token
     logger.info(s"Verify user's email: ${token.userId}")
     for {
-      response <- verifyUserEmailAction(token.userId, token.token)
+      response <- verifyUserEmailAction(UserId.parse(token.userId), UserTokenId.parse(token.token))
     } yield Right(response)
   }
 
@@ -51,7 +51,11 @@ class UsersController @Inject() (
     handleRequest {
       logger.info(s"Reset user's password: ${request.token.userId}")
       for {
-        response <- resetPasswordAction(request.token.userId, request.token.token, request.password)
+        response <- resetPasswordAction(
+          UserId.parse(request.token.userId),
+          UserTokenId.parse(request.token.token),
+          request.password
+        )
       } yield Right(response)
     }
 
@@ -67,7 +71,7 @@ class UsersController @Inject() (
 
   private def update(
       request: UpdateUser.Request,
-      userIdF: Future[UUID]
+      userIdF: Future[UserId]
   ): Future[Either[ErrorResponse, UpdateUser.Response]] = handleRequest {
     logger.info(s"Update user: $request")
     for {
@@ -79,7 +83,7 @@ class UsersController @Inject() (
 
   private def updatePassword(
       request: UpdatePassword.Request,
-      userIdF: Future[UUID]
+      userIdF: Future[UserId]
   ): Future[Either[ErrorResponse, UpdatePassword.Response]] = handleRequest {
     for {
       userId <- userIdF
@@ -89,7 +93,7 @@ class UsersController @Inject() (
     } yield Right(response)
   }
 
-  private def getLogs(userIdF: Future[UUID]): Future[Either[ErrorResponse, GetUserLogs.Response]] =
+  private def getLogs(userIdF: Future[UserId]): Future[Either[ErrorResponse, GetUserLogs.Response]] =
     handleRequest {
       for {
         userId <- userIdF

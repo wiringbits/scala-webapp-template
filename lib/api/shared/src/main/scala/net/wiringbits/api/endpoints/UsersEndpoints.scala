@@ -2,6 +2,7 @@ package net.wiringbits.api.endpoints
 
 import net.wiringbits.api.models.*
 import net.wiringbits.common.models.*
+import net.wiringbits.common.models.id.UserId
 import sttp.tapir.*
 import sttp.tapir.json.play.*
 import sttp.tapir.model.ServerRequest
@@ -136,8 +137,8 @@ object UsersEndpoints {
       )
 
   def update(implicit
-      authHandler: ServerRequest => Future[UUID]
-  ): Endpoint[Unit, (UpdateUser.Request, Future[UUID]), ErrorResponse, UpdateUser.Response, Any] =
+      authHandler: ServerRequest => Future[UserId]
+  ): Endpoint[Unit, (UpdateUser.Request, Future[UserId]), ErrorResponse, UpdateUser.Response, Any] =
     baseEndpoint.put
       .in("me")
       .in(
@@ -153,8 +154,8 @@ object UsersEndpoints {
       .summary("Updates the authenticated user details")
 
   def updatePassword(implicit
-      authHandler: ServerRequest => Future[UUID]
-  ): Endpoint[Unit, (UpdatePassword.Request, Future[UUID]), ErrorResponse, UpdatePassword.Response, Any] =
+      authHandler: ServerRequest => Future[UserId]
+  ): Endpoint[Unit, (UpdatePassword.Request, Future[UserId]), ErrorResponse, UpdatePassword.Response, Any] =
     baseEndpoint.put
       .in("me" / "password")
       .in(
@@ -173,8 +174,8 @@ object UsersEndpoints {
       .summary("Updates the authenticated user password")
 
   def getLogs(implicit
-      authHandler: ServerRequest => Future[UUID]
-  ): Endpoint[Unit, Future[UUID], ErrorResponse, GetUserLogs.Response, Any] = baseEndpoint.get
+      authHandler: ServerRequest => Future[UserId]
+  ): Endpoint[Unit, Future[UserId], ErrorResponse, GetUserLogs.Response, Any] = baseEndpoint.get
     .in("me" / "logs")
     .in(userAuth)
     .out(
@@ -195,7 +196,7 @@ object UsersEndpoints {
     .errorOut(oneOf(HttpErrors.badRequest))
     .summary("Get the logs for the authenticated user")
 
-  def routes(implicit authHandler: ServerRequest => Future[UUID]): List[AnyEndpoint] = List(
+  def routes(implicit authHandler: ServerRequest => Future[UserId]): List[AnyEndpoint] = List(
     create,
     verifyEmail,
     forgotPassword,

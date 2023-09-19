@@ -1,52 +1,50 @@
 package net.wiringbits.repositories
 
-import net.wiringbits.common.models.{Email, Name}
-import net.wiringbits.core.RepositorySpec
-import net.wiringbits.repositories.models.{User, UserToken, UserTokenType}
+import net.wiringbits.common.models.InstantCustom
+import net.wiringbits.common.models.enums.UserTokenType
+import net.wiringbits.common.models.id.{UserId, UserTokenId}
+import net.wiringbits.core.{RepositoryComponents, RepositorySpec}
+import net.wiringbits.typo_generated.public.user_tokens.UserTokensRow
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.concurrent.ScalaFutures.*
 import org.scalatest.matchers.must.Matchers.*
+import utils.RepositoryUtils
 
-import java.time.Instant
 import java.time.temporal.ChronoUnit
-import java.util.UUID
+import scala.concurrent.Future
 
-class UserTokensRepositorySpec extends RepositorySpec {
+class UserTokensRepositorySpec extends RepositorySpec with RepositoryUtils {
+  private def createTokenRequest(
+      userId: UserId,
+      token: String = "test",
+      userTokenType: UserTokenType = UserTokenType.ResetPassword
+  )(using
+      repositories: RepositoryComponents
+  ): Future[UserTokensRow] = {
+    val userTokensRow = UserTokensRow(
+      userTokenId = UserTokenId.randomUUID,
+      token = token,
+      tokenType = userTokenType,
+      createdAt = InstantCustom.now(),
+      expiresAt = InstantCustom.now().plus(2L, ChronoUnit.DAYS),
+      userId = userId
+    )
+
+    for {
+      _ <- repositories.userTokens.create(userTokensRow)
+    } yield userTokensRow
+  }
+
   "create" should {
-    "work" in withRepositories() { repositories =>
-      val request = User.CreateUser(
-        id = UUID.randomUUID(),
-        email = Email.trusted("hello@wiringbits.net"),
-        name = Name.trusted("Sample"),
-        hashedPassword = "password",
-        verifyEmailToken = "token"
-      )
-      repositories.users.create(request).futureValue
+    "work" in withRepositories() { implicit repositories =>
+      val request = createNonVerifyUser().futureValue
 
-      val tokenRequest =
-        UserToken.Create(
-          id = UUID.randomUUID(),
-          token = "test",
-          tokenType = UserTokenType.ResetPassword,
-          createdAt = Instant.now(),
-          expiresAt = Instant.now.plus(2, ChronoUnit.DAYS),
-          userId = request.id
-        )
-      repositories.userTokens.create(tokenRequest).futureValue
+      createTokenRequest(request.userId).futureValue
     }
 
-    "fail when the user doesn't exists" in withRepositories() { repositories =>
-      val tokenRequest =
-        UserToken.Create(
-          id = UUID.randomUUID(),
-          token = "test",
-          tokenType = UserTokenType.ResetPassword,
-          createdAt = Instant.now(),
-          expiresAt = Instant.now.plus(2, ChronoUnit.DAYS),
-          userId = UUID.randomUUID()
-        )
+    "fail when the user doesn't exists" in withRepositories() { implicit repositories =>
       val ex = intercept[RuntimeException] {
-        repositories.userTokens.create(tokenRequest).futureValue
+        createTokenRequest(UserId.randomUUID).futureValue
       }
       ex.getCause.getMessage must startWith(
         s"""ERROR: insert or update on table "user_tokens" violates foreign key constraint "user_tokens_user_id_fk""""
@@ -55,89 +53,49 @@ class UserTokensRepositorySpec extends RepositorySpec {
   }
 
   "find(userId)" should {
-    "return the user token" in withRepositories() { repositories =>
-      val request = User.CreateUser(
-        id = UUID.randomUUID(),
-        email = Email.trusted("hello@wiringbits.net"),
-        name = Name.trusted("Sample"),
-        hashedPassword = "password",
-        verifyEmailToken = "token"
-      )
-      repositories.users.create(request).futureValue
+    "return the user token" in withRepositories() { implicit repositories =>
+      val request = createNonVerifyUser().futureValue
 
-      val tokenRequest =
-        UserToken.Create(
-          id = UUID.randomUUID(),
-          token = "test",
-          tokenType = UserTokenType.ResetPassword,
-          createdAt = Instant.now(),
-          expiresAt = Instant.now.plus(2, ChronoUnit.DAYS),
-          userId = request.id
-        )
-      repositories.userTokens.create(tokenRequest).futureValue
+      val tokenRequest = createTokenRequest(request.userId).futureValue
 
-      val maybe = repositories.userTokens.find(request.id).futureValue
+      val maybe = repositories.userTokens.find(request.userId).futureValue
       val response = maybe.headOption.value
       response.token must be(tokenRequest.token)
       response.tokenType must be(tokenRequest.tokenType)
-      response.id must be(tokenRequest.id)
+      response.userTokenId must be(tokenRequest.userTokenId)
     }
 
     "return no results when the user doesn't exists" in withRepositories() { repositories =>
-      val response = repositories.userTokens.find(UUID.randomUUID()).futureValue
+      val response = repositories.userTokens.find(UserId.randomUUID).futureValue
       response.isEmpty must be(true)
     }
   }
 
   "find(userId, token)" should {
-    "return the user token" in withRepositories() { repositories =>
-      val request = User.CreateUser(
-        id = UUID.randomUUID(),
-        email = Email.trusted("hello@wiringbits.net"),
-        name = Name.trusted("Sample"),
-        hashedPassword = "password",
-        verifyEmailToken = "token"
-      )
-      repositories.users.create(request).futureValue
+    "return the user token" in withRepositories() { implicit repositories =>
+      val request = createNonVerifyUser().futureValue
+      val tokenRequest = createTokenRequest(request.userId).futureValue
 
-      val tokenRequest =
-        UserToken.Create(
-          id = UUID.randomUUID(),
-          token = "test",
-          tokenType = UserTokenType.ResetPassword,
-          createdAt = Instant.now(),
-          expiresAt = Instant.now.plus(2, ChronoUnit.DAYS),
-          userId = request.id
-        )
-      repositories.userTokens.create(tokenRequest).futureValue
-
-      val response = repositories.userTokens.find(request.id, tokenRequest.token).futureValue
+      val response = repositories.userTokens.find(request.userId, tokenRequest.token).futureValue
       response.isDefined must be(true)
     }
 
     "return no results when the user doesn't exists" in withRepositories() { repositories =>
-      val response = repositories.userTokens.find(UUID.randomUUID(), "test").futureValue
+      val response = repositories.userTokens.find(UserId.randomUUID, "test").futureValue
       response.isEmpty must be(true)
     }
   }
 
   "delete" should {
-    "work" in withRepositories() { repositories =>
-      val request = User.CreateUser(
-        id = UUID.randomUUID(),
-        email = Email.trusted("hello@wiringbits.net"),
-        name = Name.trusted("Sample"),
-        hashedPassword = "password",
-        verifyEmailToken = "token"
-      )
-      repositories.users.create(request).futureValue
+    "work" in withRepositories() { implicit repositories =>
+      val request = createNonVerifyUser().futureValue
 
-      val maybe = repositories.userTokens.find(request.id).futureValue
-      val tokenId = maybe.headOption.value.id
+      val maybe = repositories.userTokens.find(request.userId).futureValue
+      val tokenId = maybe.headOption.value.userTokenId
 
-      repositories.userTokens.delete(tokenId = tokenId, userId = request.id).futureValue
+      repositories.userTokens.delete(userTokenId = tokenId, userId = request.userId).futureValue
 
-      val response = repositories.userTokens.find(request.id).futureValue
+      val response = repositories.userTokens.find(request.userId).futureValue
       response.isEmpty must be(true)
     }
   }

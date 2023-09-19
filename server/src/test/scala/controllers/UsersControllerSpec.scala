@@ -13,9 +13,10 @@ import net.wiringbits.api.models.{
 import net.wiringbits.apis.models.EmailRequest
 import net.wiringbits.apis.{EmailApi, ReCaptchaApi}
 import net.wiringbits.common.models.*
+import net.wiringbits.common.models.enums.UserTokenType
+import net.wiringbits.common.models.id.{UserId, UserTokenId}
 import net.wiringbits.config.UserTokensConfig
 import net.wiringbits.repositories.UserTokensRepository
-import net.wiringbits.repositories.models.UserTokenType
 import net.wiringbits.util.{TokenGenerator, TokensHelper}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
@@ -75,7 +76,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoS
 
       val response = client.createUser(request).futureValue
       val token = userTokensRepository
-        .find(response.id)
+        .find(UserId.parse(response.id))
         .futureValue
         .find(_.tokenType == UserTokenType.EmailVerification)
         .value
@@ -153,7 +154,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoS
 
       client.verifyEmail(VerifyEmail.Request(UserToken(userId = user.id, token = verificationToken))).futureValue
 
-      userTokensRepository.find(user.id).futureValue must be(empty)
+      userTokensRepository.find(UserId.parse(user.id)).futureValue must be(empty)
     }
 
     "fail when trying to verify an already verified user's email" in withApiClient { client =>
@@ -372,12 +373,12 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoS
       val response = client.sendEmailVerificationToken(request).futureValue
 
       val token = userTokensRepository
-        .find(userCreated.id)
+        .find(UserId.parse(userCreated.id))
         .futureValue
         .find(_.tokenType == UserTokenType.EmailVerification)
         .value
 
-      response.expiresAt must be(token.expiresAt)
+      response.expiresAt must be(token.expiresAt.value)
     }
 
     "success on verifying email and login" in withApiClient { client =>

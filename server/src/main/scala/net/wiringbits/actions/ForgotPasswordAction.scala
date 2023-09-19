@@ -3,7 +3,7 @@ package net.wiringbits.actions
 import net.wiringbits.api.models.ForgotPassword
 import net.wiringbits.apis.ReCaptchaApi
 import net.wiringbits.repositories.UsersRepository
-import net.wiringbits.repositories.models.User
+import net.wiringbits.typo_generated.public.users.UsersRow
 import net.wiringbits.util.EmailsHelper
 import net.wiringbits.validations.{ValidateCaptcha, ValidateVerifiedUser}
 
@@ -25,10 +25,10 @@ class ForgotPasswordAction @Inject() (
     } yield ForgotPassword.Response()
   }
 
-  private def whenExists(user: User) = {
+  private def whenExists(usersRow: UsersRow) = {
     for {
-      _ <- Future { ValidateVerifiedUser(user) }
-      _ <- emailsHelper.sendPasswordRecoveryEmail(user)
+      _ <- Future { ValidateVerifiedUser(usersRow) }
+      _ <- emailsHelper.sendPasswordRecoveryEmail(usersRow)
     } yield ()
   }
 }

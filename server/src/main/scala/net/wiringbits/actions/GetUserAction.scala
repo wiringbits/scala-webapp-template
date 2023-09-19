@@ -1,10 +1,10 @@
 package net.wiringbits.actions
 
 import net.wiringbits.api.models.GetCurrentUser
+import net.wiringbits.common.models.id.UserId
 import net.wiringbits.repositories.UsersRepository
-import net.wiringbits.repositories.models.User
+import net.wiringbits.typo_generated.public.users.UsersRow
 
-import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -12,18 +12,18 @@ class GetUserAction @Inject() (
     usersRepository: UsersRepository
 )(implicit ec: ExecutionContext) {
 
-  def apply(userId: UUID): Future[GetCurrentUser.Response] = {
+  def apply(userId: UserId): Future[GetCurrentUser.Response] = {
     for {
       user <- unsafeUser(userId)
     } yield GetCurrentUser.Response(
-      id = user.id,
+      id = user.userId.value,
       email = user.email,
       name = user.name,
-      createdAt = user.createdAt
+      createdAt = user.createdAt.value
     )
   }
 
-  private def unsafeUser(userId: UUID): Future[User] = {
+  private def unsafeUser(userId: UserId): Future[UsersRow] = {
     usersRepository
       .find(userId)
       .map { maybe =>

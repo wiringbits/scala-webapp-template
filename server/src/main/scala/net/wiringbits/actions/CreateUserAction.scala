@@ -2,16 +2,17 @@ package net.wiringbits.actions
 
 import net.wiringbits.api.models.CreateUser
 import net.wiringbits.apis.ReCaptchaApi
+import net.wiringbits.common.models.id.UserId
+import net.wiringbits.common.models.InstantCustom
 import net.wiringbits.config.UserTokensConfig
 import net.wiringbits.repositories
 import net.wiringbits.repositories.UsersRepository
-import net.wiringbits.repositories.models.User
+import net.wiringbits.typo_generated.public.users.UsersRow
 import net.wiringbits.util.{EmailsHelper, TokenGenerator, TokensHelper}
 import net.wiringbits.validations.{ValidateCaptcha, ValidateEmailIsAvailable}
 import org.mindrot.jbcrypt.BCrypt
 
-import java.time.Instant
-import java.util.UUID
+import java.time.Clock
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -22,7 +23,8 @@ class CreateUserAction @Inject() (
     userTokensConfig: UserTokensConfig,
     emailsHelper: EmailsHelper
 )(implicit
-    ec: ExecutionContext
+    ec: ExecutionContext,
+    clock: Clock
 ) {
 
   def apply(request: CreateUser.Request): Future[CreateUser.Response] = {
@@ -33,29 +35,27 @@ class CreateUserAction @Inject() (
       hmacToken = TokensHelper.doHMACSHA1(token.toString.getBytes(), userTokensConfig.hmacSecret)
 
       // create the user
-      createUser = repositories.models.User
-        .CreateUser(
-          id = UUID.randomUUID(),
-          name = request.name,
-          email = request.email,
-          hashedPassword = hashedPassword,
-          verifyEmailToken = hmacToken
-        )
-      _ <- usersRepository.create(createUser)
+      createUsersRow = UsersRow(
+        userId = UserId.randomUUID,
+        name = request.name,
+        lastName = None,
+        email = request.email,
+        password = hashedPassword,
+        createdAt = InstantCustom.fromClock,
+        verifiedOn = None
+      )
+      _ <- usersRepository.create(createUsersRow, hmacToken)
 
       // then, send the verification email
       _ <- emailsHelper.sendRegistrationEmailWithVerificationToken(
-        User(
-          id = createUser.id,
-          name = request.name,
-          email = request.email,
-          hashedPassword = hashedPassword,
-          createdAt = Instant.now,
-          verifiedOn = None
-        ),
+        createUsersRow,
         token
       )
-    } yield CreateUser.Response(id = createUser.id, email = createUser.email, name = createUser.name)
+    } yield CreateUser.Response(
+      id = createUsersRow.userId.value,
+      email = request.email,
+      name = request.name
+    )
   }
 
   private def validations(request: CreateUser.Request) = {

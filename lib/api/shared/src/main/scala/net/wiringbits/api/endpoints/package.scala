@@ -1,6 +1,7 @@
 package net.wiringbits.api
 
 import net.wiringbits.api.models.{ErrorResponse, errorResponseFormat}
+import net.wiringbits.common.models.id.UserId
 import sttp.model.StatusCode
 import sttp.tapir.*
 import sttp.tapir.EndpointInput.AuthType
@@ -8,7 +9,6 @@ import sttp.tapir.generic.auto.*
 import sttp.tapir.json.play.*
 import sttp.tapir.model.ServerRequest
 
-import java.util.UUID
 import scala.concurrent.Future
 
 package object endpoints {
@@ -41,6 +41,8 @@ package object endpoints {
     .example(ErrorResponse("Unauthorized: Invalid or missing authentication"))
     .schema(_.hidden(true))
 
-  def userAuth(implicit handleAuth: ServerRequest => Future[UUID]): EndpointInput.ExtractFromRequest[Future[UUID]] =
+  def userAuth(implicit
+      handleAuth: ServerRequest => Future[UserId]
+  ): EndpointInput.ExtractFromRequest[Future[UserId]] =
     extractFromRequest(handleAuth)
 }

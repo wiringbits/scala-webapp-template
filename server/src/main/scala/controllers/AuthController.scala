@@ -3,12 +3,12 @@ package controllers
 import net.wiringbits.actions.*
 import net.wiringbits.api.endpoints.AuthEndpoints
 import net.wiringbits.api.models.*
+import net.wiringbits.common.models.id.UserId
 import org.slf4j.LoggerFactory
 import sttp.capabilities.WebSockets
 import sttp.capabilities.akka.AkkaStreams
 import sttp.tapir.server.ServerEndpoint
 
-import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -28,7 +28,7 @@ class AuthController @Inject() (
       } yield Right(response, cookieEncoded)
     }
 
-  private def me(userIdF: Future[UUID]): Future[Either[ErrorResponse, GetCurrentUser.Response]] =
+  private def me(userIdF: Future[UserId]): Future[Either[ErrorResponse, GetCurrentUser.Response]] =
     handleRequest {
       for {
         userId <- userIdF
@@ -37,7 +37,7 @@ class AuthController @Inject() (
       } yield Right(response)
     }
 
-  private def logout(userIdF: Future[UUID]): Future[Either[ErrorResponse, (Logout.Response, String)]] =
+  private def logout(userIdF: Future[UserId]): Future[Either[ErrorResponse, (Logout.Response, String)]] =
     handleRequest {
       for {
         _ <- userIdF

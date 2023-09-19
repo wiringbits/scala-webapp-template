@@ -1,6 +1,8 @@
 package net.wiringbits.services
 
 import net.wiringbits.api.models.{AdminGetUserLogs, AdminGetUsers}
+import net.wiringbits.common.models.id.UserId
+import net.wiringbits.common.models.{Email, Name}
 import net.wiringbits.repositories.{UserLogsRepository, UsersRepository}
 
 import java.util.UUID
@@ -11,13 +13,13 @@ class AdminService @Inject() (userLogsRepository: UserLogsRepository, usersRepos
     ec: ExecutionContext
 ) {
 
-  def userLogs(userId: UUID): Future[AdminGetUserLogs.Response] = {
+  def userLogs(userId: UserId): Future[AdminGetUserLogs.Response] = {
     for {
       logs <- userLogsRepository.logs(userId)
       items = logs.map { x =>
         AdminGetUserLogs.Response.UserLog(
-          id = x.userLogId,
-          createdAt = x.createdAt,
+          id = x.userLogId.value,
+          createdAt = x.createdAt.value,
           message = x.message
         )
       }
@@ -29,10 +31,10 @@ class AdminService @Inject() (userLogsRepository: UserLogsRepository, usersRepos
       users <- usersRepository.all()
       items = users.map { x =>
         AdminGetUsers.Response.User(
-          id = x.id,
+          id = x.userId.value,
           name = x.name,
           email = x.email,
-          createdAt = x.createdAt
+          createdAt = x.createdAt.value
         )
       }
     } yield AdminGetUsers.Response(items)

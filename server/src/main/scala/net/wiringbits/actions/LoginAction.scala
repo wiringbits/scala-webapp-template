@@ -2,6 +2,7 @@ package net.wiringbits.actions
 
 import net.wiringbits.api.models.Login
 import net.wiringbits.apis.ReCaptchaApi
+import net.wiringbits.common.models.{Email, Name}
 import net.wiringbits.repositories.{UserLogsRepository, UsersRepository}
 import net.wiringbits.validations.{ValidateCaptcha, ValidatePasswordMatches, ValidateVerifiedUser}
 
@@ -27,7 +28,7 @@ class LoginAction @Inject() (
       user = ValidatePasswordMatches(maybe, request.password)
 
       // A login token is created
-      _ <- userLogsRepository.create(user.id, "Logged in successfully")
-    } yield Login.Response(user.id, user.name, user.email)
+      _ <- userLogsRepository.create(user.userId, "Logged in successfully")
+    } yield Login.Response(user.userId.value, user.name, user.email)
   }
 }
