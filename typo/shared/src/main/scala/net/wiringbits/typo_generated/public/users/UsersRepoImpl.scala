@@ -20,7 +20,7 @@ import java.sql.Connection
 import net.wiringbits.common.models.Email
 import net.wiringbits.common.models.InstantCustom
 import net.wiringbits.common.models.Name
-import net.wiringbits.common.models.UUIDCustom
+import net.wiringbits.common.models.id.UserId
 import net.wiringbits.typo_generated.customtypes.Defaulted
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -28,19 +28,16 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 object UsersRepoImpl extends UsersRepo {
-  override def delete(userId: /* user-picked */ UUIDCustom)(implicit c: Connection): Boolean = {
-    SQL"""delete from public.users where "user_id" = ${ParameterValue(
-        userId,
-        null,
-        implicitly[ToStatement[UUIDCustom]]
-      )}""".executeUpdate() > 0
+  override def delete(userId: /* user-picked */ UserId)(implicit c: Connection): Boolean = {
+    SQL"""delete from public.users where "user_id" = ${ParameterValue(userId, null, implicitly[ToStatement[UserId]])}"""
+      .executeUpdate() > 0
   }
   override def delete: DeleteBuilder[UsersFields, UsersRow] = {
     DeleteBuilder("public.users", UsersFields)
   }
   override def insert(unsaved: UsersRow)(implicit c: Connection): UsersRow = {
     SQL"""insert into public.users("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")
-          values (${ParameterValue(unsaved.userId, null, implicitly[ToStatement[UUIDCustom]])}::uuid, ${ParameterValue(
+          values (${ParameterValue(unsaved.userId, null, implicitly[ToStatement[UserId]])}::uuid, ${ParameterValue(
         unsaved.name,
         null,
         implicitly[ToStatement[Name]]
@@ -72,7 +69,7 @@ object UsersRepoImpl extends UsersRepo {
   override def insert(unsaved: UsersRowUnsaved)(implicit c: Connection): UsersRow = {
     val namedParameters = List(
       Some(
-        (NamedParameter("user_id", ParameterValue(unsaved.userId, null, implicitly[ToStatement[UUIDCustom]])), "::uuid")
+        (NamedParameter("user_id", ParameterValue(unsaved.userId, null, implicitly[ToStatement[UserId]])), "::uuid")
       ),
       Some((NamedParameter("name", ParameterValue(unsaved.name, null, implicitly[ToStatement[Name]])), "")),
       Some(
@@ -142,15 +139,15 @@ object UsersRepoImpl extends UsersRepo {
           from public.users
        """.as(UsersRow.rowParser(1).*)
   }
-  override def selectById(userId: /* user-picked */ UUIDCustom)(implicit c: Connection): Option[UsersRow] = {
+  override def selectById(userId: /* user-picked */ UserId)(implicit c: Connection): Option[UsersRow] = {
     SQL"""select "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text
           from public.users
-          where "user_id" = ${ParameterValue(userId, null, implicitly[ToStatement[UUIDCustom]])}
+          where "user_id" = ${ParameterValue(userId, null, implicitly[ToStatement[UserId]])}
        """.as(UsersRow.rowParser(1).singleOpt)
   }
   override def selectByIds(
-      userIds: Array[ /* user-picked */ UUIDCustom]
-  )(implicit c: Connection, toStatement: ToStatement[Array[ /* user-picked */ UUIDCustom]]): List[UsersRow] = {
+      userIds: Array[ /* user-picked */ UserId]
+  )(implicit c: Connection, toStatement: ToStatement[Array[ /* user-picked */ UserId]]): List[UsersRow] = {
     SQL"""select "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text
           from public.users
           where "user_id" = ANY(${userIds})
@@ -188,7 +185,7 @@ object UsersRepoImpl extends UsersRepo {
           implicitly[ParameterMetaData[InstantCustom]]
         )
       )}::timestamptz
-          where "user_id" = ${ParameterValue(userId, null, implicitly[ToStatement[UUIDCustom]])}
+          where "user_id" = ${ParameterValue(userId, null, implicitly[ToStatement[UserId]])}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[UsersFields, UsersRow] = {
@@ -197,7 +194,7 @@ object UsersRepoImpl extends UsersRepo {
   override def upsert(unsaved: UsersRow)(implicit c: Connection): UsersRow = {
     SQL"""insert into public.users("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")
           values (
-            ${ParameterValue(unsaved.userId, null, implicitly[ToStatement[UUIDCustom]])}::uuid,
+            ${ParameterValue(unsaved.userId, null, implicitly[ToStatement[UserId]])}::uuid,
             ${ParameterValue(unsaved.name, null, implicitly[ToStatement[Name]])},
             ${ParameterValue(
         unsaved.lastName,

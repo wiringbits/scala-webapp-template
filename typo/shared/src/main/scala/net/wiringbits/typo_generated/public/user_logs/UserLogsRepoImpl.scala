@@ -18,6 +18,7 @@ import anorm.ToStatement
 import java.sql.Connection
 import net.wiringbits.common.models.InstantCustom
 import net.wiringbits.common.models.UUIDCustom
+import net.wiringbits.common.models.id.UserId
 import net.wiringbits.typo_generated.customtypes.Defaulted
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -41,7 +42,7 @@ object UserLogsRepoImpl extends UserLogsRepo {
         unsaved.userLogId,
         null,
         implicitly[ToStatement[UUIDCustom]]
-      )}::uuid, ${ParameterValue(unsaved.userId, null, implicitly[ToStatement[UUIDCustom]])}::uuid, ${ParameterValue(
+      )}::uuid, ${ParameterValue(unsaved.userId, null, implicitly[ToStatement[UserId]])}::uuid, ${ParameterValue(
         unsaved.message,
         null,
         ToStatement.stringToStatement
@@ -60,7 +61,7 @@ object UserLogsRepoImpl extends UserLogsRepo {
         )
       ),
       Some(
-        (NamedParameter("user_id", ParameterValue(unsaved.userId, null, implicitly[ToStatement[UUIDCustom]])), "::uuid")
+        (NamedParameter("user_id", ParameterValue(unsaved.userId, null, implicitly[ToStatement[UserId]])), "::uuid")
       ),
       Some((NamedParameter("message", ParameterValue(unsaved.message, null, ToStatement.stringToStatement)), "")),
       unsaved.createdAt match {
@@ -118,7 +119,7 @@ object UserLogsRepoImpl extends UserLogsRepo {
   override def update(row: UserLogsRow)(implicit c: Connection): Boolean = {
     val userLogId = row.userLogId
     SQL"""update public.user_logs
-          set "user_id" = ${ParameterValue(row.userId, null, implicitly[ToStatement[UUIDCustom]])}::uuid,
+          set "user_id" = ${ParameterValue(row.userId, null, implicitly[ToStatement[UserId]])}::uuid,
               "message" = ${ParameterValue(row.message, null, ToStatement.stringToStatement)},
               "created_at" = ${ParameterValue(row.createdAt, null, implicitly[ToStatement[InstantCustom]])}::timestamptz
           where "user_log_id" = ${ParameterValue(userLogId, null, implicitly[ToStatement[UUIDCustom]])}
@@ -131,7 +132,7 @@ object UserLogsRepoImpl extends UserLogsRepo {
     SQL"""insert into public.user_logs("user_log_id", "user_id", "message", "created_at")
           values (
             ${ParameterValue(unsaved.userLogId, null, implicitly[ToStatement[UUIDCustom]])}::uuid,
-            ${ParameterValue(unsaved.userId, null, implicitly[ToStatement[UUIDCustom]])}::uuid,
+            ${ParameterValue(unsaved.userId, null, implicitly[ToStatement[UserId]])}::uuid,
             ${ParameterValue(unsaved.message, null, ToStatement.stringToStatement)},
             ${ParameterValue(unsaved.createdAt, null, implicitly[ToStatement[InstantCustom]])}::timestamptz
           )

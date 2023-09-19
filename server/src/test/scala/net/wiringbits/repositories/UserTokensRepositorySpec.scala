@@ -1,6 +1,7 @@
 package net.wiringbits.repositories
 
 import net.wiringbits.common.models.enums.UserTokenType
+import net.wiringbits.common.models.id.UserId
 import net.wiringbits.common.models.{InstantCustom, UUIDCustom}
 import net.wiringbits.core.{RepositoryComponents, RepositorySpec}
 import net.wiringbits.typo_generated.public.user_tokens.UserTokensRow
@@ -14,7 +15,7 @@ import scala.concurrent.Future
 
 class UserTokensRepositorySpec extends RepositorySpec with RepositoryUtils {
   private def createTokenRequest(
-      userId: UUIDCustom,
+      userId: UserId,
       token: String = "test",
       userTokenType: UserTokenType = UserTokenType.ResetPassword
   )(using
@@ -43,7 +44,7 @@ class UserTokensRepositorySpec extends RepositorySpec with RepositoryUtils {
 
     "fail when the user doesn't exists" in withRepositories() { implicit repositories =>
       val ex = intercept[RuntimeException] {
-        createTokenRequest(UUIDCustom.randomUUID()).futureValue
+        createTokenRequest(UserId.randomUUID).futureValue
       }
       ex.getCause.getMessage must startWith(
         s"""ERROR: insert or update on table "user_tokens" violates foreign key constraint "user_tokens_user_id_fk""""
@@ -65,7 +66,7 @@ class UserTokensRepositorySpec extends RepositorySpec with RepositoryUtils {
     }
 
     "return no results when the user doesn't exists" in withRepositories() { repositories =>
-      val response = repositories.userTokens.find(UUIDCustom.randomUUID()).futureValue
+      val response = repositories.userTokens.find(UserId.randomUUID).futureValue
       response.isEmpty must be(true)
     }
   }
@@ -80,7 +81,7 @@ class UserTokensRepositorySpec extends RepositorySpec with RepositoryUtils {
     }
 
     "return no results when the user doesn't exists" in withRepositories() { repositories =>
-      val response = repositories.userTokens.find(UUIDCustom.randomUUID(), "test").futureValue
+      val response = repositories.userTokens.find(UserId.randomUUID, "test").futureValue
       response.isEmpty must be(true)
     }
   }

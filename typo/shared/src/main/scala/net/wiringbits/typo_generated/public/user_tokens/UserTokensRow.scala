@@ -14,6 +14,7 @@ import anorm.Success
 import net.wiringbits.common.models.InstantCustom
 import net.wiringbits.common.models.UUIDCustom
 import net.wiringbits.common.models.enums.UserTokenType
+import net.wiringbits.common.models.id.UserId
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -30,7 +31,7 @@ case class UserTokensRow(
     createdAt: /* user-picked */ InstantCustom,
     expiresAt: /* user-picked */ InstantCustom,
     /** Points to [[users.UsersRow.userId]] */
-    userId: /* user-picked */ UUIDCustom
+    userId: /* user-picked */ UserId
 )
 
 object UserTokensRow {
@@ -43,7 +44,7 @@ object UserTokensRow {
           tokenType = json.\("token_type").as(implicitly[Reads[UserTokenType]]),
           createdAt = json.\("created_at").as(implicitly[Reads[InstantCustom]]),
           expiresAt = json.\("expires_at").as(implicitly[Reads[InstantCustom]]),
-          userId = json.\("user_id").as(implicitly[Reads[UUIDCustom]])
+          userId = json.\("user_id").as(implicitly[Reads[UserId]])
         )
       )
     )
@@ -56,7 +57,7 @@ object UserTokensRow {
         tokenType = row(idx + 2)(implicitly[Column[UserTokenType]]),
         createdAt = row(idx + 3)(implicitly[Column[InstantCustom]]),
         expiresAt = row(idx + 4)(implicitly[Column[InstantCustom]]),
-        userId = row(idx + 5)(implicitly[Column[UUIDCustom]])
+        userId = row(idx + 5)(implicitly[Column[UserId]])
       )
     )
   }
@@ -68,7 +69,7 @@ object UserTokensRow {
         "token_type" -> implicitly[Writes[UserTokenType]].writes(o.tokenType),
         "created_at" -> implicitly[Writes[InstantCustom]].writes(o.createdAt),
         "expires_at" -> implicitly[Writes[InstantCustom]].writes(o.expiresAt),
-        "user_id" -> implicitly[Writes[UUIDCustom]].writes(o.userId)
+        "user_id" -> implicitly[Writes[UserId]].writes(o.userId)
       )
     )
   )

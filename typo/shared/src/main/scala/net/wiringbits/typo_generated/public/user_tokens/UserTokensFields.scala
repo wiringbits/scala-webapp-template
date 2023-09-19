@@ -11,6 +11,7 @@ package user_tokens
 import net.wiringbits.common.models.InstantCustom
 import net.wiringbits.common.models.UUIDCustom
 import net.wiringbits.common.models.enums.UserTokenType
+import net.wiringbits.common.models.id.UserId
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField
 
@@ -20,6 +21,6 @@ trait UserTokensFields[Row] {
   val tokenType: Field[ /* user-picked */ UserTokenType, Row]
   val createdAt: Field[ /* user-picked */ InstantCustom, Row]
   val expiresAt: Field[ /* user-picked */ InstantCustom, Row]
-  val userId: Field[ /* user-picked */ UUIDCustom, Row]
+  val userId: Field[ /* user-picked */ UserId, Row]
 }
 object UserTokensFields extends UserTokensStructure[UserTokensRow](None, identity, (_, x) => x)

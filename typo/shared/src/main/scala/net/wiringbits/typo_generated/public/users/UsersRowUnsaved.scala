@@ -11,7 +11,7 @@ package users
 import net.wiringbits.common.models.Email
 import net.wiringbits.common.models.InstantCustom
 import net.wiringbits.common.models.Name
-import net.wiringbits.common.models.UUIDCustom
+import net.wiringbits.common.models.id.UserId
 import net.wiringbits.typo_generated.customtypes.Defaulted
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -24,7 +24,7 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `public.users` which has not been persisted yet */
 case class UsersRowUnsaved(
-    userId: /* user-picked */ UUIDCustom,
+    userId: /* user-picked */ UserId,
     name: /* user-picked */ Name,
     lastName: Option[String],
     email: /* user-picked */ Email,
@@ -52,7 +52,7 @@ object UsersRowUnsaved {
     JsResult.fromTry(
       Try(
         UsersRowUnsaved(
-          userId = json.\("user_id").as(implicitly[Reads[UUIDCustom]]),
+          userId = json.\("user_id").as(implicitly[Reads[UserId]]),
           name = json.\("name").as(implicitly[Reads[Name]]),
           lastName = json.\("last_name").toOption.map(_.as(Reads.StringReads)),
           email = json.\("email").as(implicitly[Reads[Email]]),
@@ -66,7 +66,7 @@ object UsersRowUnsaved {
   implicit lazy val writes: OWrites[UsersRowUnsaved] = OWrites[UsersRowUnsaved](o =>
     new JsObject(
       ListMap[String, JsValue](
-        "user_id" -> implicitly[Writes[UUIDCustom]].writes(o.userId),
+        "user_id" -> implicitly[Writes[UserId]].writes(o.userId),
         "name" -> implicitly[Writes[Name]].writes(o.name),
         "last_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.lastName),
         "email" -> implicitly[Writes[Email]].writes(o.email),

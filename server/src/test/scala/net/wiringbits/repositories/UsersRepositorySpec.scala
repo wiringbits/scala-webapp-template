@@ -2,6 +2,7 @@ package net.wiringbits.repositories
 
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.Sink
+import net.wiringbits.common.models.id.UserId
 import net.wiringbits.common.models.{Email, Name, UUIDCustom}
 import net.wiringbits.core.RepositorySpec
 import net.wiringbits.util.EmailMessage
@@ -114,7 +115,7 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll with Rep
     }
 
     "return no result when the id doesn't exists" in withRepositories() { implicit repositories =>
-      val response = repositories.users.find(UUIDCustom.randomUUID()).futureValue
+      val response = repositories.users.find(UserId.randomUUID).futureValue
       response.isEmpty must be(true)
     }
   }
@@ -134,7 +135,7 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll with Rep
     "fail when the user doesn't exist" in withRepositories() { implicit repositories =>
       val newName = Name.trusted("Test")
       val ex = intercept[RuntimeException] {
-        repositories.users.update(UUIDCustom.randomUUID(), newName).futureValue
+        repositories.users.update(UserId.randomUUID, newName).futureValue
       }
       ex.getCause.getMessage must startWith(
         """ERROR: insert or update on table "user_logs" violates foreign key constraint "user_logs_users_fk""""
@@ -175,7 +176,7 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll with Rep
       val name = Name.trusted("test")
       val ex = intercept[RuntimeException] {
         repositories.users
-          .updatePassword(UUIDCustom.randomUUID(), "test", EmailMessage.updatePassword(name))
+          .updatePassword(UserId.randomUUID, "test", EmailMessage.updatePassword(name))
           .futureValue
       }
       ex.getCause.getMessage must startWith(
@@ -213,7 +214,7 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll with Rep
       val name = Name.trusted("test")
       val ex = intercept[RuntimeException] {
         repositories.users
-          .verify(UUIDCustom.randomUUID(), UUIDCustom.randomUUID(), EmailMessage.confirm(name))
+          .verify(UserId.randomUUID, UUIDCustom.randomUUID(), EmailMessage.confirm(name))
           .futureValue
       }
       ex.getCause.getMessage must startWith(
@@ -255,7 +256,7 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll with Rep
       val name = Name.trusted("test")
       val ex = intercept[RuntimeException] {
         repositories.users
-          .resetPassword(UUIDCustom.randomUUID(), "test", EmailMessage.resetPassword(name))
+          .resetPassword(UserId.randomUUID, "test", EmailMessage.resetPassword(name))
           .futureValue
       }
       ex.getCause.getMessage must startWith(

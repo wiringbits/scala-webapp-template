@@ -2,6 +2,7 @@ package net.wiringbits.actions
 
 import net.wiringbits.api.models.GetCurrentUser
 import net.wiringbits.common.models.UUIDCustom
+import net.wiringbits.common.models.id.UserId
 import net.wiringbits.repositories.UsersRepository
 import net.wiringbits.typo_generated.public.users.UsersRow
 
@@ -14,7 +15,7 @@ class GetUserAction @Inject() (
 
   def apply(userId: UUIDCustom): Future[GetCurrentUser.Response] = {
     for {
-      user <- unsafeUser(userId)
+      user <- unsafeUser(UserId.parse(userId.value))
     } yield GetCurrentUser.Response(
       id = user.userId.value,
       email = user.email,
@@ -23,7 +24,7 @@ class GetUserAction @Inject() (
     )
   }
 
-  private def unsafeUser(userId: UUIDCustom): Future[UsersRow] = {
+  private def unsafeUser(userId: UserId): Future[UsersRow] = {
     usersRepository
       .find(userId)
       .map { maybe =>

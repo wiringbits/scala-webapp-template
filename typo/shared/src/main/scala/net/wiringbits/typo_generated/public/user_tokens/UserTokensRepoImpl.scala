@@ -15,6 +15,7 @@ import java.sql.Connection
 import net.wiringbits.common.models.InstantCustom
 import net.wiringbits.common.models.UUIDCustom
 import net.wiringbits.common.models.enums.UserTokenType
+import net.wiringbits.common.models.id.UserId
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -49,7 +50,7 @@ object UserTokensRepoImpl extends UserTokensRepo {
         unsaved.expiresAt,
         null,
         implicitly[ToStatement[InstantCustom]]
-      )}::timestamptz, ${ParameterValue(unsaved.userId, null, implicitly[ToStatement[UUIDCustom]])}::uuid)
+      )}::timestamptz, ${ParameterValue(unsaved.userId, null, implicitly[ToStatement[UserId]])}::uuid)
           returning "user_token_id", "token", "token_type", "created_at"::text, "expires_at"::text, "user_id"
        """
       .executeInsert(UserTokensRow.rowParser(1).single)
@@ -93,7 +94,7 @@ object UserTokensRepoImpl extends UserTokensRepo {
         null,
         implicitly[ToStatement[InstantCustom]]
       )}::timestamptz,
-              "user_id" = ${ParameterValue(row.userId, null, implicitly[ToStatement[UUIDCustom]])}::uuid
+              "user_id" = ${ParameterValue(row.userId, null, implicitly[ToStatement[UserId]])}::uuid
           where "user_token_id" = ${ParameterValue(userTokenId, null, implicitly[ToStatement[UUIDCustom]])}
        """.executeUpdate() > 0
   }
@@ -108,7 +109,7 @@ object UserTokensRepoImpl extends UserTokensRepo {
             ${ParameterValue(unsaved.tokenType, null, implicitly[ToStatement[UserTokenType]])},
             ${ParameterValue(unsaved.createdAt, null, implicitly[ToStatement[InstantCustom]])}::timestamptz,
             ${ParameterValue(unsaved.expiresAt, null, implicitly[ToStatement[InstantCustom]])}::timestamptz,
-            ${ParameterValue(unsaved.userId, null, implicitly[ToStatement[UUIDCustom]])}::uuid
+            ${ParameterValue(unsaved.userId, null, implicitly[ToStatement[UserId]])}::uuid
           )
           on conflict ("user_token_id")
           do update set

@@ -1,6 +1,7 @@
 package net.wiringbits.actions
 
 import net.wiringbits.api.models.UpdatePassword
+import net.wiringbits.common.models.id.UserId
 import net.wiringbits.common.models.{Name, UUIDCustom}
 import net.wiringbits.repositories.UsersRepository
 import net.wiringbits.util.EmailMessage
@@ -15,7 +16,7 @@ class UpdatePasswordAction @Inject() (
     usersRepository: UsersRepository
 )(implicit ec: ExecutionContext) {
 
-  def apply(userId: UUIDCustom, request: UpdatePassword.Request): Future[Unit] = {
+  def apply(userId: UserId, request: UpdatePassword.Request): Future[Unit] = {
     for {
       maybe <- usersRepository.find(userId)
       user = ValidatePasswordMatches(maybe, request.oldPassword)

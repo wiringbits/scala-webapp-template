@@ -14,7 +14,7 @@ import anorm.Success
 import net.wiringbits.common.models.Email
 import net.wiringbits.common.models.InstantCustom
 import net.wiringbits.common.models.Name
-import net.wiringbits.common.models.UUIDCustom
+import net.wiringbits.common.models.id.UserId
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -25,7 +25,7 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class UsersRow(
-    userId: /* user-picked */ UUIDCustom,
+    userId: /* user-picked */ UserId,
     name: /* user-picked */ Name,
     lastName: Option[String],
     email: /* user-picked */ Email,
@@ -39,7 +39,7 @@ object UsersRow {
     JsResult.fromTry(
       Try(
         UsersRow(
-          userId = json.\("user_id").as(implicitly[Reads[UUIDCustom]]),
+          userId = json.\("user_id").as(implicitly[Reads[UserId]]),
           name = json.\("name").as(implicitly[Reads[Name]]),
           lastName = json.\("last_name").toOption.map(_.as(Reads.StringReads)),
           email = json.\("email").as(implicitly[Reads[Email]]),
@@ -53,7 +53,7 @@ object UsersRow {
   def rowParser(idx: Int): RowParser[UsersRow] = RowParser[UsersRow] { row =>
     Success(
       UsersRow(
-        userId = row(idx + 0)(implicitly[Column[UUIDCustom]]),
+        userId = row(idx + 0)(implicitly[Column[UserId]]),
         name = row(idx + 1)(implicitly[Column[Name]]),
         lastName = row(idx + 2)(Column.columnToOption(Column.columnToString)),
         email = row(idx + 3)(implicitly[Column[Email]]),
@@ -66,7 +66,7 @@ object UsersRow {
   implicit lazy val writes: OWrites[UsersRow] = OWrites[UsersRow](o =>
     new JsObject(
       ListMap[String, JsValue](
-        "user_id" -> implicitly[Writes[UUIDCustom]].writes(o.userId),
+        "user_id" -> implicitly[Writes[UserId]].writes(o.userId),
         "name" -> implicitly[Writes[Name]].writes(o.name),
         "last_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.lastName),
         "email" -> implicitly[Writes[Email]].writes(o.email),

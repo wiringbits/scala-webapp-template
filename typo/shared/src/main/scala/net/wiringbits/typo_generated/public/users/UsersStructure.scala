@@ -11,7 +11,7 @@ package users
 import net.wiringbits.common.models.Email
 import net.wiringbits.common.models.InstantCustom
 import net.wiringbits.common.models.Name
-import net.wiringbits.common.models.UUIDCustom
+import net.wiringbits.common.models.id.UserId
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
@@ -22,7 +22,7 @@ class UsersStructure[Row](val prefix: Option[String], val extract: Row => UsersR
     extends Relation[UsersFields, UsersRow, Row]
     with UsersFields[Row] { outer =>
 
-  override val userId = new IdField[ /* user-picked */ UUIDCustom, Row](prefix, "user_id", None, Some("uuid"))(
+  override val userId = new IdField[ /* user-picked */ UserId, Row](prefix, "user_id", None, Some("uuid"))(
     x => extract(x).userId,
     (row, value) => merge(row, extract(row).copy(userId = value))
   )

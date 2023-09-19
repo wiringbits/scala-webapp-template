@@ -11,22 +11,22 @@ package users
 import anorm.ToStatement
 import java.sql.Connection
 import net.wiringbits.common.models.Email
-import net.wiringbits.common.models.UUIDCustom
+import net.wiringbits.common.models.id.UserId
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait UsersRepo {
-  def delete(userId: /* user-picked */ UUIDCustom)(implicit c: Connection): Boolean
+  def delete(userId: /* user-picked */ UserId)(implicit c: Connection): Boolean
   def delete: DeleteBuilder[UsersFields, UsersRow]
   def insert(unsaved: UsersRow)(implicit c: Connection): UsersRow
   def insert(unsaved: UsersRowUnsaved)(implicit c: Connection): UsersRow
   def select: SelectBuilder[UsersFields, UsersRow]
   def selectAll(implicit c: Connection): List[UsersRow]
-  def selectById(userId: /* user-picked */ UUIDCustom)(implicit c: Connection): Option[UsersRow]
+  def selectById(userId: /* user-picked */ UserId)(implicit c: Connection): Option[UsersRow]
   def selectByIds(
-      userIds: Array[ /* user-picked */ UUIDCustom]
-  )(implicit c: Connection, toStatement: ToStatement[Array[ /* user-picked */ UUIDCustom]]): List[UsersRow]
+      userIds: Array[ /* user-picked */ UserId]
+  )(implicit c: Connection, toStatement: ToStatement[Array[ /* user-picked */ UserId]]): List[UsersRow]
   def selectByUnique(email: /* user-picked */ Email)(implicit c: Connection): Option[UsersRow]
   def update(row: UsersRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[UsersFields, UsersRow]

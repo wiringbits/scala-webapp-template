@@ -13,9 +13,9 @@ object API {
 
   // allows overriding the server url
   private val apiUrl = {
-    net.wiringbits.BuildInfo.apiUrl.filter(_.nonEmpty).getOrElse {
-      "http://localhost:8080/api"
-    }
+//    net.wiringbits.BuildInfo.apiUrl.filter(_.nonEmpty).getOrElse {
+    "http://localhost:8080/api"
+//    }
   }
 
   def apply(): API = {

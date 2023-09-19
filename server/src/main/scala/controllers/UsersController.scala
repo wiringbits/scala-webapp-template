@@ -4,6 +4,7 @@ import net.wiringbits.actions.*
 import net.wiringbits.api.endpoints.UsersEndpoints
 import net.wiringbits.api.models.*
 import net.wiringbits.common.models.UUIDCustom
+import net.wiringbits.common.models.id.UserId
 import org.slf4j.LoggerFactory
 import sttp.capabilities.WebSockets
 import sttp.capabilities.akka.AkkaStreams
@@ -36,7 +37,7 @@ class UsersController @Inject() (
     val token = request.token
     logger.info(s"Verify user's email: ${token.userId}")
     for {
-      response <- verifyUserEmailAction(UUIDCustom(token.userId), UUIDCustom(token.token))
+      response <- verifyUserEmailAction(UserId.parse(token.userId), UUIDCustom(token.token))
     } yield Right(response)
   }
 
@@ -53,7 +54,7 @@ class UsersController @Inject() (
       logger.info(s"Reset user's password: ${request.token.userId}")
       for {
         response <- resetPasswordAction(
-          UUIDCustom(request.token.userId),
+          UserId.parse(request.token.userId),
           UUIDCustom(request.token.token),
           request.password
         )
@@ -77,7 +78,7 @@ class UsersController @Inject() (
     logger.info(s"Update user: $request")
     for {
       userId <- userIdF
-      _ <- updateUserAction(userId, request)
+      _ <- updateUserAction(UserId.parse(userId.value), request)
       response = UpdateUser.Response()
     } yield Right(response)
   }
@@ -89,7 +90,7 @@ class UsersController @Inject() (
     for {
       userId <- userIdF
       _ = logger.info(s"Update password for: $userId")
-      _ <- updatePasswordAction(userId, request)
+      _ <- updatePasswordAction(UserId.parse(userId.value), request)
       response = UpdatePassword.Response()
     } yield Right(response)
   }
@@ -99,7 +100,7 @@ class UsersController @Inject() (
       for {
         userId <- userIdF
         _ = logger.info(s"Get user logs: $userId")
-        response <- getUserLogsAction(userId)
+        response <- getUserLogsAction(UserId.parse(userId.value))
       } yield Right(response)
     }
 

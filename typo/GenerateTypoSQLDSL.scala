@@ -25,7 +25,7 @@ object TypeOverrides {
     val relationName = RelationName(Some("public"), "users")
 
     TypeOverride.of {
-      case (relationName, ColName("user_id")) => uuidTypeImport
+      case (relationName, ColName("user_id")) => "net.wiringbits.common.models.id.UserId"
       case (relationName, ColName("email")) => emailTypeImport
       case (relationName, ColName("name")) => nameTypeImport
       case (relationName, ColName("created_at")) => instantTypeImport

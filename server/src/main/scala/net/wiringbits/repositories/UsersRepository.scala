@@ -1,6 +1,7 @@
 package net.wiringbits.repositories
 
 import net.wiringbits.common.models.enums.{BackgroundJobStatus, BackgroundJobType, UserTokenType}
+import net.wiringbits.common.models.id.UserId
 import net.wiringbits.common.models.{Email, InstantCustom, Name, UUIDCustom}
 import net.wiringbits.config.UserTokensConfig
 import net.wiringbits.executors.DatabaseExecutionContext
@@ -68,13 +69,13 @@ class UsersRepository @Inject() (
     }
   }
 
-  def find(userId: UUIDCustom): Future[Option[UsersRow]] = Future {
+  def find(userId: UserId): Future[Option[UsersRow]] = Future {
     database.withConnection { implicit conn =>
       UsersRepoImpl.selectById(userId)
     }
   }
 
-  def update(userId: UUIDCustom, name: Name): Future[Unit] = Future {
+  def update(userId: UserId, name: Name): Future[Unit] = Future {
     val createUserLogsRow = UserLogsRow(
       userLogId = UUIDCustom.randomUUID(),
       userId = userId,
@@ -88,7 +89,7 @@ class UsersRepository @Inject() (
     }
   }
 
-  def updatePassword(userId: UUIDCustom, password: String, emailMessage: EmailMessage): Future[Unit] = Future {
+  def updatePassword(userId: UserId, password: String, emailMessage: EmailMessage): Future[Unit] = Future {
     val createUserLogsRow = UserLogsRow(
       userLogId = UUIDCustom.randomUUID(),
       userId = userId,
@@ -103,7 +104,7 @@ class UsersRepository @Inject() (
     }
   }
 
-  def verify(userId: UUIDCustom, userTokenId: UUIDCustom, emailMessage: EmailMessage): Future[Unit] = Future {
+  def verify(userId: UserId, userTokenId: UUIDCustom, emailMessage: EmailMessage): Future[Unit] = Future {
     val createUserLogsRow = UserLogsRow(
       userLogId = UUIDCustom.randomUUID(),
       userId = userId,
@@ -125,7 +126,7 @@ class UsersRepository @Inject() (
     }
   }
 
-  def resetPassword(userId: UUIDCustom, password: String, emailMessage: EmailMessage): Future[Unit] = Future {
+  def resetPassword(userId: UserId, password: String, emailMessage: EmailMessage): Future[Unit] = Future {
     val createUserLogsRow = UserLogsRow(
       userLogId = UUIDCustom.randomUUID(),
       userId = userId,
@@ -140,7 +141,7 @@ class UsersRepository @Inject() (
     }
   }
 
-  private def sendEmailLater(userId: UUIDCustom, emailMessage: EmailMessage)(implicit conn: Connection): Unit = {
+  private def sendEmailLater(userId: UserId, emailMessage: EmailMessage)(implicit conn: Connection): Unit = {
     val usersRow = UsersRepoImpl.selectById(userId)
     usersRow.foreach { usersRow =>
       val payload = BackgroundJobPayload.SendEmail(

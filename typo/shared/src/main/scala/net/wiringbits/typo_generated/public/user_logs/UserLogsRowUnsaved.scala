@@ -10,6 +10,7 @@ package user_logs
 
 import net.wiringbits.common.models.InstantCustom
 import net.wiringbits.common.models.UUIDCustom
+import net.wiringbits.common.models.id.UserId
 import net.wiringbits.typo_generated.customtypes.Defaulted
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -24,7 +25,7 @@ import scala.util.Try
 case class UserLogsRowUnsaved(
     userLogId: /* user-picked */ UUIDCustom,
     /** Points to [[users.UsersRow.userId]] */
-    userId: /* user-picked */ UUIDCustom,
+    userId: /* user-picked */ UserId,
     message: String,
     /** Default: now() */
     createdAt: Defaulted[ /* user-picked */ InstantCustom] = Defaulted.UseDefault
@@ -46,7 +47,7 @@ object UserLogsRowUnsaved {
       Try(
         UserLogsRowUnsaved(
           userLogId = json.\("user_log_id").as(implicitly[Reads[UUIDCustom]]),
-          userId = json.\("user_id").as(implicitly[Reads[UUIDCustom]]),
+          userId = json.\("user_id").as(implicitly[Reads[UserId]]),
           message = json.\("message").as(Reads.StringReads),
           createdAt = json.\("created_at").as(Defaulted.reads(implicitly[Reads[InstantCustom]]))
         )
@@ -57,7 +58,7 @@ object UserLogsRowUnsaved {
     new JsObject(
       ListMap[String, JsValue](
         "user_log_id" -> implicitly[Writes[UUIDCustom]].writes(o.userLogId),
-        "user_id" -> implicitly[Writes[UUIDCustom]].writes(o.userId),
+        "user_id" -> implicitly[Writes[UserId]].writes(o.userId),
         "message" -> Writes.StringWrites.writes(o.message),
         "created_at" -> Defaulted.writes(implicitly[Writes[InstantCustom]]).writes(o.createdAt)
       )

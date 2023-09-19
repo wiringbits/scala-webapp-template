@@ -2,6 +2,7 @@ package net.wiringbits.actions
 
 import net.wiringbits.api.models.GetUserLogs
 import net.wiringbits.common.models.UUIDCustom
+import net.wiringbits.common.models.id.UserId
 import net.wiringbits.repositories.UserLogsRepository
 
 import java.util.UUID
@@ -12,7 +13,7 @@ class GetUserLogsAction @Inject() (
     userLogsRepository: UserLogsRepository
 )(implicit ec: ExecutionContext) {
 
-  def apply(userId: UUIDCustom): Future[GetUserLogs.Response] = {
+  def apply(userId: UserId): Future[GetUserLogs.Response] = {
     for {
       logs <- userLogsRepository.logs(userId)
       items = logs.map { x =>

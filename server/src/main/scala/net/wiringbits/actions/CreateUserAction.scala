@@ -2,6 +2,7 @@ package net.wiringbits.actions
 
 import net.wiringbits.api.models.CreateUser
 import net.wiringbits.apis.ReCaptchaApi
+import net.wiringbits.common.models.id.UserId
 import net.wiringbits.common.models.{InstantCustom, UUIDCustom}
 import net.wiringbits.config.UserTokensConfig
 import net.wiringbits.repositories
@@ -35,7 +36,7 @@ class CreateUserAction @Inject() (
 
       // create the user
       createUsersRow = UsersRow(
-        userId = UUIDCustom.randomUUID(),
+        userId = UserId.randomUUID,
         name = request.name,
         lastName = None,
         email = request.email,

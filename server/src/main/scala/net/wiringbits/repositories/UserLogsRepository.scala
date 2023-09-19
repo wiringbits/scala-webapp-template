@@ -1,5 +1,6 @@
 package net.wiringbits.repositories
 
+import net.wiringbits.common.models.id.UserId
 import net.wiringbits.common.models.{InstantCustom, UUIDCustom}
 import net.wiringbits.executors.DatabaseExecutionContext
 import net.wiringbits.typo_generated.public.user_logs.{UserLogsRepoImpl, UserLogsRow}
@@ -18,7 +19,7 @@ class UserLogsRepository @Inject() (database: Database)(implicit ec: DatabaseExe
     }
   }
 
-  def create(userId: UUIDCustom, message: String): Future[Unit] = Future {
+  def create(userId: UserId, message: String): Future[Unit] = Future {
     val createUserLogsRow = UserLogsRow(
       userLogId = UUIDCustom.randomUUID(),
       userId = userId,
@@ -31,7 +32,7 @@ class UserLogsRepository @Inject() (database: Database)(implicit ec: DatabaseExe
     }
   }
 
-  def logs(userId: UUIDCustom): Future[List[UserLogsRow]] = Future {
+  def logs(userId: UserId): Future[List[UserLogsRow]] = Future {
     database.withConnection { implicit conn =>
       UserLogsRepoImpl.select.where(_.userId === userId).orderBy(_.createdAt.desc).toList
     }

@@ -11,6 +11,7 @@ package user_tokens
 import net.wiringbits.common.models.InstantCustom
 import net.wiringbits.common.models.UUIDCustom
 import net.wiringbits.common.models.enums.UserTokenType
+import net.wiringbits.common.models.id.UserId
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
@@ -46,7 +47,7 @@ class UserTokensStructure[Row](
       x => extract(x).expiresAt,
       (row, value) => merge(row, extract(row).copy(expiresAt = value))
     )
-  override val userId = new Field[ /* user-picked */ UUIDCustom, Row](prefix, "user_id", None, Some("uuid"))(
+  override val userId = new Field[ /* user-picked */ UserId, Row](prefix, "user_id", None, Some("uuid"))(
     x => extract(x).userId,
     (row, value) => merge(row, extract(row).copy(userId = value))
   )
