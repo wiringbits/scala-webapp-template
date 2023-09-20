@@ -33,9 +33,9 @@ private[id] object Id {
       }
     }
 
-    implicit val emailOrdering: Ordering[T] = Ordering.by(_.value)
+    implicit val idOrdering: Ordering[T] = Ordering.by(_.value)
 
-    implicit val uuidParameterMetaData: ParameterMetaData[T] = new ParameterMetaData[T] {
+    implicit val idParameterMetaData: ParameterMetaData[T] = new ParameterMetaData[T] {
       override def sqlType: String = "UUID"
 
       override def jdbcType: Int = java.sql.Types.OTHER
@@ -45,7 +45,7 @@ private[id] object Id {
 
     implicit val idCustomWrites: Writes[T] = Writes[T](i => JsString(i.value.toString))
 
-    implicit val backgroundJobStatusCustomFormat: Format[T] = Format[T](
+    implicit val idFormat: Format[T] = Format[T](
       fjs = implicitly[Reads[String]].map(string => fromString(string)),
       tjs = Writes[T](i => JsString(i.value.toString))
     )
