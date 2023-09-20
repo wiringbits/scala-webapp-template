@@ -1,5 +1,6 @@
 package net.wiringbits.services
 
+import io.scalaland.chimney.dsl.transformInto
 import net.wiringbits.api.models.{AdminGetUserLogs, AdminGetUsers}
 import net.wiringbits.repositories.{UserLogsRepository, UsersRepository}
 
@@ -14,27 +15,14 @@ class AdminService @Inject() (userLogsRepository: UserLogsRepository, usersRepos
   def userLogs(userId: UUID): Future[AdminGetUserLogs.Response] = {
     for {
       logs <- userLogsRepository.logs(userId)
-      items = logs.map { x =>
-        AdminGetUserLogs.Response.UserLog(
-          id = x.userLogId,
-          createdAt = x.createdAt,
-          message = x.message
-        )
-      }
+      items = logs.map(_.transformInto[AdminGetUserLogs.Response.UserLog])
     } yield AdminGetUserLogs.Response(items)
   }
 
   def users(): Future[AdminGetUsers.Response] = {
     for {
       users <- usersRepository.all()
-      items = users.map { x =>
-        AdminGetUsers.Response.User(
-          id = x.id,
-          name = x.name,
-          email = x.email,
-          createdAt = x.createdAt
-        )
-      }
+      items = users.map(_.transformInto[AdminGetUsers.Response.User])
     } yield AdminGetUsers.Response(items)
   }
 }

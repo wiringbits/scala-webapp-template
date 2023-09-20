@@ -1,5 +1,6 @@
 package net.wiringbits.actions
 
+import io.scalaland.chimney.dsl.transformInto
 import net.wiringbits.api.models.Login
 import net.wiringbits.apis.ReCaptchaApi
 import net.wiringbits.repositories.{UserLogsRepository, UsersRepository}
@@ -28,6 +29,6 @@ class LoginAction @Inject() (
 
       // A login token is created
       _ <- userLogsRepository.create(user.id, "Logged in successfully")
-    } yield Login.Response(user.id, user.name, user.email)
+    } yield user.transformInto[Login.Response]
   }
 }

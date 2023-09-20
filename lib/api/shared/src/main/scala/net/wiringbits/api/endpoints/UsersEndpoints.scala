@@ -184,7 +184,7 @@ object UsersEndpoints {
           GetUserLogs.Response(
             List(
               GetUserLogs.Response.UserLog(
-                id = UUID.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6"),
+                userLogId = UUID.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6"),
                 message = "Message",
                 createdAt = Instant.parse("2021-01-01T00:00:00Z")
               )
