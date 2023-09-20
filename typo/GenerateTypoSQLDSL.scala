@@ -71,7 +71,7 @@ object GenerateTypoSQLDSL extends App {
   given conn: java.sql.Connection =
     // TODO: get connection from config
     java.sql.DriverManager.getConnection(
-      "jdbc:postgresql://localhost:5432/wiringbits_db_v2?user=postgres&password=postgres"
+      "jdbc:postgresql://localhost:5432/wiringbits_db?user=postgres&password=postgres"
     )
 
   def runScript = {
