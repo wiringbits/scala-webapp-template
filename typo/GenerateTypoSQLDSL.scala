@@ -1,7 +1,7 @@
 //> using scala "3.3.0"
 
-//> using lib "com.olvind.typo::typo:0.3.0"
-//> using lib "com.olvind.typo::typo-dsl-anorm:0.3.0"
+//> using lib "com.olvind.typo::typo:0.3.1"
+//> using lib "com.olvind.typo::typo-dsl-anorm:0.3.1"
 //> using lib "com.typesafe.play::play-json::2.10.0-RC9"
 
 import typo.*
