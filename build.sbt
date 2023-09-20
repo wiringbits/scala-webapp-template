@@ -11,6 +11,7 @@ val anorm = "2.7.0"
 val enumeratum = "1.7.2"
 val scalaJavaTime = "2.5.0"
 val tapir = "1.5.0"
+val typoVersion = "0.3.0"
 
 val consoleDisabledOptions = Seq("-Werror", "-Ywarn-unused", "-Ywarn-unused-import")
 
@@ -36,7 +37,7 @@ lazy val commonSettings: Project => Project = {
       Wart.IsInstanceOf,
       Wart.JavaConversions,
       //      Wart.JavaSerializable,
-      Wart.MutableDataStructures,
+      //      Wart.MutableDataStructures,
       //      Wart.NonUnitStatements,
       //      Wart.Nothing,
       Wart.Null,
@@ -227,7 +228,9 @@ lazy val common = (crossProject(JSPlatform, JVMPlatform) in file("lib/common"))
     libraryDependencies ++= Seq(
       "com.typesafe.play" %% "play-json" % playJson,
       "net.wiringbits" %% "webapp-common" % webappUtils,
-      "org.scalatest" %% "scalatest" % "3.2.16" % Test
+      "org.playframework.anorm" %% "anorm" % anorm,
+      "org.scalatest" %% "scalatest" % "3.2.16" % Test,
+      "com.beachape" %% "enumeratum" % enumeratum
     )
   )
   .jsSettings(
@@ -441,6 +444,17 @@ lazy val web = (project in file("web"))
     )
   )
 
+lazy val typo = (crossProject(JSPlatform, JVMPlatform) in file("typo"))
+  .dependsOn(common)
+  .settings(
+    name := "wiringbits-typo",
+    libraryDependencies ++= Seq(
+      "com.olvind.typo" %% "typo" % typoVersion,
+      "com.olvind.typo" %% "typo-dsl-anorm" % typoVersion,
+      "com.typesafe.play" %% "play-json" % playJson
+    )
+  )
+
 lazy val root = (project in file("."))
   .aggregate(
     common.jvm,
@@ -449,7 +463,9 @@ lazy val root = (project in file("."))
     api.js,
     ui,
     server,
-    web
+    web,
+    typo.jvm,
+    typo.js
   )
   .settings(
     publish := {},

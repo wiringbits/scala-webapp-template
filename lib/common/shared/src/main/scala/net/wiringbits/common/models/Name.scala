@@ -1,5 +1,6 @@
 package net.wiringbits.common.models
 
+import anorm.{Column, ParameterMetaData, ToStatement, TypeDoesNotMatch}
 import net.wiringbits.webapp.common.models.WrappedString
 import net.wiringbits.webapp.common.validators.ValidationResult
 
@@ -20,4 +21,22 @@ object Name extends WrappedString.Companion[Name] {
   }
 
   override def trusted(string: String): Name = new Name(string)
+
+  implicit val nameColumn: Column[Name] = Column.nonNull[Name] { (value, _) =>
+    value match {
+      case string: String => Right(trusted(string))
+      case _ => Left(TypeDoesNotMatch("Error parsing the name"))
+    }
+  }
+
+  implicit val nameOrdering: Ordering[Name] = Ordering.by(_.string)
+
+  implicit val nameToStatement: ToStatement[Name] =
+    ToStatement[Name]((s, index, v) => s.setObject(index, v.string))
+
+  implicit val nameParameterMetaData: ParameterMetaData[Name] = new ParameterMetaData[Name] {
+    override def sqlType: String = "VARCHAR"
+
+    override def jdbcType: Int = java.sql.Types.VARCHAR
+  }
 }
