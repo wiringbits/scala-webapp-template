@@ -1,5 +1,6 @@
 package net.wiringbits.actions
 
+import io.scalaland.chimney.dsl.transformInto
 import net.wiringbits.api.models.GetCurrentUser
 import net.wiringbits.repositories.UsersRepository
 import net.wiringbits.repositories.models.User
@@ -15,12 +16,7 @@ class GetUserAction @Inject() (
   def apply(userId: UUID): Future[GetCurrentUser.Response] = {
     for {
       user <- unsafeUser(userId)
-    } yield GetCurrentUser.Response(
-      id = user.id,
-      email = user.email,
-      name = user.name,
-      createdAt = user.createdAt
-    )
+    } yield user.transformInto[GetCurrentUser.Response]
   }
 
   private def unsafeUser(userId: UUID): Future[User] = {

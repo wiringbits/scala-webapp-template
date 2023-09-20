@@ -1,5 +1,6 @@
 package net.wiringbits.actions
 
+import io.scalaland.chimney.dsl.transformInto
 import net.wiringbits.api.models.GetUserLogs
 import net.wiringbits.repositories.UserLogsRepository
 
@@ -14,13 +15,7 @@ class GetUserLogsAction @Inject() (
   def apply(userId: UUID): Future[GetUserLogs.Response] = {
     for {
       logs <- userLogsRepository.logs(userId)
-      items = logs.map { x =>
-        GetUserLogs.Response.UserLog(
-          id = x.userLogId,
-          message = x.message,
-          createdAt = x.createdAt
-        )
-      }
+      items = logs.map(_.transformInto[GetUserLogs.Response.UserLog])
     } yield GetUserLogs.Response(items)
   }
 }

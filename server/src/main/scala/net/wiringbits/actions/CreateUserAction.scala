@@ -1,5 +1,6 @@
 package net.wiringbits.actions
 
+import io.scalaland.chimney.dsl.transformInto
 import net.wiringbits.api.models.CreateUser
 import net.wiringbits.apis.ReCaptchaApi
 import net.wiringbits.config.UserTokensConfig
@@ -55,7 +56,7 @@ class CreateUserAction @Inject() (
         ),
         token
       )
-    } yield CreateUser.Response(id = createUser.id, email = createUser.email, name = createUser.name)
+    } yield createUser.transformInto[CreateUser.Response]
   }
 
   private def validations(request: CreateUser.Request) = {
