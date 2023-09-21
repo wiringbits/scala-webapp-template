@@ -11,7 +11,7 @@ object GetUserLogs {
   case class Response(data: List[Response.UserLog])
 
   object Response {
-    case class UserLog(id: UUID, message: String, createdAt: Instant)
+    case class UserLog(userLogId: UUID, message: String, createdAt: Instant)
     implicit val getUserLogsResponseFormat: Format[UserLog] = Json.format[UserLog]
     implicit val getUserLogsResponseSchema: Schema[UserLog] =
       Schema.derived[UserLog].name(Schema.SName("GetUserLogsResponseUserLog"))
