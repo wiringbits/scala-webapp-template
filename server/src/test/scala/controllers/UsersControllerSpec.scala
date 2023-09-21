@@ -380,7 +380,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoS
         .find(_.tokenType == UserTokenType.EmailVerification)
         .value
 
-      response.expiresAt must be(token.expiresAt.value)
+      response.expiresAt must be(token.expiresAt)
     }
 
     "success on verifying email and login" in withApiClient { client =>

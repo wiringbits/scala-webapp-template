@@ -16,13 +16,7 @@ class GetUserAction @Inject() (
   def apply(userId: UserId): Future[GetCurrentUser.Response] = {
     for {
       user <- unsafeUser(userId)
-    // TODO: use chimney after creating our own types
-    } yield GetCurrentUser.Response(
-      userId = user.userId,
-      email = user.email,
-      name = user.name,
-      createdAt = user.createdAt.value
-    )
+    } yield user.transformInto[GetCurrentUser.Response]
   }
 
   private def unsafeUser(userId: UserId): Future[UsersRow] = {

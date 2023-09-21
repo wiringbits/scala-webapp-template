@@ -39,7 +39,7 @@ class EmailsHelper @Inject() (
     for {
       _ <- userTokensRepository.create(createToken)
       _ <- sendRegistrationEmailWithVerificationToken(user, token)
-    } yield createToken.expiresAt.value
+    } yield createToken.expiresAt
   }
 
   // we don't save emails in the queue when user tokens are involved

@@ -17,13 +17,7 @@ class AdminService @Inject() (userLogsRepository: UserLogsRepository, usersRepos
     for {
       logs <- userLogsRepository.logs(userId)
       // TODO: use chimney after creating our own types
-      items = logs.map { x =>
-        AdminGetUserLogs.Response.UserLog(
-          userLogId = x.userLogId,
-          createdAt = x.createdAt,
-          message = x.message
-        )
-      }
+      items = logs.transformInto[List[AdminGetUserLogs.Response.UserLog]]
     } yield AdminGetUserLogs.Response(items)
   }
 
@@ -31,14 +25,7 @@ class AdminService @Inject() (userLogsRepository: UserLogsRepository, usersRepos
     for {
       users <- usersRepository.all()
       // TODO: use chimney after creating our own types
-      items = users.map { x =>
-        AdminGetUsers.Response.User(
-          userId = x.userId,
-          name = x.name,
-          email = x.email,
-          createdAt = x.createdAt.value
-        )
-      }
+      items = users.transformInto[List[AdminGetUsers.Response.User]]
     } yield AdminGetUsers.Response(items)
   }
 }

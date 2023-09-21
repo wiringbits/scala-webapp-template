@@ -1,5 +1,6 @@
 package net.wiringbits.forms
 
+import net.wiringbits.common.models.id.{UserId, UserTokenId}
 import net.wiringbits.common.models.{Password, UserToken}
 import org.scalatest.matchers.must.Matchers.{be, empty, must}
 import org.scalatest.wordspec.AnyWordSpec
@@ -10,14 +11,14 @@ class ResetPasswordFormDataSpec extends AnyWordSpec {
   private val initialForm = ResetPasswordFormData.initial(
     passwordLabel = "Password",
     repeatPasswordLabel = "Repeat password",
-    token = Some(UserToken(UUID.randomUUID, UUID.randomUUID))
+    token = Some(UserToken(UserId.randomUUID, UserTokenId.randomUUID))
   )
 
   private val validForm = initialForm
     .copy(
       password = initialForm.password.updated(Password.validate("123456789")),
       repeatPassword = initialForm.repeatPassword.updated(Password.validate("123456789")),
-      token = Some(UserToken(UUID.randomUUID, UUID.randomUUID))
+      token = Some(UserToken(UserId.randomUUID, UserTokenId.randomUUID))
     )
 
   private val allDataInvalidForm = initialForm

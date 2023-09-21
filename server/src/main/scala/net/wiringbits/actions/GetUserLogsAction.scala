@@ -15,14 +15,7 @@ class GetUserLogsAction @Inject() (
   def apply(userId: UserId): Future[GetUserLogs.Response] = {
     for {
       logs <- userLogsRepository.logs(userId)
-      // TODO: use chimney after creating our own types
-      items = logs.map { x =>
-        GetUserLogs.Response.UserLog(
-          userLogId = x.userLogId,
-          message = x.message,
-          createdAt = x.createdAt.value
-        )
-      }
+      items = logs.transformInto[List[GetUserLogs.Response.UserLog]]
     } yield GetUserLogs.Response(items)
   }
 }

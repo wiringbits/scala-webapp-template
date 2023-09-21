@@ -52,12 +52,7 @@ class CreateUserAction @Inject() (
         createUsersRow,
         token
       )
-      // TODO: use chimney after creating our own types
-    } yield CreateUser.Response(
-      userId = createUsersRow.userId,
-      email = request.email,
-      name = request.name
-    )
+    } yield createUsersRow.transformInto[CreateUser.Response]
   }
 
   private def validations(request: CreateUser.Request) = {

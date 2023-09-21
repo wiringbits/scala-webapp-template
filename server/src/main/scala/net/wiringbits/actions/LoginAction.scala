@@ -29,8 +29,7 @@ class LoginAction @Inject() (
       user = ValidatePasswordMatches(maybe, request.password)
 
       // A login token is created
-      // TODO: use chimney after creating our own types
       _ <- userLogsRepository.create(user.userId, "Logged in successfully")
-    } yield Login.Response(user.userId, user.name, user.email)
+    } yield user.transformInto[Login.Response]
   }
 }
