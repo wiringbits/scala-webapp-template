@@ -1,5 +1,6 @@
 package net.wiringbits.actions
 
+import io.scalaland.chimney.dsl.transformInto
 import net.wiringbits.api.models.CreateUser
 import net.wiringbits.apis.ReCaptchaApi
 import net.wiringbits.common.models.id.UserId
@@ -51,6 +52,7 @@ class CreateUserAction @Inject() (
         createUsersRow,
         token
       )
+      // TODO: use chimney after creating our own types
     } yield CreateUser.Response(
       id = createUsersRow.userId.value,
       email = request.email,

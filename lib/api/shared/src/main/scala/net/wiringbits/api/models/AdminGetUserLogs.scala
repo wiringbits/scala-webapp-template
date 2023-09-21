@@ -16,7 +16,7 @@ object AdminGetUserLogs {
     .description("Includes the logs for a single user")
 
   object Response {
-    case class UserLog(id: UUID, message: String, createdAt: Instant)
+    case class UserLog(userLogId: UUID, message: String, createdAt: Instant)
     implicit val adminGetUserLogsResponseUserLogFormat: Format[UserLog] = Json.format[UserLog]
     implicit val adminGetUserLogsResponseUserLogSchema: Schema[UserLog] = Schema
       .derived[UserLog]

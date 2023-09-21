@@ -1,5 +1,6 @@
 package net.wiringbits.services
 
+import io.scalaland.chimney.dsl.transformInto
 import net.wiringbits.api.models.{AdminGetUserLogs, AdminGetUsers}
 import net.wiringbits.common.models.id.UserId
 import net.wiringbits.common.models.{Email, Name}
@@ -16,6 +17,7 @@ class AdminService @Inject() (userLogsRepository: UserLogsRepository, usersRepos
   def userLogs(userId: UserId): Future[AdminGetUserLogs.Response] = {
     for {
       logs <- userLogsRepository.logs(userId)
+      // TODO: use chimney after creating our own types
       items = logs.map { x =>
         AdminGetUserLogs.Response.UserLog(
           id = x.userLogId.value,
@@ -29,6 +31,7 @@ class AdminService @Inject() (userLogsRepository: UserLogsRepository, usersRepos
   def users(): Future[AdminGetUsers.Response] = {
     for {
       users <- usersRepository.all()
+      // TODO: use chimney after creating our own types
       items = users.map { x =>
         AdminGetUsers.Response.User(
           id = x.userId.value,

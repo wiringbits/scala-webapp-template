@@ -12,6 +12,7 @@ val enumeratum = "1.7.2"
 val scalaJavaTime = "2.5.0"
 val tapir = "1.5.0"
 val typoVersion = "0.3.1"
+val chimney = "0.8.0-RC1"
 
 val consoleDisabledOptions = Seq("-Werror", "-Ywarn-unused", "-Ywarn-unused-import")
 
@@ -378,8 +379,7 @@ lazy val server = (project in file("server"))
       "org.glassfish" % "javax.el" % "3.0.0",
       "com.beachape" %% "enumeratum" % enumeratum,
       "com.softwaremill.sttp.tapir" %% "tapir-swagger-ui-bundle" % tapir,
-      "com.olvind.typo" %% "typo" % typoVersion,
-      "com.olvind.typo" %% "typo-dsl-anorm" % typoVersion
+      "io.scalaland" %% "chimney" % chimney
     )
   )
 
