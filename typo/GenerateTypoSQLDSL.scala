@@ -1,7 +1,7 @@
 //> using scala "3.3.0"
 
-//> using lib "com.olvind.typo::typo:0.3.0"
-//> using lib "com.olvind.typo::typo-dsl-anorm:0.3.0"
+//> using lib "com.olvind.typo::typo:0.3.1"
+//> using lib "com.olvind.typo::typo-dsl-anorm:0.3.1"
 //> using lib "com.typesafe.play::play-json::2.10.0-RC9"
 
 import typo.*
@@ -71,7 +71,7 @@ object GenerateTypoSQLDSL extends App {
   given conn: java.sql.Connection =
     // TODO: get connection from config
     java.sql.DriverManager.getConnection(
-      "jdbc:postgresql://localhost:5432/wiringbits_db_v2?user=postgres&password=postgres"
+      "jdbc:postgresql://localhost:5432/wiringbits_db?user=postgres&password=postgres"
     )
 
   def runScript = {

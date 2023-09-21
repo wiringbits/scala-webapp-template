@@ -1,5 +1,6 @@
 package net.wiringbits.actions
 
+import io.scalaland.chimney.dsl.transformInto
 import net.wiringbits.api.models.Login
 import net.wiringbits.apis.ReCaptchaApi
 import net.wiringbits.common.models.{Email, Name}
@@ -28,6 +29,7 @@ class LoginAction @Inject() (
       user = ValidatePasswordMatches(maybe, request.password)
 
       // A login token is created
+      // TODO: use chimney after creating our own types
       _ <- userLogsRepository.create(user.userId, "Logged in successfully")
     } yield Login.Response(user.userId, user.name, user.email)
   }

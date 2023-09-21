@@ -13,3 +13,5 @@ local.env
 .bloop/
 .ammonite/
 metals.sbt
+
+.scala-build
