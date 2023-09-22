@@ -22,6 +22,6 @@ object Email extends WrappedString.Companion[Email] {
   }
 
   implicit override def trusted(string: String): Email = new Email(string)
-  
+
   implicit val sqlType: String = "CITEXT"
 }

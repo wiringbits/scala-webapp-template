@@ -9,10 +9,11 @@ package public
 package user_logs
 
 import anorm.ToStatement
-import net.wiringbits.common.models.id.UserLogId
-import typo.dsl.{DeleteBuilder, SelectBuilder, UpdateBuilder}
-
 import java.sql.Connection
+import net.wiringbits.common.models.id.UserLogId
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait UserLogsRepo {
   def delete(userLogId: /* user-picked */ UserLogId)(implicit c: Connection): Boolean
