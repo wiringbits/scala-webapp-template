@@ -38,7 +38,7 @@ lazy val commonSettings: Project => Project = {
       Wart.IsInstanceOf,
       Wart.JavaConversions,
       //      Wart.JavaSerializable,
-      //      Wart.MutableDataStructures,
+      Wart.MutableDataStructures,
       //      Wart.NonUnitStatements,
       //      Wart.Nothing,
       Wart.Null,
