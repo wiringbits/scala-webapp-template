@@ -99,7 +99,6 @@ object GenerateTypoSQLDSL extends App {
   }
 
   def addCustomCodecs = {
-    // TODO: get from server
     val typoCustomCodecs = os.read(os.pwd / "server" / "src" / "main" / "scala" / "net" / "wiringbits" / "repositories" / "TypoCodecs.scala")
     val firstOpenningBracket = typoCustomCodecs.indexOf("{")
     // + 1 because we are skipping the openning bracket
