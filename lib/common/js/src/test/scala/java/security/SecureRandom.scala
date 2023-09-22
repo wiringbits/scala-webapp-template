@@ -67,7 +67,7 @@ object SecureRandom {
               *
               * This was necessary because webpack seems to be polluting our runtime libraries with one that breaks in
               * the tests.
-             */
+              */
             try {
               crypto.randomFillSync(buffer)
             } catch {
