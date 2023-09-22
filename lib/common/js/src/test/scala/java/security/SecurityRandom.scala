@@ -52,7 +52,7 @@ object SecureRandom {
   private lazy val getRandomValuesFun: js.Function1[ArrayBufferView, Unit] = {
     if (
       js.typeOf(js.Dynamic.global.crypto) != "undefined" &&
-        js.typeOf(js.Dynamic.global.crypto.getRandomValues) == "function"
+      js.typeOf(js.Dynamic.global.crypto.getRandomValues) == "function"
     ) {
       { (buffer: ArrayBufferView) =>
         js.Dynamic.global.crypto.getRandomValues(buffer)
@@ -64,9 +64,9 @@ object SecureRandom {
         if (js.typeOf(crypto.randomFillSync) == "function") {
           { (buffer: ArrayBufferView) =>
             /** This part differs from the official implementation because it catches runtime exceptions
-             *
-             * This was necessary because webpack seems to be polluting our runtime libraries with one that breaks in
-             * the tests.
+              *
+              * This was necessary because webpack seems to be polluting our runtime libraries with one that breaks in
+              * the tests.
              */
             try {
               crypto.randomFillSync(buffer)
