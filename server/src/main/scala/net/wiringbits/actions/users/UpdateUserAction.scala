@@ -1,6 +1,6 @@
-package net.wiringbits.actions
+package net.wiringbits.actions.users
 
-import net.wiringbits.api.models.UpdateUser
+import net.wiringbits.api.models.users.UpdateUser
 import net.wiringbits.repositories.UsersRepository
 
 import java.util.UUID

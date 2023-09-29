@@ -1,7 +1,7 @@
-package net.wiringbits.actions
+package net.wiringbits.actions.auth
 
 import io.scalaland.chimney.dsl.transformInto
-import net.wiringbits.api.models.GetCurrentUser
+import net.wiringbits.api.models.auth.GetCurrentUser
 import net.wiringbits.repositories.UsersRepository
 import net.wiringbits.repositories.models.User
 

@@ -1,6 +1,6 @@
-package net.wiringbits.actions
+package net.wiringbits.actions.users
 
-import net.wiringbits.api.models.VerifyEmail
+import net.wiringbits.api.models.users.VerifyEmail
 import net.wiringbits.config.UserTokensConfig
 import net.wiringbits.repositories.{UserTokensRepository, UsersRepository}
 import net.wiringbits.util.{EmailMessage, TokensHelper}

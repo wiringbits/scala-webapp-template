@@ -1,7 +1,7 @@
-package net.wiringbits.actions
+package net.wiringbits.actions.auth
 
 import io.scalaland.chimney.dsl.transformInto
-import net.wiringbits.api.models.Login
+import net.wiringbits.api.models.auth.Login
 import net.wiringbits.apis.ReCaptchaApi
 import net.wiringbits.repositories.{UserLogsRepository, UsersRepository}
 import net.wiringbits.validations.{ValidateCaptcha, ValidatePasswordMatches, ValidateVerifiedUser}

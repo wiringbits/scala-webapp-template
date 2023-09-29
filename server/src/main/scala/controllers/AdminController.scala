@@ -1,7 +1,8 @@
 package controllers
 
 import net.wiringbits.api.endpoints.AdminEndpoints
-import net.wiringbits.api.models.{AdminGetUserLogs, AdminGetUsers, ErrorResponse}
+import net.wiringbits.api.models.admin.{AdminGetUserLogs, AdminGetUsers}
+import net.wiringbits.api.models.ErrorResponse
 import net.wiringbits.common.models.Email
 import net.wiringbits.services.AdminService
 import org.slf4j.LoggerFactory

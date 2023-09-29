@@ -1,7 +1,7 @@
 package net.wiringbits.components.widgets
 
 import net.wiringbits.AppContext
-import net.wiringbits.api.models.GetUserLogs
+import net.wiringbits.api.models.users.GetUserLogs
 import net.wiringbits.models.User
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.AsyncComponent
 import net.wiringbits.webapp.utils.slinkyUtils.core.GenericHooks

@@ -1,7 +1,8 @@
 package net.wiringbits.api.endpoints
 
 import net.wiringbits.api.models
-import net.wiringbits.api.models.{ErrorResponse, GetEnvironmentConfig}
+import net.wiringbits.api.models.ErrorResponse
+import net.wiringbits.api.models.environmentconfig.GetEnvironmentConfig
 import sttp.tapir.*
 import sttp.tapir.json.play.*
 

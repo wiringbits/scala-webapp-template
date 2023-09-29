@@ -1,8 +1,9 @@
 package controllers
 
-import net.wiringbits.actions.*
+import net.wiringbits.actions.auth.{GetUserAction, LoginAction}
 import net.wiringbits.api.endpoints.AuthEndpoints
 import net.wiringbits.api.models.*
+import net.wiringbits.api.models.auth.{GetCurrentUser, Login, Logout}
 import org.slf4j.LoggerFactory
 import sttp.capabilities.WebSockets
 import sttp.capabilities.akka.AkkaStreams

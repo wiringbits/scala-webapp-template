@@ -1,6 +1,6 @@
-package net.wiringbits.actions
+package net.wiringbits.actions.users
 
-import net.wiringbits.api.models.ForgotPassword
+import net.wiringbits.api.models.users.ForgotPassword
 import net.wiringbits.apis.ReCaptchaApi
 import net.wiringbits.repositories.UsersRepository
 import net.wiringbits.repositories.models.User

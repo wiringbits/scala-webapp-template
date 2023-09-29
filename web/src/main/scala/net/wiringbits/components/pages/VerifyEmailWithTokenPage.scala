@@ -3,7 +3,7 @@ package net.wiringbits.components.pages
 import com.olvind.mui.csstype.mod.Property.{FlexDirection, TextAlign}
 import com.olvind.mui.muiMaterial.components as mui
 import net.wiringbits.AppContext
-import net.wiringbits.api.models.VerifyEmail
+import net.wiringbits.api.models.users.VerifyEmail
 import net.wiringbits.common.models.UserToken
 import net.wiringbits.core.I18nHooks
 import net.wiringbits.webapp.utils.slinkyUtils.Utils.CSSPropertiesUtils

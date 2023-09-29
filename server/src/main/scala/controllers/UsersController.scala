@@ -1,8 +1,10 @@
 package controllers
 
 import net.wiringbits.actions.*
+import net.wiringbits.actions.users.{CreateUserAction, ForgotPasswordAction, GetUserLogsAction, ResetPasswordAction, SendEmailVerificationTokenAction, UpdatePasswordAction, UpdateUserAction, VerifyUserEmailAction}
 import net.wiringbits.api.endpoints.UsersEndpoints
 import net.wiringbits.api.models.*
+import net.wiringbits.api.models.users.{CreateUser, ForgotPassword, GetUserLogs, ResetPassword, SendEmailVerificationToken, UpdatePassword, UpdateUser, VerifyEmail}
 import org.slf4j.LoggerFactory
 import sttp.capabilities.WebSockets
 import sttp.capabilities.akka.AkkaStreams

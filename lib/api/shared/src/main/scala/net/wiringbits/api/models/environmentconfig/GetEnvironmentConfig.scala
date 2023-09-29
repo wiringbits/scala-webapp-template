@@ -1,4 +1,4 @@
-package net.wiringbits.api.models
+package net.wiringbits.api.models.environmentconfig
 
 import play.api.libs.json.{Format, Json}
 import sttp.tapir.Schema

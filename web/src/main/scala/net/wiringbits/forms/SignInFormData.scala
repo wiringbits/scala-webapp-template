@@ -1,6 +1,6 @@
 package net.wiringbits.forms
 
-import net.wiringbits.api.models.Login
+import net.wiringbits.api.models.auth.Login
 import net.wiringbits.common.models.{Captcha, Email, Password}
 import net.wiringbits.webapp.utils.slinkyUtils.forms.{FormData, FormField}
 

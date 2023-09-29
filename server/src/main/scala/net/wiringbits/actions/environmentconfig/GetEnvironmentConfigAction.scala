@@ -1,6 +1,6 @@
-package net.wiringbits.actions
+package net.wiringbits.actions.environmentconfig
 
-import net.wiringbits.api.models.GetEnvironmentConfig
+import net.wiringbits.api.models.environmentconfig.GetEnvironmentConfig
 import net.wiringbits.config.ReCaptchaConfig
 
 import javax.inject.Inject

@@ -1,7 +1,8 @@
 package net.wiringbits.api.endpoints
 
 import net.wiringbits.api.models
-import net.wiringbits.api.models.{AdminGetUserLogs, AdminGetUsers, ErrorResponse}
+import net.wiringbits.api.models.admin.{AdminGetUserLogs, AdminGetUsers}
+import net.wiringbits.api.models.ErrorResponse
 import net.wiringbits.common.models.{Email, Name}
 import sttp.tapir.*
 import sttp.tapir.json.play.*

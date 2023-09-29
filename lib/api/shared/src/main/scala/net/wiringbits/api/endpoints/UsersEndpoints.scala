@@ -1,6 +1,7 @@
 package net.wiringbits.api.endpoints
 
 import net.wiringbits.api.models.*
+import net.wiringbits.api.models.users.{CreateUser, ForgotPassword, GetUserLogs, ResetPassword, SendEmailVerificationToken, UpdatePassword, UpdateUser, VerifyEmail}
 import net.wiringbits.common.models.*
 import sttp.tapir.*
 import sttp.tapir.json.play.*

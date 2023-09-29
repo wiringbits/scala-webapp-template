@@ -1,6 +1,6 @@
 package net.wiringbits.forms
 
-import net.wiringbits.api.models.ResetPassword
+import net.wiringbits.api.models.users.ResetPassword
 import net.wiringbits.common.models.{Password, UserToken}
 import net.wiringbits.webapp.utils.slinkyUtils.forms.{FormData, FormField}
 

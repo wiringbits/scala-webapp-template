@@ -1,6 +1,6 @@
 package net.wiringbits.forms
 
-import net.wiringbits.api.models.SendEmailVerificationToken
+import net.wiringbits.api.models.users.SendEmailVerificationToken
 import net.wiringbits.common.models.{Captcha, Email}
 import net.wiringbits.webapp.common.validators.ValidationResult
 import net.wiringbits.webapp.utils.slinkyUtils.forms.{FormData, FormField}

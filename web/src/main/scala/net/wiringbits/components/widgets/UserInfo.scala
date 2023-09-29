@@ -2,7 +2,7 @@ package net.wiringbits.components.widgets
 
 import com.olvind.mui.muiMaterial.components as mui
 import net.wiringbits.AppContext
-import net.wiringbits.api.models.GetCurrentUser
+import net.wiringbits.api.models.auth.GetCurrentUser
 import net.wiringbits.core.I18nHooks
 import net.wiringbits.models.User
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.AsyncComponent
