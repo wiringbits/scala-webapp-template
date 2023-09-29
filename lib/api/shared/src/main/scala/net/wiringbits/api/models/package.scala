@@ -1,10 +1,9 @@
 package net.wiringbits.api
 
-import net.wiringbits.common.models.{Captcha, Email, Name, Password}
 import net.wiringbits.webapp.common.models.WrappedString
 import play.api.libs.json.*
 import sttp.tapir.generic.auto.*
-import sttp.tapir.{Codec, CodecFormat, Schema, SchemaType}
+import sttp.tapir.{Schema, SchemaType}
 
 import java.time.Instant
 
