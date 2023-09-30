@@ -2,7 +2,6 @@ package controllers
 
 import com.dimafeng.testcontainers.PostgreSQLContainer
 import controllers.common.PlayPostgresSpec
-import net.wiringbits.api.models.users.CreateUser
 import net.wiringbits.apis.models.EmailRequest
 import net.wiringbits.apis.{EmailApi, ReCaptchaApi}
 import net.wiringbits.common.models.*
@@ -41,25 +40,16 @@ class AdminControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoS
       )
 
   "GET /admin/users" should {
-    "get every user" in withApiClient { client =>
-      val request = CreateUser.Request(
-        name = Name.trusted("wiringbits"),
-        email = Email.trusted("test@email.com"),
-        password = Password.trusted("test123..."),
-        captcha = Captcha.trusted("test")
-      )
-
-      val list = List(1, 2, 3)
-      list.foreach { i =>
+    "get every user" in withApiClient { implicit client =>
+      val expected = 3
+      (1 to expected).foreach { _ =>
         createVerifyLoginUser(
-          request.copy(email = Email.trusted(s"test$i@email.com")),
-          client,
           tokenGenerator
         ).futureValue
       }
 
       val response = client.adminGetUsers.futureValue
-      response.data.length must be(list.length)
+      response.data.length must be(expected)
     }
 
     "return no results" in withApiClient { client =>
@@ -69,14 +59,8 @@ class AdminControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoS
   }
 
   "GET /admin/users/:userId/logs" should {
-    "get user logs" in withApiClient { client =>
-      val request = CreateUser.Request(
-        name = Name.trusted("wiringbits"),
-        email = Email.trusted("test@email.com"),
-        password = Password.trusted("test123..."),
-        captcha = Captcha.trusted("test")
-      )
-      val user = createVerifyLoginUser(request, client, tokenGenerator).futureValue
+    "get user logs" in withApiClient { implicit client =>
+      val user = createVerifyLoginUser(tokenGenerator).futureValue
       val response = client.adminGetUserLogs(user.id).futureValue
       response.data.isEmpty must be(false)
     }
