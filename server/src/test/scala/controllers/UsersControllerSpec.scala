@@ -3,13 +3,7 @@ package controllers
 import com.dimafeng.testcontainers.PostgreSQLContainer
 import controllers.common.PlayPostgresSpec
 import net.wiringbits.api.models.auth.Login
-import net.wiringbits.api.models.users.{
-  CreateUser,
-  ForgotPassword,
-  ResetPassword,
-  SendEmailVerificationToken,
-  VerifyEmail
-}
+import net.wiringbits.api.models.users.{ForgotPassword, ResetPassword, SendEmailVerificationToken, VerifyEmail}
 import net.wiringbits.apis.models.EmailRequest
 import net.wiringbits.apis.{EmailApi, ReCaptchaApi}
 import net.wiringbits.common.models.*
@@ -60,20 +54,14 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoS
   }
 
   "POST /users" should {
-    "return the email verification token after creating a user" in withApiClient { client =>
+    "return the email verification token after creating a user" in withApiClient { implicit client =>
       val name = Name.trusted("wiringbits")
       val email = Email.trusted("test1@email.com")
-      val request = CreateUser.Request(
-        name = name,
-        email = email,
-        password = Password.trusted("test123..."),
-        captcha = Captcha.trusted("test")
-      )
 
       val verificationToken = UUID.randomUUID()
       when(tokenGenerator.next()).thenReturn(verificationToken)
 
-      val response = client.createUser(request).futureValue
+      val response = createUser(nameMaybe = Some(name), emailMaybe = Some(email)).futureValue
       val token = userTokensRepository
         .find(response.id)
         .futureValue
@@ -85,37 +73,17 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoS
       token.token must be(createHMACToken(verificationToken))
     }
 
-    "fail when the email is already taken" in withApiClient { client =>
-      val request = CreateUser.Request(
-        name = Name.trusted("someone"),
-        email = Email.trusted("test@wiringbits.net"),
-        password = Password.trusted("test123..."),
-        captcha = Captcha.trusted("test")
-      )
+    "fail when the email is already taken" in withApiClient { implicit client =>
+      val email = Email.trusted("test@wiringbits.net")
+      createUser(emailMaybe = Some(email)).futureValue
 
-      // take the email
-      client.createUser(request).futureValue
-
-      // then, it fails
-      val error = client
-        .createUser(request)
-        .expectError
+      val error = createUser(emailMaybe = Some(email)).expectError
       error must be("The email is not available")
     }
 
-    "fail when the captcha isn't valid" in withApiClient { client =>
-      val request = CreateUser.Request(
-        name = Name.trusted("wiringbits"),
-        email = Email.trusted("test1@email.com"),
-        password = Password.trusted("test123..."),
-        captcha = Captcha.trusted("test")
-      )
-
+    "fail when the captcha isn't valid" in withApiClient { implicit client =>
       when(captchaApi.verify(any[Captcha]())).thenReturn(Future.successful(false))
-
-      val error = client
-        .createUser(request)
-        .expectError
+      val error = createUser().expectError
 
       error must be("Invalid captcha, try again")
 
@@ -124,46 +92,23 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoS
   }
 
   "POST /users/verify-email" should {
-    "success on verifying user's email" in withApiClient { client =>
+    "success on verifying user's email" in withApiClient { implicit client =>
       val name = Name.trusted("wiringbits")
       val email = Email.trusted("test1@email.com")
-      val request = CreateUser.Request(
-        name = name,
-        email = email,
-        password = Password.trusted("test123..."),
-        captcha = Captcha.trusted("test")
-      )
-      val response = createVerifyLoginUser(request, client, tokenGenerator).futureValue
+      val response = createVerifyLoginUser(tokenGenerator, nameMaybe = Some(name), emailMaybe = Some(email)).futureValue
 
       response.name must be(name)
       response.email must be(email)
     }
 
-    "delete the verification token after successful email confirmation" in withApiClient { client =>
-      val request = CreateUser.Request(
-        name = Name.trusted("wiringbits"),
-        email = Email.trusted("test1@email.com"),
-        password = Password.trusted("test123..."),
-        captcha = Captcha.trusted("test")
-      )
-      val verificationToken = UUID.randomUUID()
-      when(tokenGenerator.next()).thenReturn(verificationToken)
-
-      val user = client.createUser(request).futureValue
-
-      client.verifyEmail(VerifyEmail.Request(UserToken(userId = user.id, token = verificationToken))).futureValue
+    "delete the verification token after successful email confirmation" in withApiClient { implicit client =>
+      val user = createVerifyLoginUser(tokenGenerator).futureValue
 
       userTokensRepository.find(user.id).futureValue must be(empty)
     }
 
-    "fail when trying to verify an already verified user's email" in withApiClient { client =>
-      val request = CreateUser.Request(
-        name = Name.trusted("wiringbits"),
-        email = Email.trusted("test1@email.com"),
-        password = Password.trusted("test123..."),
-        captcha = Captcha.trusted("test")
-      )
-      val user = createVerifyLoginUser(request, client, tokenGenerator).futureValue
+    "fail when trying to verify an already verified user's email" in withApiClient { implicit client =>
+      val user = createVerifyLoginUser(tokenGenerator).futureValue
 
       val token = UUID.randomUUID()
 
@@ -176,22 +121,15 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoS
   }
 
   "POST /forgot-password" should {
-    "create the reset password token after the user's request to reset their password" in withApiClient { client =>
-      val name = Name.trusted("wiringbits")
-      val email = Email.trusted("test1@email.com")
-      val request = CreateUser.Request(
-        name = name,
-        email = email,
-        password = Password.trusted("test123..."),
-        captcha = Captcha.trusted("test")
-      )
+    "create the reset password token after the user's request to reset their password" in withApiClient {
+      implicit client =>
+        val email = Email.trusted("test1@email.com")
+        createVerifyLoginUser(tokenGenerator, emailMaybe = Some(email)).futureValue
 
-      createVerifyLoginUser(request, client, tokenGenerator).futureValue
+        val forgotPasswordRequest = ForgotPassword.Request(email, Captcha.trusted("test"))
+        val response = client.forgotPassword(forgotPasswordRequest).futureValue
 
-      val forgotPasswordRequest = ForgotPassword.Request(email, Captcha.trusted("test"))
-      val response = client.forgotPassword(forgotPasswordRequest).futureValue
-
-      response must be(ForgotPassword.Response())
+        response must be(ForgotPassword.Response())
     }
 
     "ignore the request when the user tries to reset a password for nonexistent email" in withApiClient { client =>
@@ -203,38 +141,24 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoS
       response must be(ForgotPassword.Response())
     }
 
-    "fail when the user tries to reset a password without their email verification step" in withApiClient { client =>
-      val name = Name.trusted("wiringbits")
-      val email = Email.trusted("test1@email.com")
-      val request = CreateUser.Request(
-        name = name,
-        email = email,
-        password = Password.trusted("test123..."),
-        captcha = Captcha.trusted("test")
-      )
+    "fail when the user tries to reset a password without their email verification step" in withApiClient {
+      implicit client =>
+        val email = Email.trusted("test1@email.com")
+        createUser(emailMaybe = Some(email)).futureValue
 
-      client.createUser(request).futureValue
+        val forgotPasswordRequest = ForgotPassword.Request(email, Captcha.trusted("test"))
 
-      val forgotPasswordRequest = ForgotPassword.Request(email, Captcha.trusted("test"))
+        val error = client
+          .forgotPassword(forgotPasswordRequest)
+          .expectError
 
-      val error = client
-        .forgotPassword(forgotPasswordRequest)
-        .expectError
-
-      error must be(s"The email is not verified, check your spam folder if you don't see the email.")
+        error must be(s"The email is not verified, check your spam folder if you don't see the email.")
     }
 
-    "fail when the captcha isn't valid" in withApiClient { client =>
-      val name = Name.trusted("wiringbits")
-      val email = Email.trusted("test1@email.com")
-      val request = CreateUser.Request(
-        name = name,
-        email = email,
-        password = Password.trusted("test123..."),
-        captcha = Captcha.trusted("test")
-      )
+    "fail when the captcha isn't valid" in withApiClient { implicit client =>
+      val email = Email.trusted("test@email.com")
 
-      createVerifyLoginUser(request, client, tokenGenerator).futureValue
+      createVerifyLoginUser(tokenGenerator, emailMaybe = Some(email)).futureValue
 
       val forgotPasswordRequest = ForgotPassword.Request(email, Captcha.trusted("test"))
       when(captchaApi.verify(any[Captcha]())).thenReturn(Future.successful(false))
@@ -250,17 +174,10 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoS
   }
 
   "POST /reset-password" should {
-    "reset a password for a given user" in withApiClient { client =>
+    "reset a password for a given user" in withApiClient { implicit client =>
       val name = Name.trusted("wiringbits")
-      val email = Email.trusted("test1@email.com")
-      val request = CreateUser.Request(
-        name = name,
-        email = email,
-        password = Password.trusted("test123..."),
-        captcha = Captcha.trusted("test")
-      )
-
-      val user = createVerifyLoginUser(request, client, tokenGenerator).futureValue
+      val email = Email.trusted("test@email.com")
+      val user = createVerifyLoginUser(tokenGenerator, nameMaybe = Some(name), emailMaybe = Some(email)).futureValue
 
       val verificationToken = UUID.randomUUID()
       when(tokenGenerator.next()).thenReturn(verificationToken)
@@ -273,30 +190,24 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoS
       client.resetPassword(resetPasswordRequest).futureValue
 
       val loginRequest = Login.Request(
-        email = request.email,
+        email = email,
         password = Password.trusted("test456..."),
         captcha = Captcha.trusted("test")
       )
       val loginResponse = client.login(loginRequest).futureValue
 
-      loginResponse.name must be(request.name)
-      loginResponse.email must be(request.email)
+      loginResponse.name must be(name)
+      loginResponse.email must be(email)
     }
 
-    "return a email when a user tries to reset a password" in withApiClient { client =>
+    "return a email when a user tries to reset a password" in withApiClient { implicit client =>
       val name = Name.trusted("wiringbits")
       val email = Email.trusted("test1@email.com")
-      val request = CreateUser.Request(
-        name = name,
-        email = email,
-        password = Password.trusted("test123..."),
-        captcha = Captcha.trusted("test")
-      )
 
-      val userId = createVerifyLoginUser(request, client, tokenGenerator).futureValue.id
+      val userId =
+        createVerifyLoginUser(tokenGenerator, nameMaybe = Some(name), emailMaybe = Some(email)).futureValue.id
 
-      val verificationToken = UUID.randomUUID()
-      when(tokenGenerator.next()).thenReturn(verificationToken)
+      val verificationToken = tokenGenerator.next()
 
       val forgotPasswordRequest = ForgotPassword.Request(email, Captcha.trusted("test"))
       client.forgotPassword(forgotPasswordRequest).futureValue
@@ -312,17 +223,9 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoS
     }
 
     "fail when the user tries to login with their old password after the password resetting" in withApiClient {
-      client =>
-        val name = Name.trusted("wiringbits")
+      implicit client =>
         val email = Email.trusted("test1@email.com")
-        val request = CreateUser.Request(
-          name = name,
-          email = email,
-          password = Password.trusted("test123..."),
-          captcha = Captcha.trusted("test")
-        )
-
-        val user = createVerifyLoginUser(request, client, tokenGenerator).futureValue
+        val user = createVerifyLoginUser(tokenGenerator, emailMaybe = Some(email)).futureValue
 
         val verificationToken = UUID.randomUUID()
         when(tokenGenerator.next()).thenReturn(verificationToken)
@@ -335,7 +238,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoS
         client.resetPassword(resetPasswordRequest).futureValue
 
         val loginRequest = Login.Request(
-          email = request.email,
+          email = email,
           password = Password.trusted("test123..."),
           captcha = Captcha.trusted("test")
         )
@@ -349,25 +252,18 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoS
   }
 
   "POST /users/email-verification-token" should {
-    "success on send verifying token user's email" in withApiClient { client =>
+    "success on send verifying token user's email" in withApiClient { implicit client =>
       val name = Name.trusted("wiringbits")
-      val email = Email.trusted("test1@email.com")
+      val email = Email.trusted("test@email.com")
       val request = SendEmailVerificationToken.Request(
         email = email,
-        captcha = Captcha.trusted("test")
-      )
-
-      val userRequest = CreateUser.Request(
-        name = name,
-        email = email,
-        password = Password.trusted("test123..."),
         captcha = Captcha.trusted("test")
       )
 
       val verificationToken = UUID.randomUUID()
       when(tokenGenerator.next()).thenReturn(verificationToken)
 
-      val userCreated = client.createUser(userRequest).futureValue
+      val userCreated = createUser(nameMaybe = Some(name), emailMaybe = Some(email)).futureValue
 
       val response = client.sendEmailVerificationToken(request).futureValue
 
@@ -380,47 +276,17 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoS
       response.expiresAt must be(token.expiresAt)
     }
 
-    "success on verifying email and login" in withApiClient { client =>
+    "success on verifying email and login" in withApiClient { implicit client =>
       val name = Name.trusted("wiringbits")
-      val email = Email.trusted("test1@email.com")
-      val captcha = Captcha.trusted("test")
-      val password = Password.trusted("test123...")
-      val request = SendEmailVerificationToken.Request(
-        email = email,
-        captcha = captcha
-      )
+      val email = Email.trusted("test@email.com")
+      val response = createVerifyLoginUser(tokenGenerator, nameMaybe = Some(name), emailMaybe = Some(email)).futureValue
 
-      val userRequest = CreateUser.Request(
-        name = name,
-        email = email,
-        password = password,
-        captcha = captcha
-      )
-
-      val verificationToken = UUID.randomUUID()
-      when(tokenGenerator.next()).thenReturn(verificationToken)
-
-      val userCreated = client.createUser(userRequest).futureValue
-
-      val emailVerificationToken = UUID.randomUUID()
-      when(tokenGenerator.next()).thenReturn(emailVerificationToken)
-
-      client.sendEmailVerificationToken(request).futureValue
-      client.verifyEmail(VerifyEmail.Request(UserToken(userCreated.id, emailVerificationToken))).futureValue
-
-      val loginRequest = Login.Request(
-        email = email,
-        password = password,
-        captcha = captcha
-      )
-      val loginResponse = client.login(loginRequest).futureValue
-
-      loginResponse.name must be(userRequest.name)
-      loginResponse.email must be(userRequest.email)
+      response.name must be(name)
+      response.email must be(email)
     }
 
     "fail when user's email is not registered" in withApiClient { client =>
-      val email = Email.trusted("test1@email.com")
+      val email = Email.trusted("test@email.com")
       val request = SendEmailVerificationToken.Request(
         email = email,
         captcha = Captcha.trusted("test")
@@ -431,7 +297,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoS
     }
 
     "fail when the captcha isn't valid" in withApiClient { client =>
-      val email = Email.trusted("test1@email.com")
+      val email = Email.trusted("test@email.com")
       val request = SendEmailVerificationToken.Request(
         email = email,
         captcha = Captcha.trusted("test")
@@ -448,25 +314,17 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoS
       when(captchaApi.verify(any[Captcha]())).thenReturn(Future.successful(true))
     }
 
-    "fail if the user is already verified" in withApiClient { client =>
-      val name = Name.trusted("wiringbits")
-      val email = Email.trusted("test1@email.com")
+    "fail if the user is already verified" in withApiClient { implicit client =>
+      val email = Email.trusted("test@email.com")
       val request = SendEmailVerificationToken.Request(
         email = email,
-        captcha = Captcha.trusted("test")
-      )
-
-      val userRequest = CreateUser.Request(
-        name = name,
-        email = email,
-        password = Password.trusted("test123..."),
         captcha = Captcha.trusted("test")
       )
 
       val verificationToken = UUID.randomUUID()
       when(tokenGenerator.next()).thenReturn(verificationToken)
 
-      createVerifyLoginUser(userRequest, client, tokenGenerator).futureValue
+      createVerifyLoginUser(tokenGenerator, emailMaybe = Some(email)).futureValue
 
       val error = client
         .sendEmailVerificationToken(request)
