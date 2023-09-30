@@ -5,18 +5,19 @@ import akka.stream.scaladsl.*
 import net.wiringbits.common.models.Email
 import net.wiringbits.core.RepositorySpec
 import net.wiringbits.models.jobs.{BackgroundJobPayload, BackgroundJobStatus, BackgroundJobType}
-import net.wiringbits.repositories.daos.BackgroundJobDAO
+import net.wiringbits.repositories.daos.{BackgroundJobDAO, backgroundJobParser}
 import net.wiringbits.repositories.models.BackgroundJobData
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.OptionValues.*
 import org.scalatest.concurrent.ScalaFutures.*
 import org.scalatest.matchers.must.Matchers.*
 import play.api.libs.json.Json
+import utils.RepositoryUtils
 
 import java.time.Instant
 import java.util.UUID
 
-class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll {
+class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll with RepositoryUtils {
 
   // required to test the streaming operations
   private implicit lazy val system: ActorSystem = ActorSystem("BackgroundJobsRepositorySpec")
@@ -26,24 +27,10 @@ class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll
     super.afterAll()
   }
 
-  private val backgroundJobPayload =
-    BackgroundJobPayload.SendEmail(Email.trusted("sample@wiringbits.net"), subject = "Test message", body = "it works")
   "streamPendingJobs" should {
 
-    "work (simple case)" in withRepositories() { repositories =>
-      val createRequest = BackgroundJobData.Create(
-        id = UUID.randomUUID(),
-        `type` = BackgroundJobType.SendEmail,
-        payload = backgroundJobPayload,
-        status = BackgroundJobStatus.Pending,
-        executeAt = Instant.now(),
-        createdAt = Instant.now(),
-        updatedAt = Instant.now()
-      )
-
-      repositories.database.withConnection { implicit conn =>
-        BackgroundJobDAO.create(createRequest)
-      }
+    "work (simple case)" in withRepositories() { implicit repositories =>
+      val createRequest = createBackgroundJobData()
 
       val result = repositories.backgroundJobs.streamPendingJobs.futureValue
         .runWith(Sink.seq)
@@ -56,27 +43,16 @@ class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll
       item.payload must be(Json.toJson(createRequest.payload))
     }
 
-    "only return pending jobs" in withRepositories() { repositories =>
-      val createRequestBase = BackgroundJobData.Create(
-        id = UUID.randomUUID(),
-        `type` = BackgroundJobType.SendEmail,
-        payload = backgroundJobPayload,
-        status = BackgroundJobStatus.Pending,
-        executeAt = Instant.now(),
-        createdAt = Instant.now(),
-        updatedAt = Instant.now()
-      )
-
+    "only return pending jobs" in withRepositories() { implicit repositories =>
+      val backgroundJobType = BackgroundJobType.SendEmail
+      val payload = backgroundJobPayload
       val limit = 6
       for (i <- 1 to limit) {
-        repositories.database.withConnection { implicit conn =>
-          BackgroundJobDAO.create(
-            createRequestBase.copy(
-              id = UUID.randomUUID(),
-              status = if ((i % 2) == 0) BackgroundJobStatus.Success else BackgroundJobStatus.Pending
-            )
-          )
-        }
+        createBackgroundJobData(
+          backgroundJobType = backgroundJobType,
+          payload = payload,
+          status = if (i % 2) == 0 then BackgroundJobStatus.Success else BackgroundJobStatus.Pending
+        )
       }
       val response = repositories.backgroundJobs.streamPendingJobs.futureValue
         .runWith(Sink.seq)
@@ -84,8 +60,8 @@ class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll
       response.length must be(limit / 2)
       response.foreach { x =>
         x.status must be(BackgroundJobStatus.Pending)
-        x.`type` must be(createRequestBase.`type`)
-        x.payload must be(Json.toJson(createRequestBase.payload))
+        x.`type` must be(backgroundJobType)
+        x.payload must be(Json.toJson(payload))
       }
     }
 
@@ -98,20 +74,9 @@ class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll
   }
 
   "setStatusToFailed" should {
-    "work" in withRepositories() { repositories =>
-      val createRequest = BackgroundJobData.Create(
-        id = UUID.randomUUID(),
-        `type` = BackgroundJobType.SendEmail,
-        payload = backgroundJobPayload,
-        status = BackgroundJobStatus.Pending,
-        executeAt = Instant.now(),
-        createdAt = Instant.now(),
-        updatedAt = Instant.now()
-      )
+    "work" in withRepositories() { implicit repositories =>
+      val createRequest = createBackgroundJobData()
 
-      repositories.database.withConnection { implicit conn =>
-        BackgroundJobDAO.create(createRequest)
-      }
       val failReason = "test"
       repositories.backgroundJobs
         .setStatusToFailed(createRequest.id, executeAt = Instant.now(), failReason = failReason)
@@ -137,20 +102,9 @@ class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll
   }
 
   "setStatusToSuccess" should {
-    "work" in withRepositories() { repositories =>
-      val createRequest = BackgroundJobData.Create(
-        id = UUID.randomUUID(),
-        `type` = BackgroundJobType.SendEmail,
-        payload = backgroundJobPayload,
-        status = BackgroundJobStatus.Pending,
-        executeAt = Instant.now(),
-        createdAt = Instant.now(),
-        updatedAt = Instant.now()
-      )
+    "work" in withRepositories() { implicit repositories =>
+      val createRequest = createBackgroundJobData()
 
-      repositories.database.withConnection { implicit conn =>
-        BackgroundJobDAO.create(createRequest)
-      }
       repositories.backgroundJobs.setStatusToSuccess(createRequest.id).futureValue
 
       val result = repositories.backgroundJobs.streamPendingJobs.futureValue

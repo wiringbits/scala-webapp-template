@@ -10,10 +10,11 @@ import org.scalatest.BeforeAndAfterAll
 import org.scalatest.OptionValues.*
 import org.scalatest.concurrent.ScalaFutures.*
 import org.scalatest.matchers.must.Matchers.*
+import utils.RepositoryUtils
 
 import java.util.UUID
 
-class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll {
+class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll with RepositoryUtils {
 
   // required to test the streaming operations
   private implicit lazy val system: ActorSystem = ActorSystem("UserRepositorySpec")
@@ -24,41 +25,19 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll {
   }
 
   "create" should {
-    "work" in withRepositories() { repositories =>
-      val request = User.CreateUser(
-        id = UUID.randomUUID(),
-        email = Email.trusted("hello@wiringbits.net"),
-        name = Name.trusted("Sample"),
-        hashedPassword = "password",
-        verifyEmailToken = "token"
-      )
-      repositories.users.create(request).futureValue
+    "work" in withRepositories() { implicit repositories =>
+      createUser().futureValue
     }
 
-    "create a token for verifying the email" in withRepositories() { repositories =>
-      val request = User.CreateUser(
-        id = UUID.randomUUID(),
-        email = Email.trusted("hello@wiringbits.net"),
-        name = Name.trusted("Sample"),
-        hashedPassword = "password",
-        verifyEmailToken = "token"
-      )
-      repositories.users.create(request).futureValue
+    "create a token for verifying the email" in withRepositories() { implicit repositories =>
+      val request = createUser().futureValue
 
       val response = repositories.userTokens.find(request.id).futureValue
       response.nonEmpty must be(true)
     }
 
-    "fail when the id already exists" in withRepositories() { repositories =>
-      val request = User.CreateUser(
-        id = UUID.randomUUID(),
-        email = Email.trusted("hello@wiringbits.net"),
-        name = Name.trusted("Sample"),
-        hashedPassword = "password",
-        verifyEmailToken = "token"
-      )
-
-      repositories.users.create(request).futureValue
+    "fail when the id already exists" in withRepositories() { implicit repositories =>
+      val request = createUser().futureValue
       val ex = intercept[RuntimeException] {
         repositories.users.create(request.copy(email = Email.trusted("email2@wiringbits.net"))).futureValue
       }
@@ -68,16 +47,8 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll {
       )
     }
 
-    "fail when the email already exists" in withRepositories() { repositories =>
-      val request = User.CreateUser(
-        id = UUID.randomUUID(),
-        email = Email.trusted("hello@wiringbits.net"),
-        name = Name.trusted("Sample"),
-        hashedPassword = "password",
-        verifyEmailToken = "token"
-      )
-
-      repositories.users.create(request).futureValue
+    "fail when the email already exists" in withRepositories() { implicit repositories =>
+      val request = createUser().futureValue
       val ex = intercept[RuntimeException] {
         repositories.users.create(request.copy(id = UUID.randomUUID())).futureValue
       }
@@ -89,16 +60,10 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll {
   }
 
   "all" should {
-    "return the existing users" in withRepositories() { repositories =>
-      for (i <- 1 to 3) {
-        val request = User.CreateUser(
-          id = UUID.randomUUID(),
-          email = Email.trusted(s"test$i@wiringbits.net"),
-          name = Name.trusted("Sample"),
-          hashedPassword = "password",
-          verifyEmailToken = "token"
-        )
-        repositories.users.create(request).futureValue
+    "return the existing users" in withRepositories() { implicit repositories =>
+      val expected = 3
+      for (i <- 1 to expected) {
+        createUser(email = Email.trusted(s"test$i@wiringbits.net")).futureValue
       }
 
       val response = repositories.users.all().futureValue
@@ -112,15 +77,8 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll {
   }
 
   "find(email)" should {
-    "return a user when the email exists" in withRepositories() { repositories =>
-      val request = User.CreateUser(
-        id = UUID.randomUUID(),
-        email = Email.trusted("hello@wiringbits.net"),
-        name = Name.trusted("Sample"),
-        hashedPassword = "password",
-        verifyEmailToken = "token"
-      )
-      repositories.users.create(request).futureValue
+    "return a user when the email exists" in withRepositories() { implicit repositories =>
+      val request = createUser().futureValue
 
       val response = repositories.users.find(request.email).futureValue
       response.value.email must be(request.email)
@@ -128,15 +86,8 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll {
       response.value.hashedPassword must be(request.hashedPassword)
     }
 
-    "return a user when the email exists (case insensitive match)" in withRepositories() { repositories =>
-      val request = User.CreateUser(
-        id = UUID.randomUUID(),
-        email = Email.trusted("hello@wiringbits.net"),
-        name = Name.trusted("Sample"),
-        hashedPassword = "password",
-        verifyEmailToken = "token"
-      )
-      repositories.users.create(request).futureValue
+    "return a user when the email exists (case insensitive match)" in withRepositories() { implicit repositories =>
+      val request = createUser().futureValue
 
       val email = Email.trusted(request.email.string.toUpperCase)
       val response = repositories.users.find(email).futureValue
@@ -151,15 +102,8 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll {
   }
 
   "find(id)" should {
-    "return a user when the id exists" in withRepositories() { repositories =>
-      val request = User.CreateUser(
-        id = UUID.randomUUID(),
-        email = Email.trusted("hello@wiringbits.net"),
-        name = Name.trusted("Sample"),
-        hashedPassword = "password",
-        verifyEmailToken = "token"
-      )
-      repositories.users.create(request).futureValue
+    "return a user when the id exists" in withRepositories() { implicit repositories =>
+      val request = createUser().futureValue
 
       val response = repositories.users.find(request.id).futureValue
       response.value.email must be(request.email)
@@ -175,15 +119,8 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll {
   }
 
   "update" should {
-    "update an existing user" in withRepositories() { repositories =>
-      val request = User.CreateUser(
-        id = UUID.randomUUID(),
-        email = Email.trusted("hello@wiringbits.net"),
-        name = Name.trusted("Sample"),
-        hashedPassword = "password",
-        verifyEmailToken = "token"
-      )
-      repositories.users.create(request).futureValue
+    "update an existing user" in withRepositories() { implicit repositories =>
+      val request = createUser().futureValue
 
       val newName = Name.trusted("Test")
       repositories.users.update(request.id, newName).futureValue
@@ -206,15 +143,8 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll {
   }
 
   "updatePassword" should {
-    "update the password for an existing user" in withRepositories() { repositories =>
-      val request = User.CreateUser(
-        id = UUID.randomUUID(),
-        email = Email.trusted("hello@wiringbits.net"),
-        name = Name.trusted("Sample"),
-        hashedPassword = "password",
-        verifyEmailToken = "token"
-      )
-      repositories.users.create(request).futureValue
+    "update the password for an existing user" in withRepositories() { implicit repositories =>
+      val request = createUser().futureValue
 
       val newPassword = "test"
       repositories.users.updatePassword(request.id, newPassword, EmailMessage.updatePassword(request.name)).futureValue
@@ -223,15 +153,8 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll {
       response.value.hashedPassword must be(newPassword)
     }
 
-    "produce a notification for the user" in withRepositories() { repositories =>
-      val request = User.CreateUser(
-        id = UUID.randomUUID(),
-        email = Email.trusted("hello@wiringbits.net"),
-        name = Name.trusted("Sample"),
-        hashedPassword = "password",
-        verifyEmailToken = "token"
-      )
-      repositories.users.create(request).futureValue
+    "produce a notification for the user" in withRepositories() { implicit repositories =>
+      val request = createUser().futureValue
 
       val newPassword = "test"
       repositories.users.updatePassword(request.id, newPassword, EmailMessage.updatePassword(request.name)).futureValue
@@ -254,30 +177,16 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll {
   }
 
   "verify" should {
-    "verify a user given a token" in withRepositories() { repositories =>
-      val request = User.CreateUser(
-        id = UUID.randomUUID(),
-        email = Email.trusted("hello@wiringbits.net"),
-        name = Name.trusted("Sample"),
-        hashedPassword = "password",
-        verifyEmailToken = "token"
-      )
-      repositories.users.create(request).futureValue
+    "verify a user given a token" in withRepositories() { implicit repositories =>
+      val request = createUser().futureValue
       repositories.users.verify(request.id, UUID.randomUUID(), EmailMessage.confirm(request.name)).futureValue
 
       val response = repositories.users.find(request.id).futureValue
       response.value.verifiedOn.isDefined must be(true)
     }
 
-    "produce a notification for the user" in withRepositories() { repositories =>
-      val request = User.CreateUser(
-        id = UUID.randomUUID(),
-        email = Email.trusted("hello@wiringbits.net"),
-        name = Name.trusted("Sample"),
-        hashedPassword = "password",
-        verifyEmailToken = "token"
-      )
-      repositories.users.create(request).futureValue
+    "produce a notification for the user" in withRepositories() { implicit repositories =>
+      val request = createUser().futureValue
       repositories.users.verify(request.id, UUID.randomUUID(), EmailMessage.confirm(request.name)).futureValue
 
       val response = repositories.backgroundJobs.streamPendingJobs.futureValue
@@ -298,15 +207,8 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll {
   }
 
   "resetPassword" should {
-    "update the password" in withRepositories() { repositories =>
-      val request = User.CreateUser(
-        id = UUID.randomUUID(),
-        email = Email.trusted("hello@wiringbits.net"),
-        name = Name.trusted("Sample"),
-        hashedPassword = "password",
-        verifyEmailToken = "token"
-      )
-      repositories.users.create(request).futureValue
+    "update the password" in withRepositories() { implicit repositories =>
+      val request = createUser().futureValue
 
       val newPassword = "test"
       repositories.users.resetPassword(request.id, newPassword, EmailMessage.resetPassword(request.name)).futureValue
@@ -315,15 +217,8 @@ class UsersRepositorySpec extends RepositorySpec with BeforeAndAfterAll {
       response.value.hashedPassword must be(newPassword)
     }
 
-    "produce a notification for the user" in withRepositories() { repositories =>
-      val request = User.CreateUser(
-        id = UUID.randomUUID(),
-        email = Email.trusted("hello@wiringbits.net"),
-        name = Name.trusted("Sample"),
-        hashedPassword = "password",
-        verifyEmailToken = "token"
-      )
-      repositories.users.create(request).futureValue
+    "produce a notification for the user" in withRepositories() { implicit repositories =>
+      val request = createUser().futureValue
 
       val newPassword = "test"
       repositories.users.resetPassword(request.id, newPassword, EmailMessage.resetPassword(request.name)).futureValue
