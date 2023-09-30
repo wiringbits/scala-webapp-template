@@ -2,10 +2,10 @@ package controllers
 
 import com.dimafeng.testcontainers.PostgreSQLContainer
 import controllers.common.PlayPostgresSpec
-import net.wiringbits.api.models.{
+import net.wiringbits.api.models.auth.Login
+import net.wiringbits.api.models.users.{
   CreateUser,
   ForgotPassword,
-  Login,
   ResetPassword,
   SendEmailVerificationToken,
   VerifyEmail

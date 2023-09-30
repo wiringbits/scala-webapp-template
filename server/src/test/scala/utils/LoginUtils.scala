@@ -1,7 +1,8 @@
 package utils
 
 import net.wiringbits.api.ApiClient
-import net.wiringbits.api.models.{CreateUser, Login, VerifyEmail}
+import net.wiringbits.api.models.users.{CreateUser, VerifyEmail}
+import net.wiringbits.api.models.auth.Login
 import net.wiringbits.common.models.{Captcha, Password, UserToken}
 import net.wiringbits.util.TokenGenerator
 import org.mockito.Mockito.*

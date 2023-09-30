@@ -1,6 +1,6 @@
 package net.wiringbits.forms
 
-import net.wiringbits.api.models.UpdatePassword
+import net.wiringbits.api.models.users.UpdatePassword
 import net.wiringbits.common.models.*
 import net.wiringbits.webapp.utils.slinkyUtils.forms.{FormData, FormField}
 

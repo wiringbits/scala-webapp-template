@@ -1,7 +1,8 @@
 package net.wiringbits.api.endpoints
 
 import net.wiringbits.api.models
-import net.wiringbits.api.models.{ErrorResponse, GetCurrentUser, Login, Logout}
+import net.wiringbits.api.models.auth.{GetCurrentUser, Login, Logout}
+import net.wiringbits.api.models.ErrorResponse
 import net.wiringbits.common.models.{Captcha, Email, Name, Password}
 import sttp.tapir.*
 import sttp.tapir.json.play.*

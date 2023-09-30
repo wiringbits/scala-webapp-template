@@ -1,4 +1,4 @@
-package net.wiringbits.api.models
+package net.wiringbits.api.models.auth
 
 import play.api.libs.json.{Format, Json}
 import sttp.tapir.Schema

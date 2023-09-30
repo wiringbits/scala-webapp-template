@@ -4,7 +4,7 @@ import com.olvind.mui.csstype.mod.Property.FlexDirection
 import com.olvind.mui.muiMaterial.components as mui
 import com.olvind.mui.muiMaterial.mod.PropTypes.Color
 import net.wiringbits.AppContext
-import net.wiringbits.api.models.GetUserLogs
+import net.wiringbits.api.models.users.GetUserLogs
 import net.wiringbits.api.utils.Formatter
 import net.wiringbits.core.I18nHooks
 import net.wiringbits.webapp.utils.slinkyUtils.Utils.CSSPropertiesUtils

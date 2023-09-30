@@ -1,4 +1,4 @@
-package net.wiringbits.api.models
+package net.wiringbits.api.models.users
 
 import net.wiringbits.common.models.UserToken
 import play.api.libs.json.{Format, Json}

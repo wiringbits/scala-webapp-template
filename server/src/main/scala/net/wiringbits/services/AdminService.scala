@@ -1,7 +1,7 @@
 package net.wiringbits.services
 
 import io.scalaland.chimney.dsl.transformInto
-import net.wiringbits.api.models.{AdminGetUserLogs, AdminGetUsers}
+import net.wiringbits.api.models.admin.{AdminGetUserLogs, AdminGetUsers}
 import net.wiringbits.repositories.{UserLogsRepository, UsersRepository}
 
 import java.util.UUID

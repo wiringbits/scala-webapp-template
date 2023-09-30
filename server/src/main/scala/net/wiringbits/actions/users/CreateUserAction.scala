@@ -1,7 +1,7 @@
-package net.wiringbits.actions
+package net.wiringbits.actions.users
 
 import io.scalaland.chimney.dsl.transformInto
-import net.wiringbits.api.models.CreateUser
+import net.wiringbits.api.models.users.CreateUser
 import net.wiringbits.apis.ReCaptchaApi
 import net.wiringbits.config.UserTokensConfig
 import net.wiringbits.repositories

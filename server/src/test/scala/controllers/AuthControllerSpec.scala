@@ -2,7 +2,8 @@ package controllers
 
 import com.dimafeng.testcontainers.PostgreSQLContainer
 import controllers.common.PlayPostgresSpec
-import net.wiringbits.api.models.{CreateUser, Login, VerifyEmail}
+import net.wiringbits.api.models.users.{CreateUser, VerifyEmail}
+import net.wiringbits.api.models.auth.Login
 import net.wiringbits.apis.models.EmailRequest
 import net.wiringbits.apis.{EmailApi, ReCaptchaApi}
 import net.wiringbits.common.models.*

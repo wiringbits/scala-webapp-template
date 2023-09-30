@@ -1,6 +1,6 @@
 package net.wiringbits.forms
 
-import net.wiringbits.api.models.UpdateUser
+import net.wiringbits.api.models.users.UpdateUser
 import net.wiringbits.common.models.*
 import net.wiringbits.webapp.common.validators.ValidationResult
 import net.wiringbits.webapp.utils.slinkyUtils.forms.{FormData, FormField}

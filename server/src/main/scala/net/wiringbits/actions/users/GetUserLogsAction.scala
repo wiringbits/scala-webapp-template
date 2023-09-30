@@ -1,7 +1,7 @@
-package net.wiringbits.actions
+package net.wiringbits.actions.users
 
 import io.scalaland.chimney.dsl.transformInto
-import net.wiringbits.api.models.GetUserLogs
+import net.wiringbits.api.models.users.GetUserLogs
 import net.wiringbits.repositories.UserLogsRepository
 
 import java.util.UUID

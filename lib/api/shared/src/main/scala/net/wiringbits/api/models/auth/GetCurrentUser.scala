@@ -1,5 +1,6 @@
-package net.wiringbits.api.models
+package net.wiringbits.api.models.auth
 
+import net.wiringbits.api.models.*
 import net.wiringbits.common.models.{Email, Name}
 import play.api.libs.json.{Format, Json}
 import sttp.tapir.Schema

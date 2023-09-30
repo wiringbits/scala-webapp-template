@@ -1,5 +1,6 @@
-package net.wiringbits.api.models
+package net.wiringbits.api.models.admin
 
+import net.wiringbits.api.models.*
 import play.api.libs.json.{Format, Json}
 import sttp.tapir.Schema
 import sttp.tapir.generic.auto.*

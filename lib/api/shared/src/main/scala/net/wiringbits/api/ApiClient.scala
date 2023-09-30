@@ -2,6 +2,10 @@ package net.wiringbits.api
 
 import net.wiringbits.api.endpoints.*
 import net.wiringbits.api.models.*
+import net.wiringbits.api.models.admin.{AdminGetUserLogs, AdminGetUsers}
+import net.wiringbits.api.models.auth.{GetCurrentUser, Login, Logout}
+import net.wiringbits.api.models.environmentconfig.GetEnvironmentConfig
+import net.wiringbits.api.models.users.*
 import play.api.libs.json.{Json, Reads}
 import sttp.client3.*
 import sttp.tapir.PublicEndpoint

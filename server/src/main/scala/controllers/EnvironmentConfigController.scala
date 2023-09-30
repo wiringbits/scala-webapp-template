@@ -1,8 +1,9 @@
 package controllers
 
-import net.wiringbits.actions.GetEnvironmentConfigAction
+import net.wiringbits.actions.environmentconfig.GetEnvironmentConfigAction
 import net.wiringbits.api.endpoints.EnvironmentConfigEndpoints
-import net.wiringbits.api.models.{ErrorResponse, GetEnvironmentConfig}
+import net.wiringbits.api.models.ErrorResponse
+import net.wiringbits.api.models.environmentconfig.GetEnvironmentConfig
 import org.slf4j.LoggerFactory
 import sttp.capabilities.WebSockets
 import sttp.capabilities.akka.AkkaStreams

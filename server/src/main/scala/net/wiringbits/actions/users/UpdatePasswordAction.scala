@@ -1,6 +1,6 @@
-package net.wiringbits.actions
+package net.wiringbits.actions.users
 
-import net.wiringbits.api.models.UpdatePassword
+import net.wiringbits.api.models.users.UpdatePassword
 import net.wiringbits.repositories.UsersRepository
 import net.wiringbits.util.EmailMessage
 import net.wiringbits.validations.ValidatePasswordMatches

@@ -1,8 +1,10 @@
 package controllers
 
 import net.wiringbits.actions.*
+import net.wiringbits.actions.users.*
 import net.wiringbits.api.endpoints.UsersEndpoints
 import net.wiringbits.api.models.*
+import net.wiringbits.api.models.users.*
 import org.slf4j.LoggerFactory
 import sttp.capabilities.WebSockets
 import sttp.capabilities.akka.AkkaStreams

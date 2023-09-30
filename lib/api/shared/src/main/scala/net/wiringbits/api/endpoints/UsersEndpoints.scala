@@ -1,6 +1,7 @@
 package net.wiringbits.api.endpoints
 
 import net.wiringbits.api.models.*
+import net.wiringbits.api.models.users.*
 import net.wiringbits.common.models.*
 import sttp.tapir.*
 import sttp.tapir.json.play.*
