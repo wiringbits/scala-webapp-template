@@ -1,52 +1,24 @@
 package net.wiringbits.repositories
 
-import net.wiringbits.common.models.{Email, Name}
 import net.wiringbits.core.RepositorySpec
-import net.wiringbits.repositories.models.{User, UserToken, UserTokenType}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.concurrent.ScalaFutures.*
 import org.scalatest.matchers.must.Matchers.*
+import utils.RepositoryUtils
 
-import java.time.Instant
-import java.time.temporal.ChronoUnit
 import java.util.UUID
 
-class UserTokensRepositorySpec extends RepositorySpec {
+class UserTokensRepositorySpec extends RepositorySpec with RepositoryUtils {
   "create" should {
-    "work" in withRepositories() { repositories =>
-      val request = User.CreateUser(
-        id = UUID.randomUUID(),
-        email = Email.trusted("hello@wiringbits.net"),
-        name = Name.trusted("Sample"),
-        hashedPassword = "password",
-        verifyEmailToken = "token"
-      )
-      repositories.users.create(request).futureValue
+    "work" in withRepositories() { implicit repositories =>
+      val request = createUser().futureValue
 
-      val tokenRequest =
-        UserToken.Create(
-          id = UUID.randomUUID(),
-          token = "test",
-          tokenType = UserTokenType.ResetPassword,
-          createdAt = Instant.now(),
-          expiresAt = Instant.now.plus(2, ChronoUnit.DAYS),
-          userId = request.id
-        )
-      repositories.userTokens.create(tokenRequest).futureValue
+      createToken(request.id).futureValue
     }
 
-    "fail when the user doesn't exists" in withRepositories() { repositories =>
-      val tokenRequest =
-        UserToken.Create(
-          id = UUID.randomUUID(),
-          token = "test",
-          tokenType = UserTokenType.ResetPassword,
-          createdAt = Instant.now(),
-          expiresAt = Instant.now.plus(2, ChronoUnit.DAYS),
-          userId = UUID.randomUUID()
-        )
+    "fail when the user doesn't exists" in withRepositories() { implicit repositories =>
       val ex = intercept[RuntimeException] {
-        repositories.userTokens.create(tokenRequest).futureValue
+        createToken(UUID.randomUUID()).futureValue
       }
       ex.getCause.getMessage must startWith(
         s"""ERROR: insert or update on table "user_tokens" violates foreign key constraint "user_tokens_user_id_fk""""
@@ -55,26 +27,10 @@ class UserTokensRepositorySpec extends RepositorySpec {
   }
 
   "find(userId)" should {
-    "return the user token" in withRepositories() { repositories =>
-      val request = User.CreateUser(
-        id = UUID.randomUUID(),
-        email = Email.trusted("hello@wiringbits.net"),
-        name = Name.trusted("Sample"),
-        hashedPassword = "password",
-        verifyEmailToken = "token"
-      )
-      repositories.users.create(request).futureValue
+    "return the user token" in withRepositories() { implicit repositories =>
+      val request = createUser().futureValue
 
-      val tokenRequest =
-        UserToken.Create(
-          id = UUID.randomUUID(),
-          token = "test",
-          tokenType = UserTokenType.ResetPassword,
-          createdAt = Instant.now(),
-          expiresAt = Instant.now.plus(2, ChronoUnit.DAYS),
-          userId = request.id
-        )
-      repositories.userTokens.create(tokenRequest).futureValue
+      val tokenRequest = createToken(request.id).futureValue
 
       val maybe = repositories.userTokens.find(request.id).futureValue
       val response = maybe.headOption.value
@@ -90,26 +46,10 @@ class UserTokensRepositorySpec extends RepositorySpec {
   }
 
   "find(userId, token)" should {
-    "return the user token" in withRepositories() { repositories =>
-      val request = User.CreateUser(
-        id = UUID.randomUUID(),
-        email = Email.trusted("hello@wiringbits.net"),
-        name = Name.trusted("Sample"),
-        hashedPassword = "password",
-        verifyEmailToken = "token"
-      )
-      repositories.users.create(request).futureValue
+    "return the user token" in withRepositories() { implicit repositories =>
+      val request = createUser().futureValue
 
-      val tokenRequest =
-        UserToken.Create(
-          id = UUID.randomUUID(),
-          token = "test",
-          tokenType = UserTokenType.ResetPassword,
-          createdAt = Instant.now(),
-          expiresAt = Instant.now.plus(2, ChronoUnit.DAYS),
-          userId = request.id
-        )
-      repositories.userTokens.create(tokenRequest).futureValue
+      val tokenRequest = createToken(request.id).futureValue
 
       val response = repositories.userTokens.find(request.id, tokenRequest.token).futureValue
       response.isDefined must be(true)
@@ -122,15 +62,8 @@ class UserTokensRepositorySpec extends RepositorySpec {
   }
 
   "delete" should {
-    "work" in withRepositories() { repositories =>
-      val request = User.CreateUser(
-        id = UUID.randomUUID(),
-        email = Email.trusted("hello@wiringbits.net"),
-        name = Name.trusted("Sample"),
-        hashedPassword = "password",
-        verifyEmailToken = "token"
-      )
-      repositories.users.create(request).futureValue
+    "work" in withRepositories() { implicit repositories =>
+      val request = createUser().futureValue
 
       val maybe = repositories.userTokens.find(request.id).futureValue
       val tokenId = maybe.headOption.value.id
