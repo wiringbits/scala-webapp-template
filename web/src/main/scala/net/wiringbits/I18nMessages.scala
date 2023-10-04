@@ -63,7 +63,7 @@ class I18nMessages(_lang: I18nLang) {
   def goingToBeRedirected = "You're going to be redirected"
   def emailHasBeenSent = "An email has been sent to your email with a URL to verify your account."
   def emailNotReceived = "If you haven't received the email after a few minutes, please check your spam folder"
-  def verifyingEmail = "We're verifing your email"
+  def verifyingEmail = "We're verifying your email"
   def waitAMomentPlease = "Wait a moment, please"
   def completeTheCaptcha = "Complete the captcha"
   def checkoutTheRepo = "Checkout the repository!"
