@@ -8,7 +8,6 @@ import software.amazon.awssdk.services.ses.SesAsyncClient
 import software.amazon.awssdk.services.ses.model.*
 
 import javax.inject.Inject
-//import scala.compat.java8.FutureConverters.CompletionStageOps
 import scala.jdk.FutureConverters.CompletionStageOps
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Future, blocking}

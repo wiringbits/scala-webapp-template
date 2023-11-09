@@ -24,7 +24,7 @@ class ApiRouter @Inject() (
     swaggerConfig: SwaggerConfig
 )(using ExecutionContext)
     extends SimpleRouter {
-  given ActorSystem = ActorSystem()
+  given ActorSystem = ActorSystem("ApiRouter")
 
   private val swagger = SwaggerInterpreter(
     swaggerUIOptions = SwaggerUIOptions.default.copy(contextPath = List(swaggerConfig.basePath))

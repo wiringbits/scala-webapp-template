@@ -326,7 +326,6 @@ lazy val server = (project in file("server"))
     Test / fork := true, // allows for graceful shutdown of containers once the tests have finished running
     libraryDependencies ++= Seq(
       "org.playframework.anorm" %% "anorm" % anorm,
-//      "org.playframework.anorm" %% "anorm-akka" % anorm,
       "org.playframework.anorm" %% "anorm-postgres" % anorm,
       "org.playframework" %% "play-json" % playJson,
       "org.postgresql" % "postgresql" % "42.6.0",
