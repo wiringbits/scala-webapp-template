@@ -5,12 +5,11 @@
 package anorm
 
 import java.sql.Connection
-
 import scala.util.control.NonFatal
-
 import scala.concurrent.{Future, Promise}
-
 import org.apache.pekko.stream.scaladsl.Source
+
+import scala.annotation.nowarn
 
 /** Anorm companion for the Pekko Streams.
   *
@@ -185,6 +184,7 @@ object PekkoStream {
           }
         }
 
+        @nowarn
         override def onDownstreamFinish() = {
           result.tryFailure(new InterruptedException("Downstream finished"))
           release()
