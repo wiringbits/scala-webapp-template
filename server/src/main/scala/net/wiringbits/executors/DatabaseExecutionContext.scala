@@ -1,6 +1,6 @@
 package net.wiringbits.executors
 
-import akka.actor.ActorSystem
+import org.apache.pekko.actor.ActorSystem
 import play.api.libs.concurrent.CustomExecutionContext
 
 import javax.inject.{Inject, Singleton}

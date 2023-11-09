@@ -12,7 +12,7 @@ import scala.concurrent.Future
 import scala.util.control.NonFatal
 
 class BackgroundJobsRepository @Inject() (database: Database)(implicit ec: DatabaseExecutionContext, clock: Clock) {
-  def streamPendingJobs: Future[akka.stream.scaladsl.Source[BackgroundJobData, Future[Int]]] = Future {
+  def streamPendingJobs: Future[org.apache.pekko.stream.scaladsl.Source[BackgroundJobData, Future[Int]]] = Future {
     // autocommit=false is necessary to avoid loading the whole result into memory
     implicit val conn = database.getConnection(autocommit = false)
     try {

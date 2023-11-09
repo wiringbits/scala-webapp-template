@@ -8,7 +8,8 @@ import software.amazon.awssdk.services.ses.SesAsyncClient
 import software.amazon.awssdk.services.ses.model.*
 
 import javax.inject.Inject
-import scala.compat.java8.FutureConverters.CompletionStageOps
+//import scala.compat.java8.FutureConverters.CompletionStageOps
+import scala.jdk.FutureConverters.CompletionStageOps
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Future, blocking}
 
@@ -46,7 +47,7 @@ class EmailApiAWSImpl @Inject() (
       for {
         response <- blocking {
           client.sendEmail(request)
-        }.toScala
+        }.asScala
         _ = logger.info(
           s"Email sent, to: ${emailRequest.destination}, subject = ${emailRequest.message.subject}, messageId = ${response.messageId()}"
         )

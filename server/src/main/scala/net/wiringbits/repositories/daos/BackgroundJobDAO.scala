@@ -34,7 +34,10 @@ object BackgroundJobDAO {
   def streamPendingJobs(
       allowedErrors: Int = 10,
       fetchSize: Int = 1000
-  )(implicit conn: Connection, clock: Clock): akka.stream.scaladsl.Source[BackgroundJobData, Future[Int]] = {
+  )(implicit
+      conn: Connection,
+      clock: Clock
+  ): org.apache.pekko.stream.scaladsl.Source[BackgroundJobData, Future[Int]] = {
     val query = SQL"""
       SELECT background_job_id, type, payload, status, status_details, error_count, execute_at, created_at, updated_at
       FROM background_jobs
@@ -44,10 +47,7 @@ object BackgroundJobDAO {
       ORDER BY execute_at, background_job_id
       """.withFetchSize(Some(fetchSize)) // without this, all data is loaded into memory
 
-    // this requires a Materializer that isn't used, better to set a null instead of depend on a Materializer
-    @SuppressWarnings(Array("org.wartremover.warts.Null"))
-    val materializer = null
-    AkkaStream.source(query, backgroundJobParser)(materializer, conn)
+    PekkoStream.source(query, backgroundJobParser)(conn)
   }
 
   def setStatusToFailed(backgroundJobId: UUID, executeAt: Instant, failReason: String)(implicit
