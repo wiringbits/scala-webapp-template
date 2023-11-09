@@ -6,7 +6,7 @@ import net.wiringbits.api.models.ErrorResponse
 import net.wiringbits.api.models.environmentconfig.GetEnvironmentConfig
 import org.slf4j.LoggerFactory
 import sttp.capabilities.WebSockets
-import sttp.capabilities.akka.AkkaStreams
+import sttp.capabilities.pekko.PekkoStreams
 import sttp.tapir.server.ServerEndpoint
 
 import javax.inject.Inject
@@ -24,7 +24,7 @@ class EnvironmentConfigController @Inject() (
     } yield Right(response)
   }
 
-  def routes: List[ServerEndpoint[AkkaStreams with WebSockets, Future]] = {
+  def routes: List[ServerEndpoint[PekkoStreams with WebSockets, Future]] = {
     List(EnvironmentConfigEndpoints.getEnvironmentConfig.serverLogic(_ => getEnvironmentConfig))
   }
 }

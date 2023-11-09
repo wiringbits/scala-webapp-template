@@ -1,8 +1,9 @@
 package controllers
 
-import akka.stream.Materializer
 import net.wiringbits.api.endpoints.*
 import net.wiringbits.config.SwaggerConfig
+import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.stream.Materializer
 import play.api.routing.Router.Routes
 import play.api.routing.SimpleRouter
 import sttp.apispec.openapi.Info
@@ -21,8 +22,10 @@ class ApiRouter @Inject() (
     usersController: UsersController,
     environmentConfigController: EnvironmentConfigController,
     swaggerConfig: SwaggerConfig
-)(implicit materializer: Materializer, ec: ExecutionContext)
+)(using ExecutionContext)
     extends SimpleRouter {
+  given ActorSystem = ActorSystem("ApiRouter")
+
   private val swagger = SwaggerInterpreter(
     swaggerUIOptions = SwaggerUIOptions.default.copy(contextPath = List(swaggerConfig.basePath))
   )

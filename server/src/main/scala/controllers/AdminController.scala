@@ -7,7 +7,7 @@ import net.wiringbits.common.models.Email
 import net.wiringbits.services.AdminService
 import org.slf4j.LoggerFactory
 import sttp.capabilities.WebSockets
-import sttp.capabilities.akka.AkkaStreams
+import sttp.capabilities.pekko.PekkoStreams
 import sttp.tapir.server.ServerEndpoint
 
 import java.util.UUID
@@ -42,7 +42,7 @@ class AdminController @Inject() (
     } yield Right(maskedResponse)
   }
 
-  def routes: List[ServerEndpoint[AkkaStreams with WebSockets, Future]] = {
+  def routes: List[ServerEndpoint[PekkoStreams with WebSockets, Future]] = {
     List(
       AdminEndpoints.getUserLogsEndpoint.serverLogic(getUserLogs),
       AdminEndpoints.getUsersEndpoint.serverLogic(getUsers)

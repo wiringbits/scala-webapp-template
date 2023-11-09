@@ -7,7 +7,7 @@ import net.wiringbits.api.models.*
 import net.wiringbits.api.models.users.*
 import org.slf4j.LoggerFactory
 import sttp.capabilities.WebSockets
-import sttp.capabilities.akka.AkkaStreams
+import sttp.capabilities.pekko.PekkoStreams
 import sttp.tapir.server.ServerEndpoint
 
 import java.util.UUID
@@ -100,7 +100,7 @@ class UsersController @Inject() (
       } yield Right(response)
     }
 
-  def routes: List[ServerEndpoint[AkkaStreams with WebSockets, Future]] = {
+  def routes: List[ServerEndpoint[PekkoStreams with WebSockets, Future]] = {
     List(
       UsersEndpoints.create.serverLogic(create),
       UsersEndpoints.verifyEmail.serverLogic(verifyEmail),

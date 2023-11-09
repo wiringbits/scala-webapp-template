@@ -6,7 +6,7 @@ import net.wiringbits.api.models.*
 import net.wiringbits.api.models.auth.{GetCurrentUser, Login, Logout}
 import org.slf4j.LoggerFactory
 import sttp.capabilities.WebSockets
-import sttp.capabilities.akka.AkkaStreams
+import sttp.capabilities.pekko.PekkoStreams
 import sttp.tapir.server.ServerEndpoint
 
 import java.util.UUID
@@ -47,7 +47,7 @@ class AuthController @Inject() (
       } yield Right(Logout.Response(), header)
     }
 
-  def routes: List[ServerEndpoint[AkkaStreams with WebSockets, Future]] = {
+  def routes: List[ServerEndpoint[PekkoStreams with WebSockets, Future]] = {
     List(
       AuthEndpoints.login.serverLogic(login),
       AuthEndpoints.getCurrentUser.serverLogic(me),

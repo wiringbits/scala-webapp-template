@@ -1,6 +1,6 @@
 package net.wiringbits.tasks
 
-import akka.actor.ActorSystem
+import org.apache.pekko.actor.ActorSystem
 import com.google.inject.Inject
 import net.wiringbits.actions.internal.StreamPendingBackgroundJobsForeverAction
 import net.wiringbits.apis.EmailApi
@@ -73,7 +73,7 @@ class BackgroundJobsExecutorTask @Inject() (
     // the reason to throttle and handle 1 background job concurrently is to avoid overloading the app
     val result = streamPendingBackgroundJobsForeverAction()
       .throttle(100, 1.minute)
-      .runWith(akka.stream.scaladsl.Sink.foreachAsync(1)(execute))
+      .runWith(org.apache.pekko.stream.scaladsl.Sink.foreachAsync(1)(execute))
 
     result.onComplete {
       case Failure(ex) =>

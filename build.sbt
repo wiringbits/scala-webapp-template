@@ -4,13 +4,13 @@ import java.nio.file.StandardCopyOption.REPLACE_EXISTING
 ThisBuild / scalaVersion := "3.3.0"
 ThisBuild / organization := "net.wiringbits"
 
-val playJson = "2.10.0-RC9"
+val playJson = "3.0.1"
 val sttp = "3.8.15"
 val webappUtils = "0.7.2"
 val anorm = "2.7.0"
 val enumeratum = "1.7.2"
 val scalaJavaTime = "2.5.0"
-val tapir = "1.5.0"
+val tapir = "1.8.5"
 val chimney = "0.8.0-RC1"
 
 val consoleDisabledOptions = Seq("-Werror", "-Ywarn-unused", "-Ywarn-unused-import")
@@ -226,7 +226,7 @@ lazy val common = (crossProject(JSPlatform, JVMPlatform) in file("lib/common"))
   )
   .jvmSettings(
     libraryDependencies ++= Seq(
-      "com.typesafe.play" %% "play-json" % playJson,
+      "org.playframework" %% "play-json" % playJson,
       "net.wiringbits" %% "webapp-common" % webappUtils,
       "org.scalatest" %% "scalatest" % "3.2.16" % Test
     )
@@ -238,7 +238,7 @@ lazy val common = (crossProject(JSPlatform, JVMPlatform) in file("lib/common"))
     Compile / stMinimize := Selection.All,
     libraryDependencies ++= Seq(
       "io.github.cquiroz" %%% "scala-java-time" % scalaJavaTime,
-      "com.typesafe.play" %%% "play-json" % playJson,
+      "org.playframework" %%% "play-json" % playJson,
       "net.wiringbits" %%% "webapp-common" % webappUtils,
       "org.scalatest" %%% "scalatest" % "3.2.16" % Test,
       "com.beachape" %%% "enumeratum" % enumeratum
@@ -247,14 +247,14 @@ lazy val common = (crossProject(JSPlatform, JVMPlatform) in file("lib/common"))
 
 // shared apis
 lazy val api = (crossProject(JSPlatform, JVMPlatform) in file("lib/api"))
-  .dependsOn(common, tapirPlayJson)
+  .dependsOn(common)
   .configure(baseLibSettings, commonSettings)
   .jsConfigure(_.enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin, ScalablyTypedConverterPlugin))
   .jvmSettings(
     libraryDependencies ++= Seq(
-      "com.typesafe.play" %% "play-json" % playJson,
+      "org.playframework" %% "play-json" % playJson,
       "com.softwaremill.sttp.client3" %% "core" % sttp,
-      "com.softwaremill.sttp.tapir" %% "tapir-core" % tapir,
+      "com.softwaremill.sttp.tapir" %% "tapir-json-play" % tapir,
       "com.softwaremill.sttp.tapir" %% "tapir-sttp-client" % tapir
     )
   )
@@ -264,11 +264,11 @@ lazy val api = (crossProject(JSPlatform, JVMPlatform) in file("lib/api"))
     stUseScalaJsDom := true,
     Compile / stMinimize := Selection.All,
     libraryDependencies ++= Seq(
-      "com.typesafe.play" %%% "play-json" % playJson,
-      "com.softwaremill.sttp.client3" %%% "core" % sttp,
+      "org.playframework" %%% "play-json" % playJson,
       "org.scalatest" %%% "scalatest" % "3.2.16" % Test,
       "com.beachape" %%% "enumeratum" % enumeratum,
-      "com.softwaremill.sttp.tapir" %%% "tapir-core" % tapir,
+      "com.softwaremill.sttp.client3" %%% "core" % sttp,
+      "com.softwaremill.sttp.tapir" %%% "tapir-json-play" % tapir,
       "com.softwaremill.sttp.tapir" %%% "tapir-sttp-client" % tapir
     )
   )
@@ -317,37 +317,8 @@ lazy val ui = (project in file("lib/ui"))
     )
   )
 
-lazy val tapirServerCore = (project in file("tapir/core"))
-  .settings(
-    name := "tapir-server-core",
-    libraryDependencies += "com.softwaremill.sttp.tapir" %% "tapir-core" % tapir
-  )
-
-lazy val tapirServerPlay = (project in file("tapir/tapir-play"))
-  .settings(
-    name := "tapir-server-play",
-    libraryDependencies ++= Seq(
-      "com.typesafe.play" %% "play-akka-http-server" % "2.9.0-M6",
-      "com.softwaremill.sttp.shared" %% "akka" % "1.3.14",
-      "org.scala-lang.modules" %% "scala-collection-compat" % "2.11.0"
-    )
-  )
-  .dependsOn(tapirServerCore)
-
-lazy val tapirPlayJson = (crossProject(JSPlatform, JVMPlatform) in file("tapir/playjson"))
-  .settings(
-    name := "tapir-play-json",
-    libraryDependencies ++= Seq(
-      "com.typesafe.play" %%% "play-json" % playJson,
-      "com.softwaremill.sttp.tapir" %% "tapir-core" % tapir
-    )
-  )
-  .jsSettings(
-    libraryDependencies += "io.github.cquiroz" %%% "scala-java-time" % scalaJavaTime
-  )
-
 lazy val server = (project in file("server"))
-  .dependsOn(common.jvm, api.jvm, tapirServerPlay, tapirPlayJson.jvm)
+  .dependsOn(common.jvm, api.jvm)
   .configure(baseServerSettings, commonSettings, playSettings)
   .settings(
     name := "wiringbits-server",
@@ -355,9 +326,8 @@ lazy val server = (project in file("server"))
     Test / fork := true, // allows for graceful shutdown of containers once the tests have finished running
     libraryDependencies ++= Seq(
       "org.playframework.anorm" %% "anorm" % anorm,
-      "org.playframework.anorm" %% "anorm-akka" % anorm,
       "org.playframework.anorm" %% "anorm-postgres" % anorm,
-      "com.typesafe.play" %% "play-json" % playJson,
+      "org.playframework" %% "play-json" % playJson,
       "org.postgresql" % "postgresql" % "42.6.0",
       "de.svenkubiak" % "jBCrypt" % "0.4.3",
       "commons-validator" % "commons-validator" % "1.7",
@@ -375,8 +345,11 @@ lazy val server = (project in file("server"))
       "javax.el" % "javax.el-api" % "3.0.0",
       "org.glassfish" % "javax.el" % "3.0.0",
       "com.beachape" %% "enumeratum" % enumeratum,
+      "io.scalaland" %% "chimney" % chimney,
       "com.softwaremill.sttp.tapir" %% "tapir-swagger-ui-bundle" % tapir,
-      "io.scalaland" %% "chimney" % chimney
+      "com.softwaremill.sttp.tapir" %% "tapir-json-play" % tapir,
+      "com.softwaremill.sttp.tapir" %% "tapir-play-server" % tapir,
+      "org.apache.pekko" %% "pekko-stream" % "1.0.1"
     )
   )
 
@@ -431,7 +404,7 @@ lazy val web = (project in file("web"))
       "@types/react-google-recaptcha" -> "2.1.0"
     ),
     libraryDependencies ++= Seq(
-      "com.typesafe.play" %%% "play-json" % playJson,
+      "org.playframework" %%% "play-json" % playJson,
       "com.softwaremill.sttp.client3" %%% "core" % sttp,
       "org.scala-js" %%% "scala-js-macrotask-executor" % "1.1.1",
       "com.olvind.st-material-ui" %%% "st-material-ui-icons-slinky" % "5.11.16",

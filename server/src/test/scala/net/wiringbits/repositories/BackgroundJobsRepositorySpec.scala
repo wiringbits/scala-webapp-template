@@ -1,7 +1,7 @@
 package net.wiringbits.repositories
 
-import akka.actor.ActorSystem
-import akka.stream.scaladsl.*
+import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.stream.scaladsl.*
 import net.wiringbits.common.models.Email
 import net.wiringbits.core.RepositorySpec
 import net.wiringbits.models.jobs.{BackgroundJobPayload, BackgroundJobStatus, BackgroundJobType}
