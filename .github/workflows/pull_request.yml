@@ -41,6 +41,19 @@ jobs:
       - name: Run test admin controller
         run: CI=true sbt "testOnly controllers.AdminControllerSpec"
 
+      - name: Print test results
+        run: |
+          # Find all XML files in the target/test-reports directory
+          for file in server/target/test-reports/*.xml; do
+            if [ -f "$file" ]; then
+              echo "Contents of $file:"
+              cat "$file"
+              echo
+            else
+              echo "No XML files found."
+            fi
+          done
+
       # TODO uncomment when tests are added
 #      - name: Check code format
 #        run: sbt scalafmtCheckAll
