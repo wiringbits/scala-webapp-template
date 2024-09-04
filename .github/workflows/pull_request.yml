@@ -41,33 +41,40 @@ jobs:
       - name: Run test admin controller
         run: CI=true sbt "testOnly controllers.AdminControllerSpec"
 
-      - name: Print test results
-        if: failure()
-        run: |
-          sudo apt-get update && sudo apt-get install -y libxml2-utils &&
-          # Find all XML files in the server/target/test-reports directory
-          for file in server/target/test-reports/*.xml; do
-            if [ -f "$file" ]; then
-              # check if file has <failure> tags
-              # dont print boolean
-              if xmllint --xpath 'boolean(//testsuite/testcase/failure)' "$file"; then
-                echo "Processing $file:"
-                # Extract and print <failure> tags inside <testcase> tags
-                xmllint --xpath '//testsuite/testcase/failure/text()' "$file"
-                echo
-              fi
-              # echo "Processing $file:"
-          
-              # Extract and print <failure> tags inside <testcase> tags
-              # xmllint --xpath '//testsuite/testcase/failure/text()' "$file"
-              # if there are <failure> tags, print <testcase> classname and name attributes
-              # xmllint --xpath '//testsuite/testcase/failure/parent::testcase/@classname | //testsuite/testcase/failure/parent::testcase/@name' "$file"
-          
-              echo
-            else
-              echo "No XML files found."
-            fi
-          done
+      - name: Test Summary
+        uses: test-summary/action@v2
+        with:
+          paths: "server/target/test-reports/*.xml"
+          output: test-summary.md
+        if: always()
+
+#      - name: Print test results
+#        if: failure()
+#        run: |
+#          sudo apt-get update && sudo apt-get install -y libxml2-utils &&
+#          # Find all XML files in the server/target/test-reports directory
+#          for file in server/target/test-reports/*.xml; do
+#            if [ -f "$file" ]; then
+#              # check if file has <failure> tags
+#              # dont print boolean
+#              if xmllint --xpath 'boolean(//testsuite/testcase/failure)' "$file"; then
+#                echo "Processing $file:"
+#                # Extract and print <failure> tags inside <testcase> tags
+#                xmllint --xpath '//testsuite/testcase/failure/text()' "$file"
+#                echo
+#              fi
+#              # echo "Processing $file:"
+#
+#              # Extract and print <failure> tags inside <testcase> tags
+#              # xmllint --xpath '//testsuite/testcase/failure/text()' "$file"
+#              # if there are <failure> tags, print <testcase> classname and name attributes
+#              # xmllint --xpath '//testsuite/testcase/failure/parent::testcase/@classname | //testsuite/testcase/failure/parent::testcase/@name' "$file"
+#
+#              echo
+#            else
+#              echo "No XML files found."
+#            fi
+#          done
 
       # TODO uncomment when tests are added
 #      - name: Check code format
