@@ -41,6 +41,7 @@ class AdminControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoS
 
   "GET /admin/users" should {
     "get every user" in withApiClient { implicit client =>
+      throw new NotImplementedError("Kappa error")
       val expected = 3
       (1 to expected).foreach { _ =>
         createVerifyLoginUser(

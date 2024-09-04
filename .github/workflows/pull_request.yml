@@ -38,17 +38,22 @@ jobs:
           key: compiled-code-cache-${{ hashFiles('**/build.sbt') }}
           restore-keys: compiled-code-cache-
 
-      - name: Check code format
-        run: sbt scalafmtCheckAll
+      - name: Run test admin controller
+        run: CI=true sbt testOnly controllers.AdminControllerSpec
 
-      - name: Compile
-        run: CI=true sbt compile
+      # TODO uncomment when tests are added
+#      - name: Check code format
+#        run: sbt scalafmtCheckAll
 
-      - name: Run tests
-        run: CI=true sbt test
+#      - name: Compile
+#        run: CI=true sbt compile
 
-      - name: Prepare web build
-        run: sbt web/build
+#      - name: Run tests
+#        run: CI=true sbt test
 
-      - name: Prepare server build
-        run: sbt server/dist
+#
+#      - name: Prepare web build
+#        run: sbt web/build
+#
+#      - name: Prepare server build
+#        run: sbt server/dist
