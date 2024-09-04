@@ -16,62 +16,62 @@ concurrency:
 #permissions:
 #  contents: read # for checkout
 
-jobs:
-  preview:
-
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Install ansible
-        run: python3 -m pip install --user ansible
-
-      - uses: coursier/cache-action@v6
-      - uses: VirtusLab/scala-cli-setup@main
-
-      - name: checkout
-        uses: actions/checkout@v2
-
-      - name: Setup Scala
-        uses: japgolly/setup-everything-scala@v3.1
-        with:
-          java-version: 'adopt:1.11.0-11'
-          node-version: '16.7.0'
-
-      - name: Cache compiled code
-        uses: actions/cache@v3
-        with:
-          path: |
-            **/target/
-            /home/runner/.ivy2/local
-          key: compiled-code-preview-cache-${{ hashFiles('**/build.sbt') }}
-          restore-keys: compiled-code-preview-cache-
-
-      - name: Compile
-        run: sbt compile
-
-      - name: Create SSH key
-        run: |
-          mkdir -p ~/.ssh/
-          echo "$CODEPREVIEW_PRIVATE_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          echo "StrictHostKeyChecking=no" > ~/.ssh/config
-        shell: bash
-        env:
-          CODEPREVIEW_PRIVATE_KEY: ${{ secrets.CODEPREVIEW_PRIVATE_KEY }}
-
-      - name: Create codepreview scripts
-        run: |
-          rm -rf ./infra
-          curl -u "github:$CODEPREVIEW_TOKEN" -O https://sssppa.wiringbits.dev/sssppa.zip
-          unzip sssppa.zip -d .
-          chmod +x ./infra/scripts/*.sh
-        shell: bash
-        env:
-          CODEPREVIEW_TOKEN: ${{ secrets.CODEPREVIEW_TOKEN }}
-
-      - name: Create preview env
-        run: cd infra && ./scripts/deploy-preview.sh
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_NUMBER: ${{ github.event.number }}
+#jobs:
+#  preview:
+#
+#    runs-on: ubuntu-latest
+#
+#    steps:
+#      - name: Install ansible
+#        run: python3 -m pip install --user ansible
+#
+#      - uses: coursier/cache-action@v6
+#      - uses: VirtusLab/scala-cli-setup@main
+#
+#      - name: checkout
+#        uses: actions/checkout@v2
+#
+#      - name: Setup Scala
+#        uses: japgolly/setup-everything-scala@v3.1
+#        with:
+#          java-version: 'adopt:1.11.0-11'
+#          node-version: '16.7.0'
+#
+#      - name: Cache compiled code
+#        uses: actions/cache@v3
+#        with:
+#          path: |
+#            **/target/
+#            /home/runner/.ivy2/local
+#          key: compiled-code-preview-cache-${{ hashFiles('**/build.sbt') }}
+#          restore-keys: compiled-code-preview-cache-
+#
+#      - name: Compile
+#        run: sbt compile
+#
+#      - name: Create SSH key
+#        run: |
+#          mkdir -p ~/.ssh/
+#          echo "$CODEPREVIEW_PRIVATE_KEY" > ~/.ssh/id_rsa
+#          chmod 600 ~/.ssh/id_rsa
+#          echo "StrictHostKeyChecking=no" > ~/.ssh/config
+#        shell: bash
+#        env:
+#          CODEPREVIEW_PRIVATE_KEY: ${{ secrets.CODEPREVIEW_PRIVATE_KEY }}
+#
+#      - name: Create codepreview scripts
+#        run: |
+#          rm -rf ./infra
+#          curl -u "github:$CODEPREVIEW_TOKEN" -O https://sssppa.wiringbits.dev/sssppa.zip
+#          unzip sssppa.zip -d .
+#          chmod +x ./infra/scripts/*.sh
+#        shell: bash
+#        env:
+#          CODEPREVIEW_TOKEN: ${{ secrets.CODEPREVIEW_TOKEN }}
+#
+#      - name: Create preview env
+#        run: cd infra && ./scripts/deploy-preview.sh
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#          PR_NUMBER: ${{ github.event.number }}
 

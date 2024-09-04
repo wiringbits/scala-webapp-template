@@ -39,7 +39,7 @@ jobs:
           restore-keys: compiled-code-cache-
 
       - name: Run test admin controller
-        run: CI=true sbt testOnly controllers.AdminControllerSpec
+        run: CI=true sbt "testOnly controllers.AdminControllerSpec"
 
       # TODO uncomment when tests are added
 #      - name: Check code format
