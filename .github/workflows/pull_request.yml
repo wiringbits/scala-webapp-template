@@ -38,56 +38,23 @@ jobs:
           key: compiled-code-cache-${{ hashFiles('**/build.sbt') }}
           restore-keys: compiled-code-cache-
 
-      - name: Run test admin controller
-        run: CI=true sbt "testOnly controllers.AdminControllerSpec"
+      - name: Check code format
+        run: sbt scalafmtCheckAll
+
+      - name: Compile
+        run: CI=true sbt compile
+
+      - name: Run tests
+        run: CI=true sbt test
 
       - name: Test Summary
-        if: always()
+        if: always() # Always run, even if previous steps failed
         uses: test-summary/action@v2
         with:
           paths: "**/target/test-reports/*.xml"
 
-#      - name: Print test results
-#        if: failure()
-#        run: |
-#          sudo apt-get update && sudo apt-get install -y libxml2-utils &&
-#          # Find all XML files in the server/target/test-reports directory
-#          for file in server/target/test-reports/*.xml; do
-#            if [ -f "$file" ]; then
-#              # check if file has <failure> tags
-#              # dont print boolean
-#              if xmllint --xpath 'boolean(//testsuite/testcase/failure)' "$file"; then
-#                echo "Processing $file:"
-#                # Extract and print <failure> tags inside <testcase> tags
-#                xmllint --xpath '//testsuite/testcase/failure/text()' "$file"
-#                echo
-#              fi
-#              # echo "Processing $file:"
-#
-#              # Extract and print <failure> tags inside <testcase> tags
-#              # xmllint --xpath '//testsuite/testcase/failure/text()' "$file"
-#              # if there are <failure> tags, print <testcase> classname and name attributes
-#              # xmllint --xpath '//testsuite/testcase/failure/parent::testcase/@classname | //testsuite/testcase/failure/parent::testcase/@name' "$file"
-#
-#              echo
-#            else
-#              echo "No XML files found."
-#            fi
-#          done
+      - name: Prepare web build
+        run: sbt web/build
 
-      # TODO uncomment when tests are added
-#      - name: Check code format
-#        run: sbt scalafmtCheckAll
-
-#      - name: Compile
-#        run: CI=true sbt compile
-
-#      - name: Run tests
-#        run: CI=true sbt test
-
-#
-#      - name: Prepare web build
-#        run: sbt web/build
-#
-#      - name: Prepare server build
-#        run: sbt server/dist
+      - name: Prepare server build
+        run: sbt server/dist

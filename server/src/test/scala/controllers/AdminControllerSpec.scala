@@ -41,7 +41,6 @@ class AdminControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoS
 
   "GET /admin/users" should {
     "get every user" in withApiClient { implicit client =>
-      throw new NotImplementedError("Kappa error")
       val expected = 3
       (1 to expected).foreach { _ =>
         createVerifyLoginUser(
@@ -67,7 +66,6 @@ class AdminControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoS
     }
 
     "return no results" in withApiClient { client =>
-      throw new NotImplementedError("Kappa error")
       val response = client.adminGetUserLogs(UUID.randomUUID()).futureValue
       response.data.isEmpty must be(true)
     }
