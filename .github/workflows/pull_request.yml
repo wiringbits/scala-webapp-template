@@ -45,7 +45,7 @@ jobs:
         if: always()
         uses: test-summary/action@v2
         with:
-          paths: "server/target/test-reports/*.xml"
+          paths: "**/target/test-reports/*.xml"
 
 #      - name: Print test results
 #        if: failure()
