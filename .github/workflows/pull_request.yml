@@ -47,7 +47,7 @@ jobs:
       - name: Run tests
         run: CI=true sbt test
 
-      - name: Test Summary
+      - name: Test summary
         if: always() # Always run, even if previous steps failed
         uses: test-summary/action@v2
         with:

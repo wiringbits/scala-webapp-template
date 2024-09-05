@@ -45,7 +45,7 @@ Deployment 2m demo:
 4. Practical components for testing your server-side code, writing tests for the Data/Api layer is real simple, no excuses accepted.
 5. Practical frontend utilities, for example, test your frontend forms easily, consistent UI when performing asynchronous actions (fetching/submitting data), etc.
 6. Typed data inputs, don't bother running simple validations to form data at the backend, accepted requests are already validated.
-7. Reasonable Continuous-Integration workflows, don't waste time reviewing code format or asking whether tests are passing, Github Actions do this for you.
+7. Reasonable Continuous-Integration workflows, don't waste time reviewing code format, asking whether tests are passing or looking at jobs logs finding which test failed (thanks to [TestForest Dashboard](https://github.com/marketplace/actions/testforest-dashboard) action), Github Actions do this for you.
 8. A simple to follow architecture, including short-guides for doing common tasks. 
 9. Deployment scripts to cloud instances, we believe in simplicity and most projects are fine with simple managed servers instead of containers/K8s/etc.
 
