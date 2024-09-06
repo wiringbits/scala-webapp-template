@@ -47,6 +47,12 @@ jobs:
       - name: Run tests
         run: CI=true sbt test
 
+      - name: Test summary
+        if: always() # Always run, even if previous steps failed
+        uses: test-summary/action@v2
+        with:
+          paths: "**/target/test-reports/*.xml"
+
       - name: Prepare web build
         run: sbt web/build
 
