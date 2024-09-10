@@ -6,7 +6,7 @@ import net.wiringbits.core.I18nLang
 import net.wiringbits.models.AuthState
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.{ErrorBoundaryComponent, ErrorBoundaryInfo}
 import org.scalajs.dom
-import slinky.web.ReactDOM
+import typings.reactDom.clientMod.createRoot
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSImport
@@ -37,6 +37,6 @@ object Main {
       )
     )
 
-    ReactDOM.render(app, dom.document.getElementById("root"))
+    createRoot(dom.document.getElementById("root")).render(app)
   }
 }
