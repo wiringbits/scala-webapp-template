@@ -1,17 +1,26 @@
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption.REPLACE_EXISTING
 
-ThisBuild / scalaVersion := "3.3.0"
+ThisBuild / scalaVersion := "3.6.4"
 ThisBuild / organization := "net.wiringbits"
 
-val playJson = "3.0.1"
-val sttp = "3.8.15"
+val pekkoVersion = "1.6.0"
+ThisBuild / dependencyOverrides ++= Seq(
+  "org.apache.pekko" %% "pekko-actor" % pekkoVersion,
+  "org.apache.pekko" %% "pekko-actor-typed" % pekkoVersion,
+  "org.apache.pekko" %% "pekko-stream" % pekkoVersion,
+  "org.apache.pekko" %% "pekko-slf4j" % pekkoVersion,
+  "org.apache.pekko" %% "pekko-serialization-jackson" % pekkoVersion,
+)
+
+val playJson = "3.0.6"
+val sttp = "3.11.0"
 val webappUtils = "0.7.2"
-val anorm = "2.7.0"
-val enumeratum = "1.7.2"
-val scalaJavaTime = "2.5.0"
-val tapir = "1.8.5"
-val chimney = "0.8.0-RC1"
+val anorm = "3.0.0"
+val enumeratum = "1.9.7"
+val scalaJavaTime = "2.6.0"
+val tapir = "1.13.19"
+val chimney = "1.10.0"
 
 val consoleDisabledOptions = Seq("-Werror", "-Ywarn-unused", "-Ywarn-unused-import")
 
@@ -29,6 +38,9 @@ lazy val commonSettings: Project => Project = {
         .map(_ => Seq("-Werror"))
         .getOrElse(Seq.empty[String])
     },
+    // ScalablyTyped-generated inline code uses scala.scalajs.runtime.linkingInfo which was deprecated
+    // in Scala.js 1.18.0. We can't fix it in the generated code, so suppress the warning.
+    scalacOptions += "-Wconf:cat=deprecation&origin=scala.scalajs.runtime.*:s",
     Compile / compile / wartremoverErrors ++= List(
       Wart.ArrayEquals,
       //      Wart.Any,
@@ -81,7 +93,7 @@ lazy val baseWebSettings: Project => Project =
       /* disabled because it somehow triggers many warnings */
       scalaJSLinkerConfig := scalaJSLinkerConfig.value.withSourceMap(false),
       /* for slinky */
-      libraryDependencies ++= Seq("me.shadaj" %%% "slinky-hot" % "0.7.3"),
+      libraryDependencies ++= Seq("me.shadaj" %%% "slinky-hot" % "0.7.5"),
       libraryDependencies ++= Seq(
         "io.github.cquiroz" %%% "scala-java-time" % scalaJavaTime,
         "io.github.cquiroz" %%% "scala-java-time-tzdb" % scalaJavaTime
@@ -208,12 +220,12 @@ lazy val playSettings: Project => Project = {
         evolutions,
         jdbc,
         ws,
-        "com.google.inject" % "guice" % "5.1.0"
+        "com.google.inject" % "guice" % "6.0.0"
       ),
       // test
       libraryDependencies ++= Seq(
-        "org.scalatestplus.play" %% "scalatestplus-play" % "6.0.0-M6" % Test,
-        "org.scalatestplus" %% "mockito-4-6" % "3.2.15.0" % Test
+        "org.scalatestplus.play" %% "scalatestplus-play" % "7.0.2" % Test,
+        "org.scalatestplus" %% "mockito-4-11" % "3.2.18.0" % Test
       )
     )
 }
@@ -228,7 +240,7 @@ lazy val common = (crossProject(JSPlatform, JVMPlatform) in file("lib/common"))
     libraryDependencies ++= Seq(
       "org.playframework" %% "play-json" % playJson,
       "net.wiringbits" %% "webapp-common" % webappUtils,
-      "org.scalatest" %% "scalatest" % "3.2.16" % Test
+      "org.scalatest" %% "scalatest" % "3.2.20" % Test
     )
   )
   .jsSettings(
@@ -240,7 +252,7 @@ lazy val common = (crossProject(JSPlatform, JVMPlatform) in file("lib/common"))
       "io.github.cquiroz" %%% "scala-java-time" % scalaJavaTime,
       "org.playframework" %%% "play-json" % playJson,
       "net.wiringbits" %%% "webapp-common" % webappUtils,
-      "org.scalatest" %%% "scalatest" % "3.2.16" % Test,
+      "org.scalatest" %%% "scalatest" % "3.2.20" % Test,
       "com.beachape" %%% "enumeratum" % enumeratum
     )
   )
@@ -265,7 +277,7 @@ lazy val api = (crossProject(JSPlatform, JVMPlatform) in file("lib/api"))
     Compile / stMinimize := Selection.All,
     libraryDependencies ++= Seq(
       "org.playframework" %%% "play-json" % playJson,
-      "org.scalatest" %%% "scalatest" % "3.2.16" % Test,
+      "org.scalatest" %%% "scalatest" % "3.2.20" % Test,
       "com.beachape" %%% "enumeratum" % enumeratum,
       "com.softwaremill.sttp.client3" %%% "core" % sttp,
       "com.softwaremill.sttp.tapir" %%% "tapir-json-play" % tapir,
@@ -292,7 +304,9 @@ lazy val ui = (project in file("lib/ui"))
       "@emotion/react",
       "@emotion/styled",
       "react-router",
-      "react-router-dom"
+      "react-router-dom",
+      "node",
+      "undici-types"
     ),
     Compile / npmDependencies ++= Seq(
       "@mui/material" -> "5.11.16",
@@ -312,7 +326,7 @@ lazy val ui = (project in file("lib/ui"))
       "org.scala-js" %%% "scala-js-macrotask-executor" % "1.1.1",
       "com.olvind.st-material-ui" %%% "st-material-ui-icons-slinky" % "5.11.16",
       "net.wiringbits" %%% "slinky-utils" % webappUtils,
-      "org.scalatest" %%% "scalatest" % "3.2.16" % Test,
+      "org.scalatest" %%% "scalatest" % "3.2.20" % Test,
       "com.beachape" %%% "enumeratum" % enumeratum
     )
   )
@@ -327,18 +341,19 @@ lazy val server = (project in file("server"))
     libraryDependencies ++= Seq(
       "org.playframework.anorm" %% "anorm" % anorm,
       "org.playframework.anorm" %% "anorm-postgres" % anorm,
+      "org.playframework.anorm" %% "anorm-pekko" % anorm,
       "org.playframework" %% "play-json" % playJson,
-      "org.postgresql" % "postgresql" % "42.6.0",
+      "org.postgresql" % "postgresql" % "42.7.11",
       "de.svenkubiak" % "jBCrypt" % "0.4.3",
-      "commons-validator" % "commons-validator" % "1.7",
-      "com.dimafeng" %% "testcontainers-scala-scalatest" % "0.40.16" % "test",
-      "com.dimafeng" %% "testcontainers-scala-postgresql" % "0.40.16" % "test",
+      "commons-validator" % "commons-validator" % "1.10.1",
+      "com.dimafeng" %% "testcontainers-scala-scalatest" % "0.44.1" % "test",
+      "com.dimafeng" %% "testcontainers-scala-postgresql" % "0.44.1" % "test",
       "com.softwaremill.sttp.client3" %% "core" % sttp % "test",
       "com.softwaremill.sttp.client3" %% "async-http-client-backend-future" % sttp % "test",
       // "net.wiringbits" %% "admin-data-explorer-play-server" % webappUtils,
-      "software.amazon.awssdk" % "ses" % "2.17.141",
-      "jakarta.xml.bind" % "jakarta.xml.bind-api" % "4.0.0",
-      "org.apache.commons" % "commons-text" % "1.10.0",
+      "software.amazon.awssdk" % "ses" % "2.44.9",
+      "jakarta.xml.bind" % "jakarta.xml.bind-api" % "4.0.5",
+      "org.apache.commons" % "commons-text" % "1.15.0",
       // JAX-B dependencies for JDK 9+, required to use play sessions
       "javax.xml.bind" % "jaxb-api" % "2.3.1",
       "javax.annotation" % "javax.annotation-api" % "1.3.2",
@@ -349,7 +364,7 @@ lazy val server = (project in file("server"))
       "com.softwaremill.sttp.tapir" %% "tapir-swagger-ui-bundle" % tapir,
       "com.softwaremill.sttp.tapir" %% "tapir-json-play" % tapir,
       "com.softwaremill.sttp.tapir" %% "tapir-play-server" % tapir,
-      "org.apache.pekko" %% "pekko-stream" % "1.0.1"
+      "org.apache.pekko" %% "pekko-stream" % pekkoVersion
     )
   )
 
@@ -391,7 +406,7 @@ lazy val web = (project in file("web"))
     stUseScalaJsDom := true,
     Compile / stMinimize := Selection.All,
     // material-ui is provided by a pre-packaged library
-    stIgnore ++= List("@mui/material", "@mui/icons-material", "@mui/joy", "react-router", "react-router-dom"),
+    stIgnore ++= List("@mui/material", "@mui/icons-material", "@mui/joy", "react-router", "react-router-dom", "node", "undici-types"),
     Compile / npmDependencies ++= Seq(
       "@mui/material" -> "5.11.16",
       "@mui/icons-material" -> "5.11.16",
@@ -412,7 +427,7 @@ lazy val web = (project in file("web"))
       "com.softwaremill.sttp.tapir" %%% "tapir-sttp-client" % tapir
     ),
     libraryDependencies ++= Seq(
-      "org.scalatest" %%% "scalatest" % "3.2.16" % Test
+      "org.scalatest" %%% "scalatest" % "3.2.20" % Test
     )
   )
 

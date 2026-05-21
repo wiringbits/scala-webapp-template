@@ -9,7 +9,7 @@ case class ResetPasswordFormData(
     repeatPassword: FormField[Password],
     token: Option[UserToken]
 ) extends FormData[ResetPassword.Request] {
-  override def fields: List[FormField[_]] = List(password, repeatPassword)
+  override def fields: List[FormField[?]] = List(password, repeatPassword)
 
   override def formValidationErrors: List[String] = {
     val isTokenDefined =

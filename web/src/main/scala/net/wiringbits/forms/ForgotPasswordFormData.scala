@@ -8,7 +8,7 @@ case class ForgotPasswordFormData(
     email: FormField[Email],
     captcha: Option[Captcha] = None
 ) extends FormData[ForgotPassword.Request] {
-  override def fields: List[FormField[_]] = List(email)
+  override def fields: List[FormField[?]] = List(email)
 
   override def formValidationErrors: List[String] = {
     val captchaError = Option.when(captcha.isEmpty)("Complete the captcha")

@@ -100,7 +100,7 @@ class UsersController @Inject() (
       } yield Right(response)
     }
 
-  def routes: List[ServerEndpoint[PekkoStreams with WebSockets, Future]] = {
+  def routes: List[ServerEndpoint[PekkoStreams & WebSockets, Future]] = {
     List(
       UsersEndpoints.create.serverLogic(create),
       UsersEndpoints.verifyEmail.serverLogic(verifyEmail),

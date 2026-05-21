@@ -23,7 +23,7 @@ object ApisModule {
     private val logger = LoggerFactory.getLogger(this.getClass)
 
     override def get(): EmailApi = {
-      if (config.provider equalsIgnoreCase "aws") {
+      if (config.provider.equalsIgnoreCase("aws")) {
         logger.info("Mail provider set to AWS")
         awsImpl
       } else {

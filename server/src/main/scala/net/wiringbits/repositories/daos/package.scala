@@ -19,7 +19,7 @@ package object daos {
     val MetaDataItem(qualified, _, clazz) = meta
     value match {
       case str: String => Right(str)
-      case obj: PGobject if "citext" equalsIgnoreCase obj.getType => Right(obj.getValue)
+      case obj: PGobject if "citext".equalsIgnoreCase(obj.getType) => Right(obj.getValue)
       case _ =>
         Left(
           TypeDoesNotMatch(

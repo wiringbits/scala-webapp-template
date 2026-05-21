@@ -19,6 +19,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import utils.LoginUtils
 
 import java.time.{Clock, Instant}
+import java.time.temporal.ChronoUnit
 import java.util.UUID
 import scala.concurrent.Future
 
@@ -27,7 +28,7 @@ class UsersControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoS
   def userTokensRepository: UserTokensRepository = app.injector.instanceOf(classOf[UserTokensRepository])
 
   private val clock = mock[Clock]
-  when(clock.instant).thenReturn(Instant.now())
+  when(clock.instant).thenReturn(Instant.now().truncatedTo(ChronoUnit.MICROS))
 
   private val tokenGenerator = mock[TokenGenerator]
 

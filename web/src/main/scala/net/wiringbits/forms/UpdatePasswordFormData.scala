@@ -9,7 +9,7 @@ case class UpdatePasswordFormData(
     password: FormField[Password],
     repeatPassword: FormField[Password]
 ) extends FormData[UpdatePassword.Request] {
-  override def fields: List[FormField[_]] = List(oldPassword, password, repeatPassword)
+  override def fields: List[FormField[?]] = List(oldPassword, password, repeatPassword)
 
   override def formValidationErrors: List[String] = {
     // the error is rendered only when both fields are provided

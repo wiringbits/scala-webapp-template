@@ -22,7 +22,7 @@ object ApiClient {
 
 class ApiClient(config: ApiClient.Config)(implicit
     ex: ExecutionContext,
-    sttpBackend: SttpBackend[Future, _]
+    sttpBackend: SttpBackend[Future, ?]
 ) {
   // While the server requires a userId, it is extracted from the Session cookie, we need a dummy value just to
   // fulfill the method signatures
@@ -56,9 +56,9 @@ class ApiClient(config: ApiClient.Config)(implicit
   /** This is necessary for non-browser clients, this way, the cookies from the last authentication response are
     * propagated to the next requests
     */
-  private var lastAuthResponse = Option.empty[Response[_]]
+  private var lastAuthResponse = Option.empty[Response[?]]
 
-  private def unsafeSetLoginResponse(response: Response[_]): Unit = synchronized {
+  private def unsafeSetLoginResponse(response: Response[?]): Unit = synchronized {
     lastAuthResponse = Some(response)
   }
 

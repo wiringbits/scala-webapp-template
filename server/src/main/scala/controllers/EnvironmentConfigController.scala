@@ -24,7 +24,7 @@ class EnvironmentConfigController @Inject() (
     } yield Right(response)
   }
 
-  def routes: List[ServerEndpoint[PekkoStreams with WebSockets, Future]] = {
+  def routes: List[ServerEndpoint[PekkoStreams & WebSockets, Future]] = {
     List(EnvironmentConfigEndpoints.getEnvironmentConfig.serverLogic(_ => getEnvironmentConfig))
   }
 }

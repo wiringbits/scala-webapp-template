@@ -11,7 +11,7 @@ case class SignUpFormData(
     repeatPassword: FormField[Password],
     captcha: Option[Captcha] = None
 ) extends FormData[CreateUser.Request] {
-  override def fields: List[FormField[_]] = List(name, email, password, repeatPassword)
+  override def fields: List[FormField[?]] = List(name, email, password, repeatPassword)
 
   override def formValidationErrors: List[String] = {
     // the error is rendered only when both fields are provided
