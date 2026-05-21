@@ -9,7 +9,7 @@ case class SignInFormData(
     password: FormField[Password],
     captcha: Option[Captcha] = None
 ) extends FormData[Login.Request] {
-  override def fields: List[FormField[_]] = List(email, password)
+  override def fields: List[FormField[?]] = List(email, password)
 
   override def formValidationErrors: List[String] = {
     val emptyCaptcha = Option.when(captcha.isEmpty)("Complete the captcha")

@@ -48,7 +48,7 @@ class ReCaptchaApiSpec extends AnyWordSpec with MockitoSugar {
     when(request.addQueryStringParameters(ArgumentMatchers.any[(String, String)])).thenReturn(request)
     when(response.json).thenReturn(body)
     val _ =
-      when(request.post[String](ArgumentMatchers.anyString())(ArgumentMatchers.eq(implicitly[BodyWritable[String]])))
+      when(request.post[String](ArgumentMatchers.anyString())(using ArgumentMatchers.any[BodyWritable[String]]()))
         .thenReturn(Future.successful(response))
   }
 }

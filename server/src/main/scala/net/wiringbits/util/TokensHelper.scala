@@ -16,6 +16,6 @@ object TokensHelper {
 
   def isSignatureValid(tokensSecret: String, digest: String, data: Array[Byte]): Boolean = {
     val ourDigest = doHMACSHA1(data, tokensSecret)
-    ourDigest equalsIgnoreCase digest
+    ourDigest.equalsIgnoreCase(digest)
   }
 }

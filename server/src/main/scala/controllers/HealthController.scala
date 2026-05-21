@@ -15,7 +15,7 @@ class HealthController @Inject() (implicit ec: ExecutionContext) {
   private def check: Future[Either[Unit, Unit]] =
     Future.successful(Right(()))
 
-  def routes: List[ServerEndpoint[PekkoStreams with WebSockets, Future]] = {
+  def routes: List[ServerEndpoint[PekkoStreams & WebSockets, Future]] = {
     List(HealthEndpoints.check.serverLogic(_ => check))
   }
 }

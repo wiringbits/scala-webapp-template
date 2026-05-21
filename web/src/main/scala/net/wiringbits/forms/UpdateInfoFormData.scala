@@ -9,7 +9,7 @@ case class UpdateInfoFormData(
     name: FormField[Name],
     email: FormField[Email]
 ) extends FormData[UpdateUser.Request] {
-  override def fields: List[FormField[_]] = List(name)
+  override def fields: List[FormField[?]] = List(name)
 
   override def formValidationErrors: List[String] = {
     List(

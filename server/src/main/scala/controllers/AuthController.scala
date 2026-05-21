@@ -47,7 +47,7 @@ class AuthController @Inject() (
       } yield Right(Logout.Response(), header)
     }
 
-  def routes: List[ServerEndpoint[PekkoStreams with WebSockets, Future]] = {
+  def routes: List[ServerEndpoint[PekkoStreams & WebSockets, Future]] = {
     List(
       AuthEndpoints.login.serverLogic(login),
       AuthEndpoints.getCurrentUser.serverLogic(me),

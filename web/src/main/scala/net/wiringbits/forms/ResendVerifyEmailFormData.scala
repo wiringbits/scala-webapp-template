@@ -10,7 +10,7 @@ case class ResendVerifyEmailFormData(
     email: FormField[Email],
     captcha: Option[Captcha] = None
 ) extends FormData[SendEmailVerificationToken.Request] {
-  override def fields: List[FormField[_]] = List(email)
+  override def fields: List[FormField[?]] = List(email)
 
   override def formValidationErrors: List[String] = {
     val emptyCaptcha = Option.when(captcha.isEmpty)(texts.emptyCaptchaError)

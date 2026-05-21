@@ -44,7 +44,7 @@ object SignUpForm {
       }
     }
 
-    def handleSubmit(e: SyntheticEvent[_, dom.Event]): Unit = {
+    def handleSubmit(e: SyntheticEvent[?, dom.Event]): Unit = {
       e.preventDefault()
 
       if (formData.isSubmitButtonEnabled) {

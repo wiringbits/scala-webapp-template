@@ -35,7 +35,7 @@ trait PlayAPISpec extends PlaySpec with ScalaFutures {
   def GET(url: String, extraHeaders: (String, String)*)(implicit application: Application): Future[Result] = {
     val headers = JsonHeader :: extraHeaders.toList
     val request = FakeRequest("GET", url)
-      .withHeaders(headers: _*)
+      .withHeaders(headers*)
 
     val response = route(application, request).value
     log(request, response)
@@ -43,7 +43,7 @@ trait PlayAPISpec extends PlaySpec with ScalaFutures {
   }
 
   def POST(url: String, extraHeaders: (String, String)*)(implicit application: Application): Future[Result] = {
-    POST(url, EmptyJson, extraHeaders: _*)
+    POST(url, EmptyJson, extraHeaders*)
   }
 
   def POST(url: String, jsonBody: String, extraHeaders: (String, String)*)(implicit
@@ -51,7 +51,7 @@ trait PlayAPISpec extends PlaySpec with ScalaFutures {
   ): Future[Result] = {
     val headers = JsonHeader :: extraHeaders.toList
     val request = FakeRequest("POST", url)
-      .withHeaders(headers: _*)
+      .withHeaders(headers*)
       .withBody(jsonBody)
 
     val response = route(application, request).value
@@ -60,7 +60,7 @@ trait PlayAPISpec extends PlaySpec with ScalaFutures {
   }
 
   def PUT(url: String, extraHeaders: (String, String)*)(implicit application: Application): Future[Result] = {
-    PUT(url, EmptyJson, extraHeaders: _*)
+    PUT(url, EmptyJson, extraHeaders*)
   }
 
   def PUT(url: String, jsonBody: String, extraHeaders: (String, String)*)(implicit
@@ -68,7 +68,7 @@ trait PlayAPISpec extends PlaySpec with ScalaFutures {
   ): Future[Result] = {
     val headers = JsonHeader :: extraHeaders.toList
     val request = FakeRequest("PUT", url)
-      .withHeaders(headers: _*)
+      .withHeaders(headers*)
       .withBody(jsonBody)
 
     val response = route(application, request).value
@@ -79,7 +79,7 @@ trait PlayAPISpec extends PlaySpec with ScalaFutures {
   def DELETE(url: String, extraHeaders: (String, String)*)(implicit application: Application): Future[Result] = {
     val headers = JsonHeader :: extraHeaders.toList
     val request = FakeRequest("DELETE", url)
-      .withHeaders(headers: _*)
+      .withHeaders(headers*)
 
     val response = route(application, request).value
     log(request, response)

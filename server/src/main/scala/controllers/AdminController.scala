@@ -42,7 +42,7 @@ class AdminController @Inject() (
     } yield Right(maskedResponse)
   }
 
-  def routes: List[ServerEndpoint[PekkoStreams with WebSockets, Future]] = {
+  def routes: List[ServerEndpoint[PekkoStreams & WebSockets, Future]] = {
     List(
       AdminEndpoints.getUserLogsEndpoint.serverLogic(getUserLogs),
       AdminEndpoints.getUsersEndpoint.serverLogic(getUsers)

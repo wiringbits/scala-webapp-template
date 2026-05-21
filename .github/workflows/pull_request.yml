@@ -19,6 +19,9 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    env:
+      NODE_OPTIONS: --openssl-legacy-provider
+
     steps:
       - name: checkout
         uses: actions/checkout@v2
@@ -26,8 +29,11 @@ jobs:
       - name: Setup Scala
         uses: japgolly/setup-everything-scala@v3.1
         with:
-          java-version: 'adopt:1.11.0-11'
-          node-version: '16.7.0'
+          java-version: 'temurin:25'
+          node-version: '24'
+
+      - name: Install yarn
+        run: npm install -g yarn
 
       - name: Cache compiled code
         uses: actions/cache@v3
