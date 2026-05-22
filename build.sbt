@@ -430,10 +430,34 @@ lazy val web = (project in file("web"))
     libraryDependencies ++= Seq(
       "org.scalatest" %%% "scalatest" % "3.2.20" % Test
     ),
-    // @webpack-cli/serve 1.7.0 requires webpack-cli APIs (loadWebpack, toKebabCase, etc.) that were
-    // added only in webpack-cli 4.7.0+ and don't exist in the 4.5.0 hardcoded by sbt-scalajs-bundler.
-    // Pin the transitive dep to 1.3.1, which shipped alongside webpack-cli 4.5.0.
-    Compile / additionalNpmConfig += "resolutions" -> JSON.objStr(Seq("@webpack-cli/serve" -> "1.3.1"))
+    // sbt-scalajs-bundler hardcodes webpack-cli 4.5.0.  @webpack-cli/serve 1.6+ calls APIs that only
+    // exist in webpack-cli 4.7+ (loadWebpack, toKebabCase, …), so yarn may resolve the transitive dep
+    // to an incompatible version.  The postinstall script patches both files after every yarn install,
+    // which is robust against cache restores and resolution surprises.
+    //   patch 1 – webpack-cli 4.5.0 makeCommand: options() is async in newer @webpack-cli/serve,
+    //             add await so options.forEach doesn't receive a Promise.
+    //   patch 2 – loadWebpack() was added in webpack-cli 4.7.0; shim it as require('webpack').
+    Compile / additionalNpmConfig ++= Map(
+      "resolutions" -> JSON.objStr(Seq("@webpack-cli/serve" -> "1.3.1")),
+      "scripts" -> JSON.obj(
+        "postinstall" -> JSON.str(
+          "node -e \"" +
+          "const fs=require('fs');" +
+          "let s=fs.readFileSync('node_modules/webpack-cli/lib/webpack-cli.js','utf8');" +
+          "fs.writeFileSync('node_modules/webpack-cli/lib/webpack-cli.js'," +
+            "s.replace('options = options();','options = await options();'));" +
+          "const p='node_modules/@webpack-cli/serve/lib/index.js';" +
+          "if(fs.existsSync(p)){" +
+            "let t=fs.readFileSync(p,'utf8');" +
+            "fs.writeFileSync(p," +
+              "t.replace('await cli.loadWebpack()'," +
+                "'typeof cli.loadWebpack===\\'function\\'?await cli.loadWebpack():require(\\'webpack\\')')" +
+            ");" +
+          "}" +
+          "\""
+        )
+      )
+    )
   )
 
 lazy val root = (project in file("."))

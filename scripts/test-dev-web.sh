@@ -9,9 +9,10 @@ PORT=8080
 TIMEOUT_SECS=150
 
 # mktemp -d avoids the race condition of mktemp -u (unsafe temp name).
-# The FIFO lives inside the directory so cleanup is a single rm -rf.
+# The FIFO and log live inside the directory so cleanup is a single rm -rf.
 WORK_DIR=$(mktemp -d)
 FIFO="$WORK_DIR/sbt-stdin"
+LOG="$WORK_DIR/sbt.log"
 mkfifo "$FIFO"
 
 # Open read/write so the exec never blocks waiting for a reader,
@@ -29,13 +30,21 @@ cleanup() {
 }
 trap cleanup EXIT
 
-sbt dev-web < "$FIFO" &
+sbt dev-web < "$FIFO" > "$LOG" 2>&1 &
 SBT_PID=$!
 
 echo "Waiting for dev server at http://localhost:$PORT ..."
 MAX=$((TIMEOUT_SECS / 5))
 for i in $(seq 1 "$MAX"); do
   sleep 5
+
+  # Fail immediately if webpack-cli logged a fatal error.
+  if grep -q "\[error\] \[webpack-cli\]" "$LOG" 2>/dev/null; then
+    echo "Fatal webpack-cli error detected:"
+    grep "\[error\]" "$LOG" >&2
+    exit 1
+  fi
+
   if curl -sf --max-time 3 "http://localhost:$PORT/" > /dev/null 2>&1; then
     echo "Server ready after ~$((i * 5))s"
     break
@@ -43,6 +52,8 @@ for i in $(seq 1 "$MAX"); do
   echo "  ($i/$MAX) still waiting..."
   if [ "$i" -eq "$MAX" ]; then
     echo "ERROR: dev server did not start within ${TIMEOUT_SECS}s"
+    echo "--- last 30 lines of sbt output ---" >&2
+    tail -30 "$LOG" >&2
     exit 1
   fi
 done
