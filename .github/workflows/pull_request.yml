@@ -59,11 +59,11 @@ jobs:
         with:
           paths: "**/target/test-reports/*.xml"
 
-      - name: Prepare web build
-        run: sbt web/build
-
       - name: Test dev-web
         run: ./scripts/test-dev-web.sh
+
+      - name: Prepare web build
+        run: sbt web/build
 
       - name: Prepare server build
         run: sbt server/dist
