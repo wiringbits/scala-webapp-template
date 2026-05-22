@@ -20,8 +20,8 @@ object Main {
 
   def main(argv: Array[String]): Unit = {
     val scheduler = monix.execution.Scheduler.global
-    val $authState = Var[AuthState](AuthState.Unauthenticated)(scheduler)
-    val $lang = Var[I18nLang](I18nLang.English)(scheduler)
+    val $authState = Var[AuthState](AuthState.Unauthenticated)(using scheduler)
+    val $lang = Var[I18nLang](I18nLang.English)(using scheduler)
     val ctx = AppContext(
       API(),
       $authState,
