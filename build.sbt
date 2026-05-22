@@ -429,11 +429,10 @@ lazy val web = (project in file("web"))
     libraryDependencies ++= Seq(
       "org.scalatest" %%% "scalatest" % "3.2.20" % Test
     ),
-    // webpack-cli 4.5.0 (hardcoded by sbt-scalajs-bundler) depends on @webpack-cli/serve@^1.3.0.
-    // Without an explicit pin yarn resolves that range to 1.7.0, which requires APIs only present
-    // in webpack-cli 4.7+ and breaks `webpack serve`.  Pinning it here as a direct devDependency
-    // forces yarn to hoist 1.3.1 everywhere; 1.3.1 is fully compatible with webpack-cli 4.5.0.
-    Compile / npmDevDependencies += "@webpack-cli/serve" -> "1.3.1"
+    // sbt-scalajs-bundler defaults to webpack-cli 4.5.0 which ships with @webpack-cli/serve@^1.3.0.
+    // yarn now resolves that range to 1.7.0, which requires internal APIs added in webpack-cli 4.7+.
+    // Upgrading to 4.10.0 (latest 4.x) pins the correct @webpack-cli/serve@^1.7.0 from the start.
+    webpackCliVersion := "4.10.0"
   )
 
 lazy val root = (project in file("."))
