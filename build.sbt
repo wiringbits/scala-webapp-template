@@ -1,6 +1,5 @@
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption.REPLACE_EXISTING
-import scalajsbundler.util.JSON
 
 ThisBuild / scalaVersion := "3.6.4"
 ThisBuild / organization := "net.wiringbits"
@@ -430,34 +429,11 @@ lazy val web = (project in file("web"))
     libraryDependencies ++= Seq(
       "org.scalatest" %%% "scalatest" % "3.2.20" % Test
     ),
-    // sbt-scalajs-bundler hardcodes webpack-cli 4.5.0.  @webpack-cli/serve 1.6+ calls APIs that only
-    // exist in webpack-cli 4.7+ (loadWebpack, toKebabCase, …), so yarn may resolve the transitive dep
-    // to an incompatible version.  The postinstall script patches both files after every yarn install,
-    // which is robust against cache restores and resolution surprises.
-    //   patch 1 – webpack-cli 4.5.0 makeCommand: options() is async in newer @webpack-cli/serve,
-    //             add await so options.forEach doesn't receive a Promise.
-    //   patch 2 – loadWebpack() was added in webpack-cli 4.7.0; shim it as require('webpack').
-    Compile / additionalNpmConfig ++= Map(
-      "resolutions" -> JSON.objStr(Seq("@webpack-cli/serve" -> "1.3.1")),
-      "scripts" -> JSON.obj(
-        "postinstall" -> JSON.str(
-          "node -e \"" +
-          "const fs=require('fs');" +
-          "let s=fs.readFileSync('node_modules/webpack-cli/lib/webpack-cli.js','utf8');" +
-          "fs.writeFileSync('node_modules/webpack-cli/lib/webpack-cli.js'," +
-            "s.replace('options = options();','options = await options();'));" +
-          "const p='node_modules/@webpack-cli/serve/lib/index.js';" +
-          "if(fs.existsSync(p)){" +
-            "let t=fs.readFileSync(p,'utf8');" +
-            "fs.writeFileSync(p," +
-              "t.replace('await cli.loadWebpack()'," +
-                "'typeof cli.loadWebpack===\\'function\\'?await cli.loadWebpack():require(\\'webpack\\')')" +
-            ");" +
-          "}" +
-          "\""
-        )
-      )
-    )
+    // webpack-cli 4.5.0 (hardcoded by sbt-scalajs-bundler) depends on @webpack-cli/serve@^1.3.0.
+    // Without an explicit pin yarn resolves that range to 1.7.0, which requires APIs only present
+    // in webpack-cli 4.7+ and breaks `webpack serve`.  Pinning it here as a direct devDependency
+    // forces yarn to hoist 1.3.1 everywhere; 1.3.1 is fully compatible with webpack-cli 4.5.0.
+    Compile / npmDevDependencies += "@webpack-cli/serve" -> "1.3.1"
   )
 
 lazy val root = (project in file("."))
