@@ -6,6 +6,7 @@ logs/
 admin/build/
 web/build/
 local.env
+.envrc
 
 # https://scalameta.org/metals/docs/editors/vscode/#files-and-directories-to-include-in-your-gitignore
 .metals/
