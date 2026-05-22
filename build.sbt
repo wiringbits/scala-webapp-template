@@ -1,5 +1,6 @@
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption.REPLACE_EXISTING
+import scalajsbundler.util.JSON
 
 ThisBuild / scalaVersion := "3.6.4"
 ThisBuild / organization := "net.wiringbits"
@@ -428,7 +429,11 @@ lazy val web = (project in file("web"))
     ),
     libraryDependencies ++= Seq(
       "org.scalatest" %%% "scalatest" % "3.2.20" % Test
-    )
+    ),
+    // @webpack-cli/serve 1.7.0 requires webpack-cli APIs (loadWebpack, toKebabCase, etc.) that were
+    // added only in webpack-cli 4.7.0+ and don't exist in the 4.5.0 hardcoded by sbt-scalajs-bundler.
+    // Pin the transitive dep to 1.3.1, which shipped alongside webpack-cli 4.5.0.
+    Compile / additionalNpmConfig += "resolutions" -> JSON.objStr(Seq("@webpack-cli/serve" -> "1.3.1"))
   )
 
 lazy val root = (project in file("."))
@@ -446,4 +451,4 @@ lazy val root = (project in file("."))
     publishLocal := {}
   )
 
-addCommandAlias("dev-web", ";web/fastOptJS::startWebpackDevServer;~web/fastOptJS")
+addCommandAlias("dev-web", ";web/fastOptJS/startWebpackDevServer;~web/fastOptJS")
