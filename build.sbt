@@ -401,6 +401,9 @@ lazy val web = (project in file("web"))
     name := "wiringbits-web",
     useYarn := true,
     webpackDevServerPort := 8080,
+    // sbt-scalajs-bundler only copies *.js to the webpack working dir by default;
+    // index.html must also be there so webpack-dev-server can serve it at "/".
+    Compile / webpackResources := (baseDirectory.value / "src" / "main" / "js") ** "*.html",
     stFlavour := Flavour.Slinky,
     stReactEnableTreeShaking := Selection.All,
     stUseScalaJsDom := true,
