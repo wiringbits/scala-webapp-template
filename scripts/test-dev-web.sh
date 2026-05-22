@@ -63,4 +63,23 @@ if [ "$HTTP_STATUS" != "200" ]; then
   echo "ERROR: expected HTTP 200, got $HTTP_STATUS"
   exit 1
 fi
-echo "HTTP $HTTP_STATUS – dev-web health check passed"
+echo "HTTP $HTTP_STATUS – index page returned"
+
+# Verify the response body is our app's HTML (not an error page or placeholder).
+BODY=$(curl -s --max-time 5 "http://localhost:$PORT/")
+if ! echo "$BODY" | grep -q "wiringbits-web-fastopt-bundle.js"; then
+  echo "ERROR: index page does not contain the app bundle reference" >&2
+  echo "--- first 10 lines of response ---" >&2
+  echo "$BODY" | head -10 >&2
+  exit 1
+fi
+echo "Content check passed – app HTML served"
+
+# Verify the JS bundle itself is reachable (not 404).
+BUNDLE_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:$PORT/wiringbits-web-fastopt-bundle.js")
+if [ "$BUNDLE_STATUS" != "200" ]; then
+  echo "ERROR: JS bundle returned HTTP $BUNDLE_STATUS" >&2
+  exit 1
+fi
+echo "HTTP $BUNDLE_STATUS – JS bundle served"
+echo "dev-web health check passed"
