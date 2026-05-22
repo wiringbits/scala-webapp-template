@@ -5,7 +5,7 @@ var generated = require('./scalajs.webpack.config');
 // webpack 5 uses MD4 hashing internally, which OpenSSL 3 (Node 18+) dropped; patch to sha256
 const crypto = require('crypto');
 const origCreateHash = crypto.createHash;
-crypto.createHash = (algorithm) => origCreateHash(algorithm === 'md4' ? 'sha256' : algorithm);
+crypto.createHash = (algorithm, ...args) => origCreateHash(algorithm === 'md4' ? 'sha256' : algorithm, ...args);
 
 var local = {
     devServer: {

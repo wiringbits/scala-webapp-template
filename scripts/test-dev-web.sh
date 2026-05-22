@@ -8,17 +8,24 @@ set -euo pipefail
 PORT=8080
 TIMEOUT_SECS=150
 
-# Keep a FIFO with an open write fd so sbt's stdin never hits EOF.
-# Without it, sbt exits watch mode → JVM shutdown hooks kill webpack-dev-server.
-FIFO=$(mktemp -u /tmp/sbt-stdin-XXXXXX)
+# mktemp -d avoids the race condition of mktemp -u (unsafe temp name).
+# The FIFO lives inside the directory so cleanup is a single rm -rf.
+WORK_DIR=$(mktemp -d)
+FIFO="$WORK_DIR/sbt-stdin"
 mkfifo "$FIFO"
-exec 9>"$FIFO"
+
+# Open read/write so the exec never blocks waiting for a reader,
+# and the write side stays open (no EOF) until we explicitly close fd 9.
+exec 9<>"$FIFO"
+
+# Initialize before the trap so cleanup never hits an unbound variable.
+SBT_PID=""
 
 cleanup() {
   exec 9>&- 2>/dev/null || true
-  kill "$SBT_PID" 2>/dev/null || true
-  wait "$SBT_PID" 2>/dev/null || true
-  rm -f "$FIFO"
+  [ -n "${SBT_PID:-}" ] && kill "$SBT_PID" 2>/dev/null || true
+  [ -n "${SBT_PID:-}" ] && wait "$SBT_PID" 2>/dev/null || true
+  rm -rf "$WORK_DIR"
 }
 trap cleanup EXIT
 
