@@ -11,6 +11,9 @@ var local = {
     devServer: {
         // the historyAPIFallback allows react-router to work
         historyApiFallback: true,
+        // serve index.html and other static assets from the source directory so
+        // that `sbt dev-web` works even on a fresh checkout (before any build run)
+        contentBase: path.resolve(__dirname, "../../../../src/main/js"),
         proxy: {
             // when a request to /api is done, we want to apply a proxy
             '/api': {
