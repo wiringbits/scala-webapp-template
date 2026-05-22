@@ -47,7 +47,7 @@ object BackgroundJobDAO {
       ORDER BY execute_at, background_job_id
       """.withFetchSize(Some(fetchSize)) // without this, all data is loaded into memory
 
-    PekkoStream.source(query, backgroundJobParser)(conn)
+    PekkoStream.source(query, backgroundJobParser)(using conn)
   }
 
   def setStatusToFailed(backgroundJobId: UUID, executeAt: Instant, failReason: String)(implicit

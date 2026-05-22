@@ -1,7 +1,7 @@
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption.REPLACE_EXISTING
 
-ThisBuild / scalaVersion := "3.6.4"
+ThisBuild / scalaVersion := "3.8.3"
 ThisBuild / organization := "net.wiringbits"
 
 val pekkoVersion = "1.6.0"
