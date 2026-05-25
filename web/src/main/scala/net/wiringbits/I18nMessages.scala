@@ -53,7 +53,7 @@ class I18nMessages(_lang: I18nLang) {
   def aboutPage = "About page"
   def projectDetails = "Add details about the project"
   def dashboardPage = "Dashboard page"
-  def homePage = "Home page"
+  def homePage = "Home page | Preview demo"
   def landingPageContent = "The landing page content goes here"
 
   def verifyYourEmailAddress = "Verify your email address"
