@@ -2,9 +2,9 @@ name: Build the app
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 
 concurrency:
   # Only run once for latest commit per ref and cancel other (previous) runs.

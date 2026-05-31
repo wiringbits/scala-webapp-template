@@ -26,6 +26,8 @@ cleanup() {
   exec 9>&- 2>/dev/null || true
   [ -n "${SBT_PID:-}" ] && kill "$SBT_PID" 2>/dev/null || true
   [ -n "${SBT_PID:-}" ] && wait "$SBT_PID" 2>/dev/null || true
+  # webpack-dev-server is a separate Node process that outlives the sbt JVM.
+  lsof -ti :"$PORT" 2>/dev/null | xargs kill 2>/dev/null || true
   rm -rf "$WORK_DIR"
 }
 trap cleanup EXIT
