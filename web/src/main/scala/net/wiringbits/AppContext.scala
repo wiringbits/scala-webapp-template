@@ -12,6 +12,7 @@ case class AppContext(
     api: API,
     $auth: Var[AuthState],
     $lang: Var[I18nLang],
+    $darkMode: Var[Boolean],
     contactEmail: Email,
     contactPhone: String,
     executionContext: ExecutionContext

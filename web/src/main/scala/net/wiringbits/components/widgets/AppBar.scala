@@ -110,6 +110,7 @@ object AppBar {
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val texts = I18nHooks.useMessages(props.ctx.$lang)
     val auth = ReactiveHooks.useDistinctValue(props.ctx.$auth)
+    val isDark = ReactiveHooks.useDistinctValue(props.ctx.$darkMode)
     val history = useHistory()
     val location = useLocation()
     val pathname = location.asInstanceOf[js.Dynamic].pathname.asInstanceOf[String]
@@ -250,27 +251,38 @@ object AppBar {
       .open(drawerOpen)
       .anchor("right")
 
+    val darkToggle = mui.IconButton
+      .normal()(mui.Icon(if (isDark) muiIcons.Brightness7() else muiIcons.Brightness4()))
+      .sx(menuIconSx)
+      .size("small")
+      .onClick(_ => props.ctx.$darkMode := !isDark)
+
     mui.AppBar
       .sx(appBarSx.asInstanceOf[CSSPropertiesUtils])
       .position("sticky")(
-        mui.Toolbar.sx(toolbarSx.asInstanceOf[CSSPropertiesUtils])(
-          brand,
-          mui.Box().sx(new CSSPropertiesUtils { flex = 1 }),
-          if (isMobile) {
-            Fragment(
-              mui.IconButton
-                .normal()(mui.Icon(muiIcons.Menu()))
-                .sx(menuIconSx)
-                .onClick(_ => setDrawerOpen(true)),
-              mobileDrawer
+        mui.Container.maxWidth("lg")(
+          mui.Toolbar
+            .sx(toolbarSx.asInstanceOf[CSSPropertiesUtils])
+            .disableGutters(true)(
+              brand,
+              mui.Box().sx(new CSSPropertiesUtils { flex = 1 }),
+              darkToggle,
+              if (isMobile) {
+                Fragment(
+                  mui.IconButton
+                    .normal()(mui.Icon(muiIcons.Menu()))
+                    .sx(menuIconSx)
+                    .onClick(_ => setDrawerOpen(true)),
+                  mobileDrawer
+                )
+              } else {
+                mui
+                  .Box()
+                  .sx(new CSSPropertiesUtils { display = "flex"; alignItems = "center"; gap = "2px" })(
+                    desktopNav
+                  )
+              }
             )
-          } else {
-            mui
-              .Box()
-              .sx(new CSSPropertiesUtils { display = "flex"; alignItems = "center"; gap = "2px" })(
-                desktopNav
-              )
-          }
         )
       )
   }

@@ -22,10 +22,12 @@ object Main {
     val scheduler = monix.execution.Scheduler.global
     val $authState = Var[AuthState](AuthState.Unauthenticated)(using scheduler)
     val $lang = Var[I18nLang](I18nLang.English)(using scheduler)
+    val $darkMode = Var[Boolean](false)(using scheduler)
     val ctx = AppContext(
       API(),
       $authState,
       $lang,
+      $darkMode,
       Email.trusted("hello@wiringbits.net"),
       "+52 (999) 9999 999",
       org.scalajs.macrotaskexecutor.MacrotaskExecutor
