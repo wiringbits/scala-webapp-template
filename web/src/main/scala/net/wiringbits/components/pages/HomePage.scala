@@ -51,7 +51,7 @@ object HomePage {
             gap = "8px",
             px = "12px",
             py = "5px",
-            borderRadius = 999,
+            borderRadius = "999px",
             border = s"1px solid $divider",
             bgcolor = "#FFFFFF",
             color = "#5A6A65",
@@ -114,14 +114,20 @@ object HomePage {
           .size("large")
           .endIcon(mui.Icon(muiIcons.ArrowForward()))
           .onClick(_ => history.push(if (isAuthed) "/dashboard" else "/signup")),
-        mui.Button
-          .normal()("View repository")
-          .variant("outlined")
-          .size("large")
-          .color("inherit")
-          .sx(js.Dynamic.literal(color = "#15201D", borderColor = divider).asInstanceOf[CSSPropertiesUtils])
-          .startIcon(mui.Icon(muiIcons.GitHub()))
-          .onClick(_ => org.scalajs.dom.window.open("https://github.com/wiringbits/scala-webapp-template", "_blank"))
+        a(
+          slinky.web.html.href := "https://github.com/wiringbits/scala-webapp-template",
+          target := "_blank",
+          rel := "noopener noreferrer",
+          style := new CSSPropertiesUtils { textDecoration = "none" }
+        )(
+          mui.Button
+            .normal()("View repository")
+            .variant("outlined")
+            .size("large")
+            .color("inherit")
+            .sx(js.Dynamic.literal(color = "#15201D", borderColor = divider).asInstanceOf[CSSPropertiesUtils])
+            .startIcon(mui.Icon(muiIcons.GitHub()))
+        )
       )
 
     val hero = mui
@@ -153,7 +159,7 @@ object HomePage {
         .Card()
         .variant("outlined")
         .sx(
-          js.Dynamic.literal(borderRadius = 12, borderColor = divider).asInstanceOf[CSSPropertiesUtils]
+          js.Dynamic.literal(borderRadius = "12px", borderColor = divider).asInstanceOf[CSSPropertiesUtils]
         )(
           mui
             .CardContent()
@@ -165,7 +171,7 @@ object HomePage {
                     .literal(
                       width = 44,
                       height = 44,
-                      borderRadius = 8,
+                      borderRadius = "8px",
                       display = "flex",
                       alignItems = "center",
                       justifyContent = "center",
@@ -264,7 +270,7 @@ object HomePage {
           .Box()
           .sx(
             js.Dynamic
-              .literal(flex = 1, mx = "8px", height = 30, borderRadius = 4, bgcolor = "#FFFFFF")
+              .literal(flex = 1, mx = "8px", height = 30, borderRadius = "4px", bgcolor = "#FFFFFF")
               .asInstanceOf[CSSPropertiesUtils]
           ),
         mui
@@ -274,7 +280,7 @@ object HomePage {
               .literal(
                 px = "14px",
                 py = "5px",
-                borderRadius = 4,
+                borderRadius = "4px",
                 bgcolor = "#86C440",
                 color = "#0E1B17",
                 fontWeight = 700,
@@ -294,7 +300,7 @@ object HomePage {
               alignItems = "center",
               gap = "12px",
               border = s"1px solid ${methodFg}44",
-              borderRadius = 6,
+              borderRadius = "6px",
               bgcolor = s"${methodFg}18",
               px = "10px",
               py = "8px"
@@ -309,7 +315,7 @@ object HomePage {
                   width = 58,
                   textAlign = "center",
                   py = "4px",
-                  borderRadius = 4,
+                  borderRadius = "4px",
                   bgcolor = methodFg,
                   color = "#FFFFFF",
                   fontWeight = 700,
@@ -342,7 +348,7 @@ object HomePage {
       .variant("outlined")
       .sx(
         js.Dynamic
-          .literal(borderRadius = 10, overflow = "hidden", borderColor = divider)
+          .literal(borderRadius = "10px", overflow = "hidden", borderColor = divider)
           .asInstanceOf[CSSPropertiesUtils]
       )(
         swaggerPreviewTopBar,
@@ -374,7 +380,7 @@ object HomePage {
                       .literal(
                         px = "7px",
                         py = "2px",
-                        borderRadius = 999,
+                        borderRadius = "999px",
                         bgcolor = primaryAlpha10,
                         color = primary,
                         fontSize = 11,
@@ -446,7 +452,7 @@ object HomePage {
       .variant("outlined")
       .sx(
         js.Dynamic
-          .literal(borderRadius = 10, overflow = "hidden", borderColor = divider)
+          .literal(borderRadius = "10px", overflow = "hidden", borderColor = divider)
           .asInstanceOf[CSSPropertiesUtils]
       )(
         mui
@@ -494,7 +500,7 @@ object HomePage {
       .Card()
       .variant("outlined")
       .sx(
-        js.Dynamic.literal(borderRadius = 10, borderColor = divider).asInstanceOf[CSSPropertiesUtils]
+        js.Dynamic.literal(borderRadius = "10px", borderColor = divider).asInstanceOf[CSSPropertiesUtils]
       )(
         mui
           .CardContent()
@@ -591,7 +597,7 @@ object HomePage {
       .variant("outlined")
       .sx(
         js.Dynamic
-          .literal(borderRadius = 10, borderColor = divider, overflow = "hidden")
+          .literal(borderRadius = "10px", borderColor = divider, overflow = "hidden")
           .asInstanceOf[CSSPropertiesUtils]
       )(
         mui
@@ -609,7 +615,7 @@ object HomePage {
                       .literal(
                         width = 44,
                         height = 44,
-                        borderRadius = 8,
+                        borderRadius = "8px",
                         display = "flex",
                         alignItems = "center",
                         justifyContent = "center",
@@ -669,7 +675,7 @@ object HomePage {
                             ml = "auto",
                             px = "8px",
                             py = "2px",
-                            borderRadius = 999,
+                            borderRadius = "999px",
                             bgcolor = "rgba(14,140,111,0.15)",
                             color = primary,
                             fontSize = 12,

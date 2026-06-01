@@ -38,7 +38,7 @@ object AboutPage {
           .sx(
             js.Dynamic
               .literal(
-                borderRadius = 16,
+                borderRadius = "16px",
                 maxWidth = 520,
                 width = "100%",
                 textAlign = "center",
@@ -93,15 +93,19 @@ object AboutPage {
                       )
                       .asInstanceOf[CSSPropertiesUtils]
                   ),
-                mui.Button
-                  .normal()(texts.checkoutTheRepo)
-                  .variant("contained")
-                  .size("large")
-                  .startIcon(mui.Icon(muiIcons.GitHub()))
-                  .endIcon(mui.Icon(muiIcons.ArrowForward()))
-                  .onClick(_ =>
-                    org.scalajs.dom.window.open("https://github.com/wiringbits/scala-webapp-template", "_blank")
-                  )
+                a(
+                  slinky.web.html.href := "https://github.com/wiringbits/scala-webapp-template",
+                  target := "_blank",
+                  rel := "noopener noreferrer",
+                  style := new CSSPropertiesUtils { textDecoration = "none" }
+                )(
+                  mui.Button
+                    .normal()(texts.checkoutTheRepo)
+                    .variant("contained")
+                    .size("large")
+                    .startIcon(mui.Icon(muiIcons.GitHub()))
+                    .endIcon(mui.Icon(muiIcons.ArrowForward()))
+                )
               )
           )
       )

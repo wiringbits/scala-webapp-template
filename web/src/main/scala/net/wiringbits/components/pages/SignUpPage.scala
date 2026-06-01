@@ -71,7 +71,7 @@ object SignUpPage {
               .sx(
                 js.Dynamic
                   .literal(
-                    borderRadius = 12,
+                    borderRadius = "12px",
                     borderColor = "#E6ECEA",
                     boxShadow = "0 1px 2px rgba(0,0,0,0.04), 0 18px 50px rgba(0,0,0,0.07)"
                   )

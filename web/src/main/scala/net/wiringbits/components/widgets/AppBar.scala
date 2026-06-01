@@ -51,10 +51,10 @@ object AppBar {
     color = "#FFFFFF",
     fontWeight = 700,
     fontSize = 14.5,
-    paddingLeft = 12,
-    paddingRight = 12,
+    paddingLeft = "12px",
+    paddingRight = "12px",
     minWidth = 0,
-    borderRadius = 6,
+    borderRadius = "6px",
     textTransform = "none",
     background = "rgba(255,255,255,0.14)"
   )
@@ -63,10 +63,10 @@ object AppBar {
     color = "rgba(255,255,255,0.86)",
     fontWeight = 600,
     fontSize = 14.5,
-    paddingLeft = 12,
-    paddingRight = 12,
+    paddingLeft = "12px",
+    paddingRight = "12px",
     minWidth = 0,
-    borderRadius = 6,
+    borderRadius = "6px",
     textTransform = "none"
   )
 

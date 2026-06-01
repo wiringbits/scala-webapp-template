@@ -29,7 +29,7 @@ object LogList {
       .Card()
       .variant("outlined")
       .sx(
-        js.Dynamic.literal(borderRadius = 12, borderColor = divider).asInstanceOf[CSSPropertiesUtils]
+        js.Dynamic.literal(borderRadius = "12px", borderColor = divider).asInstanceOf[CSSPropertiesUtils]
       )(
         // card header
         mui
@@ -59,7 +59,7 @@ object LogList {
                     ml = "12px",
                     px = "8px",
                     py = "2px",
-                    borderRadius = 999,
+                    borderRadius = "999px",
                     bgcolor = "rgba(14,140,111,0.10)",
                     color = primary,
                     fontSize = 12.5,
@@ -99,7 +99,7 @@ object LogList {
                         width = 38,
                         height = 38,
                         flex = "0 0 auto",
-                        borderRadius = 8,
+                        borderRadius = "8px",
                         display = "flex",
                         alignItems = "center",
                         justifyContent = "center",
