@@ -35,7 +35,9 @@ object DashboardPage {
           mui
             .Typography(texts.welcome(props.user.name))
             .sx(
-              js.Dynamic.literal(color = "#5A6A65", fontSize = 16, marginTop = "6px").asInstanceOf[CSSPropertiesUtils]
+              js.Dynamic
+                .literal(color = "text.secondary", fontSize = 16, marginTop = "6px")
+                .asInstanceOf[CSSPropertiesUtils]
             )
         ),
       Logs(props.ctx, props.user)

@@ -53,7 +53,7 @@ object VerifyEmailPage {
                     alignItems = "center",
                     justifyContent = "center",
                     bgcolor = "rgba(14,140,111,0.10)",
-                    color = "#0E8C6F"
+                    color = "primary.main"
                   )
                   .asInstanceOf[CSSPropertiesUtils]
               )(
@@ -71,7 +71,7 @@ object VerifyEmailPage {
               )
               .sx(
                 js.Dynamic
-                  .literal(color = "#5A6A65", fontSize = 16, lineHeight = 1.7, marginBottom = "32px")
+                  .literal(color = "text.secondary", fontSize = 16, lineHeight = 1.7, marginBottom = "32px")
                   .asInstanceOf[CSSPropertiesUtils]
               ),
             mui.Button

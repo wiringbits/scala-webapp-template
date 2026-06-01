@@ -18,9 +18,6 @@ object LogList {
 
   case class Props(ctx: AppContext, response: GetUserLogs.Response, forceRefresh: () => Unit)
 
-  private val primary = "#0E8C6F"
-  private val divider = "#E6ECEA"
-
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val texts = I18nHooks.useMessages(props.ctx.$lang)
     val items = props.response.data
@@ -29,7 +26,7 @@ object LogList {
       .Card()
       .variant("outlined")
       .sx(
-        js.Dynamic.literal(borderRadius = "12px", borderColor = divider).asInstanceOf[CSSPropertiesUtils]
+        js.Dynamic.literal(borderRadius = "12px", borderColor = "divider").asInstanceOf[CSSPropertiesUtils]
       )(
         // card header
         mui
@@ -41,7 +38,8 @@ object LogList {
                 py = "16px",
                 display = "flex",
                 alignItems = "center",
-                borderBottom = s"1px solid $divider"
+                borderBottom = 1,
+                borderColor = "divider"
               )
               .asInstanceOf[CSSPropertiesUtils]
           )(
@@ -61,7 +59,7 @@ object LogList {
                     py = "2px",
                     borderRadius = "999px",
                     bgcolor = "rgba(14,140,111,0.10)",
-                    color = primary,
+                    color = "primary.main",
                     fontSize = 12.5,
                     fontWeight = 700
                   )
@@ -86,7 +84,8 @@ object LogList {
                     gap = "16px",
                     px = "24px",
                     py = "18px",
-                    borderBottom = if (i < items.length - 1) s"1px solid $divider" else "none"
+                    borderBottom = if (i < items.length - 1) "1px solid" else "none",
+                    borderColor = "divider"
                   )
                   .asInstanceOf[CSSPropertiesUtils]
               )
@@ -104,7 +103,7 @@ object LogList {
                         alignItems = "center",
                         justifyContent = "center",
                         bgcolor = "rgba(14,140,111,0.10)",
-                        color = primary
+                        color = "primary.main"
                       )
                       .asInstanceOf[CSSPropertiesUtils]
                   )(
@@ -117,7 +116,7 @@ object LogList {
                       .Typography(item.message)
                       .sx(
                         js.Dynamic
-                          .literal(fontWeight = 600, fontSize = 14.5, color = "#15201D")
+                          .literal(fontWeight = 600, fontSize = 14.5, color = "text.primary")
                           .asInstanceOf[CSSPropertiesUtils]
                       ),
                     mui
@@ -126,7 +125,7 @@ object LogList {
                         js.Dynamic
                           .literal(
                             fontSize = 13,
-                            color = "#5A6A65",
+                            color = "text.secondary",
                             marginTop = "2px",
                             fontVariantNumeric = "tabular-nums"
                           )

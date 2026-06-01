@@ -41,7 +41,7 @@ object UserEditPage {
         .variant("outlined")
         .sx(
           js.Dynamic
-            .literal(borderRadius = "12px", borderColor = "#E6ECEA", maxWidth = 720)
+            .literal(borderRadius = "12px", borderColor = "divider", maxWidth = 720)
             .asInstanceOf[CSSPropertiesUtils]
         )(
           mui
@@ -54,7 +54,7 @@ object UserEditPage {
               js.Dynamic
                 .literal(
                   px = "8px",
-                  borderBottom = "1px solid #E6ECEA"
+                  borderBottom = 1
                 )
                 .asInstanceOf[CSSPropertiesUtils]
             ),

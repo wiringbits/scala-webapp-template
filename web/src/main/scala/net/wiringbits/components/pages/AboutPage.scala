@@ -42,7 +42,7 @@ object AboutPage {
                 maxWidth = 520,
                 width = "100%",
                 textAlign = "center",
-                borderColor = "#E6ECEA",
+                borderColor = "divider",
                 boxShadow = "0 18px 50px rgba(0,0,0,0.06)"
               )
               .asInstanceOf[CSSPropertiesUtils]
@@ -84,7 +84,7 @@ object AboutPage {
                   .sx(
                     js.Dynamic
                       .literal(
-                        color = "#5A6A65",
+                        color = "text.secondary",
                         fontSize = 15.5,
                         lineHeight = 1.7,
                         marginBottom = "32px",

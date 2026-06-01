@@ -49,7 +49,7 @@ object SignInPage {
                     alignItems = "center",
                     gap = "8px",
                     marginBottom = "24px",
-                    color = "#0E8C6F"
+                    color = "primary.main"
                   )
                   .asInstanceOf[CSSPropertiesUtils]
               )(
@@ -62,7 +62,7 @@ object SignInPage {
                   .Typography(texts.signIn)
                   .variant("h4")
                   .sx(
-                    js.Dynamic.literal(color = "#15201D", marginTop = "8px").asInstanceOf[CSSPropertiesUtils]
+                    js.Dynamic.literal(color = "text.primary", marginTop = "8px").asInstanceOf[CSSPropertiesUtils]
                   )
               ),
             // card
@@ -73,7 +73,7 @@ object SignInPage {
                 js.Dynamic
                   .literal(
                     borderRadius = "12px",
-                    borderColor = "#E6ECEA",
+                    borderColor = "divider",
                     boxShadow = "0 1px 2px rgba(0,0,0,0.04), 0 18px 50px rgba(0,0,0,0.07)"
                   )
                   .asInstanceOf[CSSPropertiesUtils]
@@ -105,7 +105,9 @@ object SignInPage {
                             mui
                               .Typography()
                               .sx(
-                                js.Dynamic.literal(fontSize = 14, color = "#5A6A65").asInstanceOf[CSSPropertiesUtils]
+                                js.Dynamic
+                                  .literal(fontSize = 14, color = "text.secondary")
+                                  .asInstanceOf[CSSPropertiesUtils]
                               )(
                                 s"${texts.dontHaveAccountYet} ",
                                 mui
@@ -121,7 +123,9 @@ object SignInPage {
                             mui
                               .Typography()
                               .sx(
-                                js.Dynamic.literal(fontSize = 14, color = "#5A6A65").asInstanceOf[CSSPropertiesUtils]
+                                js.Dynamic
+                                  .literal(fontSize = 14, color = "text.secondary")
+                                  .asInstanceOf[CSSPropertiesUtils]
                               )(
                                 s"${texts.forgotYourPassword} ",
                                 mui

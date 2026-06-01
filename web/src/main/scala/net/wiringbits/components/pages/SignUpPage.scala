@@ -48,7 +48,7 @@ object SignUpPage {
                     alignItems = "center",
                     gap = "8px",
                     marginBottom = "24px",
-                    color = "#0E8C6F"
+                    color = "primary.main"
                   )
                   .asInstanceOf[CSSPropertiesUtils]
               )(
@@ -61,7 +61,7 @@ object SignUpPage {
                   .Typography(texts.signUp)
                   .variant("h4")
                   .sx(
-                    js.Dynamic.literal(color = "#15201D", marginTop = "8px").asInstanceOf[CSSPropertiesUtils]
+                    js.Dynamic.literal(color = "text.primary", marginTop = "8px").asInstanceOf[CSSPropertiesUtils]
                   )
               ),
             // card
@@ -72,7 +72,7 @@ object SignUpPage {
                 js.Dynamic
                   .literal(
                     borderRadius = "12px",
-                    borderColor = "#E6ECEA",
+                    borderColor = "divider",
                     boxShadow = "0 1px 2px rgba(0,0,0,0.04), 0 18px 50px rgba(0,0,0,0.07)"
                   )
                   .asInstanceOf[CSSPropertiesUtils]
@@ -85,7 +85,7 @@ object SignUpPage {
                       .Typography()
                       .sx(
                         js.Dynamic
-                          .literal(fontSize = 14, color = "#5A6A65", textAlign = "center", paddingTop = "12px")
+                          .literal(fontSize = 14, color = "text.secondary", textAlign = "center", paddingTop = "12px")
                           .asInstanceOf[CSSPropertiesUtils]
                       )(
                         s"${texts.alreadyHaveAccount} ",

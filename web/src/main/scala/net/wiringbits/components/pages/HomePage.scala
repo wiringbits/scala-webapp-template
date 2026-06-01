@@ -52,9 +52,9 @@ object HomePage {
             px = "12px",
             py = "5px",
             borderRadius = "999px",
-            border = s"1px solid $divider",
-            bgcolor = "#FFFFFF",
-            color = "#5A6A65",
+            border = 1,
+            bgcolor = "background.paper",
+            color = "text.secondary",
             fontSize = 13,
             fontWeight = 600,
             marginBottom = "24px"
@@ -63,7 +63,7 @@ object HomePage {
       )(
         mui
           .Icon(muiIcons.Bolt())
-          .sx(js.Dynamic.literal(color = primary, fontSize = 16).asInstanceOf[CSSPropertiesUtils]),
+          .sx(js.Dynamic.literal(color = "primary.main", fontSize = 16).asInstanceOf[CSSPropertiesUtils]),
         "Scala / Scala.js skeleton"
       )
 
@@ -81,7 +81,10 @@ object HomePage {
           .asInstanceOf[CSSPropertiesUtils]
       )(
         "Ship web apps, ",
-        span(style := new CSSPropertiesUtils { color = primary })("not boilerplate")
+        mui
+          .Box()
+          .component("span")
+          .sx(js.Dynamic.literal(color = "primary.main").asInstanceOf[CSSPropertiesUtils])("not boilerplate")
       )
 
     val heroSubtitle = mui
@@ -92,7 +95,7 @@ object HomePage {
         js.Dynamic
           .literal(
             fontSize = 19,
-            color = "#5A6A65",
+            color = "text.secondary",
             maxWidth = 620,
             margin = "0 auto",
             lineHeight = 1.6,
@@ -125,7 +128,7 @@ object HomePage {
             .variant("outlined")
             .size("large")
             .color("inherit")
-            .sx(js.Dynamic.literal(color = "#15201D", borderColor = divider).asInstanceOf[CSSPropertiesUtils])
+            .sx(js.Dynamic.literal(color = "text.primary", borderColor = "divider").asInstanceOf[CSSPropertiesUtils])
             .startIcon(mui.Icon(muiIcons.GitHub()))
         )
       )
@@ -137,7 +140,7 @@ object HomePage {
           .literal(
             position = "relative",
             overflow = "hidden",
-            borderBottom = s"1px solid $divider",
+            borderBottom = 1,
             background = s"radial-gradient(1200px 380px at 50% -120px, ${primaryAlpha10}, transparent)"
           )
           .asInstanceOf[CSSPropertiesUtils]
@@ -159,7 +162,7 @@ object HomePage {
         .Card()
         .variant("outlined")
         .sx(
-          js.Dynamic.literal(borderRadius = "12px", borderColor = divider).asInstanceOf[CSSPropertiesUtils]
+          js.Dynamic.literal(borderRadius = "12px", borderColor = "divider").asInstanceOf[CSSPropertiesUtils]
         )(
           mui
             .CardContent()
@@ -177,7 +180,7 @@ object HomePage {
                       justifyContent = "center",
                       marginBottom = "16px",
                       bgcolor = primaryAlpha10,
-                      color = primary
+                      color = "primary.main"
                     )
                     .asInstanceOf[CSSPropertiesUtils]
                 )(icon),
@@ -191,7 +194,7 @@ object HomePage {
                 .Typography(body)
                 .sx(
                   js.Dynamic
-                    .literal(color = "#5A6A65", fontSize = 14.5, lineHeight = 1.6)
+                    .literal(color = "text.secondary", fontSize = 14.5, lineHeight = 1.6)
                     .asInstanceOf[CSSPropertiesUtils]
                 )
             )
@@ -332,14 +335,14 @@ object HomePage {
                   fontFamily = """ui-monospace, SFMono-Regular, Menlo, monospace""",
                   fontWeight = 700,
                   fontSize = 14,
-                  color = "#1B2B26"
+                  color = "text.primary"
                 )
                 .asInstanceOf[CSSPropertiesUtils]
             ),
           mui
             .Typography(desc)
             .sx(
-              js.Dynamic.literal(color = "#5A6A65", fontSize = 13, flex = 1).asInstanceOf[CSSPropertiesUtils]
+              js.Dynamic.literal(color = "text.secondary", fontSize = 13, flex = 1).asInstanceOf[CSSPropertiesUtils]
             )
         )
 
@@ -348,7 +351,7 @@ object HomePage {
       .variant("outlined")
       .sx(
         js.Dynamic
-          .literal(borderRadius = "10px", overflow = "hidden", borderColor = divider)
+          .literal(borderRadius = "10px", overflow = "hidden", borderColor = "divider")
           .asInstanceOf[CSSPropertiesUtils]
       )(
         swaggerPreviewTopBar,
@@ -356,7 +359,7 @@ object HomePage {
           .Box()
           .sx(
             js.Dynamic
-              .literal(px = "20px", py = "16px", borderBottom = s"1px solid $divider")
+              .literal(px = "20px", py = "16px", borderBottom = 1)
               .asInstanceOf[CSSPropertiesUtils]
           )(
             mui
@@ -382,7 +385,7 @@ object HomePage {
                         py = "2px",
                         borderRadius = "999px",
                         bgcolor = primaryAlpha10,
-                        color = primary,
+                        color = "primary.main",
                         fontSize = 11,
                         fontWeight = 700
                       )
@@ -392,7 +395,7 @@ object HomePage {
             mui
               .Typography("Base URL: /api · The API for the Scala webapp template app")
               .sx(
-                js.Dynamic.literal(color = "#5A6A65", fontSize = 13).asInstanceOf[CSSPropertiesUtils]
+                js.Dynamic.literal(color = "text.secondary", fontSize = 13).asInstanceOf[CSSPropertiesUtils]
               )
           ),
         mui
@@ -403,7 +406,7 @@ object HomePage {
               .variant("overline")
               .sx(
                 js.Dynamic
-                  .literal(color = "#5A6A65", display = "block", marginBottom = "8px")
+                  .literal(color = "text.secondary", display = "block", marginBottom = "8px")
                   .asInstanceOf[CSSPropertiesUtils]
               ),
             mui
@@ -427,7 +430,7 @@ object HomePage {
         mui
           .Typography("Swagger integration")
           .variant("overline")
-          .sx(js.Dynamic.literal(color = "#5A6A65").asInstanceOf[CSSPropertiesUtils]),
+          .sx(js.Dynamic.literal(color = "text.secondary").asInstanceOf[CSSPropertiesUtils]),
         mui
           .Typography("Your API, ready to explore")
           .variant("h4")
@@ -440,7 +443,13 @@ object HomePage {
           )
           .sx(
             js.Dynamic
-              .literal(color = "#5A6A65", fontSize = 15.5, lineHeight = 1.6, maxWidth = 640, marginBottom = "24px")
+              .literal(
+                color = "text.secondary",
+                fontSize = 15.5,
+                lineHeight = 1.6,
+                maxWidth = 640,
+                marginBottom = "24px"
+              )
               .asInstanceOf[CSSPropertiesUtils]
           ),
         swaggerPreview
@@ -452,7 +461,7 @@ object HomePage {
       .variant("outlined")
       .sx(
         js.Dynamic
-          .literal(borderRadius = "10px", overflow = "hidden", borderColor = divider)
+          .literal(borderRadius = "10px", overflow = "hidden", borderColor = "divider")
           .asInstanceOf[CSSPropertiesUtils]
       )(
         mui
@@ -462,7 +471,7 @@ object HomePage {
               .literal(
                 px = "20px",
                 py = "12px",
-                borderBottom = s"1px solid $divider",
+                borderBottom = 1,
                 display = "flex",
                 alignItems = "center",
                 gap = "10px"
@@ -471,7 +480,7 @@ object HomePage {
           )(
             mui
               .Icon(muiIcons.Code())
-              .sx(js.Dynamic.literal(color = "#5A6A65", fontSize = 19).asInstanceOf[CSSPropertiesUtils]),
+              .sx(js.Dynamic.literal(color = "text.secondary", fontSize = 19).asInstanceOf[CSSPropertiesUtils]),
             mui
               .Typography("AsyncComponent.scala")
               .sx(
@@ -500,7 +509,7 @@ object HomePage {
       .Card()
       .variant("outlined")
       .sx(
-        js.Dynamic.literal(borderRadius = "10px", borderColor = divider).asInstanceOf[CSSPropertiesUtils]
+        js.Dynamic.literal(borderRadius = "10px", borderColor = "divider").asInstanceOf[CSSPropertiesUtils]
       )(
         mui
           .CardContent()
@@ -510,7 +519,7 @@ object HomePage {
               .variant("overline")
               .sx(
                 js.Dynamic
-                  .literal(color = "#5A6A65", display = "block", marginBottom = "16px")
+                  .literal(color = "text.secondary", display = "block", marginBottom = "16px")
                   .asInstanceOf[CSSPropertiesUtils]
               ),
             mui
@@ -524,7 +533,7 @@ object HomePage {
                   .CircularProgress()
                   .sx(
                     js.Dynamic
-                      .literal(color = primary, width = "32px !important", height = "32px !important")
+                      .literal(color = "primary.main", width = "32px !important", height = "32px !important")
                       .asInstanceOf[CSSPropertiesUtils]
                   ),
                 mui.Box()(
@@ -533,7 +542,7 @@ object HomePage {
                     .sx(js.Dynamic.literal(fontWeight = 600, fontSize = 14.5).asInstanceOf[CSSPropertiesUtils]),
                   mui
                     .Typography("while data is fetched")
-                    .sx(js.Dynamic.literal(color = "#5A6A65", fontSize = 13).asInstanceOf[CSSPropertiesUtils])
+                    .sx(js.Dynamic.literal(color = "text.secondary", fontSize = 13).asInstanceOf[CSSPropertiesUtils])
                 )
               ),
             mui.Divider(),
@@ -546,7 +555,7 @@ object HomePage {
               )(
                 mui
                   .Icon(muiIcons.Warning())
-                  .sx(js.Dynamic.literal(fontSize = 34, color = "#C0392B").asInstanceOf[CSSPropertiesUtils]),
+                  .sx(js.Dynamic.literal(fontSize = 34, color = "error.main").asInstanceOf[CSSPropertiesUtils]),
                 mui
                   .Box()
                   .sx(js.Dynamic.literal(flex = 1).asInstanceOf[CSSPropertiesUtils])(
@@ -555,7 +564,7 @@ object HomePage {
                       .sx(js.Dynamic.literal(fontWeight = 600, fontSize = 14.5).asInstanceOf[CSSPropertiesUtils]),
                     mui
                       .Typography("recover from a failed request")
-                      .sx(js.Dynamic.literal(color = "#5A6A65", fontSize = 13).asInstanceOf[CSSPropertiesUtils])
+                      .sx(js.Dynamic.literal(color = "text.secondary", fontSize = 13).asInstanceOf[CSSPropertiesUtils])
                   ),
                 mui.Button.normal()("Retry").variant("outlined").size("small").color("inherit")
               )
@@ -568,7 +577,7 @@ object HomePage {
         mui
           .Typography("Consistent data loading")
           .variant("overline")
-          .sx(js.Dynamic.literal(color = "#5A6A65").asInstanceOf[CSSPropertiesUtils]),
+          .sx(js.Dynamic.literal(color = "text.secondary").asInstanceOf[CSSPropertiesUtils]),
         mui
           .Typography("Loading, error and retry — handled once")
           .variant("h4")
@@ -597,7 +606,7 @@ object HomePage {
       .variant("outlined")
       .sx(
         js.Dynamic
-          .literal(borderRadius = "10px", borderColor = divider, overflow = "hidden")
+          .literal(borderRadius = "10px", borderColor = "divider", overflow = "hidden")
           .asInstanceOf[CSSPropertiesUtils]
       )(
         mui
@@ -621,7 +630,7 @@ object HomePage {
                         justifyContent = "center",
                         marginBottom = "16px",
                         bgcolor = primaryAlpha10,
-                        color = primary
+                        color = "primary.main"
                       )
                       .asInstanceOf[CSSPropertiesUtils]
                   )(
@@ -639,7 +648,7 @@ object HomePage {
                   )
                   .sx(
                     js.Dynamic
-                      .literal(color = "#5A6A65", fontSize = 15, lineHeight = 1.7)
+                      .literal(color = "text.secondary", fontSize = 15, lineHeight = 1.7)
                       .asInstanceOf[CSSPropertiesUtils]
                   )
               ),
@@ -649,8 +658,8 @@ object HomePage {
                 js.Dynamic
                   .literal(
                     padding = "32px",
-                    bgcolor = "#F7FAF9",
-                    borderLeft = s"1px solid $divider"
+                    bgcolor = "background.default",
+                    borderLeft = 1
                   )
                   .asInstanceOf[CSSPropertiesUtils]
               )(
@@ -663,7 +672,7 @@ object HomePage {
                   )(
                     mui
                       .Icon(muiIcons.GitHub())
-                      .sx(js.Dynamic.literal(fontSize = 19, color = "#5A6A65").asInstanceOf[CSSPropertiesUtils]),
+                      .sx(js.Dynamic.literal(fontSize = 19, color = "text.secondary").asInstanceOf[CSSPropertiesUtils]),
                     mui
                       .Typography("CI / GitHub Actions")
                       .sx(js.Dynamic.literal(fontWeight = 700, fontSize = 14).asInstanceOf[CSSPropertiesUtils]),
@@ -677,7 +686,7 @@ object HomePage {
                             py = "2px",
                             borderRadius = "999px",
                             bgcolor = "rgba(14,140,111,0.15)",
-                            color = primary,
+                            color = "primary.main",
                             fontSize = 12,
                             fontWeight = 700
                           )
@@ -702,7 +711,9 @@ object HomePage {
                         .withKey(i.toString)(
                           mui
                             .Icon(muiIcons.CheckCircle())
-                            .sx(js.Dynamic.literal(fontSize = 19, color = primary).asInstanceOf[CSSPropertiesUtils]),
+                            .sx(
+                              js.Dynamic.literal(fontSize = 19, color = "primary.main").asInstanceOf[CSSPropertiesUtils]
+                            ),
                           mui.Typography(check).sx(js.Dynamic.literal(fontSize = 14).asInstanceOf[CSSPropertiesUtils])
                         )
                     }*
@@ -717,7 +728,7 @@ object HomePage {
         mui
           .Typography("Quality")
           .variant("overline")
-          .sx(js.Dynamic.literal(color = "#5A6A65").asInstanceOf[CSSPropertiesUtils]),
+          .sx(js.Dynamic.literal(color = "text.secondary").asInstanceOf[CSSPropertiesUtils]),
         mui
           .Typography("A simple architecture, well tested")
           .variant("h4")
