@@ -1,15 +1,14 @@
 package net.wiringbits.components.pages
 
-import com.olvind.mui.csstype.mod.Property.FlexDirection
 import com.olvind.mui.muiMaterial.components as mui
 import net.wiringbits.AppContext
-import net.wiringbits.components.widgets.*
+import net.wiringbits.components.widgets.SignInForm
 import net.wiringbits.core.I18nHooks
 import net.wiringbits.webapp.utils.slinkyUtils.Utils.CSSPropertiesUtils
-import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{Container, Title}
 import net.wiringbits.webapp.utils.slinkyUtils.facades.reactrouterdom.useHistory
 import slinky.core.facade.Fragment
 import slinky.core.{FunctionalComponent, KeyAddingStage}
+import slinky.web.html.*
 
 import scala.scalajs.js
 
@@ -19,64 +18,127 @@ object SignInPage {
 
   case class Props(ctx: AppContext)
 
-  private val styling = new CSSPropertiesUtils {
-    maxWidth = 350
-    width = "100%"
-  }
-
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
     val texts = I18nHooks.useMessages(props.ctx.$lang)
     val history = useHistory()
 
-    Container(
-      flex = Some(1),
-      justifyContent = Container.Alignment.center,
-      alignItems = Container.Alignment.center,
-      child = mui.Box.sx(styling)(
-        AppCard(
-          Fragment(
-            Container(
-              justifyContent = Container.Alignment.center,
-              alignItems = Container.Alignment.center,
-              child = Title(texts.signIn)
-            ),
-            Container(
-              flex = Some(1),
-              alignItems = Container.Alignment.center,
-              justifyContent = Container.Alignment.center,
-              padding = Container.EdgeInsets.top(16),
-              child = SignInForm(props.ctx)
-            ),
-            Container(
-              margin = Container.EdgeInsets.top(8),
-              flexDirection = FlexDirection.row,
-              alignItems = Container.Alignment.center,
-              justifyContent = Container.Alignment.center,
-              child = Fragment(
-                mui.Typography(texts.dontHaveAccountYet),
-                mui.Button
-                  .normal()(texts.signUp)
-                  .variant("text")
-                  .color("primary")
-                  .onClick(_ => history.push("/signUp"))
-              )
-            ),
-            Container(
-              flexDirection = FlexDirection.row,
-              alignItems = Container.Alignment.center,
-              justifyContent = Container.Alignment.center,
-              child = Fragment(
-                mui.Typography(texts.forgotYourPassword),
-                mui.Button
-                  .normal(texts.recoverIt)
-                  .variant("text")
-                  .color("primary")
-                  .onClick(_ => history.push("/forgot-password"))
-              )
-            )
+    mui
+      .Box()
+      .sx(
+        js.Dynamic
+          .literal(
+            flex = 1,
+            display = "flex",
+            alignItems = "center",
+            justifyContent = "center",
+            padding = "48px 16px 64px"
           )
-        )
+          .asInstanceOf[CSSPropertiesUtils]
+      )(
+        mui
+          .Box()
+          .sx(js.Dynamic.literal(width = "100%", maxWidth = 440).asInstanceOf[CSSPropertiesUtils])(
+            // auth shell header
+            mui
+              .Box()
+              .sx(
+                js.Dynamic
+                  .literal(
+                    display = "flex",
+                    flexDirection = "column",
+                    alignItems = "center",
+                    gap = 8,
+                    marginBottom = 24,
+                    color = "#0E8C6F"
+                  )
+                  .asInstanceOf[CSSPropertiesUtils]
+              )(
+                img(
+                  src := "/img/wiringbits-logo.png",
+                  alt := "wiringbits",
+                  style := new CSSPropertiesUtils { height = "36px"; width = "auto" }
+                ),
+                mui
+                  .Typography(texts.signIn)
+                  .variant("h4")
+                  .sx(
+                    js.Dynamic.literal(color = "#15201D", marginTop = 8).asInstanceOf[CSSPropertiesUtils]
+                  )
+              ),
+            // card
+            mui
+              .Card()
+              .variant("outlined")
+              .sx(
+                js.Dynamic
+                  .literal(
+                    borderRadius = 12,
+                    borderColor = "#E6ECEA",
+                    boxShadow = "0 1px 2px rgba(0,0,0,0.04), 0 18px 50px rgba(0,0,0,0.07)"
+                  )
+                  .asInstanceOf[CSSPropertiesUtils]
+              )(
+                mui
+                  .CardContent()
+                  .sx(js.Dynamic.literal(padding = 32).asInstanceOf[CSSPropertiesUtils])(
+                    mui
+                      .Box()
+                      .sx(
+                        js.Dynamic
+                          .literal(display = "flex", flexDirection = "column", gap = 20)
+                          .asInstanceOf[CSSPropertiesUtils]
+                      )(
+                        SignInForm(props.ctx),
+                        mui
+                          .Box()
+                          .sx(
+                            js.Dynamic
+                              .literal(
+                                display = "flex",
+                                flexDirection = "column",
+                                gap = 6,
+                                alignItems = "center",
+                                paddingTop = 4
+                              )
+                              .asInstanceOf[CSSPropertiesUtils]
+                          )(
+                            mui
+                              .Typography()
+                              .sx(
+                                js.Dynamic.literal(fontSize = 14, color = "#5A6A65").asInstanceOf[CSSPropertiesUtils]
+                              )(
+                                s"${texts.dontHaveAccountYet} ",
+                                mui
+                                  .Link(texts.signUp)
+                                  .sx(
+                                    js.Dynamic
+                                      .literal(fontSize = 14, cursor = "pointer")
+                                      .asInstanceOf[CSSPropertiesUtils]
+                                  )
+                                  .component("button")
+                                  .onClick(_ => history.push("/signup"))
+                              ),
+                            mui
+                              .Typography()
+                              .sx(
+                                js.Dynamic.literal(fontSize = 14, color = "#5A6A65").asInstanceOf[CSSPropertiesUtils]
+                              )(
+                                s"${texts.forgotYourPassword} ",
+                                mui
+                                  .Link(texts.recoverIt)
+                                  .sx(
+                                    js.Dynamic
+                                      .literal(fontSize = 14, cursor = "pointer")
+                                      .asInstanceOf[CSSPropertiesUtils]
+                                  )
+                                  .component("button")
+                                  .onClick(_ => history.push("/forgot-password"))
+                              )
+                          )
+                      )
+                  )
+              )
+          )
       )
-    )
   }
 }

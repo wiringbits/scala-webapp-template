@@ -1,32 +1,68 @@
 package net.wiringbits
 
-import com.olvind.mui.muiMaterial.stylesCreateThemeMod.ThemeOptions
-import com.olvind.mui.muiMaterial.stylesCreateThemeMod.Theme
-import com.olvind.mui.muiMaterial.stylesCreatePaletteMod.SimplePaletteColorOptions
-import com.olvind.mui.muiMaterial.stylesCreatePaletteMod.PaletteOptions
-import com.olvind.mui.muiMaterial.stylesCreateTypographyMod.TypographyOptions
-import com.olvind.mui.muiMaterial.stylesMod.{createMuiTheme, createTheme}
-import com.olvind.mui.muiMaterial.colorsMod as Colors
-import com.olvind.mui.muiMaterial.components as mui
-import com.olvind.mui.react.mod.CSSProperties
-import com.olvind.mui.muiMaterial.mod.PropTypes.Color
-import com.olvind.mui.muiIconsMaterial.components as muiIcons
-import com.olvind.mui.csstype.mod.Property.{BoxSizing, FlexDirection, Position}
-import com.olvind.mui.muiSystem.createThemeShapeMod.ShapeOptions
+import com.olvind.mui.muiMaterial.stylesCreateThemeMod.{Theme, ThemeOptions}
+import com.olvind.mui.muiMaterial.stylesMod.createTheme
+
+import scala.scalajs.js
 
 object AppTheme {
-  val primaryColor = Colors.teal.`500`
-  val secondaryColor = Colors.amber
-  val typography = TypographyOptions()
-  val borderRadius = 8
-
   val value: Theme = createTheme(
-    ThemeOptions()
-      .setPalette(
-        PaletteOptions()
-          .setPrimary(SimplePaletteColorOptions(primaryColor))
+    js.Dynamic
+      .literal(
+        palette = js.Dynamic.literal(
+          primary = js.Dynamic.literal(
+            main = "#0E8C6F",
+            dark = "#0A6B54",
+            contrastText = "#FFFFFF"
+          )
+        ),
+        shape = js.Dynamic.literal(borderRadius = 10),
+        typography = js.Dynamic.literal(
+          fontFamily =
+            """-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", Arial, sans-serif""",
+          button = js.Dynamic.literal(textTransform = "none", fontWeight = 600, letterSpacing = 0)
+        ),
+        components = js.Dynamic.literal(
+          MuiButton = js.Dynamic.literal(
+            defaultProps = js.Dynamic.literal(disableElevation = true),
+            styleOverrides = js.Dynamic.literal(
+              root = js.Dynamic.literal(
+                borderRadius = 9,
+                paddingLeft = 18,
+                paddingRight = 18
+              ),
+              sizeLarge = js.Dynamic.literal(
+                paddingTop = 11,
+                paddingBottom = 11,
+                fontSize = 15
+              )
+            )
+          ),
+          MuiOutlinedInput = js.Dynamic.literal(
+            styleOverrides = js.Dynamic.literal(
+              root = js.Dynamic.literal(
+                borderRadius = 10,
+                backgroundColor = "#FFFFFF"
+              )
+            )
+          ),
+          MuiInputLabel = js.Dynamic.literal(
+            styleOverrides = js.Dynamic.literal(
+              root = js.Dynamic.literal(fontSize = 14.5)
+            )
+          ),
+          MuiTab = js.Dynamic.literal(
+            styleOverrides = js.Dynamic.literal(
+              root = js.Dynamic.literal(textTransform = "none", fontWeight = 600, fontSize = 14, minHeight = 46)
+            )
+          ),
+          MuiTabs = js.Dynamic.literal(
+            styleOverrides = js.Dynamic.literal(
+              indicator = js.Dynamic.literal(height = 2.5, borderRadius = 2)
+            )
+          )
+        )
       )
-      .setTypography(typography)
-      .setShape(ShapeOptions().setBorderRadius(borderRadius))
+      .asInstanceOf[ThemeOptions]
   )
 }

@@ -6,7 +6,7 @@ import net.wiringbits.core.I18nHooks
 import net.wiringbits.forms.SignUpFormData
 import net.wiringbits.ui.components.inputs.{EmailInput, NameInput, PasswordInput}
 import net.wiringbits.webapp.utils.slinkyUtils.components.core.ErrorLabel
-import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container, Title}
+import net.wiringbits.webapp.utils.slinkyUtils.components.core.widgets.{CircularLoader, Container}
 import net.wiringbits.webapp.utils.slinkyUtils.facades.reactrouterdom.useHistory
 import net.wiringbits.webapp.utils.slinkyUtils.forms.StatefulFormData
 import org.scalajs.dom
@@ -149,32 +149,25 @@ object SignUpForm {
         .`type`("submit")
     }
 
-    // TODO: Use a form to get the enter key submitting the form
     form(onSubmit := (handleSubmit(_)))(
-      mui
-        .Paper()
-        .elevation(1)(
+      Container(
+        minWidth = Some("100%"),
+        alignItems = Container.Alignment.center,
+        child = Fragment(
+          nameInput,
+          emailInput,
+          passwordInput,
+          repeatPasswordInput,
+          recaptcha,
+          error,
           Container(
-            minWidth = Some("300px"),
+            minWidth = Some("100%"),
+            margin = Container.EdgeInsets.top(16),
             alignItems = Container.Alignment.center,
-            padding = Container.EdgeInsets.all(16),
-            child = Fragment(
-              Title(texts.signUp),
-              nameInput,
-              emailInput,
-              passwordInput,
-              repeatPasswordInput,
-              recaptcha,
-              error,
-              Container(
-                minWidth = Some("100%"),
-                margin = Container.EdgeInsets.top(16),
-                alignItems = Container.Alignment.center,
-                child = signUpButton
-              )
-            )
+            child = signUpButton
           )
         )
+      )
     )
   }
 }
