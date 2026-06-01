@@ -23,20 +23,20 @@ object Footer {
   private val footerSx = js.Dynamic.literal(
     background = footerBg,
     marginTop = "auto",
-    paddingTop = 48,
-    paddingBottom = 24
+    paddingTop = "48px",
+    paddingBottom = "24px"
   )
 
   private val gridSx = js.Dynamic.literal(
     display = "grid",
     gridTemplateColumns = "1.6fr 1fr 1fr",
-    gap = 48
+    gap = "48px"
   )
 
   private val gridMobileSx = js.Dynamic.literal(
     display = "flex",
     flexDirection = "column",
-    gap = 40
+    gap = "40px"
   )
 
   private val sectionHeadSx = js.Dynamic.literal(
@@ -45,7 +45,7 @@ object Footer {
     fontSize = 13,
     letterSpacing = "0.1em",
     textTransform = "uppercase",
-    marginBottom = 16
+    marginBottom = "16px"
   )
 
   private val linkSx = js.Dynamic.literal(
@@ -53,22 +53,22 @@ object Footer {
     fontSize = 14,
     textDecoration = "none",
     display = "block",
-    marginBottom = 8
+    marginBottom = "8px"
   )
 
   private val subLabelSx = js.Dynamic.literal(
     color = footerSub,
     fontSize = 13,
-    marginBottom = 4
+    marginBottom = "4px"
   )
 
   private val bottomBarSx = js.Dynamic.literal(
-    marginTop = 48,
-    paddingTop = 24,
+    marginTop = "48px",
+    paddingTop = "24px",
     borderTop = "1px solid rgba(255,255,255,0.08)",
     display = "flex",
     flexWrap = "wrap",
-    gap = 12,
+    gap = "12px",
     justifyContent = "space-between",
     alignItems = "center"
   )
@@ -104,7 +104,7 @@ object Footer {
         .Box()
         .sx(
           js.Dynamic
-            .literal(display = "flex", alignItems = "center", gap = "10px", marginBottom = 16)
+            .literal(display = "flex", alignItems = "center", gap = "10px", marginBottom = "16px")
             .asInstanceOf[CSSPropertiesUtils]
         )(
           img(src := "/img/wiringbits-logo.png", alt := "wiringbits", style := logoSx),
@@ -142,7 +142,7 @@ object Footer {
       sectionHead("Contact"),
       mui
         .Box()
-        .sx(js.Dynamic.literal(marginBottom = 16).asInstanceOf[CSSPropertiesUtils])(
+        .sx(js.Dynamic.literal(marginBottom = "16px").asInstanceOf[CSSPropertiesUtils])(
           mui.Typography("Email").sx(subLabelSx.asInstanceOf[CSSPropertiesUtils]),
           a(
             slinky.web.html.href := s"mailto:${props.ctx.contactEmail.string}",

@@ -54,7 +54,7 @@ object AboutPage {
                   .Box()
                   .sx(
                     js.Dynamic
-                      .literal(display = "flex", justifyContent = "center", marginBottom = 20)
+                      .literal(display = "flex", justifyContent = "center", marginBottom = "20px")
                       .asInstanceOf[CSSPropertiesUtils]
                   )(
                     img(
@@ -72,7 +72,7 @@ object AboutPage {
                         fontWeight = 700,
                         fontSize = 38,
                         letterSpacing = "-0.01em",
-                        marginBottom = 12,
+                        marginBottom = "12px",
                         display = "block"
                       )
                       .asInstanceOf[CSSPropertiesUtils]
@@ -87,7 +87,7 @@ object AboutPage {
                         color = "#5A6A65",
                         fontSize = 15.5,
                         lineHeight = 1.7,
-                        marginBottom = 32,
+                        marginBottom = "32px",
                         maxWidth = 380,
                         margin = "0 auto 32px"
                       )

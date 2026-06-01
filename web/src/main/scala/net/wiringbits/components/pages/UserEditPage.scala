@@ -32,7 +32,7 @@ object UserEditPage {
               fontSize = 34,
               fontWeight = 700,
               letterSpacing = "-0.02em",
-              marginBottom = 32
+              marginBottom = "32px"
             )
             .asInstanceOf[CSSPropertiesUtils]
         ),
@@ -60,7 +60,7 @@ object UserEditPage {
             ),
           mui
             .CardContent()
-            .sx(js.Dynamic.literal(padding = 32).asInstanceOf[CSSPropertiesUtils])(
+            .sx(js.Dynamic.literal(padding = "32px").asInstanceOf[CSSPropertiesUtils])(
               menuOption match {
                 case EditSummary => UserInfo(props.ctx, props.user)
                 case EditPassword => EditPasswordForm(props.ctx, props.user)

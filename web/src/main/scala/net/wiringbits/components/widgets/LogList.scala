@@ -83,7 +83,7 @@ object LogList {
                 js.Dynamic
                   .literal(
                     display = "flex",
-                    gap = 16,
+                    gap = "16px",
                     px = "24px",
                     py = "18px",
                     borderBottom = if (i < items.length - 1) s"1px solid $divider" else "none"
@@ -124,7 +124,12 @@ object LogList {
                       .Typography(Formatter.instant(item.createdAt))
                       .sx(
                         js.Dynamic
-                          .literal(fontSize = 13, color = "#5A6A65", marginTop = 2, fontVariantNumeric = "tabular-nums")
+                          .literal(
+                            fontSize = 13,
+                            color = "#5A6A65",
+                            marginTop = "2px",
+                            fontVariantNumeric = "tabular-nums"
+                          )
                           .asInstanceOf[CSSPropertiesUtils]
                       )
                   )

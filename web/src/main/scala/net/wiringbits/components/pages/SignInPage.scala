@@ -47,8 +47,8 @@ object SignInPage {
                     display = "flex",
                     flexDirection = "column",
                     alignItems = "center",
-                    gap = 8,
-                    marginBottom = 24,
+                    gap = "8px",
+                    marginBottom = "24px",
                     color = "#0E8C6F"
                   )
                   .asInstanceOf[CSSPropertiesUtils]
@@ -62,7 +62,7 @@ object SignInPage {
                   .Typography(texts.signIn)
                   .variant("h4")
                   .sx(
-                    js.Dynamic.literal(color = "#15201D", marginTop = 8).asInstanceOf[CSSPropertiesUtils]
+                    js.Dynamic.literal(color = "#15201D", marginTop = "8px").asInstanceOf[CSSPropertiesUtils]
                   )
               ),
             // card
@@ -80,12 +80,12 @@ object SignInPage {
               )(
                 mui
                   .CardContent()
-                  .sx(js.Dynamic.literal(padding = 32).asInstanceOf[CSSPropertiesUtils])(
+                  .sx(js.Dynamic.literal(padding = "32px").asInstanceOf[CSSPropertiesUtils])(
                     mui
                       .Box()
                       .sx(
                         js.Dynamic
-                          .literal(display = "flex", flexDirection = "column", gap = 20)
+                          .literal(display = "flex", flexDirection = "column", gap = "20px")
                           .asInstanceOf[CSSPropertiesUtils]
                       )(
                         SignInForm(props.ctx),
@@ -96,9 +96,9 @@ object SignInPage {
                               .literal(
                                 display = "flex",
                                 flexDirection = "column",
-                                gap = 6,
+                                gap = "6px",
                                 alignItems = "center",
-                                paddingTop = 4
+                                paddingTop = "4px"
                               )
                               .asInstanceOf[CSSPropertiesUtils]
                           )(

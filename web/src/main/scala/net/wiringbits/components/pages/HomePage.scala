@@ -48,7 +48,7 @@ object HomePage {
           .literal(
             display = "inline-flex",
             alignItems = "center",
-            gap = 8,
+            gap = "8px",
             px = "12px",
             py = "5px",
             borderRadius = 999,
@@ -57,7 +57,7 @@ object HomePage {
             color = "#5A6A65",
             fontSize = 13,
             fontWeight = 600,
-            marginBottom = 24
+            marginBottom = "24px"
           )
           .asInstanceOf[CSSPropertiesUtils]
       )(
@@ -76,7 +76,7 @@ object HomePage {
             fontWeight = 800,
             letterSpacing = "-0.025em",
             lineHeight = 1.05,
-            marginBottom = 20
+            marginBottom = "20px"
           )
           .asInstanceOf[CSSPropertiesUtils]
       )(
@@ -96,7 +96,7 @@ object HomePage {
             maxWidth = 620,
             margin = "0 auto",
             lineHeight = 1.6,
-            marginBottom = 36
+            marginBottom = "36px"
           )
           .asInstanceOf[CSSPropertiesUtils]
       )
@@ -105,7 +105,7 @@ object HomePage {
       .Box()
       .sx(
         js.Dynamic
-          .literal(display = "flex", gap = 12, justifyContent = "center", flexWrap = "wrap")
+          .literal(display = "flex", gap = "12px", justifyContent = "center", flexWrap = "wrap")
           .asInstanceOf[CSSPropertiesUtils]
       )(
         mui.Button
@@ -141,7 +141,7 @@ object HomePage {
             .Box()
             .sx(
               js.Dynamic
-                .literal(textAlign = "center", paddingTop = 96, paddingBottom = 96)
+                .literal(textAlign = "center", paddingTop = "96px", paddingBottom = "96px")
                 .asInstanceOf[CSSPropertiesUtils]
             )(heroBadge, heroTitle, heroSubtitle, heroButtons)
         )
@@ -157,7 +157,7 @@ object HomePage {
         )(
           mui
             .CardContent()
-            .sx(js.Dynamic.literal(padding = 24).asInstanceOf[CSSPropertiesUtils])(
+            .sx(js.Dynamic.literal(padding = "24px").asInstanceOf[CSSPropertiesUtils])(
               mui
                 .Box()
                 .sx(
@@ -169,7 +169,7 @@ object HomePage {
                       display = "flex",
                       alignItems = "center",
                       justifyContent = "center",
-                      marginBottom = 16,
+                      marginBottom = "16px",
                       bgcolor = primaryAlpha10,
                       color = primary
                     )
@@ -179,7 +179,7 @@ object HomePage {
                 .Typography(title)
                 .variant("h6")
                 .sx(
-                  js.Dynamic.literal(marginBottom = 8, fontSize = 18).asInstanceOf[CSSPropertiesUtils]
+                  js.Dynamic.literal(marginBottom = "8px", fontSize = 18).asInstanceOf[CSSPropertiesUtils]
                 ),
               mui
                 .Typography(body)
@@ -198,7 +198,7 @@ object HomePage {
           .literal(
             display = "grid",
             gridTemplateColumns = "1fr 1fr",
-            gap = 20
+            gap = "20px"
           )
           .asInstanceOf[CSSPropertiesUtils]
       )(
@@ -235,7 +235,7 @@ object HomePage {
             py = "14px",
             display = "flex",
             alignItems = "center",
-            gap = 12
+            gap = "12px"
           )
           .asInstanceOf[CSSPropertiesUtils]
       )(
@@ -292,7 +292,7 @@ object HomePage {
             .literal(
               display = "flex",
               alignItems = "center",
-              gap = 12,
+              gap = "12px",
               border = s"1px solid ${methodFg}44",
               borderRadius = 6,
               bgcolor = s"${methodFg}18",
@@ -357,7 +357,7 @@ object HomePage {
               .Box()
               .sx(
                 js.Dynamic
-                  .literal(display = "flex", alignItems = "center", gap = 8, marginBottom = 4)
+                  .literal(display = "flex", alignItems = "center", gap = "8px", marginBottom = "4px")
                   .asInstanceOf[CSSPropertiesUtils]
               )(
                 mui
@@ -397,14 +397,14 @@ object HomePage {
               .variant("overline")
               .sx(
                 js.Dynamic
-                  .literal(color = "#5A6A65", display = "block", marginBottom = 8)
+                  .literal(color = "#5A6A65", display = "block", marginBottom = "8px")
                   .asInstanceOf[CSSPropertiesUtils]
               ),
             mui
               .Box()
               .sx(
                 js.Dynamic
-                  .literal(display = "flex", flexDirection = "column", gap = 10)
+                  .literal(display = "flex", flexDirection = "column", gap = "10px")
                   .asInstanceOf[CSSPropertiesUtils]
               )(
                 swaggerEndpoint("GET", "", "#3B82F6", "/auth/me", "Get the details for the authenticated user"),
@@ -417,7 +417,7 @@ object HomePage {
 
     val swaggerSection = mui
       .Box()
-      .sx(js.Dynamic.literal(marginTop = 48).asInstanceOf[CSSPropertiesUtils])(
+      .sx(js.Dynamic.literal(marginTop = "48px").asInstanceOf[CSSPropertiesUtils])(
         mui
           .Typography("Swagger integration")
           .variant("overline")
@@ -426,7 +426,7 @@ object HomePage {
           .Typography("Your API, ready to explore")
           .variant("h4")
           .sx(
-            js.Dynamic.literal(fontSize = 30, marginTop = 4, marginBottom = 8).asInstanceOf[CSSPropertiesUtils]
+            js.Dynamic.literal(fontSize = 30, marginTop = "4px", marginBottom = "8px").asInstanceOf[CSSPropertiesUtils]
           ),
         mui
           .Typography(
@@ -434,7 +434,7 @@ object HomePage {
           )
           .sx(
             js.Dynamic
-              .literal(color = "#5A6A65", fontSize = 15.5, lineHeight = 1.6, maxWidth = 640, marginBottom = 24)
+              .literal(color = "#5A6A65", fontSize = 15.5, lineHeight = 1.6, maxWidth = 640, marginBottom = "24px")
               .asInstanceOf[CSSPropertiesUtils]
           ),
         swaggerPreview
@@ -459,7 +459,7 @@ object HomePage {
                 borderBottom = s"1px solid $divider",
                 display = "flex",
                 alignItems = "center",
-                gap = 10
+                gap = "10px"
               )
               .asInstanceOf[CSSPropertiesUtils]
           )(
@@ -498,20 +498,20 @@ object HomePage {
       )(
         mui
           .CardContent()
-          .sx(js.Dynamic.literal(padding = 24).asInstanceOf[CSSPropertiesUtils])(
+          .sx(js.Dynamic.literal(padding = "24px").asInstanceOf[CSSPropertiesUtils])(
             mui
               .Typography("Built-in states")
               .variant("overline")
               .sx(
                 js.Dynamic
-                  .literal(color = "#5A6A65", display = "block", marginBottom = 16)
+                  .literal(color = "#5A6A65", display = "block", marginBottom = "16px")
                   .asInstanceOf[CSSPropertiesUtils]
               ),
             mui
               .Box()
               .sx(
                 js.Dynamic
-                  .literal(display = "flex", alignItems = "center", gap = 12, marginBottom = 16)
+                  .literal(display = "flex", alignItems = "center", gap = "12px", marginBottom = "16px")
                   .asInstanceOf[CSSPropertiesUtils]
               )(
                 mui
@@ -535,7 +535,7 @@ object HomePage {
               .Box()
               .sx(
                 js.Dynamic
-                  .literal(display = "flex", alignItems = "center", gap = 12, marginTop = 16)
+                  .literal(display = "flex", alignItems = "center", gap = "12px", marginTop = "16px")
                   .asInstanceOf[CSSPropertiesUtils]
               )(
                 mui
@@ -558,7 +558,7 @@ object HomePage {
 
     val codeSection = mui
       .Box()
-      .sx(js.Dynamic.literal(marginTop = 48).asInstanceOf[CSSPropertiesUtils])(
+      .sx(js.Dynamic.literal(marginTop = "48px").asInstanceOf[CSSPropertiesUtils])(
         mui
           .Typography("Consistent data loading")
           .variant("overline")
@@ -567,13 +567,13 @@ object HomePage {
           .Typography("Loading, error and retry — handled once")
           .variant("h4")
           .sx(
-            js.Dynamic.literal(fontSize = 30, marginTop = 4, marginBottom = 24).asInstanceOf[CSSPropertiesUtils]
+            js.Dynamic.literal(fontSize = 30, marginTop = "4px", marginBottom = "24px").asInstanceOf[CSSPropertiesUtils]
           ),
         mui
           .Box()
           .sx(
             js.Dynamic
-              .literal(display = "grid", gridTemplateColumns = "1.25fr 1fr", gap = 20, alignItems = "stretch")
+              .literal(display = "grid", gridTemplateColumns = "1.25fr 1fr", gap = "20px", alignItems = "stretch")
               .asInstanceOf[CSSPropertiesUtils]
           )(codeCard, statesCard)
       )
@@ -601,7 +601,7 @@ object HomePage {
           )(
             mui
               .Box()
-              .sx(js.Dynamic.literal(padding = 32).asInstanceOf[CSSPropertiesUtils])(
+              .sx(js.Dynamic.literal(padding = "32px").asInstanceOf[CSSPropertiesUtils])(
                 mui
                   .Box()
                   .sx(
@@ -613,7 +613,7 @@ object HomePage {
                         display = "flex",
                         alignItems = "center",
                         justifyContent = "center",
-                        marginBottom = 16,
+                        marginBottom = "16px",
                         bgcolor = primaryAlpha10,
                         color = primary
                       )
@@ -625,7 +625,7 @@ object HomePage {
                   .Typography("Tests are first-class citizens")
                   .variant("h5")
                   .sx(
-                    js.Dynamic.literal(fontSize = 22, marginBottom = 8).asInstanceOf[CSSPropertiesUtils]
+                    js.Dynamic.literal(fontSize = 22, marginBottom = "8px").asInstanceOf[CSSPropertiesUtils]
                   ),
                 mui
                   .Typography(
@@ -642,7 +642,7 @@ object HomePage {
               .sx(
                 js.Dynamic
                   .literal(
-                    padding = 32,
+                    padding = "32px",
                     bgcolor = "#F7FAF9",
                     borderLeft = s"1px solid $divider"
                   )
@@ -652,7 +652,7 @@ object HomePage {
                   .Box()
                   .sx(
                     js.Dynamic
-                      .literal(display = "flex", alignItems = "center", gap = 8, marginBottom = 16)
+                      .literal(display = "flex", alignItems = "center", gap = "8px", marginBottom = "16px")
                       .asInstanceOf[CSSPropertiesUtils]
                   )(
                     mui
@@ -682,7 +682,7 @@ object HomePage {
                   .Box()
                   .sx(
                     js.Dynamic
-                      .literal(display = "flex", flexDirection = "column", gap = 10)
+                      .literal(display = "flex", flexDirection = "column", gap = "10px")
                       .asInstanceOf[CSSPropertiesUtils]
                   )(
                     ciChecks.zipWithIndex.map { case (check, i) =>
@@ -690,7 +690,7 @@ object HomePage {
                         .Box()
                         .sx(
                           js.Dynamic
-                            .literal(display = "flex", alignItems = "center", gap = 10)
+                            .literal(display = "flex", alignItems = "center", gap = "10px")
                             .asInstanceOf[CSSPropertiesUtils]
                         )
                         .withKey(i.toString)(
@@ -707,7 +707,7 @@ object HomePage {
 
     val qualitySection = mui
       .Box()
-      .sx(js.Dynamic.literal(marginTop = 48).asInstanceOf[CSSPropertiesUtils])(
+      .sx(js.Dynamic.literal(marginTop = "48px").asInstanceOf[CSSPropertiesUtils])(
         mui
           .Typography("Quality")
           .variant("overline")
@@ -716,7 +716,7 @@ object HomePage {
           .Typography("A simple architecture, well tested")
           .variant("h4")
           .sx(
-            js.Dynamic.literal(fontSize = 30, marginTop = 4, marginBottom = 24).asInstanceOf[CSSPropertiesUtils]
+            js.Dynamic.literal(fontSize = 30, marginTop = "4px", marginBottom = "24px").asInstanceOf[CSSPropertiesUtils]
           ),
         testingStrip
       )
@@ -726,7 +726,7 @@ object HomePage {
       mui.Container.maxWidth("lg")(
         mui
           .Box()
-          .sx(js.Dynamic.literal(paddingTop = 48, paddingBottom = 64).asInstanceOf[CSSPropertiesUtils])(
+          .sx(js.Dynamic.literal(paddingTop = "48px", paddingBottom = "64px").asInstanceOf[CSSPropertiesUtils])(
             features,
             swaggerSection,
             codeSection,

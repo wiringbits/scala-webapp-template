@@ -63,7 +63,7 @@ object VerifyEmailPage {
               .Typography(texts.verifyYourEmailAddress)
               .variant("h4")
               .sx(
-                js.Dynamic.literal(marginBottom = 12, fontWeight = 600).asInstanceOf[CSSPropertiesUtils]
+                js.Dynamic.literal(marginBottom = "12px", fontWeight = 600).asInstanceOf[CSSPropertiesUtils]
               ),
             mui
               .Typography(
@@ -71,7 +71,7 @@ object VerifyEmailPage {
               )
               .sx(
                 js.Dynamic
-                  .literal(color = "#5A6A65", fontSize = 16, lineHeight = 1.7, marginBottom = 32)
+                  .literal(color = "#5A6A65", fontSize = 16, lineHeight = 1.7, marginBottom = "32px")
                   .asInstanceOf[CSSPropertiesUtils]
               ),
             mui.Button

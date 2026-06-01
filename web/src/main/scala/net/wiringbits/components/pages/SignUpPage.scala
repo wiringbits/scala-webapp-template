@@ -46,8 +46,8 @@ object SignUpPage {
                     display = "flex",
                     flexDirection = "column",
                     alignItems = "center",
-                    gap = 8,
-                    marginBottom = 24,
+                    gap = "8px",
+                    marginBottom = "24px",
                     color = "#0E8C6F"
                   )
                   .asInstanceOf[CSSPropertiesUtils]
@@ -61,7 +61,7 @@ object SignUpPage {
                   .Typography(texts.signUp)
                   .variant("h4")
                   .sx(
-                    js.Dynamic.literal(color = "#15201D", marginTop = 8).asInstanceOf[CSSPropertiesUtils]
+                    js.Dynamic.literal(color = "#15201D", marginTop = "8px").asInstanceOf[CSSPropertiesUtils]
                   )
               ),
             // card
@@ -79,13 +79,13 @@ object SignUpPage {
               )(
                 mui
                   .CardContent()
-                  .sx(js.Dynamic.literal(padding = 32).asInstanceOf[CSSPropertiesUtils])(
+                  .sx(js.Dynamic.literal(padding = "32px").asInstanceOf[CSSPropertiesUtils])(
                     SignUpForm(props.ctx),
                     mui
                       .Typography()
                       .sx(
                         js.Dynamic
-                          .literal(fontSize = 14, color = "#5A6A65", textAlign = "center", paddingTop = 12)
+                          .literal(fontSize = 14, color = "#5A6A65", textAlign = "center", paddingTop = "12px")
                           .asInstanceOf[CSSPropertiesUtils]
                       )(
                         s"${texts.alreadyHaveAccount} ",

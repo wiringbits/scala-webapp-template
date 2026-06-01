@@ -23,7 +23,7 @@ object DashboardPage {
     Fragment(
       mui
         .Box()
-        .sx(js.Dynamic.literal(marginBottom = 32).asInstanceOf[CSSPropertiesUtils])(
+        .sx(js.Dynamic.literal(marginBottom = "32px").asInstanceOf[CSSPropertiesUtils])(
           mui
             .Typography(texts.dashboardPage)
             .variant("h3")
@@ -35,7 +35,7 @@ object DashboardPage {
           mui
             .Typography(texts.welcome(props.user.name))
             .sx(
-              js.Dynamic.literal(color = "#5A6A65", fontSize = 16, marginTop = 6).asInstanceOf[CSSPropertiesUtils]
+              js.Dynamic.literal(color = "#5A6A65", fontSize = 16, marginTop = "6px").asInstanceOf[CSSPropertiesUtils]
             )
         ),
       Logs(props.ctx, props.user)
