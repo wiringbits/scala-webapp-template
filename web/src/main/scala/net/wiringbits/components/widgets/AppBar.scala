@@ -37,25 +37,15 @@ object AppBar {
   private val brandSx = js.Dynamic.literal(
     display = "flex",
     alignItems = "center",
-    gap = "10px",
     cursor = "pointer",
-    marginRight = 16,
-    textDecoration = "none"
+    marginRight = 16
   )
 
   private val logoSx = new CSSPropertiesUtils {
-    height = "28px"
+    height = "32px"
     width = "auto"
     display = "block"
   }
-
-  private val brandNameSx = js.Dynamic.literal(
-    fontWeight = 800,
-    fontSize = 17,
-    letterSpacing = "-0.02em",
-    color = "#FFFFFF",
-    whiteSpace = "nowrap"
-  )
 
   private val navLinkActiveSx = js.Dynamic.literal(
     color = "#FFFFFF",
@@ -136,16 +126,7 @@ object AppBar {
       .Box()
       .sx(brandSx.asInstanceOf[CSSPropertiesUtils])
       .onClick(_ => history.push("/"))(
-        logo,
-        mui
-          .Typography("Wiringbits ")
-          .sx(brandNameSx.asInstanceOf[CSSPropertiesUtils])
-          .component("span")(
-            span(style := new CSSPropertiesUtils {
-              color = "rgba(255,255,255,0.72)"
-              fontWeight = 600
-            })("Web App Template")
-          )
+        logo
       )
 
     def navBtn(label: String, path: String, active: Boolean): ReactElement =

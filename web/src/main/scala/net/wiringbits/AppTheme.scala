@@ -14,15 +14,38 @@ object AppTheme {
             main = "#0E8C6F",
             dark = "#0A6B54",
             contrastText = "#FFFFFF"
-          )
+          ),
+          success = js.Dynamic.literal(main = "#0E8C6F"),
+          error = js.Dynamic.literal(main = "#C0392B"),
+          background = js.Dynamic.literal(
+            default = "#F4F7F6",
+            paper = "#FFFFFF"
+          ),
+          text = js.Dynamic.literal(
+            primary = "#15201D",
+            secondary = "#5A6A65"
+          ),
+          divider = "#E6ECEA"
         ),
         shape = js.Dynamic.literal(borderRadius = 10),
         typography = js.Dynamic.literal(
           fontFamily =
             """-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", Arial, sans-serif""",
+          h1 = js.Dynamic.literal(fontWeight = 800, letterSpacing = "-0.025em", lineHeight = 1.05),
+          h2 = js.Dynamic.literal(fontWeight = 800, letterSpacing = "-0.02em"),
+          h3 = js.Dynamic.literal(fontWeight = 700, letterSpacing = "-0.02em"),
+          h4 = js.Dynamic.literal(fontWeight = 700, letterSpacing = "-0.015em"),
+          h5 = js.Dynamic.literal(fontWeight = 700, letterSpacing = "-0.01em"),
+          h6 = js.Dynamic.literal(fontWeight = 700, letterSpacing = "-0.01em"),
+          overline = js.Dynamic.literal(fontWeight = 700, letterSpacing = "0.12em", fontSize = 11.5),
           button = js.Dynamic.literal(textTransform = "none", fontWeight = 600, letterSpacing = 0)
         ),
         components = js.Dynamic.literal(
+          MuiCssBaseline = js.Dynamic.literal(
+            styleOverrides = js.Dynamic.literal(
+              body = js.Dynamic.literal(backgroundColor = "#F4F7F6")
+            )
+          ),
           MuiButton = js.Dynamic.literal(
             defaultProps = js.Dynamic.literal(disableElevation = true),
             styleOverrides = js.Dynamic.literal(
