@@ -647,7 +647,7 @@ object HomePage {
         )
     }
 
-    val syncArrow = mui
+    def syncArrow = mui
       .Box()
       .sx(
         js.Dynamic
