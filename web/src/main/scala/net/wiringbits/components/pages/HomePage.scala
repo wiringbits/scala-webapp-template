@@ -67,29 +67,6 @@ object HomePage {
     )
   )
 
-  private val AI_POINTS = List(
-    (
-      muiIcons.Security(),
-      "Strong types guide AI",
-      "The compiler catches mistakes before you even run the code, so AI suggestions stay grounded in what actually compiles."
-    ),
-    (
-      muiIcons.Refresh(),
-      "Consistent patterns",
-      "Every endpoint looks the same and every page follows the same shape — AI learns the codebase and extends it reliably."
-    ),
-    (
-      muiIcons.Hub(),
-      "Swagger out of the box",
-      "AI can read the full API contract directly, without digging through source code to understand your endpoints."
-    ),
-    (
-      muiIcons.CheckCircle(),
-      "Deep test suite",
-      "AI can verify its own suggestions against a real integration suite — no manual checking required."
-    )
-  )
-
   private val TECH_STACK = List("Scala", "Scala.js", "Play Framework", "PostgreSQL", "React", "MUI 5")
 
   val component: FunctionalComponent[Props] = FunctionalComponent[Props] { props =>
@@ -97,6 +74,29 @@ object HomePage {
     val history = useHistory()
     val auth = ReactiveHooks.useDistinctValue(props.ctx.$auth)
     val isAuthed = auth match { case _: AuthState.Authenticated => true; case _ => false }
+
+    val aiPoints = List(
+      (
+        muiIcons.Security(),
+        "Strong types guide AI",
+        "The compiler catches mistakes before you even run the code, so AI suggestions stay grounded in what actually compiles."
+      ),
+      (
+        muiIcons.Refresh(),
+        "Consistent patterns",
+        "Every endpoint looks the same and every page follows the same shape — AI learns the codebase and extends it reliably."
+      ),
+      (
+        muiIcons.Hub(),
+        "Swagger out of the box",
+        "AI can read the full API contract directly, without digging through source code to understand your endpoints."
+      ),
+      (
+        muiIcons.CheckCircle(),
+        "Deep test suite",
+        "AI can verify its own suggestions against a real integration suite — no manual checking required."
+      )
+    )
     val isDark = ReactiveHooks.useDistinctValue(props.ctx.$darkMode)
 
     val bgAlpha = if (isDark) "rgba(47,207,166,0.22)" else "rgba(14,140,111,0.10)"
@@ -383,7 +383,7 @@ object HomePage {
                       .literal(display = "grid", gridTemplateColumns = "1fr 1fr", gap = "16px")
                       .asInstanceOf[CSSPropertiesUtils]
                   )(
-                    AI_POINTS.zipWithIndex.map { case ((icon, title, body), i) =>
+                    aiPoints.zipWithIndex.map { case ((icon, title, body), i) =>
                       mui
                         .Box()
                         .sx(
