@@ -11,12 +11,13 @@ import org.scalajs.dom
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.must.Matchers.*
 import org.scalatest.wordspec.AnyWordSpec
+import scala.compiletime.uninitialized
 import slinky.core.facade.ReactElement
 import slinky.web.ReactDOM
 
 class HomePageSpec extends AnyWordSpec with BeforeAndAfterEach {
 
-  private var container: dom.Element = _
+  private var container: dom.Element = uninitialized
 
   override def beforeEach(): Unit = {
     container = dom.document.createElement("div")

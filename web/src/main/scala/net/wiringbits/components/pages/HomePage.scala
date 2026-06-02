@@ -380,7 +380,11 @@ object HomePage {
                   .Box()
                   .sx(
                     js.Dynamic
-                      .literal(display = "grid", gridTemplateColumns = "1fr 1fr", gap = "16px")
+                      .literal(
+                        display = "grid",
+                        gridTemplateColumns = js.Dynamic.literal(xs = "1fr", sm = "1fr 1fr"),
+                        gap = "16px"
+                      )
                       .asInstanceOf[CSSPropertiesUtils]
                   )(
                     aiPoints.zipWithIndex.map { case ((icon, title, body), i) =>
@@ -472,7 +476,11 @@ object HomePage {
           .Box()
           .sx(
             js.Dynamic
-              .literal(display = "grid", gridTemplateColumns = "1fr 1fr 1fr", gap = "10px")
+              .literal(
+                display = "grid",
+                gridTemplateColumns = js.Dynamic.literal(xs = "1fr", sm = "1fr 1fr", md = "1fr 1fr 1fr"),
+                gap = "10px"
+              )
               .asInstanceOf[CSSPropertiesUtils]
           )(
             SHIPS.zipWithIndex.map { case (item, i) =>
@@ -559,7 +567,11 @@ object HomePage {
       .Box()
       .sx(
         js.Dynamic
-          .literal(display = "grid", gridTemplateColumns = "1fr 1fr 1fr", gap = "20px")
+          .literal(
+            display = "grid",
+            gridTemplateColumns = js.Dynamic.literal(xs = "1fr", sm = "1fr 1fr", md = "1fr 1fr 1fr"),
+            gap = "20px"
+          )
           .asInstanceOf[CSSPropertiesUtils]
       )(
         featureCard(
@@ -703,7 +715,12 @@ object HomePage {
                   .Box()
                   .sx(
                     js.Dynamic
-                      .literal(display = "flex", alignItems = "stretch", gap = "8px")
+                      .literal(
+                        display = "flex",
+                        flexDirection = js.Dynamic.literal(xs = "column", md = "row"),
+                        alignItems = "stretch",
+                        gap = "8px"
+                      )
                       .asInstanceOf[CSSPropertiesUtils]
                   )(
                     stackBox(muiIcons.Storage(), "Server", "Play + PostgreSQL", false),
@@ -766,7 +783,11 @@ object HomePage {
           .Box()
           .sx(
             js.Dynamic
-              .literal(display = "grid", gridTemplateColumns = "1fr 1fr 1fr", gap = "16px")
+              .literal(
+                display = "grid",
+                gridTemplateColumns = js.Dynamic.literal(xs = "1fr", sm = "1fr 1fr", md = "1fr 1fr 1fr"),
+                gap = "16px"
+              )
               .asInstanceOf[CSSPropertiesUtils]
           )(
             AVOIDED.zipWithIndex.map { case ((title, body), i) =>
@@ -1178,7 +1199,12 @@ object HomePage {
           .Box()
           .sx(
             js.Dynamic
-              .literal(display = "grid", gridTemplateColumns = "1.25fr 1fr", gap = "20px", alignItems = "stretch")
+              .literal(
+                display = "grid",
+                gridTemplateColumns = js.Dynamic.literal(xs = "1fr", md = "1.25fr 1fr"),
+                gap = "20px",
+                alignItems = "stretch"
+              )
               .asInstanceOf[CSSPropertiesUtils]
           )(codeCard, statesCard)
       )
@@ -1202,7 +1228,9 @@ object HomePage {
         mui
           .Box()
           .sx(
-            js.Dynamic.literal(display = "grid", gridTemplateColumns = "1fr 1fr").asInstanceOf[CSSPropertiesUtils]
+            js.Dynamic
+              .literal(display = "grid", gridTemplateColumns = js.Dynamic.literal(xs = "1fr", md = "1fr 1fr"))
+              .asInstanceOf[CSSPropertiesUtils]
           )(
             mui
               .Box()
