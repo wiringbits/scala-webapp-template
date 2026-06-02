@@ -74,8 +74,16 @@ object Footer {
   )
 
   private val logoSx = new CSSPropertiesUtils {
-    height = "28px"
+    height = "40px"
     width = "auto"
+    display = "block"
+  }
+
+  private val footerDividerSx = new CSSPropertiesUtils {
+    width = "1px"
+    height = "30px"
+    background = "rgba(255,255,255,0.20)"
+    flexShrink = 0
     display = "block"
   }
 
@@ -104,15 +112,21 @@ object Footer {
         .Box()
         .sx(
           js.Dynamic
-            .literal(display = "flex", alignItems = "center", gap = "10px", marginBottom = "16px")
+            .literal(display = "flex", alignItems = "center", gap = "12px", marginBottom = "16px")
             .asInstanceOf[CSSPropertiesUtils]
         )(
-          img(src := "/img/wiringbits-logo.png", alt := "wiringbits", style := logoSx),
+          img(src := "/img/wiringbits-logo-reverse-rgb.svg", alt := "wiringbits", style := logoSx),
+          span(style := footerDividerSx),
           mui
-            .Typography("Wiringbits Web App Template")
+            .Typography("Web App Template")
             .sx(
               js.Dynamic
-                .literal(color = "#FFFFFF", fontWeight = 800, fontSize = 18, letterSpacing = "-0.02em")
+                .literal(
+                  color = "rgba(255,255,255,0.85)",
+                  fontWeight = 600,
+                  fontSize = 15,
+                  letterSpacing = "0.01em"
+                )
                 .asInstanceOf[CSSPropertiesUtils]
             )
         ),

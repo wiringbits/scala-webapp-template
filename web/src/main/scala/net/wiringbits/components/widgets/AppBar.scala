@@ -2,7 +2,6 @@ package net.wiringbits.components.widgets
 
 import com.olvind.mui.muiIconsMaterial.components as muiIcons
 import com.olvind.mui.muiMaterial.components as mui
-import com.olvind.mui.muiMaterial.mod.PropTypes.Color
 import net.wiringbits.AppContext
 import net.wiringbits.core.{I18nHooks, ReactiveHooks}
 import net.wiringbits.models.AuthState
@@ -21,11 +20,13 @@ object AppBar {
 
   case class Props(ctx: AppContext)
 
+  // Filled (primary) app bar styles
   private val appBarSx = js.Dynamic.literal(
     background = "#0E8C6F",
     color = "#FFFFFF",
     borderBottom = "none",
-    boxShadow = "0 1px 0 rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.06)"
+    boxShadow = "0 1px 0 rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.06)",
+    backdropFilter = "saturate(180%) blur(8px)"
   )
 
   private val toolbarSx = js.Dynamic.literal(
@@ -37,59 +38,116 @@ object AppBar {
   private val brandSx = js.Dynamic.literal(
     display = "flex",
     alignItems = "center",
+    gap = "12px",
     cursor = "pointer",
     marginRight = 16
   )
 
   private val logoSx = new CSSPropertiesUtils {
-    height = "32px"
+    height = "34px"
     width = "auto"
     display = "block"
   }
 
-  private val navLinkActiveSx = js.Dynamic.literal(
-    color = "#FFFFFF",
-    fontWeight = 700,
-    fontSize = 14.5,
-    paddingLeft = "12px",
-    paddingRight = "12px",
-    minWidth = 0,
-    borderRadius = "6px",
-    textTransform = "none",
-    background = "rgba(255,255,255,0.14)"
-  )
+  private val dividerSx = new CSSPropertiesUtils {
+    width = "1px"
+    height = "26px"
+    background = "rgba(255,255,255,0.32)"
+    flexShrink = 0
+    display = "block"
+  }
 
-  private val navLinkSx = js.Dynamic.literal(
-    color = "rgba(255,255,255,0.86)",
+  private val brandTextSx = js.Dynamic.literal(
+    display = "block",
     fontWeight = 600,
-    fontSize = 14.5,
-    paddingLeft = "12px",
-    paddingRight = "12px",
-    minWidth = 0,
-    borderRadius = "6px",
-    textTransform = "none"
+    fontSize = 13.5,
+    letterSpacing = "0.01em",
+    color = "rgba(255,255,255,0.82)",
+    whiteSpace = "nowrap"
   )
 
+  // Active nav link: underline indicator via ::after
+  private val navLinkActiveSx: js.Object = {
+    val obj = js.Dynamic.literal(
+      color = "#FFFFFF",
+      fontWeight = 700,
+      fontSize = 14.5,
+      px = 1.5,
+      minWidth = 0,
+      position = "relative",
+      borderRadius = 1.5
+    )
+    obj.updateDynamic("&::after")(
+      js.Dynamic.literal(
+        content = "\"\"",
+        position = "absolute",
+        left = 12,
+        right = 12,
+        bottom = 4,
+        height = 2,
+        borderRadius = 2,
+        background = "#FFFFFF"
+      )
+    )
+    obj.updateDynamic("&:hover")(
+      js.Dynamic.literal(
+        background = "rgba(255,255,255,0.12)",
+        color = "#FFFFFF"
+      )
+    )
+    obj.asInstanceOf[js.Object]
+  }
+
+  // Inactive nav link
+  private val navLinkSx: js.Object = {
+    val obj = js.Dynamic.literal(
+      color = "rgba(255,255,255,0.86)",
+      fontWeight = 600,
+      fontSize = 14.5,
+      px = 1.5,
+      minWidth = 0,
+      position = "relative",
+      borderRadius = 1.5
+    )
+    obj.updateDynamic("&:hover")(
+      js.Dynamic.literal(
+        background = "rgba(255,255,255,0.12)",
+        color = "#FFFFFF"
+      )
+    )
+    obj.asInstanceOf[js.Object]
+  }
+
+  // "Sign in" — text button, white/dim
   private val signInBtnSx = js.Dynamic.literal(
     color = "rgba(255,255,255,0.92)",
-    fontWeight = 600,
-    textTransform = "none"
+    fontWeight = 600
   )
 
+  // "Sign up" — white contained, primary text
   private val signUpBtnSx = js.Dynamic.literal(
     marginLeft = 8,
     backgroundColor = "#FFFFFF",
     color = "#0E8C6F",
-    fontWeight = 700,
-    textTransform = "none"
+    fontWeight = 700
   )
 
-  private val signOutBtnSx = js.Dynamic.literal(
-    marginLeft = 8,
-    color = "#FFFFFF",
-    borderColor = "rgba(255,255,255,0.4)",
-    textTransform = "none"
-  )
+  // "Sign out" — outlined-like text button with manual border
+  private val signOutBtnSx: js.Object = {
+    val obj = js.Dynamic.literal(
+      marginLeft = 4,
+      color = "#FFFFFF",
+      border = "1px solid rgba(255,255,255,0.4)",
+      fontWeight = 600
+    )
+    obj.updateDynamic("&:hover")(
+      js.Dynamic.literal(
+        border = "1px solid #FFFFFF",
+        background = "rgba(255,255,255,0.10)"
+      )
+    )
+    obj.asInstanceOf[js.Object]
+  }
 
   private val menuIconSx = new CSSPropertiesUtils {
     color = "#FFFFFF"
@@ -118,7 +176,7 @@ object AppBar {
     val (drawerOpen, setDrawerOpen) = Hooks.useState(false)
 
     val logo = img(
-      src := "/img/wiringbits-logo.png",
+      src := "/img/wiringbits-logo-reverse-rgb.svg",
       alt := "wiringbits",
       style := logoSx
     )
@@ -126,9 +184,16 @@ object AppBar {
     val brand: ReactElement = mui
       .Box()
       .sx(brandSx.asInstanceOf[CSSPropertiesUtils])
-      .onClick(_ => history.push("/"))(
-        logo
-      )
+      .onClick(_ => history.push("/")) {
+        Fragment(
+          logo,
+          span(style := dividerSx),
+          mui
+            .Typography("Web App Template")
+            .sx(brandTextSx.asInstanceOf[CSSPropertiesUtils])
+            .component("span")
+        )
+      }
 
     def navBtn(label: String, path: String, active: Boolean): ReactElement =
       mui.Button
@@ -136,24 +201,16 @@ object AppBar {
         .sx((if (active) navLinkActiveSx else navLinkSx).asInstanceOf[CSSPropertiesUtils])
         .onClick(_ => history.push(path))
 
-    val desktopNav: ReactElement = auth match {
+    val authBtns: ReactElement = auth match {
       case AuthState.Authenticated(_) =>
-        Fragment(
-          navBtn(texts.home, "/", pathname == "/"),
-          navBtn(texts.dashboard, "/dashboard", pathname == "/dashboard"),
-          navBtn(texts.about, "/about", pathname == "/about"),
-          navBtn(texts.profile, "/me", pathname == "/me"),
-          mui.Button
-            .normal()(texts.signOut)
-            .sx(signOutBtnSx.asInstanceOf[CSSPropertiesUtils])
-            .variant("outlined")
-            .size("small")
-            .onClick(_ => history.push("/signout"))
-        )
+        mui.Button
+          .normal()(mui.Icon(muiIcons.Logout()), " ", texts.signOut)
+          .sx(signOutBtnSx.asInstanceOf[CSSPropertiesUtils])
+          .size("small")
+          .onClick(_ => history.push("/signout"))
+
       case AuthState.Unauthenticated =>
         Fragment(
-          navBtn(texts.home, "/", pathname == "/"),
-          navBtn(texts.about, "/about", pathname == "/about"),
           mui.Button
             .normal()(texts.signIn)
             .sx(signInBtnSx.asInstanceOf[CSSPropertiesUtils])
@@ -166,6 +223,21 @@ object AppBar {
             .variant("contained")
             .size("small")
             .onClick(_ => history.push("/signup"))
+        )
+    }
+
+    val navLinks: ReactElement = auth match {
+      case AuthState.Authenticated(_) =>
+        Fragment(
+          navBtn(texts.home, "/", pathname == "/"),
+          navBtn(texts.dashboard, "/dashboard", pathname == "/dashboard"),
+          navBtn(texts.about, "/about", pathname == "/about"),
+          navBtn(texts.profile, "/me", pathname == "/me")
+        )
+      case AuthState.Unauthenticated =>
+        Fragment(
+          navBtn(texts.home, "/", pathname == "/"),
+          navBtn(texts.about, "/about", pathname == "/about")
         )
     }
 
@@ -266,9 +338,9 @@ object AppBar {
             .disableGutters(true)(
               brand,
               mui.Box().sx(new CSSPropertiesUtils { flex = 1 }),
-              darkToggle,
               if (isMobile) {
                 Fragment(
+                  darkToggle,
                   mui.IconButton
                     .normal()(mui.Icon(muiIcons.Menu()))
                     .sx(menuIconSx)
@@ -278,8 +350,14 @@ object AppBar {
               } else {
                 mui
                   .Box()
-                  .sx(new CSSPropertiesUtils { display = "flex"; alignItems = "center"; gap = "2px" })(
-                    desktopNav
+                  .sx(new CSSPropertiesUtils {
+                    display = "flex"; alignItems = "center"; gap = "2px"
+                  })(
+                    navLinks,
+                    mui.Box().sx(js.Dynamic.literal(width = 6).asInstanceOf[CSSPropertiesUtils]),
+                    darkToggle,
+                    mui.Box().sx(js.Dynamic.literal(width = 8).asInstanceOf[CSSPropertiesUtils]),
+                    authBtns
                   )
               }
             )
