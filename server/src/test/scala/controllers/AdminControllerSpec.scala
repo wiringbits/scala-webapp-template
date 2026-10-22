@@ -40,21 +40,18 @@ class AdminControllerSpec extends PlayPostgresSpec with LoginUtils with MockitoS
       )
 
   "GET /admin/users" should {
+    // The admin listing is global (every user in the database), and the suite shares one Postgres container, so this
+    // checks that the users created here are present rather than asserting an absolute count.
     "get every user" in withApiClient { implicit client =>
       val expected = 3
-      (1 to expected).foreach { _ =>
+      val createdIds = (1 to expected).map { _ =>
         createVerifyLoginUser(
           tokenGenerator
-        ).futureValue
+        ).futureValue.id
       }
 
       val response = client.adminGetUsers.futureValue
-      response.data.length must be(expected)
-    }
-
-    "return no results" in withApiClient { client =>
-      val response = client.adminGetUsers.futureValue
-      response.data.isEmpty must be(true)
+      response.data.map(_.id) must contain allElementsOf createdIds
     }
   }
 

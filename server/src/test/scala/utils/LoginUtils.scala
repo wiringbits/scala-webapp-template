@@ -22,7 +22,7 @@ trait LoginUtils {
   ): Future[CreateUser.Response] = {
     val request = CreateUser.Request(
       name = nameMaybe.getOrElse(Name.trusted("wiringbits")),
-      email = emailMaybe.getOrElse(Email.trusted(s"test${UUID.randomUUID()}@email.com")),
+      email = emailMaybe.getOrElse(RandomData.randomEmail()),
       password = passwordMaybe.getOrElse(Password.trusted("test123...")),
       captcha = Captcha.trusted("test")
     )
