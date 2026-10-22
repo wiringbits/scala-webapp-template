@@ -21,14 +21,15 @@ trait RepositoryUtils {
       id: UUID = UUID.randomUUID(),
       backgroundJobType: BackgroundJobType = BackgroundJobType.SendEmail,
       status: BackgroundJobStatus = BackgroundJobStatus.Pending,
-      payload: BackgroundJobPayload = backgroundJobPayload
+      payload: BackgroundJobPayload = backgroundJobPayload,
+      executeAt: Instant = Instant.now()
   )(using repositories: RepositoryComponents): BackgroundJobData.Create = {
     val createRequest = BackgroundJobData.Create(
       id = id,
       `type` = backgroundJobType,
       payload = payload,
       status = status,
-      executeAt = Instant.now(),
+      executeAt = executeAt,
       createdAt = Instant.now(),
       updatedAt = Instant.now()
     )

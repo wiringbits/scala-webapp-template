@@ -9,6 +9,7 @@ object BackgroundJobStatus extends Enum[BackgroundJobStatus] {
   case object Success extends BackgroundJobStatus
   case object Pending extends BackgroundJobStatus
   case object Failed extends BackgroundJobStatus
+  case object Running extends BackgroundJobStatus
 
   val values = findValues
 }

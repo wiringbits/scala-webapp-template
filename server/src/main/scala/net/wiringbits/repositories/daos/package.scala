@@ -92,6 +92,7 @@ package object daos {
       "status_details",
       "error_count",
       "execute_at",
+      "deadline",
       "created_at",
       "updated_at"
     )
