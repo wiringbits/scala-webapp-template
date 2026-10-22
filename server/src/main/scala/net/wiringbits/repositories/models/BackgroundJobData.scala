@@ -14,6 +14,7 @@ case class BackgroundJobData(
     statusDetails: Option[String],
     errorCount: Int,
     executeAt: Instant,
+    deadline: Option[Instant],
     createdAt: Instant,
     updatedAt: Instant
 )
