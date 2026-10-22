@@ -1,0 +1,73 @@
+# Run the whole app locally: Postgres + backend (Play, dev mode) + web (Scala.js dev server).
+#
+#   docker compose up --build
+#
+# Then open http://localhost:8080. The web dev server proxies /api/* to the backend container,
+# so the web reaches the backend with no nginx. First startup is slow (Scala.js link + webpack).
+#
+# Email defaults to a no-op log provider (the verification/reset emails are printed to the backend
+# logs), and the captcha uses Google's test keys, so the app runs fully without any credentials.
+# To send real emails via AWS SES, copy .env.example to .env and fill in the values; compose
+# propagates them into the backend container.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DATABASE:-wiringbits_db}
+      POSTGRES_USER: ${POSTGRES_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker/initdb:/docker-entrypoint-initdb.d:ro   # creates the citext extension
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USERNAME:-postgres} -d ${POSTGRES_DATABASE:-wiringbits_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 15
+
+  backend:
+    image: wiringbits-dev
+    build:
+      context: .
+      dockerfile: docker/dev.Dockerfile
+    command: ["sbt", "-J-Xmx2g", "server/run"]
+    tty: true          # Play's dev `run` reads stdin; keep it open so it doesn't stop on EOF
+    stdin_open: true
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      # --- database ---
+      POSTGRES_HOST: postgres:5432
+      POSTGRES_DATABASE: ${POSTGRES_DATABASE:-wiringbits_db}
+      POSTGRES_USERNAME: ${POSTGRES_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      # --- app ---
+      APP_ALLOWED_HOST_1: backend:9000
+      APP_ALLOWED_HOST_2: localhost:8080
+      WEBAPP_HOST: http://localhost:8080
+      # --- email via AWS SES (optional; defaults to the log provider when unset) ---
+      EMAIL_PROVIDER: ${EMAIL_PROVIDER:-}
+      EMAIL_SENDER_ADDRESS: ${EMAIL_SENDER_ADDRESS:-}
+      AWS_REGION: ${AWS_REGION:-}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+    ports:
+      - "9000:9000"   # optional: reach the backend directly
+
+  web:
+    image: wiringbits-dev
+    build:
+      context: .
+      dockerfile: docker/dev.Dockerfile
+    command: ["sbt", "-J-Xmx3g", "dev-web"]
+    depends_on:
+      - backend
+    environment:
+      API_PROXY_TARGET: http://backend:9000   # where the dev server proxies /api
+    ports:
+      - "8080:8080"
+
+volumes:
+  pgdata:
