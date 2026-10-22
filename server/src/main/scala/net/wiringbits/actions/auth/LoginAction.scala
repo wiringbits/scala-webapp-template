@@ -4,6 +4,7 @@ import io.scalaland.chimney.dsl.transformInto
 import net.wiringbits.api.models.auth.Login
 import net.wiringbits.apis.ReCaptchaApi
 import net.wiringbits.repositories.{UserLogsRepository, UsersRepository}
+import net.wiringbits.services.PasswordHasher
 import net.wiringbits.validations.{ValidateCaptcha, ValidatePasswordMatches, ValidateVerifiedUser}
 
 import javax.inject.Inject
@@ -12,7 +13,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class LoginAction @Inject() (
     captchaApi: ReCaptchaApi,
     usersRepository: UsersRepository,
-    userLogsRepository: UserLogsRepository
+    userLogsRepository: UserLogsRepository,
+    passwordHasher: PasswordHasher
 )(implicit
     ec: ExecutionContext
 ) {
@@ -25,7 +27,7 @@ class LoginAction @Inject() (
       _ = maybe.foreach(ValidateVerifiedUser.apply)
 
       // The password matches
-      user = ValidatePasswordMatches(maybe, request.password)
+      user = ValidatePasswordMatches(maybe, request.password, passwordHasher)
 
       // A login token is created
       _ <- userLogsRepository.create(user.id, "Logged in successfully")
