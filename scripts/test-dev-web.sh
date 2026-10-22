@@ -32,7 +32,9 @@ cleanup() {
 }
 trap cleanup EXIT
 
-sbt dev-web < "$FIFO" > "$LOG" 2>&1 &
+# --no-server: run a standalone sbt (its own JVM) rather than joining/contending with a
+# thin-client sbt server a caller may have running; dev-web is torn down by killing this JVM.
+sbt --no-server dev-web < "$FIFO" > "$LOG" 2>&1 &
 SBT_PID=$!
 
 echo "Waiting for dev server at http://localhost:$PORT ..."

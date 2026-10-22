@@ -3,8 +3,24 @@ name: Build the app
 on:
   push:
     branches: [ main ]
+    paths:
+      - 'build.sbt'
+      - 'project/**'
+      - 'server/src/**'
+      - 'web/src/**'
+      - 'lib/**'
+      - 'scripts/**'
+      - '.github/workflows/pull_request.yml'
   pull_request:
     branches: [ main ]
+    paths:
+      - 'build.sbt'
+      - 'project/**'
+      - 'server/src/**'
+      - 'web/src/**'
+      - 'lib/**'
+      - 'scripts/**'
+      - '.github/workflows/pull_request.yml'
 
 concurrency:
   # Only run once for latest commit per ref and cancel other (previous) runs.
@@ -19,51 +35,189 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    # Hard cap so a hung step (e.g. a stuck server shutdown) can't run for hours. A warm build
+    # finishes in ~3-4 min, but a cold one (cache eviction or a key rotation re-resolving deps
+    # and regenerating ScalablyTyped facades) can approach ~12-14 min; 15 absorbs that while
+    # still failing fast on a real hang.
+    timeout-minutes: 15
+
     env:
       NODE_OPTIONS: --openssl-legacy-provider
+      # Set job-wide so the shared sbt server (sbt --client) boots with it: the server
+      # captures env at startup, so per-step `CI=true` would not reach an already-running
+      # server. CI enables fatal warnings (-Werror) and yarn's --pure-lockfile.
+      CI: "true"
 
     steps:
       - name: checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Setup Scala
-        uses: japgolly/setup-everything-scala@v3.1
+      # Install JDK 25 from GitHub's toolcache (not coursier). The Scala setup
+      # below then uses this system JVM, so coursier never fetches its JVM index
+      # (that fetch was flaky and failed the "Setup Scala" step before compile).
+      - name: Setup JDK
+        uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
         with:
-          java-version: 'temurin:25'
+          distribution: temurin
+          java-version: '25'
+
+      # Replaces japgolly/setup-everything-scala with its sub-actions, minus coursier/cache-action
+      # (which never persisted here and burned ~29s every run in "Post Setup Scala" — we cache deps
+      # ourselves). jvm: system reuses the JDK above so coursier never fetches its flaky JVM index.
+      - name: Setup sbt (coursier)
+        uses: coursier/setup-action@648df969f41ef15fda2baba8b37f9fa3d16390a3 # v3.0.4
+        with:
+          jvm: system
+          apps: sbt sbtn
+
+      - name: Setup Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
           node-version: '24'
+
+      - name: Setup Scala.js (jsdom test env)
+        uses: japgolly/setup-scalajs@f530918424acb5cca3d46ccd8f6d6a35f5654fd3 # v1
 
       - name: Install yarn
         run: npm install -g yarn
 
-      - name: Cache compiled code
-        uses: actions/cache@v3
+      # Restore the compiled sbt output (**/target/) so zinc skips recompiling unchanged
+      # sources. Keyed per commit; the prefix restore-key means every build restores the
+      # most recent main snapshot. Only main saves (see "Save compiled code") - PRs branch
+      # from main, so main's output is the right base and PRs needn't upload their own.
+      # (A hashFiles key is avoided on purpose: **/build.sbt also matches generated files
+      # under target/, so it is not stable between the restore and save steps.)
+      # The ScalablyTyped facades (~/.ivy2/local) are cached separately - see below.
+      - name: Restore compiled code
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          path: |
-            **/target/
-            /home/runner/.ivy2/local
-          key: compiled-code-cache-${{ hashFiles('**/build.sbt') }}
+          path: '**/target/'
+          key: compiled-code-cache-${{ github.sha }}
           restore-keys: compiled-code-cache-
 
+      # Cache resolved dependencies ourselves. setup-everything-scala's
+      # coursier/cache-action does not persist them in this setup (its save tars the
+      # workspace, not ~/.cache/coursier), so every run re-downloaded all POMs/JARs and
+      # the first sbt step paid full dependency resolution. Keyed on the build
+      # definition (what actually changes resolution), with a prefix fallback.
+      - name: Cache sbt dependencies
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ~/.cache/coursier
+            ~/.cache/sbt
+            ~/.sbt
+            ~/.ivy2/cache
+          key: sbt-deps-v1-${{ hashFiles('**/*.sbt', 'project/**') }}
+          restore-keys: sbt-deps-v1-
+
+      # ScalablyTyped artifacts: the .d.ts->Scala parse cache (~/.cache/scalablytyped) and
+      # the generated facade libraries it publishes (~/.ivy2/local). These are driven by the
+      # JS dependencies, so key them on the yarn lockfile (+ the ST plugin version) rather
+      # than the Scala build or the commit. Stable key, so normal PRs exact-hit and skip the
+      # save; a PR that bumps JS deps regenerates and caches them for its own re-runs. The
+      # parse cache is content-addressed on its inputs, so it self-heals if the key lags.
+      - name: Cache ScalablyTyped
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ~/.cache/scalablytyped
+            ~/.ivy2/local
+          key: scalablytyped-${{ hashFiles('**/yarn.lock', 'project/plugins.sbt') }}
+          restore-keys: scalablytyped-
+
+      # Classify the diff so a PR only runs the side it touches. Shared code
+      # (lib/common, lib/api) and the build definition affect both sides, so they
+      # fall into `shared` which forces everything to run.
+      - name: Detect changes
+        if: github.event_name == 'pull_request'
+        uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
+        id: filter
+        with:
+          filters: |
+            shared:
+              - 'build.sbt'
+              - 'project/**'
+              - 'lib/common/**'
+              - 'lib/api/**'
+              - '.github/workflows/pull_request.yml'
+            server:
+              - 'server/**'
+            web:
+              - 'web/**'
+              - 'lib/ui/**'
+              - 'scripts/**'
+
+      # Decide what to run. A push to main always runs everything (integration check);
+      # a PR runs the full suite only when shared/build code changed, otherwise just the
+      # side that changed.
+      - name: Decide scope
+        id: scope
+        run: |
+          if [ "${{ github.event_name }}" != "pull_request" ] || [ "${{ steps.filter.outputs.shared }}" = "true" ]; then
+            echo "all=true"    >> "$GITHUB_OUTPUT"
+            echo "server=true" >> "$GITHUB_OUTPUT"
+            echo "web=true"    >> "$GITHUB_OUTPUT"
+          else
+            echo "all=false" >> "$GITHUB_OUTPUT"
+            echo "server=${{ steps.filter.outputs.server }}" >> "$GITHUB_OUTPUT"
+            echo "web=${{ steps.filter.outputs.web }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      # The sbt steps below reuse a single sbt server via the thin client (sbt --client),
+      # so the build is loaded once and the incremental compiler stays warm between
+      # steps, while each step stays separate for readable logs and failure reporting.
       - name: Check code format
-        run: sbt scalafmtCheckAll
+        run: sbt --client scalafmtCheckAll
 
       - name: Compile
-        run: CI=true sbt compile
+        run: sbt --client Test/compile
 
-      - name: Run tests
-        run: CI=true sbt test
+      # When shared/build changed (or on a push), run the whole suite in one task so the
+      # shared-library tests run too; otherwise run only the changed side's tests.
+      - name: Run all tests
+        if: steps.scope.outputs.all == 'true'
+        run: sbt --client test
 
+      - name: Run server tests
+        if: steps.scope.outputs.all != 'true' && steps.scope.outputs.server == 'true'
+        run: sbt --client server/test
+
+      - name: Run web tests
+        if: steps.scope.outputs.all != 'true' && steps.scope.outputs.web == 'true'
+        run: sbt --client web/test
+
+      # Only render the report when something failed: on green runs it adds ~30s for a
+      # summary nobody reads. failure() runs this step iff an earlier step (the tests) failed.
       - name: Test summary
-        if: always() # Always run, even if previous steps failed
-        uses: test-summary/action@v2
+        if: failure()
+        uses: test-summary/action@37b508cfee6d4d080eedd00b5bb240a6a784a6a5 # v2.6
         with:
           paths: "**/target/test-reports/*.xml"
 
-      - name: Test dev-web
-        run: ./scripts/test-dev-web.sh
-
       - name: Prepare web build
-        run: sbt web/build
+        if: steps.scope.outputs.web == 'true'
+        run: sbt --client web/build
 
       - name: Prepare server build
-        run: sbt server/dist
+        if: steps.scope.outputs.server == 'true'
+        run: sbt --client server/dist
+
+      # dev-web is a blocking webpack-dev-server watch that the script tears down by
+      # killing its sbt JVM, so it runs as its own standalone sbt (`--no-server`, set in
+      # the script) rather than the shared thin-client server. Runs last so its
+      # web/target writes don't race the shared server's build steps.
+      - name: Test dev-web
+        if: steps.scope.outputs.web == 'true'
+        run: ./scripts/test-dev-web.sh
+
+      # Persist the compiled output only on pushes to main, under a per-commit key, so
+      # the cache always tracks latest main. PRs restore it but never save: no redundant
+      # upload (~40s) and no eviction pressure on the dependency cache. always() so the
+      # output is saved even if a later test step fails.
+      - name: Save compiled code
+        if: always() && github.ref == 'refs/heads/main'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: '**/target/'
+          key: compiled-code-cache-${{ github.sha }}
