@@ -54,6 +54,30 @@ Deployment 2m demo:
 Read the [docs](./docs/README.md) or watch our [onboarding videos](http://onboarding.wiringbits.net).
 
 
+## Run with Docker
+
+Runs the whole app locally — Postgres, backend, and web — with no extra setup:
+
+```bash
+docker compose up --build
+```
+
+Then open **http://localhost:8080**. The web dev server proxies `/api/*` to the backend
+container, so the frontend reaches the backend with no reverse proxy. The first start is slow
+(it links the Scala.js bundle and boots webpack); later starts are fast.
+
+| Service    | Port | What it runs |
+|------------|------|--------------|
+| `postgres` | —    | Postgres 16 (schema applied automatically by Play Evolutions) |
+| `backend`  | 9000 | Play backend in dev mode (`sbt server/run`) |
+| `web`      | 8080 | Scala.js webpack dev server (`sbt dev-web`), proxies `/api` → backend |
+
+Email defaults to a no-op provider that logs the verification/reset emails to the backend logs, and
+the captcha uses Google's test keys, so the app runs fully without any credentials. To send real
+emails via AWS SES, copy `.env.example` to `.env` and fill in the values. Stop with `Ctrl-C`;
+`docker compose down -v` also removes the database volume.
+
+
 ## Presentations
 
 There have been some presentations involing this project:

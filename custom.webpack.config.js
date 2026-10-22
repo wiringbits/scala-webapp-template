@@ -9,6 +9,9 @@ crypto.createHash = (algorithm, ...args) => origCreateHash(algorithm === 'md4' ?
 
 var local = {
     devServer: {
+        // bind on all interfaces + relax host check so the dev server works inside a container
+        host: '0.0.0.0',
+        disableHostCheck: true,
         // the historyAPIFallback allows react-router to work
         historyApiFallback: true,
         proxy: {
@@ -16,7 +19,8 @@ var local = {
             '/api': {
                 changeOrigin: true,
                 cookieDomainRewrite: 'localhost',
-                target: 'http://localhost:9000',
+                // API_PROXY_TARGET lets docker-compose point this at the backend container.
+                target: process.env.API_PROXY_TARGET || 'http://localhost:9000',
                 pathRewrite: { '^/api': '/'},
                 onProxyReq: (req) => {
                     if (req.getHeader('origin')) {
