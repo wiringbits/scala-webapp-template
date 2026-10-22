@@ -2,9 +2,9 @@ name: Create preview environment
 
 on:
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
   push:
-    branches: [ master, scala3 ]
+    branches: [ main, scala3 ]
 
 concurrency:
   # The preview script can't handle concurrent deploys
