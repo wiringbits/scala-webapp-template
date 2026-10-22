@@ -13,3 +13,10 @@ local.env
 .bloop/
 .ammonite/
 metals.sbt
+
+# Orca run-state, cache, worktrees and settings — only the reviewers are tracked.
+.orca/*
+!.orca/reviewers/
+
+# scala-cli build artifacts for the claude/ Orca scripts
+.scala-build/

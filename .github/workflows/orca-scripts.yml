@@ -1,0 +1,48 @@
+name: Orca scripts
+
+# The Orca flows under claude/ are standalone scala-cli scripts, not part of the
+# sbt build, so the main CI never compiles them. This gate does — it fails a PR
+# that breaks them (a bad API bump, a typo in a reviewer wiring, etc.).
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'claude/*.sc'
+      - 'claude/*.scala'
+      - '.github/workflows/orca-scripts.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'claude/*.sc'
+      - 'claude/*.scala'
+      - '.github/workflows/orca-scripts.yml'
+
+concurrency:
+  group: orca-scripts-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read # for checkout
+
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup Scala CLI
+        uses: VirtusLab/scala-cli-setup@3f5bf11a33bb88343238780c18257c8fa43789e1 # v1.18.0
+        with:
+          jvm: temurin:21
+
+      # Compiled one at a time: each script is its own scala-cli program, so
+      # compiling them together would clash on the top-level flow entry point.
+      - name: Compile Orca flows
+        # scala-cli's Bloop build server hangs on GitHub runners; --server=false compiles
+        # without it. See https://github.com/VirtusLab/scala-cli/issues/3054
+        run: |
+          scala-cli compile --server=false claude/review.sc
+          scala-cli compile --server=false claude/implement.sc
