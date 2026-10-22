@@ -7,9 +7,9 @@ import net.wiringbits.config.UserTokensConfig
 import net.wiringbits.repositories
 import net.wiringbits.repositories.UsersRepository
 import net.wiringbits.repositories.models.User
+import net.wiringbits.services.PasswordHasher
 import net.wiringbits.util.{EmailsHelper, TokenGenerator, TokensHelper}
 import net.wiringbits.validations.{ValidateCaptcha, ValidateEmailIsAvailable}
-import org.mindrot.jbcrypt.BCrypt
 
 import java.time.Instant
 import java.util.UUID
@@ -21,7 +21,8 @@ class CreateUserAction @Inject() (
     reCaptchaApi: ReCaptchaApi,
     tokenGenerator: TokenGenerator,
     userTokensConfig: UserTokensConfig,
-    emailsHelper: EmailsHelper
+    emailsHelper: EmailsHelper,
+    passwordHasher: PasswordHasher
 )(implicit
     ec: ExecutionContext
 ) {
@@ -29,7 +30,7 @@ class CreateUserAction @Inject() (
   def apply(request: CreateUser.Request): Future[CreateUser.Response] = {
     for {
       _ <- validations(request)
-      hashedPassword = BCrypt.hashpw(request.password.string, BCrypt.gensalt())
+      hashedPassword = passwordHasher.hash(request.password.string)
       token = tokenGenerator.next()
       hmacToken = TokensHelper.doHMACSHA1(token.toString.getBytes(), userTokensConfig.hmacSecret)
 

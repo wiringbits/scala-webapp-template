@@ -4,9 +4,9 @@ import net.wiringbits.api.models.users.ResetPassword
 import net.wiringbits.common.models.Password
 import net.wiringbits.config.UserTokensConfig
 import net.wiringbits.repositories.{UserTokensRepository, UsersRepository}
+import net.wiringbits.services.PasswordHasher
 import net.wiringbits.util.{EmailMessage, TokensHelper}
 import net.wiringbits.validations.ValidateUserToken
-import org.mindrot.jbcrypt.BCrypt
 
 import java.time.Clock
 import java.util.UUID
@@ -16,14 +16,15 @@ import scala.concurrent.{ExecutionContext, Future}
 class ResetPasswordAction @Inject() (
     userTokensConfig: UserTokensConfig,
     usersRepository: UsersRepository,
-    userTokensRepository: UserTokensRepository
+    userTokensRepository: UserTokensRepository,
+    passwordHasher: PasswordHasher
 )(implicit
     ec: ExecutionContext,
     clock: Clock
 ) {
 
   def apply(userId: UUID, token: UUID, password: Password): Future[ResetPassword.Response] = {
-    val hashedPassword = BCrypt.hashpw(password.string, BCrypt.gensalt())
+    val hashedPassword = passwordHasher.hash(password.string)
     val hmacToken = TokensHelper.doHMACSHA1(token.toString.getBytes, userTokensConfig.hmacSecret)
     for {
       // When the token valid

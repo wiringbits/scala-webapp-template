@@ -3,10 +3,12 @@ package controllers.common
 import com.dimafeng.testcontainers.PostgreSQLContainer
 import com.dimafeng.testcontainers.scalatest.TestContainerForEach
 import net.wiringbits.api.ApiClient
+import net.wiringbits.services.{BcryptPasswordHasher, PasswordHasher}
 import org.scalatest.TestData
 import org.scalatest.time.SpanSugar.convertIntToGrainOfTime
 import org.scalatestplus.play.guice.GuiceOneServerPerTest
 import org.testcontainers.utility.DockerImageName
+import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.{Application, Configuration, Environment, Mode}
 import sttp.client3.HttpClientFutureBackend
@@ -39,6 +41,8 @@ trait PlayPostgresSpec extends PlayAPISpec with TestContainerForEach with GuiceO
   def guiceApplicationBuilder(container: PostgreSQLContainer): GuiceApplicationBuilder =
     GuiceApplicationBuilder(loadConfiguration = env => loadConfigWithoutEvolutions(env, container))
       .in(Mode.Test)
+      // Use the real bcrypt hasher with the cheapest cost so password hashing/verification doesn't dominate test time.
+      .overrides(bind[PasswordHasher].toInstance(new BcryptPasswordHasher(logRounds = 4)))
 
   override def newAppForTest(testData: TestData): Application = {
     withContainers { postgres =>
