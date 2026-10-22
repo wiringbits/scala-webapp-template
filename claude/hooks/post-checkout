@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# Warm a new git worktree's build cache. On `git worktree add` (which runs a
+# checkout), copy every target/ dir from the MAIN checkout into the new worktree
+# so the first sbt build is incremental, not cold. This is dev-tooling that only
+# touches gitignored target/ dirs — it never stages, commits, or changes history.
+#
+# INSTALL BY COPYING, NOT SYMLINKING. A symlink would make the installed hook
+# track whatever is in the branch you have checked out, so a branch you pull to
+# test could silently change the script that runs on your machine. Copy it so it
+# only changes when you deliberately re-copy:
+#   cp claude/hooks/post-checkout .git/hooks/post-checkout
+#   chmod +x .git/hooks/post-checkout
+# This file is a committed REFERENCE; it is not auto-wired (no core.hooksPath).
+#
+# post-checkout args: $1=old-HEAD $2=new-HEAD $3=branch-flag
+set -uo pipefail
+
+# Act only on a freshly created LINKED worktree:
+#  - a new worktree's old-HEAD is all-zeros
+#  - a linked worktree's git-dir differs from the common dir (main's is equal)
+[ "${1:-}" = "0000000000000000000000000000000000000000" ] || exit 0
+[ "$(git rev-parse --git-dir)" != "$(git rev-parse --git-common-dir)" ] || exit 0
+
+new="$(pwd)"
+main="$(git worktree list --porcelain | awk '/^worktree /{print $2; exit}')"
+[ -n "$main" ] && [ -d "$main" ] && [ "$main" != "$new" ] || exit 0
+
+cd "$main" || exit 0
+# every target/ dir except the worktrees container; best-effort (a failure here
+# must never block the worktree)
+find . -type d -name target -prune -not -path './.orca/*' | while read -r d; do
+  rel="${d#./}"
+  mkdir -p "$new/$rel" && rsync -a "$d/" "$new/$rel/" || true
+done
+exit 0
