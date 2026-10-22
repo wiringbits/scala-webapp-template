@@ -21,10 +21,14 @@ class ApiRouter @Inject() (
     healthController: HealthController,
     usersController: UsersController,
     environmentConfigController: EnvironmentConfigController,
-    swaggerConfig: SwaggerConfig
+    swaggerConfig: SwaggerConfig,
+    actorSystem: ActorSystem
 )(using ExecutionContext)
     extends SimpleRouter {
-  given ActorSystem = ActorSystem("ApiRouter")
+  // Use the application's ActorSystem (managed by Play's lifecycle). Creating a new one here leaked an
+  // unmanaged ActorSystem per router that was never shut down, which could stall app/actor-system
+  // termination (the Coordinated Shutdown hang seen under parallel tests).
+  given ActorSystem = actorSystem
 
   private val swagger = SwaggerInterpreter(
     swaggerUIOptions = SwaggerUIOptions.default.copy(contextPath = List(swaggerConfig.basePath))
