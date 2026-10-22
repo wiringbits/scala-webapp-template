@@ -29,4 +29,15 @@ trait RepositorySpec extends AnyWordSpec with PostgresSpec {
       )
     runTest(components)
   }
+
+  /** background_jobs is a global queue that isn't scoped by user, so claim/stream semantics can only be tested against
+    * an empty queue. Only the background job specs should use this, and they must mix in IsolatedPostgresSpec so the
+    * DELETE can't race a concurrent suite on the shared container.
+    */
+  def withEmptyJobQueue[T](runTest: RepositoryComponents => T): T = withRepositories() { repositories =>
+    repositories.database.withConnection { implicit conn =>
+      anorm.SQL("DELETE FROM background_jobs").executeUpdate()
+    }
+    runTest(repositories)
+  }
 }

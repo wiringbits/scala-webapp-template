@@ -346,7 +346,12 @@ lazy val server = (project in file("server"))
   .settings(
     name := "wiringbits-server",
     fork := true,
-    Test / fork := true, // allows for graceful shutdown of containers once the tests have finished running
+    // In CI, run suites in parallel in a single JVM sharing the one Postgres container (SharedPostgres), scaled to
+    // cores via sbt's default concurrency, for a faster test step. Locally keep fork := true: it runs serially with
+    // graceful container shutdown. Suites that assert over a global, un-user-scoped table use IsolatedPostgresSpec so
+    // they can't race a concurrent suite.
+    Test / fork := !sys.env.get("CI").exists(_.nonEmpty),
+    Test / parallelExecution := sys.env.get("CI").exists(_.nonEmpty),
     libraryDependencies ++= Seq(
       "org.playframework.anorm" %% "anorm" % anorm,
       "org.playframework.anorm" %% "anorm-postgres" % anorm,

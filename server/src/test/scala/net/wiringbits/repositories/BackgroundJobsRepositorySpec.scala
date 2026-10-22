@@ -3,7 +3,7 @@ package net.wiringbits.repositories
 import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.stream.scaladsl.*
 import net.wiringbits.common.models.Email
-import net.wiringbits.core.RepositorySpec
+import net.wiringbits.core.{IsolatedPostgresSpec, RepositorySpec}
 import net.wiringbits.models.jobs.{BackgroundJobPayload, BackgroundJobStatus, BackgroundJobType}
 import net.wiringbits.repositories.daos.{BackgroundJobDAO, backgroundJobParser}
 import net.wiringbits.repositories.models.BackgroundJobData
@@ -17,7 +17,13 @@ import utils.RepositoryUtils
 import java.time.Instant
 import java.util.UUID
 
-class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll with RepositoryUtils {
+// The background_jobs queue is global (not user-scoped), so these count/empty assertions need an empty queue per test
+// (withEmptyJobQueue). An isolated database keeps that per-test DELETE from racing other suites on the shared container.
+class BackgroundJobsRepositorySpec
+    extends RepositorySpec
+    with IsolatedPostgresSpec
+    with BeforeAndAfterAll
+    with RepositoryUtils {
 
   // required to test the streaming operations
   private implicit lazy val system: ActorSystem = ActorSystem("BackgroundJobsRepositorySpec")
@@ -29,7 +35,7 @@ class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll
 
   "streamPendingJobs" should {
 
-    "work (simple case)" in withRepositories() { implicit repositories =>
+    "work (simple case)" in withEmptyJobQueue { implicit repositories =>
       val createRequest = createBackgroundJobData()
 
       val result = repositories.backgroundJobs.streamPendingJobs.futureValue
@@ -43,7 +49,7 @@ class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll
       item.payload must be(Json.toJson(createRequest.payload))
     }
 
-    "only return pending jobs" in withRepositories() { implicit repositories =>
+    "only return pending jobs" in withEmptyJobQueue { implicit repositories =>
       val backgroundJobType = BackgroundJobType.SendEmail
       val payload = backgroundJobPayload
       val limit = 6
@@ -65,7 +71,7 @@ class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll
       }
     }
 
-    "return no results" in withRepositories() { repositories =>
+    "return no results" in withEmptyJobQueue { repositories =>
       val response = repositories.backgroundJobs.streamPendingJobs.futureValue
         .runWith(Sink.seq)
         .futureValue
@@ -74,7 +80,7 @@ class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll
   }
 
   "setStatusToFailed" should {
-    "work" in withRepositories() { implicit repositories =>
+    "work" in withEmptyJobQueue { implicit repositories =>
       val createRequest = createBackgroundJobData()
 
       val failReason = "test"
@@ -92,7 +98,7 @@ class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll
       item.statusDetails must be(Some(failReason))
     }
 
-    "fail if the job doesn't exists" in withRepositories() { repositories =>
+    "fail if the job doesn't exists" in withEmptyJobQueue { repositories =>
       pending // TODO: setStatusToFailed must actually return an error because right now it succeeds
 
       repositories.backgroundJobs
@@ -102,7 +108,7 @@ class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll
   }
 
   "setStatusToSuccess" should {
-    "work" in withRepositories() { implicit repositories =>
+    "work" in withEmptyJobQueue { implicit repositories =>
       val createRequest = createBackgroundJobData()
 
       repositories.backgroundJobs.setStatusToSuccess(createRequest.id).futureValue
@@ -113,7 +119,7 @@ class BackgroundJobsRepositorySpec extends RepositorySpec with BeforeAndAfterAll
       result.isEmpty must be(true)
     }
 
-    "fail if the notification doesn't exists" in withRepositories() { repositories =>
+    "fail if the notification doesn't exists" in withEmptyJobQueue { repositories =>
       pending // TODO: setStatusToFailed must actually return an error because right now it succeeds
       repositories.backgroundJobs.setStatusToSuccess(UUID.randomUUID()).futureValue
     }
