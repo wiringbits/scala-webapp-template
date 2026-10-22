@@ -28,6 +28,12 @@ val consoleDisabledOptions = Seq("-Werror", "-Ywarn-unused", "-Ywarn-unused-impo
   */
 lazy val build = TaskKey[File]("build")
 
+// In automated flows (CI, and orca/claude which run with CI=true) lock yarn.lock so sbt-driven installs
+// don't rewrite it. A plain local `sbt` leaves CI unset, keeping today's behavior: updating a dependency
+// regenerates the lock as before.
+lazy val yarnLockfileArgs: Seq[String] =
+  sys.env.get("CI").filter(_.nonEmpty).map(_ => Seq("--pure-lockfile")).getOrElse(Seq.empty[String])
+
 lazy val commonSettings: Project => Project = {
   _.settings(
     // Enable fatal warnings only when running in the CI
@@ -245,6 +251,7 @@ lazy val common = (crossProject(JSPlatform, JVMPlatform) in file("lib/common"))
   )
   .jsSettings(
     useYarn := true,
+    yarnExtraArgs ++= yarnLockfileArgs,
     Test / fork := false, // sjs needs this to run tests
     stUseScalaJsDom := true,
     Compile / stMinimize := Selection.All,
@@ -272,6 +279,7 @@ lazy val api = (crossProject(JSPlatform, JVMPlatform) in file("lib/api"))
   )
   .jsSettings(
     useYarn := true,
+    yarnExtraArgs ++= yarnLockfileArgs,
     Test / fork := false, // sjs needs this to run tests
     stUseScalaJsDom := true,
     Compile / stMinimize := Selection.All,
@@ -293,6 +301,7 @@ lazy val ui = (project in file("lib/ui"))
   .settings(
     name := "wiringbits-lib-ui",
     useYarn := true,
+    yarnExtraArgs ++= yarnLockfileArgs,
     Test / requireJsDomEnv := true,
     Test / fork := false, // sjs needs this to run tests
     stTypescriptVersion := "3.9.3",
@@ -400,6 +409,7 @@ lazy val web = (project in file("web"))
   .settings(
     name := "wiringbits-web",
     useYarn := true,
+    yarnExtraArgs ++= yarnLockfileArgs,
     webpackDevServerPort := 8080,
     // sbt-scalajs-bundler only copies *.js to the webpack working dir by default;
     // index.html must also be there so webpack-dev-server can serve it at "/".
